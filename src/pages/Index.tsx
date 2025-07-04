@@ -1,11 +1,7 @@
-import PromptImprover from "@/components/PromptImprover";
+import LegislationGenerator from "@/components/LegislationGenerator";
 
 const Index = () => {
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-brand-50/50 py-12">
-      <PromptImprover />
-    </div>
-  );
+  return <LegislationGenerator />;
 };
 
 export default Index;
