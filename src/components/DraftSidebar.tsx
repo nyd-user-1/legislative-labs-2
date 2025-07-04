@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { LegislativeDraft } from "@/types/legislation";
-import { FileText, Plus, Trash2, Calendar } from "lucide-react";
+import { FileText, Plus, Trash2, Calendar, ChevronDown, ChevronUp } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface DraftSidebarProps {
@@ -13,6 +14,7 @@ interface DraftSidebarProps {
 
 export const DraftSidebar = ({ currentDraft, onDraftSelect }: DraftSidebarProps) => {
   const [drafts, setDrafts] = useState<LegislativeDraft[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -88,60 +90,64 @@ export const DraftSidebar = ({ currentDraft, onDraftSelect }: DraftSidebarProps)
   };
 
   return (
-    <Sidebar className="w-72 border-r">
-      <SidebarContent>
-        <div className="p-4 border-b">
-          <Button onClick={createNewDraft} className="w-full">
-            <Plus className="mr-2 h-4 w-4" />
-            New Draft
-          </Button>
-        </div>
-
-        <SidebarGroup>
-          <SidebarGroupLabel className="px-4 py-2">
-            <div className="flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              Recent Drafts ({drafts.length})
+    <div className="border-b bg-background">
+      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+        <div className="container px-4 sm:px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Button onClick={createNewDraft} size="sm">
+                <Plus className="mr-2 h-4 w-4" />
+                New Draft
+              </Button>
+              <CollapsibleTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <FileText className="mr-2 h-4 w-4" />
+                  Recent Drafts ({drafts.length})
+                  {isOpen ? <ChevronUp className="ml-2 h-4 w-4" /> : <ChevronDown className="ml-2 h-4 w-4" />}
+                </Button>
+              </CollapsibleTrigger>
             </div>
-          </SidebarGroupLabel>
+          </div>
           
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {drafts.length === 0 ? (
-                <div className="p-4 text-center text-muted-foreground">
-                  <FileText className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                  <p className="text-sm">No drafts yet</p>
-                  <p className="text-xs">Create your first legislative draft</p>
-                </div>
-              ) : (
-                drafts.map((draft) => (
-                  <SidebarMenuItem key={draft.id}>
-                    <SidebarMenuButton 
-                      onClick={() => onDraftSelect(draft)}
-                      className={`w-full justify-start p-3 h-auto ${
-                        currentDraft?.id === draft.id ? 'bg-muted' : ''
-                      }`}
-                    >
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-1">
-                          <p className="font-medium text-sm truncate flex-1">
-                            {draft.title || 'Untitled Draft'}
-                          </p>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e) => deleteDraft(draft.id, e)}
-                            className="h-6 w-6 p-0 ml-2 hover:bg-destructive hover:text-destructive-foreground"
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
-                        </div>
-                        
-                        <div className="flex items-center gap-2 mb-1">
-                          <Badge variant="outline" className={`text-xs ${getTypeColor(draft.type)}`}>
-                            {draft.type}
-                          </Badge>
-                        </div>
+          <CollapsibleContent className="mt-4">
+            {drafts.length === 0 ? (
+              <Card>
+                <CardContent className="flex flex-col items-center justify-center py-8">
+                  <FileText className="h-12 w-12 mb-4 opacity-50" />
+                  <p className="text-sm text-muted-foreground text-center">No drafts yet</p>
+                  <p className="text-xs text-muted-foreground text-center">Create your first legislative draft</p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {drafts.map((draft) => (
+                  <Card 
+                    key={draft.id} 
+                    className={`cursor-pointer transition-colors hover:bg-muted/50 ${
+                      currentDraft?.id === draft.id ? 'ring-2 ring-primary' : ''
+                    }`}
+                    onClick={() => onDraftSelect(draft)}
+                  >
+                    <CardHeader className="pb-2">
+                      <div className="flex items-start justify-between">
+                        <CardTitle className="text-sm font-medium truncate flex-1 mr-2">
+                          {draft.title || 'Untitled Draft'}
+                        </CardTitle>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => deleteDraft(draft.id, e)}
+                          className="h-6 w-6 p-0 hover:bg-destructive hover:text-destructive-foreground"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <div className="space-y-2">
+                        <Badge variant="outline" className={`text-xs ${getTypeColor(draft.type)}`}>
+                          {draft.type}
+                        </Badge>
                         
                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
                           <Calendar className="h-3 w-3" />
@@ -149,19 +155,19 @@ export const DraftSidebar = ({ currentDraft, onDraftSelect }: DraftSidebarProps)
                         </div>
                         
                         {draft.originalIdea && (
-                          <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                            {draft.originalIdea.substring(0, 60)}...
+                          <p className="text-xs text-muted-foreground line-clamp-2">
+                            {draft.originalIdea.substring(0, 80)}...
                           </p>
                         )}
                       </div>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))
-              )}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-    </Sidebar>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </CollapsibleContent>
+        </div>
+      </Collapsible>
+    </div>
   );
 };
