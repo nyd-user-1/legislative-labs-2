@@ -170,8 +170,16 @@ export const ExportPanel = ({ draft }: ExportPanelProps) => {
           <CardTitle>Preview</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="bg-muted/50 p-6 rounded-lg max-h-96 overflow-y-auto">
-            <div className="prose max-w-none font-serif text-sm">
+          <div className="relative bg-muted/50 p-6 rounded-lg max-h-96 overflow-y-auto">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-2 right-2 h-8 w-8 bg-background/80 hover:bg-background"
+              onClick={handleCopyToClipboard}
+            >
+              <Copy className="h-4 w-4" />
+            </Button>
+            <div className="prose max-w-none font-serif text-sm pr-12">
               <pre className="whitespace-pre-wrap font-serif">{draft.draftContent}</pre>
             </div>
           </div>
