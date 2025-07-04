@@ -88,7 +88,7 @@ export const DraftSidebar = ({ currentDraft, onDraftSelect }: DraftSidebarProps)
   };
 
   return (
-    <Sidebar className="w-80 border-r">
+    <Sidebar className="w-72 border-r">
       <SidebarContent>
         <div className="p-4 border-b">
           <Button onClick={createNewDraft} className="w-full">
