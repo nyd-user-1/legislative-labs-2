@@ -32,7 +32,7 @@ export const DraftEditor = ({ draft, onDraftChange, onProgressChange }: DraftEdi
     }
   }, [draft]);
 
-  const improveIdea = async () => {
+const improveIdea = async () => {
     if (!idea.trim()) {
       toast({
         title: "Please enter an idea",
@@ -44,9 +44,7 @@ export const DraftEditor = ({ draft, onDraftChange, onProgressChange }: DraftEdi
 
     setIsImprovingIdea(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      
-      const improved = generateImprovedIdea(idea, draftType);
+      const improved = await generateImprovedIdea(idea, draftType);
       setImprovedIdea(improved);
       
       onProgressChange({
@@ -267,42 +265,110 @@ export const DraftEditor = ({ draft, onDraftChange, onProgressChange }: DraftEdi
 };
 
 // Helper functions
-const generateImprovedIdea = (idea: string, type: string): string => {
-  return `ENHANCED LEGISLATIVE CONCEPT
+const generateImprovedIdea = async (idea: string, type: string): Promise<string> => {
+  // Derive a proper problem statement from the user input
+  const problemStatement = deriveProblemStatement(idea);
+  
+  // Try to find similar legislation via web search
+  let similarLegislation = "• Research needed for similar legislation in other jurisdictions";
+  try {
+    const searchResults = await searchSimilarLegislation(idea, type);
+    if (searchResults) {
+      similarLegislation = searchResults;
+    }
+  } catch (error) {
+    console.error("Failed to search for similar legislation:", error);
+  }
+  
+  return `CONSIDERATIONS
 
 PROBLEM STATEMENT:
-${idea}
+${problemStatement}
 
 LEGISLATIVE APPROACH (${type}):
-This ${type.toLowerCase()} addresses the identified issues through a structured approach that considers constitutional authority, implementation feasibility, and stakeholder impact.
+This ${type.toLowerCase()} legislation addresses the identified issues through a structured approach that considers constitutional authority, implementation feasibility, and stakeholder impact.
 
 KEY IMPROVEMENTS NEEDED:
-• Define specific legal authority and jurisdiction
-• Clarify enforcement mechanisms and responsible agencies
-• Establish clear timelines and implementation phases
-• Include provisions for public comment and stakeholder input
-• Address potential constitutional or legal challenges
-• Define funding sources and fiscal impact
-• Include sunset clauses or review periods where appropriate
+• Define specific legal authority and jurisdiction (See: Congressional Research Service guides on statutory authority)
+• Clarify enforcement mechanisms and responsible agencies (Reference: Administrative Procedure Act, 5 U.S.C. §551 et seq.)
+• Establish clear timelines and implementation phases (Best practice: 180-day implementation period for regulations)
+• Include provisions for public comment and stakeholder input (Required under: Administrative Procedure Act notice-and-comment procedures)
+• Address potential constitutional challenges (Review: relevant Supreme Court precedents and constitutional law analyses)
+• Define funding sources and fiscal impact (Consult: Congressional Budget Office scoring methodology)
+• Include sunset clauses or review periods where appropriate (Standard practice: 5-10 year review cycles for new programs)
 
 RECOMMENDED RESEARCH AREAS:
-• Similar legislation in other jurisdictions
-• Constitutional law precedents
-• Administrative feasibility assessment
-• Stakeholder analysis and potential opposition
-• Economic impact evaluation
-• Implementation cost analysis
+${similarLegislation}
+• Constitutional law precedents (Search: Westlaw, Lexis databases for relevant case law)
+• Administrative feasibility assessment (Consult: Government Accountability Office implementation studies)
+• Stakeholder analysis and potential opposition (Review: lobbying disclosures, industry position papers)
+• Economic impact evaluation (Reference: Office of Management and Budget Circular A-4 for regulatory analysis)
+• Implementation cost analysis (Model after: similar program cost estimates from CBO or agency budget justifications)
 
 POTENTIAL CHALLENGES:
-• Legal and constitutional concerns
-• Administrative complexity
-• Political feasibility
-• Resource requirements
-• Enforcement difficulties
-• Unintended consequences
+• Legal and constitutional concerns (Consider: Commerce Clause, Due Process, Equal Protection implications)
+• Administrative complexity (Factor in: agency capacity, existing regulatory framework, coordination requirements)
+• Political feasibility (Assess: current political climate, stakeholder support, timing considerations)
+• Resource requirements (Estimate: personnel, technology, infrastructure needs)
+• Enforcement difficulties (Plan for: compliance monitoring, penalty structures, appeal processes)
+• Unintended consequences (Conduct: stakeholder impact analysis, small business considerations)
 
 NEXT STEPS:
 Proceed to draft generation to create properly structured legislative text with standard legal formatting and required sections.`;
+};
+
+const deriveProblemStatement = (idea: string): string => {
+  // Extract the core problem from the user's legislative idea
+  const sentences = idea.split(/[.!?]+/).filter(s => s.trim().length > 0);
+  
+  if (sentences.length === 0) return idea;
+  
+  // Look for problem indicators in the text
+  const problemIndicators = ['problem', 'issue', 'concern', 'lack', 'insufficient', 'need', 'challenge', 'gap'];
+  const solutionIndicators = ['propose', 'suggest', 'should', 'would', 'create', 'establish', 'implement'];
+  
+  let problemStatement = "";
+  let foundProblem = false;
+  
+  for (const sentence of sentences) {
+    const lowerSentence = sentence.toLowerCase();
+    
+    // If we find a problem indicator, this likely describes the problem
+    if (problemIndicators.some(indicator => lowerSentence.includes(indicator)) && !foundProblem) {
+      problemStatement += sentence.trim() + ". ";
+      foundProblem = true;
+    }
+    // If no explicit problem found, look for context that implies a problem
+    else if (!foundProblem && !solutionIndicators.some(indicator => lowerSentence.includes(indicator))) {
+      problemStatement += sentence.trim() + ". ";
+      foundProblem = true;
+    }
+  }
+  
+  // If we couldn't derive a problem statement, create one
+  if (!problemStatement) {
+    problemStatement = `Current legislative frameworks are inadequate to address the issues outlined in the following proposal: ${idea}`;
+  }
+  
+  return problemStatement.trim();
+};
+
+const searchSimilarLegislation = async (idea: string, type: string): Promise<string> => {
+  try {
+    // Use web search to find actual comparable legislation
+    const searchQuery = `${type} legislation ${idea.split(' ').slice(0, 5).join(' ')} similar bills`;
+    
+    // This would use the web_search function if available
+    // For now, return a more specific placeholder
+    return `• Similar legislation in other jurisdictions (Search needed: "${searchQuery}")
+• Constitutional law precedents (Research required for relevant Supreme Court cases)
+• Administrative feasibility assessment (Review needed: agency implementation capacity studies)
+• Stakeholder analysis and potential opposition (Analysis needed: industry and advocacy group positions)
+• Economic impact evaluation (Required: cost-benefit analysis using OMB guidelines)
+• Implementation cost analysis (Needed: detailed budget estimates and resource requirements)`;
+  } catch (error) {
+    throw error;
+  }
 };
 
 const generateLegislativeDraft = (idea: string, type: string): string => {
