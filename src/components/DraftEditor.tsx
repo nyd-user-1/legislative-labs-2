@@ -18,7 +18,7 @@ export const DraftEditor = ({ draft, onDraftChange, onProgressChange }: DraftEdi
   const [idea, setIdea] = useState("");
   const [improvedIdea, setImprovedIdea] = useState("");
   const [draftContent, setDraftContent] = useState("");
-  const [draftType, setDraftType] = useState<'Bill' | 'Resolution' | 'Amendment'>('Bill');
+  const [draftType, setDraftType] = useState<'technology' | 'environment' | 'tax' | 'social services' | 'labor' | 'human rights' | 'digital rights' | 'education'>('technology');
   const [isImprovingIdea, setIsImprovingIdea] = useState(false);
   const [isGeneratingDraft, setIsGeneratingDraft] = useState(false);
   const { toast } = useToast();
@@ -158,15 +158,20 @@ export const DraftEditor = ({ draft, onDraftChange, onProgressChange }: DraftEdi
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="draftType">Draft Type</Label>
-            <Select value={draftType} onValueChange={(value: 'Bill' | 'Resolution' | 'Amendment') => setDraftType(value)}>
+            <Label htmlFor="draftType">Category</Label>
+            <Select value={draftType} onValueChange={(value: 'technology' | 'environment' | 'tax' | 'social services' | 'labor' | 'human rights' | 'digital rights' | 'education') => setDraftType(value)}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Bill">Bill</SelectItem>
-                <SelectItem value="Resolution">Resolution</SelectItem>
-                <SelectItem value="Amendment">Amendment</SelectItem>
+                <SelectItem value="technology">Technology</SelectItem>
+                <SelectItem value="environment">Environment</SelectItem>
+                <SelectItem value="tax">Tax</SelectItem>
+                <SelectItem value="social services">Social Services</SelectItem>
+                <SelectItem value="labor">Labor</SelectItem>
+                <SelectItem value="human rights">Human Rights</SelectItem>
+                <SelectItem value="digital rights">Digital Rights</SelectItem>
+                <SelectItem value="education">Education</SelectItem>
               </SelectContent>
             </Select>
           </div>

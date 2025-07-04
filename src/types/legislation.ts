@@ -1,7 +1,7 @@
 export interface LegislativeDraft {
   id: string;
   title: string;
-  type: 'Bill' | 'Resolution' | 'Amendment';
+  type: 'technology' | 'environment' | 'tax' | 'social services' | 'labor' | 'human rights' | 'digital rights' | 'education';
   originalIdea: string;
   improvedIdea: string;
   draftContent: string;

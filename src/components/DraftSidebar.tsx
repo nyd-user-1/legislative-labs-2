@@ -30,7 +30,7 @@ export const DraftSidebar = ({ currentDraft, onDraftSelect }: DraftSidebarProps)
     const newDraft: LegislativeDraft = {
       id: crypto.randomUUID(),
       title: "New Draft",
-      type: 'Bill',
+      type: 'technology',
       originalIdea: "",
       improvedIdea: "",
       draftContent: "",
@@ -88,9 +88,14 @@ export const DraftSidebar = ({ currentDraft, onDraftSelect }: DraftSidebarProps)
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'Bill': return 'bg-blue-100 text-blue-800';
-      case 'Resolution': return 'bg-green-100 text-green-800';
-      case 'Amendment': return 'bg-orange-100 text-orange-800';
+      case 'technology': return 'bg-blue-100 text-blue-800';
+      case 'environment': return 'bg-green-100 text-green-800';
+      case 'tax': return 'bg-yellow-100 text-yellow-800';
+      case 'social services': return 'bg-purple-100 text-purple-800';
+      case 'labor': return 'bg-orange-100 text-orange-800';
+      case 'human rights': return 'bg-red-100 text-red-800';
+      case 'digital rights': return 'bg-cyan-100 text-cyan-800';
+      case 'education': return 'bg-indigo-100 text-indigo-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
