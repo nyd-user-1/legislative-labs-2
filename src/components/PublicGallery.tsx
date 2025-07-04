@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { LegislativeDraft } from "@/types/legislation";
-import { ThumbsUp, ThumbsDown, Minus, Eye, Calendar, Users } from "lucide-react";
+import { Eye, Calendar, Users, Star } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface PublicGalleryProps {
@@ -12,7 +12,7 @@ interface PublicGalleryProps {
 
 export const PublicGallery = ({ onDraftSelect }: PublicGalleryProps) => {
   const [publicDrafts, setPublicDrafts] = useState<LegislativeDraft[]>([]);
-  const [userVotes, setUserVotes] = useState<Record<string, 'support' | 'oppose' | 'neutral'>>({});
+  const [userVotes, setUserVotes] = useState<Record<string, number>>({});
   const { toast } = useToast();
 
   useEffect(() => {
@@ -31,9 +31,10 @@ export const PublicGallery = ({ onDraftSelect }: PublicGalleryProps) => {
     setUserVotes(votes);
   };
 
-  const vote = (draftId: string, voteType: 'support' | 'oppose' | 'neutral') => {
+  const vote = (draftId: string, rating: number) => {
     // Update user's vote record
-    const newUserVotes = { ...userVotes, [draftId]: voteType };
+    const previousRating = userVotes[draftId];
+    const newUserVotes = { ...userVotes, [draftId]: rating };
     setUserVotes(newUserVotes);
     localStorage.setItem('userVotes', JSON.stringify(newUserVotes));
 
@@ -44,13 +45,20 @@ export const PublicGallery = ({ onDraftSelect }: PublicGalleryProps) => {
         const updatedVotes = { ...draft.votes };
         
         // Remove previous vote if exists
-        const previousVote = userVotes[draftId];
-        if (previousVote) {
-          updatedVotes[previousVote]--;
+        if (previousRating) {
+          updatedVotes.starCounts[previousRating - 1]--;
+          updatedVotes.totalVotes--;
         }
         
         // Add new vote
-        updatedVotes[voteType]++;
+        updatedVotes.starCounts[rating - 1]++;
+        updatedVotes.totalVotes++;
+        
+        // Calculate new average rating
+        const totalRating = updatedVotes.starCounts.reduce((sum, count, index) => 
+          sum + (count * (index + 1)), 0
+        );
+        updatedVotes.rating = updatedVotes.totalVotes > 0 ? totalRating / updatedVotes.totalVotes : 0;
         
         return { ...draft, votes: updatedVotes };
       }
@@ -61,17 +69,9 @@ export const PublicGallery = ({ onDraftSelect }: PublicGalleryProps) => {
     setPublicDrafts(updatedDrafts.filter((draft: LegislativeDraft) => draft.isPublic));
 
     toast({
-      title: "Vote recorded",
-      description: `Your ${voteType} vote has been recorded anonymously.`,
+      title: "Rating recorded",
+      description: `Your ${rating}-star rating has been recorded.`,
     });
-  };
-
-  const getTotalVotes = (votes: LegislativeDraft['votes']) => {
-    return votes.support + votes.oppose + votes.neutral;
-  };
-
-  const getVotePercentage = (count: number, total: number) => {
-    return total > 0 ? Math.round((count / total) * 100) : 0;
   };
 
   const formatDate = (date: Date) => {
@@ -84,11 +84,34 @@ export const PublicGallery = ({ onDraftSelect }: PublicGalleryProps) => {
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'Bill': return 'bg-blue-100 text-blue-800';
-      case 'Resolution': return 'bg-green-100 text-green-800';
-      case 'Amendment': return 'bg-orange-100 text-orange-800';
+      case 'technology': return 'bg-blue-100 text-blue-800';
+      case 'environment': return 'bg-green-100 text-green-800';
+      case 'tax': return 'bg-yellow-100 text-yellow-800';
+      case 'social services': return 'bg-purple-100 text-purple-800';
+      case 'labor': return 'bg-orange-100 text-orange-800';
+      case 'human rights': return 'bg-red-100 text-red-800';
+      case 'digital rights': return 'bg-cyan-100 text-cyan-800';
+      case 'education': return 'bg-indigo-100 text-indigo-800';
       default: return 'bg-gray-100 text-gray-800';
     }
+  };
+
+  const renderStars = (rating: number, onStarClick?: (star: number) => void) => {
+    return (
+      <div className="flex gap-1">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <Star
+            key={star}
+            className={`h-4 w-4 ${
+              star <= rating 
+                ? 'fill-yellow-400 text-yellow-400' 
+                : 'text-gray-300'
+            } ${onStarClick ? 'cursor-pointer hover:scale-110 transition-transform' : ''}`}
+            onClick={() => onStarClick?.(star)}
+          />
+        ))}
+      </div>
+    );
   };
 
   if (publicDrafts.length === 0) {
@@ -110,7 +133,7 @@ export const PublicGallery = ({ onDraftSelect }: PublicGalleryProps) => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Public Legislation Gallery</h2>
-          <p className="text-muted-foreground">Community legislation open for anonymous voting</p>
+          <p className="text-muted-foreground">Vote for your favorite ideas</p>
         </div>
         <Badge variant="outline" className="text-sm">
           {publicDrafts.length} public {publicDrafts.length === 1 ? 'draft' : 'drafts'}
@@ -119,8 +142,7 @@ export const PublicGallery = ({ onDraftSelect }: PublicGalleryProps) => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {publicDrafts.map((draft) => {
-          const totalVotes = getTotalVotes(draft.votes);
-          const userVote = userVotes[draft.id];
+          const userRating = userVotes[draft.id] || 0;
           
           return (
             <Card key={draft.id} className="hover:shadow-lg transition-shadow">
@@ -157,64 +179,32 @@ export const PublicGallery = ({ onDraftSelect }: PublicGalleryProps) => {
                   </p>
                 )}
 
-                {/* Voting Stats */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Community Sentiment</span>
-                    <span className="text-muted-foreground">{totalVotes} votes</span>
+                {/* Rating Display */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      {renderStars(Math.round(draft.votes.rating))}
+                      <span className="text-sm font-medium">
+                        {draft.votes.rating.toFixed(1)}
+                      </span>
+                    </div>
+                    <span className="text-xs text-muted-foreground">
+                      {draft.votes.totalVotes} {draft.votes.totalVotes === 1 ? 'vote' : 'votes'}
+                    </span>
                   </div>
-                  
-                  <div className="grid grid-cols-3 gap-1 text-xs">
-                    <div className="text-center">
-                      <div className="text-green-600 font-medium">
-                        {getVotePercentage(draft.votes.support, totalVotes)}%
-                      </div>
-                      <div className="text-muted-foreground">Support</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-gray-600 font-medium">
-                        {getVotePercentage(draft.votes.neutral, totalVotes)}%
-                      </div>
-                      <div className="text-muted-foreground">Neutral</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-red-600 font-medium">
-                        {getVotePercentage(draft.votes.oppose, totalVotes)}%
-                      </div>
-                      <div className="text-muted-foreground">Oppose</div>
-                    </div>
-                  </div>
-                </div>
 
-                {/* Voting Buttons */}
-                <div className="flex gap-2">
-                  <Button
-                    variant={userVote === 'support' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => vote(draft.id, 'support')}
-                    className="flex-1"
-                  >
-                    <ThumbsUp className="h-3 w-3 mr-1" />
-                    Support
-                  </Button>
-                  <Button
-                    variant={userVote === 'neutral' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => vote(draft.id, 'neutral')}
-                    className="flex-1"
-                  >
-                    <Minus className="h-3 w-3 mr-1" />
-                    Neutral
-                  </Button>
-                  <Button
-                    variant={userVote === 'oppose' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => vote(draft.id, 'oppose')}
-                    className="flex-1"
-                  >
-                    <ThumbsDown className="h-3 w-3 mr-1" />
-                    Oppose
-                  </Button>
+                  {/* User Voting */}
+                  <div className="space-y-2">
+                    <div className="text-xs text-muted-foreground">Rate this idea:</div>
+                    <div className="flex items-center gap-1">
+                      {renderStars(userRating, (star) => vote(draft.id, star))}
+                      {userRating > 0 && (
+                        <span className="text-xs text-muted-foreground ml-2">
+                          You rated {userRating} star{userRating !== 1 ? 's' : ''}
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>

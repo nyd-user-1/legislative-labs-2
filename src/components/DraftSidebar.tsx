@@ -41,9 +41,9 @@ export const DraftSidebar = ({ currentDraft, onDraftSelect }: DraftSidebarProps)
         stakeholders: []
       },
       votes: {
-        support: 0,
-        oppose: 0,
-        neutral: 0
+        rating: 0,
+        totalVotes: 0,
+        starCounts: [0, 0, 0, 0, 0]
       },
       isPublic: true,
       createdAt: new Date(),

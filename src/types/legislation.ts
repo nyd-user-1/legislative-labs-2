@@ -12,9 +12,9 @@ export interface LegislativeDraft {
     stakeholders: string[];
   };
   votes: {
-    support: number;
-    oppose: number;
-    neutral: number;
+    rating: number; // Average rating
+    totalVotes: number; // Total number of votes
+    starCounts: [number, number, number, number, number]; // Count for each star rating (1-5)
   };
   isPublic: boolean;
   createdAt: Date;
