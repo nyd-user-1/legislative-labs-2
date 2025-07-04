@@ -378,53 +378,206 @@ const improveIdea = async () => {
 };
 
 // Helper functions
-const generateImprovedIdea = async (idea: string, type: string): Promise<string> => {
-  // Derive a proper problem statement from the user input
+const analyzeLegislativeIdea = (idea: string, type: string) => {
+  const lowerIdea = idea.toLowerCase();
+  const words = lowerIdea.split(/\W+/);
+  
+  // Extract problem statement using existing function
   const problemStatement = deriveProblemStatement(idea);
   
-  // Try to find similar legislation via web search
-  let similarLegislation = "• Research needed for similar legislation in other jurisdictions";
-  try {
-    const searchResults = await searchSimilarLegislation(idea, type);
-    if (searchResults) {
-      similarLegislation = searchResults;
-    }
-  } catch (error) {
-    console.error("Failed to search for similar legislation:", error);
+  // Determine specific legislative approach based on content analysis
+  const legislativeApproach = generateLegislativeApproach(idea, type, lowerIdea);
+  
+  // Generate contextual improvements based on idea content
+  const keyImprovements = generateKeyImprovements(lowerIdea, type);
+  
+  // Generate targeted research areas
+  const researchAreas = generateResearchAreas(lowerIdea, type);
+  
+  // Identify specific challenges for this type of legislation
+  const challenges = generateChallenges(lowerIdea, type);
+  
+  // Generate strategic considerations
+  const strategicConsiderations = generateStrategicConsiderations(lowerIdea, type);
+  
+  return {
+    problemStatement,
+    category: type,
+    legislativeApproach,
+    keyImprovements,
+    researchAreas,
+    challenges,
+    strategicConsiderations
+  };
+};
+
+const generateLegislativeApproach = (idea: string, type: string, lowerIdea: string): string => {
+  // Analyze the core intent and approach
+  const hasRegulatory = lowerIdea.includes('regulat') || lowerIdea.includes('standard') || lowerIdea.includes('requirement');
+  const hasIncentives = lowerIdea.includes('incentiv') || lowerIdea.includes('credit') || lowerIdea.includes('subsid');
+  const hasBan = lowerIdea.includes('ban') || lowerIdea.includes('prohibit') || lowerIdea.includes('illegal');
+  const hasProgram = lowerIdea.includes('program') || lowerIdea.includes('service') || lowerIdea.includes('fund');
+  
+  let approach = `This ${type} legislation `;
+  
+  if (hasBan) {
+    approach += "establishes prohibitions and enforcement mechanisms to prevent harmful practices, ";
+  } else if (hasRegulatory) {
+    approach += "creates comprehensive regulatory standards and oversight frameworks to ensure compliance, ";
+  } else if (hasIncentives) {
+    approach += "implements incentive structures and support mechanisms to encourage positive behaviors, ";
+  } else if (hasProgram) {
+    approach += "establishes new programs and services to address identified gaps, ";
+  } else {
+    approach += "addresses the identified issues through a structured policy framework that ";
   }
+  
+  approach += "while considering constitutional authority, implementation feasibility, and stakeholder impact.";
+  
+  return approach;
+};
+
+const generateKeyImprovements = (lowerIdea: string, type: string): string[] => {
+  const improvements = [];
+  
+  // Standard improvements that apply to most legislation
+  improvements.push("Define clear legal authority and jurisdictional scope (Reference: relevant constitutional provisions and statutory framework)");
+  improvements.push("Establish specific enforcement mechanisms and responsible agencies (Model: successful enforcement structures in similar legislation)");
+  
+  // Targeted improvements based on content
+  if (lowerIdea.includes('fund') || lowerIdea.includes('money') || lowerIdea.includes('cost')) {
+    improvements.push("Provide detailed funding mechanisms and revenue sources (Analysis: sustainable financing models from comparable programs)");
+  }
+  
+  if (lowerIdea.includes('private') || lowerIdea.includes('business') || lowerIdea.includes('company')) {
+    improvements.push("Include provisions for public-private partnerships and industry engagement (Framework: successful collaboration models)");
+  }
+  
+  if (lowerIdea.includes('data') || lowerIdea.includes('information') || lowerIdea.includes('privacy')) {
+    improvements.push("Address data privacy and information security requirements (Compliance: relevant privacy laws and cybersecurity standards)");
+  }
+  
+  if (lowerIdea.includes('climate') || lowerIdea.includes('environment')) {
+    improvements.push("Include environmental impact assessment and mitigation strategies (Standards: environmental review processes)");
+  }
+  
+  improvements.push("Establish clear timelines and implementation phases with measurable outcomes (Best practice: phased implementation with pilot programs)");
+  improvements.push("Create oversight and accountability mechanisms with regular review periods (Standard: 3-5 year evaluation cycles)");
+  
+  return improvements.slice(0, 6); // Limit to most relevant
+};
+
+const generateResearchAreas = (lowerIdea: string, type: string): string[] => {
+  const research = [];
+  
+  // Always include constitutional analysis
+  research.push("Constitutional authority analysis and legal precedent review (Research: relevant Supreme Court decisions and constitutional law)");
+  
+  // Type-specific research
+  const typeResearch = {
+    'technology': ['Technology impact assessments and digital rights considerations', 'Cybersecurity standards and data protection requirements'],
+    'environment': ['Environmental impact studies and scientific evidence review', 'Climate policy effectiveness and implementation models'],
+    'tax': ['Revenue impact analysis and economic modeling', 'Tax policy precedents and comparative jurisdiction studies'],
+    'social services': ['Social program effectiveness research and outcome evaluation', 'Service delivery models and accessibility studies'],
+    'labor': ['Employment law precedents and workplace safety standards', 'Labor economics research and worker protection frameworks'],
+    'human rights': ['Human rights law and international treaty obligations', 'Anti-discrimination precedents and enforcement mechanisms'],
+    'digital rights': ['Digital privacy law and technology regulation frameworks', 'Online safety standards and platform accountability research'],
+    'education': ['Educational policy research and outcome studies', 'School finance and equity analysis']
+  };
+  
+  if (typeResearch[type as keyof typeof typeResearch]) {
+    research.push(...typeResearch[type as keyof typeof typeResearch]);
+  }
+  
+  // Content-driven research
+  if (lowerIdea.includes('penalty') || lowerIdea.includes('fine') || lowerIdea.includes('violation')) {
+    research.push("Penalty structure analysis and enforcement effectiveness studies (Review: comparable penalty frameworks)");
+  }
+  
+  research.push("Stakeholder impact assessment and cost-benefit analysis (Method: comprehensive economic impact evaluation)");
+  research.push("Implementation feasibility study and resource requirement analysis (Assessment: agency capacity and infrastructure needs)");
+  
+  return research.slice(0, 5);
+};
+
+const generateChallenges = (lowerIdea: string, type: string): string[] => {
+  const challenges = [];
+  
+  // Universal challenges
+  challenges.push("Constitutional and legal compliance ensuring due process and equal protection requirements");
+  challenges.push("Political feasibility and stakeholder opposition management during legislative process");
+  
+  // Content-specific challenges
+  if (lowerIdea.includes('enforce') || lowerIdea.includes('penalty')) {
+    challenges.push("Enforcement complexity and resource allocation for effective compliance monitoring");
+  }
+  
+  if (lowerIdea.includes('cost') || lowerIdea.includes('fund') || lowerIdea.includes('expensive')) {
+    challenges.push("Funding sustainability and long-term fiscal impact on government budgets");
+  }
+  
+  if (lowerIdea.includes('private') || lowerIdea.includes('business')) {
+    challenges.push("Industry compliance costs and potential economic disruption effects");
+  }
+  
+  if (lowerIdea.includes('technology') || lowerIdea.includes('digital')) {
+    challenges.push("Rapid technological change requiring adaptive regulatory frameworks");
+  }
+  
+  challenges.push("Implementation timeline coordination across multiple agencies and jurisdictions");
+  challenges.push("Unintended consequences and need for flexible adjustment mechanisms");
+  
+  return challenges.slice(0, 5);
+};
+
+const generateStrategicConsiderations = (lowerIdea: string, type: string): string[] => {
+  const considerations = [];
+  
+  // Timing and political strategy
+  considerations.push("Legislative timing alignment with political cycles and policy priorities");
+  considerations.push("Coalition building strategy involving key stakeholders and advocacy groups");
+  
+  // Implementation strategy
+  if (lowerIdea.includes('pilot') || lowerIdea.includes('test')) {
+    considerations.push("Pilot program development for testing approach before full implementation");
+  } else {
+    considerations.push("Phased implementation approach starting with high-impact, low-cost measures");
+  }
+  
+  // Stakeholder management
+  if (lowerIdea.includes('business') || lowerIdea.includes('industry')) {
+    considerations.push("Industry engagement strategy to minimize opposition and ensure practical implementation");
+  }
+  
+  considerations.push("Public education and awareness campaign to build support and understanding");
+  considerations.push("Sunset clause inclusion for future legislative review and improvement opportunities");
+  
+  return considerations.slice(0, 5);
+};
+
+const generateImprovedIdea = async (idea: string, type: string): Promise<string> => {
+  // Analyze the legislative idea contextually
+  const analysis = analyzeLegislativeIdea(idea, type);
   
   return `CONSIDERATIONS
 
 PROBLEM STATEMENT:
-${problemStatement}
+${analysis.problemStatement}
 
-LEGISLATIVE APPROACH (${type}):
-This ${type.toLowerCase()} legislation addresses the identified issues through a structured approach that considers constitutional authority, implementation feasibility, and stakeholder impact.
+LEGISLATIVE APPROACH (${analysis.category}):
+${analysis.legislativeApproach}
 
 KEY IMPROVEMENTS NEEDED:
-• Define specific legal authority and jurisdiction (See: Congressional Research Service guides on statutory authority)
-• Clarify enforcement mechanisms and responsible agencies (Reference: Administrative Procedure Act, 5 U.S.C. §551 et seq.)
-• Establish clear timelines and implementation phases (Best practice: 180-day implementation period for regulations)
-• Include provisions for public comment and stakeholder input (Required under: Administrative Procedure Act notice-and-comment procedures)
-• Address potential constitutional challenges (Review: relevant Supreme Court precedents and constitutional law analyses)
-• Define funding sources and fiscal impact (Consult: Congressional Budget Office scoring methodology)
-• Include sunset clauses or review periods where appropriate (Standard practice: 5-10 year review cycles for new programs)
+${analysis.keyImprovements.map(improvement => `• ${improvement}`).join('\n')}
 
 RECOMMENDED RESEARCH AREAS:
-${similarLegislation}
-• Constitutional law precedents (Search: Westlaw, Lexis databases for relevant case law)
-• Administrative feasibility assessment (Consult: Government Accountability Office implementation studies)
-• Stakeholder analysis and potential opposition (Review: lobbying disclosures, industry position papers)
-• Economic impact evaluation (Reference: Office of Management and Budget Circular A-4 for regulatory analysis)
-• Implementation cost analysis (Model after: similar program cost estimates from CBO or agency budget justifications)
+${analysis.researchAreas.map(area => `• ${area}`).join('\n')}
 
 POTENTIAL CHALLENGES:
-• Legal and constitutional concerns (Consider: Commerce Clause, Due Process, Equal Protection implications)
-• Administrative complexity (Factor in: agency capacity, existing regulatory framework, coordination requirements)
-• Political feasibility (Assess: current political climate, stakeholder support, timing considerations)
-• Resource requirements (Estimate: personnel, technology, infrastructure needs)
-• Enforcement difficulties (Plan for: compliance monitoring, penalty structures, appeal processes)
-• Unintended consequences (Conduct: stakeholder impact analysis, small business considerations)
+${analysis.challenges.map(challenge => `• ${challenge}`).join('\n')}
+
+STRATEGIC CONSIDERATIONS:
+${analysis.strategicConsiderations.map(consideration => `• ${consideration}`).join('\n')}
 
 NEXT STEPS:
 Proceed to draft generation to create properly structured legislative text with standard legal formatting and required sections.`;
