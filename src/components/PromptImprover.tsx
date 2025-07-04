@@ -88,7 +88,7 @@ const PromptImprover = () => {
     <div className="w-full max-w-3xl mx-auto p-6 space-y-8">
       <div className="text-center space-y-2">
         <h1 className="text-4xl font-bold bg-gradient-to-r from-brand-600 to-brand-800 bg-clip-text text-transparent">
-          AI Bill Generator
+          AI Legislation Generator
         </h1>
         <p className="text-muted-foreground">
           Enter your idea below and let AI help you make it into draft legislation
