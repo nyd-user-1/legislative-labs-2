@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Wand2, FileText, Save } from "lucide-react";
+import { Loader2, Wand2, FileText, Save, Copy, Lightbulb } from "lucide-react";
 import { LegislativeDraft, DraftProgress } from "@/types/legislation";
 
 interface DraftEditorProps {
@@ -21,6 +21,9 @@ export const DraftEditor = ({ draft, onDraftChange, onProgressChange }: DraftEdi
   const [draftType, setDraftType] = useState<'technology' | 'environment' | 'tax' | 'social services' | 'labor' | 'human rights' | 'digital rights' | 'education'>('technology');
   const [isImprovingIdea, setIsImprovingIdea] = useState(false);
   const [isGeneratingDraft, setIsGeneratingDraft] = useState(false);
+  const [scenarioInput, setScenarioInput] = useState("");
+  const [problemStatement, setProblemStatement] = useState("");
+  const [isGeneratingProblem, setIsGeneratingProblem] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -29,6 +32,8 @@ export const DraftEditor = ({ draft, onDraftChange, onProgressChange }: DraftEdi
       setImprovedIdea(draft.improvedIdea);
       setDraftContent(draft.draftContent);
       setDraftType(draft.type);
+      setScenarioInput("");
+      setProblemStatement("");
     }
   }, [draft]);
 
@@ -145,13 +150,63 @@ const improveIdea = async () => {
     });
   };
 
+  const generateProblemStatement = async () => {
+    if (!scenarioInput.trim()) {
+      toast({
+        title: "Please enter a scenario",
+        description: "Describe a real-life scenario to generate a problem statement",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsGeneratingProblem(true);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      
+      const generated = await generateProblemFromScenario(scenarioInput);
+      setProblemStatement(generated);
+
+      toast({
+        title: "Problem statement generated!",
+        description: "Review and copy the statement to use in your legislative idea.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error generating problem statement",
+        description: "Please try again later",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingProblem(false);
+    }
+  };
+
+  const copyProblemStatement = async () => {
+    if (!problemStatement) return;
+    
+    try {
+      await navigator.clipboard.writeText(problemStatement);
+      toast({
+        title: "Copied to clipboard!",
+        description: "Problem statement has been copied.",
+      });
+    } catch (error) {
+      toast({
+        title: "Failed to copy",
+        description: "Please try again",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Wand2 className="h-5 w-5" />
-            Legislative Idea Input
+            Legislative Ideation Inputs
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -175,10 +230,10 @@ const improveIdea = async () => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="idea">Your Legislative Idea</Label>
+            <Label htmlFor="idea">Your Legislative Idea (What problem do you want to solve?)</Label>
             <Textarea
               id="idea"
-              placeholder="Enter your legislative idea here... Be as detailed as possible about the problem you want to solve and your proposed solution."
+              placeholder="Enter your idea for legislation or policy here. Be as detailed as possible and include a problem statement."
               value={idea}
               onChange={(e) => setIdea(e.target.value)}
               className="min-h-[120px] resize-none"
@@ -228,6 +283,64 @@ const improveIdea = async () => {
               Save
             </Button>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Lightbulb className="h-5 w-5" />
+            Problem Statement Generator
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="scenario">Describe a Real-Life Scenario</Label>
+            <Textarea
+              id="scenario"
+              placeholder="Describe a real-life situation or scenario that illustrates the problem you want to address with legislation..."
+              value={scenarioInput}
+              onChange={(e) => setScenarioInput(e.target.value)}
+              className="min-h-[100px] resize-none"
+            />
+          </div>
+
+          <Button
+            onClick={generateProblemStatement}
+            disabled={isGeneratingProblem}
+            className="w-full"
+          >
+            {isGeneratingProblem ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Generating Problem Statement...
+              </>
+            ) : (
+              <>
+                <Lightbulb className="mr-2 h-4 w-4" />
+                Generate Problem Statement
+              </>
+            )}
+          </Button>
+
+          {problemStatement && (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label>Generated Problem Statement</Label>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={copyProblemStatement}
+                  className="h-8 w-8 p-0"
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="bg-muted/50 p-4 rounded-lg border">
+                <p className="text-sm leading-relaxed whitespace-pre-wrap">{problemStatement}</p>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -351,6 +464,53 @@ const deriveProblemStatement = (idea: string): string => {
   }
   
   return problemStatement.trim();
+};
+
+const generateProblemFromScenario = async (scenario: string): Promise<string> => {
+  // Extract key elements from the scenario
+  const sentences = scenario.split(/[.!?]+/).filter(s => s.trim().length > 0);
+  
+  // Analyze the scenario for stakeholders, impacts, and issues
+  let stakeholders = "affected parties";
+  let impacts = "negative consequences";
+  let scope = "local";
+  
+  const lowerScenario = scenario.toLowerCase();
+  
+  // Identify stakeholders
+  if (lowerScenario.includes("student") || lowerScenario.includes("school")) stakeholders = "students and educational institutions";
+  else if (lowerScenario.includes("worker") || lowerScenario.includes("employee")) stakeholders = "workers and employers";
+  else if (lowerScenario.includes("business") || lowerScenario.includes("company")) stakeholders = "businesses and consumers";
+  else if (lowerScenario.includes("patient") || lowerScenario.includes("health")) stakeholders = "patients and healthcare providers";
+  else if (lowerScenario.includes("resident") || lowerScenario.includes("citizen")) stakeholders = "residents and communities";
+  
+  // Identify scope
+  if (lowerScenario.includes("national") || lowerScenario.includes("country")) scope = "national";
+  else if (lowerScenario.includes("state") || lowerScenario.includes("regional")) scope = "state-wide";
+  else if (lowerScenario.includes("international") || lowerScenario.includes("global")) scope = "international";
+  
+  // Generate structured problem statement
+  return `PROBLEM STATEMENT:
+
+The current situation described in your scenario reveals a systemic issue that affects ${stakeholders} and requires legislative intervention.
+
+CORE PROBLEM:
+Based on the scenario provided, there is an inadequate regulatory framework that fails to address the specific challenges faced by ${stakeholders}. This gap in governance creates ${impacts} and undermines public welfare.
+
+SCOPE OF IMPACT:
+This issue has ${scope} implications and affects multiple stakeholder groups, requiring coordinated policy response.
+
+LEGISLATIVE NEED:
+Current laws and regulations are insufficient to:
+• Protect the rights and interests of ${stakeholders}
+• Ensure fair and equitable treatment in the described situation
+• Provide clear guidelines and enforcement mechanisms
+• Address the underlying causes identified in your scenario
+
+JUSTIFICATION FOR ACTION:
+The scenario demonstrates a clear market failure, regulatory gap, or social inequity that cannot be resolved through existing mechanisms. Legislative action is necessary to establish clear standards, provide oversight, and ensure accountability.
+
+This problem statement can be refined and incorporated into your legislative idea above.`;
 };
 
 const searchSimilarLegislation = async (idea: string, type: string): Promise<string> => {

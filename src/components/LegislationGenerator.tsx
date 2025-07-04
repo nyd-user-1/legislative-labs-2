@@ -23,8 +23,8 @@ const LegislationGenerator = () => {
       <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40">
         <div className="flex h-16 items-center justify-between px-4 sm:px-6">
           <div className="flex flex-col min-w-0 mr-4">
-            <h1 className="text-lg sm:text-xl font-bold truncate">Legislation Lab</h1>
-            <p className="text-xs text-muted-foreground truncate hidden sm:block">Democratized legislative drafting platform</p>
+            <h1 className="text-lg sm:text-xl font-bold truncate">Legislative Labs</h1>
+            <p className="text-xs text-muted-foreground truncate hidden sm:block">Democratized legislative ideation & voting.</p>
           </div>
           <div className="flex-shrink-0">
             <ProgressIndicator progress={progress} />
