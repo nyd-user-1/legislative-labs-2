@@ -13,8 +13,8 @@ const PromptImprover = () => {
   const improvePrompt = async () => {
     if (!prompt.trim()) {
       toast({
-        title: "Please enter a prompt",
-        description: "The prompt field cannot be empty",
+        title: "Please enter an idea",
+        description: "The idea field cannot be empty",
         variant: "destructive",
       });
       return;
@@ -54,12 +54,12 @@ const PromptImprover = () => {
       
       setImprovedPrompt(improved);
       toast({
-        title: "Prompt improved!",
-        description: "Your prompt has been enhanced with more specific details and clarity.",
+        title: "Idea improved!",
+        description: "Your idea has been transformed into draft legislation format.",
       });
     } catch (error) {
       toast({
-        title: "Error improving prompt",
+        title: "Error improving idea",
         description: "Please try again later",
         variant: "destructive",
       });
@@ -73,7 +73,7 @@ const PromptImprover = () => {
       await navigator.clipboard.writeText(improvedPrompt);
       toast({
         title: "Copied to clipboard!",
-        description: "You can now paste the improved prompt anywhere",
+        description: "You can now paste the draft legislation anywhere",
       });
     } catch (error) {
       toast({
@@ -88,18 +88,18 @@ const PromptImprover = () => {
     <div className="w-full max-w-3xl mx-auto p-6 space-y-8">
       <div className="text-center space-y-2">
         <h1 className="text-4xl font-bold bg-gradient-to-r from-brand-600 to-brand-800 bg-clip-text text-transparent">
-          AI Prompt Improver
+          AI Bill Generator
         </h1>
         <p className="text-muted-foreground">
-          Enter your prompt below and let AI help you make it better
+          Enter your idea below and let AI help you make it into draft legislation
         </p>
       </div>
 
       <div className="space-y-4">
         <div className="space-y-2">
-          <label className="text-sm font-medium">Your Prompt</label>
+          <label className="text-sm font-medium">Your Idea</label>
           <Textarea
-            placeholder="Enter your prompt here..."
+            placeholder="Enter your idea here..."
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             className="min-h-[100px] resize-none"
@@ -119,7 +119,7 @@ const PromptImprover = () => {
           ) : (
             <>
               <Wand2 className="mr-2 h-4 w-4" />
-              Improve Prompt
+              Improve Idea
             </>
           )}
         </Button>
