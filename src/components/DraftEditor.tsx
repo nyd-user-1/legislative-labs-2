@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Wand2, FileText, Save, Copy, Lightbulb } from "lucide-react";
@@ -18,8 +17,6 @@ export const DraftEditor = ({ draft, onDraftChange, onProgressChange }: DraftEdi
   const [idea, setIdea] = useState("");
   const [improvedIdea, setImprovedIdea] = useState("");
   const [draftContent, setDraftContent] = useState("");
-  const [draftType, setDraftType] = useState<'technology' | 'environment' | 'tax' | 'social services' | 'labor' | 'human rights' | 'digital rights' | 'education'>('technology');
-  const [isImprovingIdea, setIsImprovingIdea] = useState(false);
   const [isGeneratingDraft, setIsGeneratingDraft] = useState(false);
   const [scenarioInput, setScenarioInput] = useState("");
   const [problemStatement, setProblemStatement] = useState("");
@@ -31,47 +28,10 @@ export const DraftEditor = ({ draft, onDraftChange, onProgressChange }: DraftEdi
       setIdea(draft.originalIdea);
       setImprovedIdea(draft.improvedIdea);
       setDraftContent(draft.draftContent);
-      setDraftType(draft.type);
       setScenarioInput("");
       setProblemStatement("");
     }
   }, [draft]);
-
-const improveIdea = async () => {
-    if (!idea.trim()) {
-      toast({
-        title: "Please enter an idea",
-        description: "The idea field cannot be empty",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsImprovingIdea(true);
-    try {
-      const improved = await generateImprovedIdea(idea, draftType);
-      setImprovedIdea(improved);
-      
-      onProgressChange({
-        currentStep: 2,
-        totalSteps: 4,
-        stepNames: ["Idea Input", "Analysis", "Draft Generation", "Review & Export"]
-      });
-
-      toast({
-        title: "Idea analyzed and improved!",
-        description: "Review the enhanced version and analysis below.",
-      });
-    } catch (error) {
-      toast({
-        title: "Error improving idea",
-        description: "Please try again later",
-        variant: "destructive",
-      });
-    } finally {
-      setIsImprovingIdea(false);
-    }
-  };
 
   const generateDraft = async () => {
     if (!idea.trim()) {
@@ -87,7 +47,9 @@ const improveIdea = async () => {
     try {
       await new Promise((resolve) => setTimeout(resolve, 3000));
       
-      const draft = generateLegislativeDraft(improvedIdea || idea, draftType);
+      // Automatically detect the legislative category from the content
+      const detectedCategory = detectLegislativeCategory(idea);
+      const draft = generateLegislativeDraft(idea, detectedCategory);
       setDraftContent(draft);
       
       onProgressChange({
@@ -112,10 +74,11 @@ const improveIdea = async () => {
   };
 
   const saveDraft = () => {
+    const detectedCategory = detectLegislativeCategory(idea);
     const newDraft: LegislativeDraft = {
       id: draft?.id || crypto.randomUUID(),
       title: extractTitleFromIdea(idea) || "Untitled Draft",
-      type: draftType,
+      type: detectedCategory,
       originalIdea: idea,
       improvedIdea,
       draftContent,
@@ -205,90 +168,6 @@ const improveIdea = async () => {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Wand2 className="h-5 w-5" />
-            Legislative Ideation Inputs
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="draftType">Category</Label>
-            <Select value={draftType} onValueChange={(value: 'technology' | 'environment' | 'tax' | 'social services' | 'labor' | 'human rights' | 'digital rights' | 'education') => setDraftType(value)}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="technology">Technology</SelectItem>
-                <SelectItem value="environment">Environment</SelectItem>
-                <SelectItem value="tax">Tax</SelectItem>
-                <SelectItem value="social services">Social Services</SelectItem>
-                <SelectItem value="labor">Labor</SelectItem>
-                <SelectItem value="human rights">Human Rights</SelectItem>
-                <SelectItem value="digital rights">Digital Rights</SelectItem>
-                <SelectItem value="education">Education</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="idea">Your Legislative Idea (What problem do you want to solve?)</Label>
-            <Textarea
-              id="idea"
-              placeholder="Enter your idea for legislation or policy here. Be as detailed as possible and include a problem statement."
-              value={idea}
-              onChange={(e) => setIdea(e.target.value)}
-              className="min-h-[120px] resize-none"
-            />
-          </div>
-
-          <div className="flex gap-3">
-            <Button
-              onClick={improveIdea}
-              disabled={isImprovingIdea}
-              className="flex-1"
-            >
-              {isImprovingIdea ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Analyzing...
-                </>
-              ) : (
-                <>
-                  <Wand2 className="mr-2 h-4 w-4" />
-                  Improve Idea
-                </>
-              )}
-            </Button>
-
-            <Button
-              onClick={generateDraft}
-              disabled={isGeneratingDraft}
-              variant="secondary"
-              className="flex-1"
-            >
-              {isGeneratingDraft ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Generating...
-                </>
-              ) : (
-                <>
-                  <FileText className="mr-2 h-4 w-4" />
-                  Generate Draft
-                </>
-              )}
-            </Button>
-
-            <Button onClick={saveDraft} variant="outline">
-              <Save className="mr-2 h-4 w-4" />
-              Save
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
             <Lightbulb className="h-5 w-5" />
             Problem Statement Generator
           </CardTitle>
@@ -344,20 +223,51 @@ const improveIdea = async () => {
         </CardContent>
       </Card>
 
-      {improvedIdea && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Enhanced Legislative Concept</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="prose max-w-none">
-              <div className="bg-muted/50 p-4 rounded-lg">
-                <p className="whitespace-pre-wrap text-sm leading-relaxed">{improvedIdea}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Wand2 className="h-5 w-5" />
+            Legislative Ideation Inputs
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="idea">Your Legislative Idea (What problem do you want to solve?)</Label>
+            <Textarea
+              id="idea"
+              placeholder="Enter your idea for legislation or policy here. Be as detailed as possible and include a problem statement."
+              value={idea}
+              onChange={(e) => setIdea(e.target.value)}
+              className="min-h-[120px] resize-none"
+            />
+          </div>
+
+          <div className="flex gap-3">
+            <Button
+              onClick={generateDraft}
+              disabled={isGeneratingDraft}
+              className="flex-1"
+            >
+              {isGeneratingDraft ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <FileText className="mr-2 h-4 w-4" />
+                  Generate Draft
+                </>
+              )}
+            </Button>
+
+            <Button onClick={saveDraft} variant="outline">
+              <Save className="mr-2 h-4 w-4" />
+              Save
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       {draftContent && (
         <Card>
@@ -376,6 +286,48 @@ const improveIdea = async () => {
     </div>
   );
 };
+
+// Helper function to detect legislative category from content
+const detectLegislativeCategory = (idea: string): 'technology' | 'environment' | 'tax' | 'social services' | 'labor' | 'human rights' | 'digital rights' | 'education' => {
+  const lowerIdea = idea.toLowerCase();
+  
+  // Define category keywords
+  const categoryMap = {
+    'technology': ['tech', 'software', 'algorithm', 'ai', 'artificial intelligence', 'cyber', 'digital', 'computer', 'internet', 'platform'],
+    'environment': ['environment', 'climate', 'pollution', 'carbon', 'emissions', 'renewable', 'energy', 'conservation', 'wildlife'],
+    'tax': ['tax', 'revenue', 'fiscal', 'budget', 'income', 'corporate', 'sales tax', 'property tax', 'irs'],
+    'social services': ['welfare', 'benefits', 'assistance', 'healthcare', 'medicare', 'medicaid', 'social security', 'food stamps'],
+    'labor': ['employment', 'worker', 'workplace', 'wage', 'union', 'overtime', 'safety', 'discrimination', 'job'],
+    'human rights': ['discrimination', 'civil rights', 'equality', 'freedom', 'liberty', 'constitution', 'amendment', 'voting'],
+    'digital rights': ['privacy', 'data protection', 'surveillance', 'online', 'internet freedom', 'encryption', 'digital privacy'],
+    'education': ['school', 'student', 'teacher', 'education', 'university', 'college', 'learning', 'curriculum', 'tuition']
+  };
+  
+  // Special case mappings for common terms
+  if (lowerIdea.includes('childcare') || lowerIdea.includes('child care') || lowerIdea.includes('daycare')) {
+    return 'social services';
+  }
+  
+  if (lowerIdea.includes('housing') || lowerIdea.includes('rent') || lowerIdea.includes('homeless')) {
+    return 'social services';
+  }
+  
+  // Score each category based on keyword matches
+  const scores = Object.entries(categoryMap).map(([category, keywords]) => {
+    const matches = keywords.filter(keyword => lowerIdea.includes(keyword)).length;
+    return { category, score: matches };
+  });
+  
+  // Get the highest scoring category
+  const bestMatch = scores.reduce((max, current) => 
+    current.score > max.score ? current : max
+  );
+  
+  // Default to social services if no strong match found
+  return bestMatch.score > 0 ? bestMatch.category as any : 'social services';
+};
+
+// Helper functions
 
 // Helper functions
 const analyzeLegislativeIdea = (idea: string, type: string) => {
