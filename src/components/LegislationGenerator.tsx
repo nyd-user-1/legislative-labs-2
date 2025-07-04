@@ -5,6 +5,7 @@ import { AnalysisPanel } from "./AnalysisPanel";
 import { ExportPanel } from "./ExportPanel";
 import { DraftSidebar } from "./DraftSidebar";
 import { ProgressIndicator } from "./ProgressIndicator";
+import { PublicGallery } from "./PublicGallery";
 import { LegislativeDraft, DraftProgress } from "@/types/legislation";
 
 const LegislationGenerator = () => {
@@ -22,8 +23,8 @@ const LegislationGenerator = () => {
       <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40">
         <div className="flex h-16 items-center justify-between px-4 sm:px-6">
           <div className="flex flex-col min-w-0 mr-4">
-            <h1 className="text-lg sm:text-xl font-bold truncate">AI Legislation Generator</h1>
-            <p className="text-xs text-muted-foreground truncate hidden sm:block">Professional legislative drafting platform</p>
+            <h1 className="text-lg sm:text-xl font-bold truncate">Legislation Lab</h1>
+            <p className="text-xs text-muted-foreground truncate hidden sm:block">Democratized legislative drafting platform</p>
           </div>
           <div className="flex-shrink-0">
             <ProgressIndicator progress={progress} />
@@ -40,10 +41,11 @@ const LegislationGenerator = () => {
       {/* Main Content */}
       <main className="container px-4 sm:px-6 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-6">
+          <TabsList className="grid w-full grid-cols-4 mb-6">
             <TabsTrigger value="draft">Draft</TabsTrigger>
             <TabsTrigger value="analysis">Analysis</TabsTrigger>
             <TabsTrigger value="export">Export</TabsTrigger>
+            <TabsTrigger value="gallery">Public Gallery</TabsTrigger>
           </TabsList>
           
           <TabsContent value="draft" className="mt-0">
@@ -60,6 +62,10 @@ const LegislationGenerator = () => {
           
           <TabsContent value="export" className="mt-0">
             <ExportPanel draft={currentDraft} />
+          </TabsContent>
+          
+          <TabsContent value="gallery" className="mt-0">
+            <PublicGallery onDraftSelect={setCurrentDraft} />
           </TabsContent>
         </Tabs>
       </main>

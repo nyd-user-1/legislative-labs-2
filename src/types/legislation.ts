@@ -11,6 +11,12 @@ export interface LegislativeDraft {
     similarLegislation: string[];
     stakeholders: string[];
   };
+  votes: {
+    support: number;
+    oppose: number;
+    neutral: number;
+  };
+  isPublic: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

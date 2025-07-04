@@ -122,6 +122,12 @@ export const DraftEditor = ({ draft, onDraftChange, onProgressChange }: DraftEdi
         similarLegislation: [],
         stakeholders: []
       },
+      votes: draft?.votes || {
+        support: 0,
+        oppose: 0,
+        neutral: 0
+      },
+      isPublic: true, // All saves are public by default
       createdAt: draft?.createdAt || new Date(),
       updatedAt: new Date()
     };
