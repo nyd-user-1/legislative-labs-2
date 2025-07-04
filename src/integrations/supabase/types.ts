@@ -117,6 +117,120 @@ export type Database = {
         }
         Relationships: []
       }
+      legislative_drafts: {
+        Row: {
+          analysis: Json | null
+          created_at: string
+          draft_content: string
+          id: string
+          is_public: boolean | null
+          legislative_idea_id: string | null
+          status: string | null
+          title: string
+          type: string | null
+          updated_at: string
+          user_id: string
+          votes: Json | null
+        }
+        Insert: {
+          analysis?: Json | null
+          created_at?: string
+          draft_content: string
+          id?: string
+          is_public?: boolean | null
+          legislative_idea_id?: string | null
+          status?: string | null
+          title: string
+          type?: string | null
+          updated_at?: string
+          user_id: string
+          votes?: Json | null
+        }
+        Update: {
+          analysis?: Json | null
+          created_at?: string
+          draft_content?: string
+          id?: string
+          is_public?: boolean | null
+          legislative_idea_id?: string | null
+          status?: string | null
+          title?: string
+          type?: string | null
+          updated_at?: string
+          user_id?: string
+          votes?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "legislative_drafts_legislative_idea_id_fkey"
+            columns: ["legislative_idea_id"]
+            isOneToOne: false
+            referencedRelation: "legislative_ideas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "legislative_drafts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      legislative_ideas: {
+        Row: {
+          category: string | null
+          created_at: string
+          id: string
+          improved_idea: string | null
+          original_idea: string
+          problem_statement_id: string | null
+          status: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          improved_idea?: string | null
+          original_idea: string
+          problem_statement_id?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          improved_idea?: string | null
+          original_idea?: string
+          problem_statement_id?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "legislative_ideas_problem_statement_id_fkey"
+            columns: ["problem_statement_id"]
+            isOneToOne: false
+            referencedRelation: "problem_statements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "legislative_ideas_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       People: {
         Row: {
           ballotpedia: string | null
@@ -177,6 +291,86 @@ export type Database = {
           role_id?: number | null
           suffix?: string | null
           votesmart_id?: number | null
+        }
+        Relationships: []
+      }
+      problem_statements: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string
+          id: string
+          priority: string | null
+          status: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description: string
+          id?: string
+          priority?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          priority?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "problem_statements_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          role: string | null
+          updated_at: string
+          user_id: string
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          role?: string | null
+          updated_at?: string
+          user_id: string
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          role?: string | null
+          updated_at?: string
+          user_id?: string
+          username?: string | null
         }
         Relationships: []
       }

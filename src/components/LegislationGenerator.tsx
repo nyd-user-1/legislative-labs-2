@@ -6,6 +6,7 @@ import { ExportPanel } from "./ExportPanel";
 import { DraftSidebar } from "./DraftSidebar";
 import { ProgressIndicator } from "./ProgressIndicator";
 import { PublicGallery } from "./PublicGallery";
+import { UserMenu } from "./UserMenu";
 import { LegislativeDraft, DraftProgress } from "@/types/legislation";
 
 const LegislationGenerator = () => {
@@ -31,8 +32,11 @@ const LegislationGenerator = () => {
             <h1 className="text-lg sm:text-xl font-bold truncate">Legislative Labs</h1>
             <p className="text-xs text-muted-foreground truncate hidden sm:block">Democratized legislative ideation & voting.</p>
           </div>
-          <div className="flex-shrink-0">
-            <ProgressIndicator progress={progress} />
+          <div className="flex items-center gap-4">
+            <div className="flex-shrink-0">
+              <ProgressIndicator progress={progress} />
+            </div>
+            <UserMenu />
           </div>
         </div>
       </header>
