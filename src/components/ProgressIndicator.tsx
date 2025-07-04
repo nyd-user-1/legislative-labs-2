@@ -11,8 +11,8 @@ export const ProgressIndicator = ({ progress }: ProgressIndicatorProps) => {
   const progressPercentage = (progress.currentStep / progress.totalSteps) * 100;
 
   return (
-    <div className="flex items-center gap-4">
-      <div className="hidden md:flex items-center gap-2">
+    <div className="flex items-center gap-2">
+      <div className="hidden lg:flex items-center gap-2">
         {progress.stepNames.map((step, index) => {
           const stepNumber = index + 1;
           const isCompleted = stepNumber < progress.currentStep;
@@ -39,8 +39,8 @@ export const ProgressIndicator = ({ progress }: ProgressIndicatorProps) => {
       </div>
       
       <div className="flex items-center gap-2">
-        <Progress value={progressPercentage} className="w-24" />
-        <Badge variant="outline" className="text-xs">
+        <Progress value={progressPercentage} className="w-16 sm:w-24" />
+        <Badge variant="outline" className="text-xs whitespace-nowrap">
           {progress.currentStep}/{progress.totalSteps}
         </Badge>
       </div>

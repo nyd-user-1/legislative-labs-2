@@ -18,27 +18,26 @@ const LegislationGenerator = () => {
   const [activeTab, setActiveTab] = useState("draft");
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-brand-50/30">
-      <SidebarProvider defaultOpen>
-        <div className="flex min-h-screen w-full">
-          <DraftSidebar 
-            currentDraft={currentDraft}
-            onDraftSelect={setCurrentDraft}
-          />
-          
-          <main className="flex-1 flex flex-col">
-            {/* Header */}
-            <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40">
-              <div className="container flex h-16 items-center px-6">
-                <div className="flex flex-col">
-                  <h1 className="text-2xl font-bold">AI Legislation Generator</h1>
-                  <p className="text-sm text-muted-foreground">Professional legislative drafting platform</p>
-                </div>
-                <div className="ml-auto">
-                  <ProgressIndicator progress={progress} />
-                </div>
+    <SidebarProvider defaultOpen>
+      <div className="min-h-screen bg-gradient-to-b from-background to-brand-50/30 flex w-full">
+        <DraftSidebar 
+          currentDraft={currentDraft}
+          onDraftSelect={setCurrentDraft}
+        />
+        
+        <main className="flex-1 flex flex-col min-w-0">
+          {/* Header */}
+          <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40">
+            <div className="flex h-16 items-center justify-between px-6">
+              <div className="flex flex-col min-w-0">
+                <h1 className="text-xl font-bold truncate">AI Legislation Generator</h1>
+                <p className="text-xs text-muted-foreground truncate">Professional legislative drafting platform</p>
               </div>
-            </header>
+              <div className="flex-shrink-0 ml-4">
+                <ProgressIndicator progress={progress} />
+              </div>
+            </div>
+          </header>
 
             {/* Content */}
             <div className="flex-1 container px-6 py-6">
@@ -66,10 +65,9 @@ const LegislationGenerator = () => {
                 </TabsContent>
               </Tabs>
             </div>
-          </main>
-        </div>
-      </SidebarProvider>
-    </div>
+        </main>
+      </div>
+    </SidebarProvider>
   );
 };
 
