@@ -34,20 +34,25 @@
 
     --radius: 0.5rem;
 
+    /* Brand colors */
+    --brand-50: 249 250 251;
+    --brand-100: 243 244 246;
+    --brand-200: 229 231 235;
+    --brand-300: 209 213 219;
+    --brand-400: 156 163 175;
+    --brand-500: 107 114 128;
+    --brand-600: 75 85 99;
+    --brand-700: 55 65 81;
+    --brand-800: 31 41 55;
+    --brand-900: 17 24 39;
+
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
