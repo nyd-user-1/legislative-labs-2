@@ -11,9 +11,10 @@ interface DraftEditorProps {
   draft: LegislativeDraft | null;
   onDraftChange: (draft: LegislativeDraft) => void;
   onProgressChange: (progress: DraftProgress) => void;
+  saveTrigger?: number;
 }
 
-export const DraftEditor = ({ draft, onDraftChange, onProgressChange }: DraftEditorProps) => {
+export const DraftEditor = ({ draft, onDraftChange, onProgressChange, saveTrigger }: DraftEditorProps) => {
   const [idea, setIdea] = useState("");
   const [improvedIdea, setImprovedIdea] = useState("");
   const [draftContent, setDraftContent] = useState("");
@@ -32,6 +33,12 @@ export const DraftEditor = ({ draft, onDraftChange, onProgressChange }: DraftEdi
       setProblemStatement("");
     }
   }, [draft]);
+
+  useEffect(() => {
+    if (saveTrigger && saveTrigger > 0) {
+      saveDraft();
+    }
+  }, [saveTrigger]);
 
   const generateDraft = async () => {
     if (!idea.trim()) {
@@ -242,30 +249,23 @@ export const DraftEditor = ({ draft, onDraftChange, onProgressChange }: DraftEdi
             />
           </div>
 
-          <div className="flex gap-3">
-            <Button
-              onClick={generateDraft}
-              disabled={isGeneratingDraft}
-              className="flex-1"
-            >
-              {isGeneratingDraft ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Generating...
-                </>
-              ) : (
-                <>
-                  <FileText className="mr-2 h-4 w-4" />
-                  Generate Draft
-                </>
-              )}
-            </Button>
-
-            <Button onClick={saveDraft} variant="outline">
-              <Save className="mr-2 h-4 w-4" />
-              Save
-            </Button>
-          </div>
+          <Button
+            onClick={generateDraft}
+            disabled={isGeneratingDraft}
+            className="w-full"
+          >
+            {isGeneratingDraft ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Generating...
+              </>
+            ) : (
+              <>
+                <FileText className="mr-2 h-4 w-4" />
+                Generate Draft
+              </>
+            )}
+          </Button>
         </CardContent>
       </Card>
 

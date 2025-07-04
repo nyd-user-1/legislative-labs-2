@@ -4,15 +4,16 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { LegislativeDraft } from "@/types/legislation";
-import { FileText, Plus, Trash2, Calendar, ChevronDown, ChevronUp } from "lucide-react";
+import { FileText, Plus, Trash2, Calendar, ChevronDown, ChevronUp, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface DraftSidebarProps {
   currentDraft: LegislativeDraft | null;
   onDraftSelect: (draft: LegislativeDraft) => void;
+  onSaveDraft?: () => void;
 }
 
-export const DraftSidebar = ({ currentDraft, onDraftSelect }: DraftSidebarProps) => {
+export const DraftSidebar = ({ currentDraft, onDraftSelect, onSaveDraft }: DraftSidebarProps) => {
   const [drafts, setDrafts] = useState<LegislativeDraft[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
@@ -117,6 +118,12 @@ export const DraftSidebar = ({ currentDraft, onDraftSelect }: DraftSidebarProps)
                   {isOpen ? <ChevronUp className="ml-2 h-4 w-4" /> : <ChevronDown className="ml-2 h-4 w-4" />}
                 </Button>
               </CollapsibleTrigger>
+              {onSaveDraft && (
+                <Button onClick={onSaveDraft} variant="outline" size="sm">
+                  <Save className="mr-2 h-4 w-4" />
+                  Save
+                </Button>
+              )}
             </div>
           </div>
           

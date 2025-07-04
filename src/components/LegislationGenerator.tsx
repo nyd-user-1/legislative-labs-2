@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DraftEditor } from "./DraftEditor";
 import { AnalysisPanel } from "./AnalysisPanel";
@@ -16,6 +16,11 @@ const LegislationGenerator = () => {
     stepNames: ["Idea Input", "Analysis", "Draft Generation", "Review & Export"]
   });
   const [activeTab, setActiveTab] = useState("draft");
+  const [saveTrigger, setSaveTrigger] = useState(0);
+
+  const handleSaveDraft = () => {
+    setSaveTrigger(prev => prev + 1);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-brand-50/30">
@@ -36,6 +41,7 @@ const LegislationGenerator = () => {
       <DraftSidebar 
         currentDraft={currentDraft}
         onDraftSelect={setCurrentDraft}
+        onSaveDraft={handleSaveDraft}
       />
       
       {/* Main Content */}
@@ -53,6 +59,7 @@ const LegislationGenerator = () => {
               draft={currentDraft}
               onDraftChange={setCurrentDraft}
               onProgressChange={setProgress}
+              saveTrigger={saveTrigger}
             />
           </TabsContent>
           
