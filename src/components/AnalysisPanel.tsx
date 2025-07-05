@@ -1,23 +1,14 @@
-import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Button } from "@/components/ui/button";
 import { LegislativeDraft } from "@/types/legislation";
-import { TrendingUp, Clock, Users, Scale, AlertTriangle, Loader2 } from "lucide-react";
-import { generateAnalysis, AnalysisData } from "@/utils/analysisHelpers";
-import { useToast } from "@/hooks/use-toast";
+import { TrendingUp, Clock, Users, Scale, AlertTriangle } from "lucide-react";
 
 interface AnalysisPanelProps {
   draft: LegislativeDraft | null;
 }
 
 export const AnalysisPanel = ({ draft }: AnalysisPanelProps) => {
-  const [analysis, setAnalysis] = useState<AnalysisData | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const { toast } = useToast();
-
   if (!draft) {
     return (
       <Card>
@@ -28,93 +19,44 @@ export const AnalysisPanel = ({ draft }: AnalysisPanelProps) => {
     );
   }
 
-  const handleGenerateAnalysis = async () => {
-    if (!draft.draftContent || !draft.title) {
-      toast({
-        title: "Error",
-        description: "Draft content is required for analysis",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const analysisData = await generateAnalysis(draft.draftContent, draft.title);
-      setAnalysis(analysisData);
-      toast({
-        title: "Analysis Generated",
-        description: "Legislative analysis has been generated successfully"
-      });
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to generate analysis';
-      setError(errorMessage);
-      toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
-    }
+  const mockAnalysis = {
+    fiscalImpact: {
+      estimatedCost: "$2.5M - $5.2M annually",
+      confidence: 75,
+      breakdown: [
+        "Administrative costs: $1.2M",
+        "Implementation costs: $800K",
+        "Ongoing operations: $1.5M"
+      ]
+    },
+    implementationTimeline: {
+      phases: [
+        { name: "Regulatory Development", duration: "6 months", status: "pending" },
+        { name: "Agency Training", duration: "3 months", status: "pending" },
+        { name: "Public Outreach", duration: "4 months", status: "pending" },
+        { name: "Full Implementation", duration: "12 months", status: "pending" }
+      ]
+    },
+    similarLegislation: [
+      { state: "California", bill: "AB 123", similarity: 85, status: "Enacted" },
+      { state: "New York", bill: "S 456", similarity: 72, status: "Pending" },
+      { state: "Texas", bill: "HB 789", similarity: 68, status: "Failed" }
+    ],
+    stakeholders: [
+      { group: "Industry Associations", impact: "High", position: "Opposed" },
+      { group: "Consumer Groups", impact: "High", position: "Supportive" },
+      { group: "Government Agencies", impact: "Medium", position: "Neutral" },
+      { group: "Legal Community", impact: "Medium", position: "Mixed" }
+    ],
+    riskFactors: [
+      { risk: "Constitutional Challenge", probability: "Medium", impact: "High" },
+      { risk: "Implementation Delays", probability: "High", impact: "Medium" },
+      { risk: "Industry Pushback", probability: "High", impact: "Medium" }
+    ]
   };
-
-  if (!analysis && !isLoading && !error) {
-    return (
-      <Card>
-        <CardContent className="flex flex-col items-center justify-center py-16 space-y-4">
-          <Scale className="h-16 w-16 opacity-50" />
-          <h3 className="text-lg font-medium">No Analysis Generated</h3>
-          <p className="text-sm text-muted-foreground text-center max-w-md">
-            Generate a comprehensive analysis of this legislative draft including fiscal impact, timeline, and risk assessment.
-          </p>
-          <Button onClick={handleGenerateAnalysis} className="mt-4">
-            Generate Analysis
-          </Button>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <Card>
-        <CardContent className="flex flex-col items-center justify-center py-16 space-y-4">
-          <Loader2 className="h-8 w-8 animate-spin" />
-          <p className="text-sm text-muted-foreground">Generating analysis...</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (error) {
-    return (
-      <Card>
-        <CardContent className="flex flex-col items-center justify-center py-16 space-y-4">
-          <AlertTriangle className="h-16 w-16 text-destructive opacity-50" />
-          <h3 className="text-lg font-medium">Analysis Failed</h3>
-          <p className="text-sm text-muted-foreground text-center max-w-md">{error}</p>
-          <Button onClick={handleGenerateAnalysis} variant="outline">
-            Try Again
-          </Button>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (!analysis) return null;
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Legislative Analysis</h2>
-        <Button onClick={handleGenerateAnalysis} variant="outline" size="sm" disabled={isLoading}>
-          {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Regenerate"}
-        </Button>
-      </div>
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Fiscal Impact */}
         <Card>
@@ -128,13 +70,13 @@ export const AnalysisPanel = ({ draft }: AnalysisPanelProps) => {
             <div>
               <div className="flex justify-between items-center mb-2">
                 <span className="text-sm font-medium">Cost Estimate</span>
-                <Badge variant="outline">{analysis.fiscalImpact.confidence}% confidence</Badge>
+                <Badge variant="outline">{mockAnalysis.fiscalImpact.confidence}% confidence</Badge>
               </div>
-              <p className="text-2xl font-bold text-primary">{analysis.fiscalImpact.estimatedCost}</p>
+              <p className="text-2xl font-bold text-primary">{mockAnalysis.fiscalImpact.estimatedCost}</p>
             </div>
             <div className="space-y-2">
               <h4 className="font-medium">Cost Breakdown:</h4>
-              {analysis.fiscalImpact.breakdown.map((item, index) => (
+              {mockAnalysis.fiscalImpact.breakdown.map((item, index) => (
                 <p key={index} className="text-sm text-muted-foreground">• {item}</p>
               ))}
             </div>
@@ -150,7 +92,7 @@ export const AnalysisPanel = ({ draft }: AnalysisPanelProps) => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {analysis.implementationTimeline.phases.map((phase, index) => (
+            {mockAnalysis.implementationTimeline.phases.map((phase, index) => (
               <div key={index} className="space-y-2">
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium">{phase.name}</span>
@@ -173,7 +115,7 @@ export const AnalysisPanel = ({ draft }: AnalysisPanelProps) => {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {analysis.similarLegislation.map((leg, index) => (
+            {mockAnalysis.similarLegislation.map((leg, index) => (
               <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
                 <div>
                   <p className="font-medium">{leg.state} - {leg.bill}</p>
@@ -198,7 +140,7 @@ export const AnalysisPanel = ({ draft }: AnalysisPanelProps) => {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {analysis.stakeholders.map((stakeholder, index) => (
+            {mockAnalysis.stakeholders.map((stakeholder, index) => (
               <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
                 <div>
                   <p className="font-medium">{stakeholder.group}</p>
@@ -226,7 +168,7 @@ export const AnalysisPanel = ({ draft }: AnalysisPanelProps) => {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {analysis.riskFactors.map((risk, index) => (
+            {mockAnalysis.riskFactors.map((risk, index) => (
               <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
                 <div>
                   <p className="font-medium">{risk.risk}</p>
