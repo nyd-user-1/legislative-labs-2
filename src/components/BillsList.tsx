@@ -178,7 +178,7 @@ export const BillsList = ({ filters, onBillSelect }: BillsListProps) => {
                       </div>
 
                       {bill.description && (
-                        <p className="text-muted-foreground text-sm line-clamp-3">
+                        <p className="text-muted-foreground text-sm line-clamp-3 break-words">
                           {bill.description}
                         </p>
                       )}

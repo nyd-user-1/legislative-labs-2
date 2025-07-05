@@ -16,6 +16,7 @@ import {
   Vote
 } from "lucide-react";
 import { BillStatusBadge } from "./BillStatusBadge";
+import { BillJourney } from "./BillJourney";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
 
@@ -130,13 +131,10 @@ export const BillDetail = ({ bill, onBack }: BillDetailProps) => {
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
               <CardTitle className="text-2xl leading-tight">
-                {bill.bill_number && (
-                  <span className="text-primary mr-3">{bill.bill_number}</span>
-                )}
-                {bill.title || "Untitled Bill"}
+                {bill.bill_number || "No Bill Number"}
               </CardTitle>
-              {bill.description && (
-                <p className="text-muted-foreground mt-2">{bill.description}</p>
+              {bill.title && (
+                <p className="text-muted-foreground mt-2 text-lg">{bill.title}</p>
               )}
             </div>
             <div className="flex-shrink-0">
@@ -195,12 +193,13 @@ export const BillDetail = ({ bill, onBack }: BillDetailProps) => {
             </div>
           </div>
 
-          {bill.last_action && (
-            <div className="mt-6 p-4 bg-muted/50 rounded-lg">
-              <h4 className="font-medium mb-2">Latest Action</h4>
-              <p className="text-sm">{bill.last_action}</p>
-            </div>
-          )}
+          <div className="mt-6">
+            <BillJourney 
+              status={bill.status}
+              statusDesc={bill.status_desc}
+              lastAction={bill.last_action}
+            />
+          </div>
         </CardContent>
       </Card>
 
