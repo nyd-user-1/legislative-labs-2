@@ -93,7 +93,7 @@ Use proper legislative language and formatting. Make it comprehensive but focuse
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Wand2 className="h-5 w-5" />
-          Legislative Ideation
+          Ideation
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
