@@ -36,6 +36,8 @@ serve(async (req) => {
             role: 'system', 
             content: type === 'problem' 
               ? 'You are a legislative policy expert. Generate clear, structured problem statements that identify issues requiring legislative action. Focus on the problem, its impact, and why legislation is needed.'
+              : type === 'media'
+              ? 'You are a legislative communications expert. Generate comprehensive media materials including press releases, talking points, and social media content. Use professional language that is accessible to the public.'
               : 'You are a legislative drafting expert. Generate well-structured legislative bills with proper sections, findings, definitions, and operative provisions. Follow standard legislative format and language.'
           },
           { role: 'user', content: prompt }
