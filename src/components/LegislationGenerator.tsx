@@ -27,38 +27,22 @@ const LegislationGenerator = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-brand-50/30">
-      {/* Header */}
-      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40">
-        <div className="container flex h-16 items-center justify-between px-4 sm:px-6">
-          <div className="flex flex-col min-w-0 mr-4">
-            <h1 className="text-lg sm:text-xl font-bold truncate">Legislative Labs</h1>
-            <p className="text-xs text-muted-foreground truncate hidden sm:block">Democratized legislative ideation & voting.</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <Link to="/bills">
-              <Button variant="outline" size="sm" className="hidden sm:flex items-center gap-2">
-                <FileText className="h-4 w-4" />
-                Bills
-              </Button>
-            </Link>
-            <div className="flex-shrink-0">
-              <ProgressIndicator progress={progress} />
-            </div>
-            <UserMenu />
-          </div>
+    <div className="page-container min-h-screen bg-gray-50 p-6">
+      <div className="content-wrapper max-w-6xl mx-auto">
+        {/* Progress Indicator */}
+        <div className="mb-6">
+          <ProgressIndicator progress={progress} />
         </div>
-      </header>
 
-      {/* Collapsible Sidebar */}
-      <DraftSidebar 
-        currentDraft={currentDraft}
-        onDraftSelect={setCurrentDraft}
-        onSaveDraft={handleSaveDraft}
-      />
-      
-      {/* Main Content */}
-      <main className="container px-4 sm:px-6 py-6">
+        {/* Collapsible Sidebar */}
+        <DraftSidebar 
+          currentDraft={currentDraft}
+          onDraftSelect={setCurrentDraft}
+          onSaveDraft={handleSaveDraft}
+        />
+        
+        {/* Main Content */}
+        <div className="space-y-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-4 mb-6">
             <TabsTrigger value="draft">Draft</TabsTrigger>
@@ -88,7 +72,8 @@ const LegislationGenerator = () => {
             <PublicGallery onDraftSelect={setCurrentDraft} />
           </TabsContent>
         </Tabs>
-      </main>
+        </div>
+      </div>
     </div>
   );
 };

@@ -231,6 +231,60 @@ export type Database = {
           },
         ]
       }
+      media_outputs: {
+        Row: {
+          content: string
+          content_type: string
+          created_at: string
+          id: string
+          legislative_draft_id: string | null
+          metadata: Json | null
+          status: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          content_type: string
+          created_at?: string
+          id?: string
+          legislative_draft_id?: string | null
+          metadata?: Json | null
+          status?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          content_type?: string
+          created_at?: string
+          id?: string
+          legislative_draft_id?: string | null
+          metadata?: Json | null
+          status?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_outputs_legislative_draft_id_fkey"
+            columns: ["legislative_draft_id"]
+            isOneToOne: false
+            referencedRelation: "legislative_drafts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "media_outputs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       People: {
         Row: {
           ballotpedia: string | null
