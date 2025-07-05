@@ -133,10 +133,10 @@ export const DraftEditor = ({ draft, onDraftChange, onProgressChange, saveTrigge
         <div className="flex justify-between items-center pt-4 border-t">
           <div className="flex gap-3">
             <Button onClick={saveDraft} variant="outline" className="touch-manipulation">
-              Save Draft
+              Save
             </Button>
             <Button onClick={handleSaveAndSubmit} className="touch-manipulation">
-              Save & Submit to Gallery
+              Save and Submit
             </Button>
           </div>
           
@@ -146,7 +146,7 @@ export const DraftEditor = ({ draft, onDraftChange, onProgressChange, saveTrigge
             className="touch-manipulation"
           >
             <Newspaper className="mr-2 h-4 w-4" />
-            Enter Pressroom
+            Media Kit
           </Button>
         </div>
       )}
