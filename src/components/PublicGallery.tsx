@@ -82,6 +82,16 @@ export const PublicGallery = ({ onDraftSelect }: PublicGalleryProps) => {
     });
   };
 
+  const extractBillTitle = (draft: LegislativeDraft) => {
+    // Extract bill title from draft content if available
+    if (draft.draftContent) {
+      const match = draft.draftContent.match(/\*\*([^*]+Act[^*]*)\*\*/);
+      if (match) {
+        return match[1];
+      }
+    }
+    return draft.title;
+  };
   const getTypeColor = (type: string) => {
     switch (type) {
       case 'technology': return 'bg-blue-100 text-blue-800';
@@ -132,11 +142,11 @@ export const PublicGallery = ({ onDraftSelect }: PublicGalleryProps) => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Public Legislation Gallery</h2>
+          <h2 className="text-2xl font-bold">Gallery</h2>
           <p className="text-muted-foreground">Vote for your favorite ideas</p>
         </div>
         <Badge variant="outline" className="text-sm">
-          {publicDrafts.length} public {publicDrafts.length === 1 ? 'draft' : 'drafts'}
+          {publicDrafts.length}
         </Badge>
       </div>
 
@@ -149,7 +159,7 @@ export const PublicGallery = ({ onDraftSelect }: PublicGalleryProps) => {
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between mb-2">
                   <CardTitle className="text-lg font-medium line-clamp-2 flex-1">
-                    {draft.title}
+                    {extractBillTitle(draft)}
                   </CardTitle>
                   <Button
                     variant="ghost"
