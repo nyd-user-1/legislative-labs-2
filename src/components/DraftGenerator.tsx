@@ -93,7 +93,7 @@ Use proper legislative language and formatting. Make it comprehensive but focuse
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Wand2 className="h-5 w-5" />
-          Legislative Ideation Inputs
+          Legislative Ideation
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -104,14 +104,19 @@ Use proper legislative language and formatting. Make it comprehensive but focuse
             placeholder="Enter your idea for legislation or policy here. Be as detailed as possible and include a problem statement."
             value={idea}
             onChange={(e) => onIdeaChange(e.target.value)}
-            className="min-h-[120px] resize-none"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && e.ctrlKey) {
+                generateDraft();
+              }
+            }}
+            className="min-h-[120px] resize-none form-input"
           />
         </div>
 
         <Button
           onClick={generateDraft}
           disabled={isGeneratingDraft}
-          className="w-full"
+          className="button-generate"
         >
           {isGeneratingDraft ? (
             <>

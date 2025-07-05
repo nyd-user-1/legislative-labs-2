@@ -4,14 +4,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Lightbulb, Copy } from "lucide-react";
+import { Loader2, Lightbulb, Copy, FileText } from "lucide-react";
 import { generateProblemFromScenario } from "@/utils/problemStatementHelpers";
 
 interface ProblemGeneratorProps {
   onProblemGenerated?: (problem: string) => void;
+  onDraftBill?: (problem: string) => void;
 }
 
-export const ProblemGenerator = ({ onProblemGenerated }: ProblemGeneratorProps) => {
+export const ProblemGenerator = ({ onProblemGenerated, onDraftBill }: ProblemGeneratorProps) => {
   const [scenarioInput, setScenarioInput] = useState("");
   const [problemStatement, setProblemStatement] = useState("");
   const [isGeneratingProblem, setIsGeneratingProblem] = useState(false);
@@ -84,14 +85,19 @@ export const ProblemGenerator = ({ onProblemGenerated }: ProblemGeneratorProps) 
             placeholder="Describe a real-life situation or scenario that illustrates the problem you want to address with legislation..."
             value={scenarioInput}
             onChange={(e) => setScenarioInput(e.target.value)}
-            className="min-h-[100px] resize-none"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && e.ctrlKey) {
+                generateProblemStatement();
+              }
+            }}
+            className="min-h-[100px] resize-none form-input"
           />
         </div>
 
         <Button
           onClick={generateProblemStatement}
           disabled={isGeneratingProblem}
-          className="w-full"
+          className="button-generate"
         >
           {isGeneratingProblem ? (
             <>
@@ -107,21 +113,30 @@ export const ProblemGenerator = ({ onProblemGenerated }: ProblemGeneratorProps) 
         </Button>
 
         {problemStatement && (
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
+          <div className="space-y-4">
+            <div className="space-y-2">
               <Label>Generated Problem Statement</Label>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={copyProblemStatement}
-                className="h-8 w-8 p-0"
-              >
-                <Copy className="h-4 w-4" />
-              </Button>
+              <div className="bg-muted/50 p-4 rounded-lg border output-container relative">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={copyProblemStatement}
+                  className="absolute top-2 right-2 h-8 w-8 p-0 opacity-70 hover:opacity-100"
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
+                <p className="text-sm leading-relaxed whitespace-pre-wrap pr-10">{problemStatement}</p>
+              </div>
             </div>
-            <div className="bg-muted/50 p-4 rounded-lg border">
-              <p className="text-sm leading-relaxed whitespace-pre-wrap">{problemStatement}</p>
-            </div>
+            
+            <Button
+              onClick={() => onDraftBill?.(problemStatement)}
+              variant="secondary"
+              className="w-full"
+            >
+              <FileText className="mr-2 h-4 w-4" />
+              Draft Bill from Problem Statement
+            </Button>
           </div>
         )}
       </CardContent>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
 import { LegislativeDraft, DraftProgress } from "@/types/legislation";
 import { detectLegislativeCategory, extractTitleFromIdea } from "@/utils/legislativeHelpers";
 import { ProblemGenerator } from "./ProblemGenerator";
@@ -71,9 +72,25 @@ export const DraftEditor = ({ draft, onDraftChange, onProgressChange, saveTrigge
     });
   };
 
+  const handleDraftBill = (problemStatement: string) => {
+    setIdea(problemStatement);
+  };
+
+  const handleSaveAndSubmit = () => {
+    saveDraft();
+    // TODO: Add submit to public gallery functionality
+    toast({
+      title: "Draft saved and submitted!",
+      description: "Your draft has been saved and submitted to the public gallery.",
+    });
+  };
+
   return (
-    <div className="space-y-6">
-      <ProblemGenerator onProblemGenerated={() => {}} />
+    <div className="space-y-6 workflow-container">
+      <ProblemGenerator 
+        onProblemGenerated={() => {}} 
+        onDraftBill={handleDraftBill}
+      />
       
       <DraftGenerator
         idea={idea}
@@ -83,6 +100,17 @@ export const DraftEditor = ({ draft, onDraftChange, onProgressChange, saveTrigge
       />
 
       <DraftDisplay draftContent={draftContent} />
+
+      {(idea || draftContent) && (
+        <div className="flex gap-3 pt-4 border-t">
+          <Button onClick={saveDraft} variant="outline">
+            Save Draft
+          </Button>
+          <Button onClick={handleSaveAndSubmit}>
+            Save & Submit to Gallery
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

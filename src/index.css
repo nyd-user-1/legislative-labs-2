@@ -95,6 +95,26 @@
   }
 }
 
+@layer components {
+  .button-generate {
+    @apply px-8 py-2 h-10;
+    width: auto;
+    min-width: 200px;
+  }
+  
+  .output-container {
+    position: relative;
+  }
+  
+  .form-input:focus {
+    @apply ring-2 ring-primary ring-offset-2;
+  }
+  
+  .workflow-container {
+    @apply space-y-6;
+  }
+}
+
 @layer base {
   * {
     @apply border-border;

@@ -15,9 +15,9 @@ serve(async (req) => {
   }
 
   try {
-    const { prompt, type } = await req.json();
+    const { prompt, type, stream = false } = await req.json();
 
-    console.log('Generating content with OpenAI:', { type, promptLength: prompt?.length });
+    console.log('Generating content with OpenAI:', { type, promptLength: prompt?.length, stream });
 
     if (!openAIApiKey) {
       throw new Error('OpenAI API key not configured');
@@ -42,6 +42,7 @@ serve(async (req) => {
         ],
         temperature: 0.7,
         max_tokens: 2000,
+        stream: stream,
       }),
     });
 
@@ -51,14 +52,26 @@ serve(async (req) => {
       throw new Error(`OpenAI API error: ${response.status}`);
     }
 
-    const data = await response.json();
-    const generatedText = data.choices[0].message.content;
+    if (stream) {
+      // Return streaming response
+      return new Response(response.body, {
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'text/plain',
+          'Transfer-Encoding': 'chunked'
+        },
+      });
+    } else {
+      // Return complete response
+      const data = await response.json();
+      const generatedText = data.choices[0].message.content;
 
-    console.log('Content generated successfully');
+      console.log('Content generated successfully');
 
-    return new Response(JSON.stringify({ generatedText }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+      return new Response(JSON.stringify({ generatedText }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
   } catch (error) {
     console.error('Error in generate-with-openai function:', error);
     return new Response(JSON.stringify({ error: error.message }), {
