@@ -11,6 +11,7 @@ import { Tables } from "@/integrations/supabase/types";
 type Bill = Tables<"Bills">;
 
 const Bills = () => {
+  console.log("Bills page component rendering");
   const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
   const [committees, setCommittees] = useState<string[]>([]);
   const [filters, setFilters] = useState({

@@ -33,6 +33,7 @@ export const BillsList = ({ filters, onBillSelect }: BillsListProps) => {
     try {
       setLoading(true);
       setError(null);
+      console.log("Fetching bills with filters:", filters);
 
       let query = supabase.from("Bills").select("*");
 
@@ -68,9 +69,11 @@ export const BillsList = ({ filters, onBillSelect }: BillsListProps) => {
       const { data, error } = await query;
 
       if (error) {
+        console.error("Query error:", error);
         throw error;
       }
 
+      console.log("Bills fetched successfully:", data?.length || 0, "bills");
       setBills(data || []);
     } catch (err) {
       console.error("Error fetching bills:", err);
