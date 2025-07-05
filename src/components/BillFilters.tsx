@@ -19,29 +19,48 @@ interface BillFiltersProps {
 export const BillFilters = ({ onFiltersChange, committees }: BillFiltersProps) => {
   const [filters, setFilters] = useState({
     search: "",
-    status: "",
-    committee: "",
-    dateRange: ""
+    status: "all",
+    committee: "all",
+    dateRange: "all"
   });
 
   const handleFilterChange = (key: string, value: string) => {
     const newFilters = { ...filters, [key]: value };
     setFilters(newFilters);
-    onFiltersChange(newFilters);
+    
+    // Convert "all" back to empty strings when passing to parent
+    const filtersForParent = {
+      ...newFilters,
+      status: newFilters.status === "all" ? "" : newFilters.status,
+      committee: newFilters.committee === "all" ? "" : newFilters.committee,
+      dateRange: newFilters.dateRange === "all" ? "" : newFilters.dateRange,
+    };
+    onFiltersChange(filtersForParent);
   };
 
   const clearFilters = () => {
     const emptyFilters = {
       search: "",
+      status: "all",
+      committee: "all",
+      dateRange: "all"
+    };
+    setFilters(emptyFilters);
+    
+    // Convert "all" back to empty strings when passing to parent
+    const filtersForParent = {
+      search: "",
       status: "",
       committee: "",
       dateRange: ""
     };
-    setFilters(emptyFilters);
-    onFiltersChange(emptyFilters);
+    onFiltersChange(filtersForParent);
   };
 
-  const hasActiveFilters = Object.values(filters).some(value => value !== "");
+  const hasActiveFilters = filters.search !== "" || 
+    (filters.status !== "all" && filters.status !== "") ||
+    (filters.committee !== "all" && filters.committee !== "") ||
+    (filters.dateRange !== "all" && filters.dateRange !== "");
 
   return (
     <Card>
@@ -85,7 +104,7 @@ export const BillFilters = ({ onFiltersChange, committees }: BillFiltersProps) =
                 <SelectValue placeholder="All Statuses" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Statuses</SelectItem>
+                <SelectItem value="all">All Statuses</SelectItem>
                 <SelectItem value="1">Introduced</SelectItem>
                 <SelectItem value="2">Committee</SelectItem>
                 <SelectItem value="3">Floor</SelectItem>
@@ -103,7 +122,7 @@ export const BillFilters = ({ onFiltersChange, committees }: BillFiltersProps) =
                 <SelectValue placeholder="All Committees" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Committees</SelectItem>
+                <SelectItem value="all">All Committees</SelectItem>
                 {committees.map((committee) => (
                   <SelectItem key={committee} value={committee}>
                     {committee}
@@ -120,7 +139,7 @@ export const BillFilters = ({ onFiltersChange, committees }: BillFiltersProps) =
                 <SelectValue placeholder="All Time" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Time</SelectItem>
+                <SelectItem value="all">All Time</SelectItem>
                 <SelectItem value="7">Last 7 days</SelectItem>
                 <SelectItem value="30">Last 30 days</SelectItem>
                 <SelectItem value="90">Last 3 months</SelectItem>
