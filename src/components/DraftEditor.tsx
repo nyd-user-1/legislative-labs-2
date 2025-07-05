@@ -156,6 +156,7 @@ export const DraftEditor = ({ draft, onDraftChange, onProgressChange, saveTrigge
           <MediaPlanning 
             problemStatement={problemStatement}
             legislativeIdea={idea}
+            shouldPopulateInput={showMediaPlanning}
           />
         </div>
       )}

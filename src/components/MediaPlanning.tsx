@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -11,13 +11,22 @@ import { supabase } from "@/integrations/supabase/client";
 interface MediaPlanningProps {
   problemStatement: string;
   legislativeIdea: string;
+  shouldPopulateInput?: boolean;
 }
 
-export const MediaPlanning = ({ problemStatement, legislativeIdea }: MediaPlanningProps) => {
+export const MediaPlanning = ({ problemStatement, legislativeIdea, shouldPopulateInput }: MediaPlanningProps) => {
   const [planningInput, setPlanningInput] = useState("");
   const [mediaContent, setMediaContent] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
+
+  // Auto-populate input when component is shown
+  useEffect(() => {
+    if (shouldPopulateInput && (problemStatement || legislativeIdea)) {
+      const populatedContent = `Problem Statement: ${problemStatement}\n\nLegislative Idea: ${legislativeIdea}`;
+      setPlanningInput(populatedContent);
+    }
+  }, [shouldPopulateInput, problemStatement, legislativeIdea]);
 
   const generateMediaContent = async () => {
     if (!planningInput.trim() && !problemStatement && !legislativeIdea) {
@@ -31,23 +40,41 @@ export const MediaPlanning = ({ problemStatement, legislativeIdea }: MediaPlanni
 
     setIsGenerating(true);
     try {
-      const baseContent = `Problem Statement: ${problemStatement}\n\nLegislative Idea: ${legislativeIdea}`;
-      const userInput = planningInput.trim() || "Prepare talking points, draft a press release, and draw up a social media post...all at once.";
-      
-      const prompt = `Based on this legislative content, create comprehensive media materials:
+      const prompt = `You are an expert political communications strategist and media planner. When generating media content, create:
 
-${baseContent}
+**Press Release Structure:**
+- Compelling headline with strong action verbs
+- Lead paragraph answering who, what, when, where, why
+- Supporting quotes from key stakeholders/officials
+- Background context and supporting data
+- Clear call-to-action and next steps
+- Professional boilerplate conclusion
 
-Media Planning Request: ${userInput}
+**Talking Points Format:**
+- 3-5 key messages in bullet format
+- Each point should be 1-2 sentences maximum
+- Include anticipated counterarguments with responses
+- Provide relevant statistics and sound bites
+- Frame messaging for target audiences (voters, media, stakeholders)
 
-Please create:
-1. Key talking points for interviews and speeches
-2. A professional press release
-3. Social media posts for different platforms (Twitter, Facebook, LinkedIn)
-4. Background briefing materials
-5. FAQ responses for common questions
+**Social Media Post:**
+- Platform-appropriate length and tone
+- Include relevant hashtags (#legislation #policy)
+- Compelling hook in first line
+- Clear value proposition
+- Call-to-action (contact representatives, share, etc.)
+- Consider visual content suggestions
 
-Make it comprehensive but focused, suitable for legislative advocacy and public communication.`;
+**Tone & Style:**
+- Professional yet accessible language
+- Avoid political jargon, use plain English
+- Focus on real-world impact and benefits
+- Maintain nonpartisan, solution-focused approach
+- Emphasize urgency and importance of the issue
+
+Generate all three deliverables as distinct, clearly labeled sections. Base content on the provided problem statement and legislative context:
+
+${planningInput}`;
 
       const { data, error } = await supabase.functions.invoke('generate-with-openai', {
         body: { prompt, type: 'media' }
