@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { LegislativeDraft, DraftProgress } from "@/types/legislation";
@@ -6,6 +6,8 @@ import { detectLegislativeCategory, extractTitleFromIdea } from "@/utils/legisla
 import { ProblemGenerator } from "./ProblemGenerator";
 import { DraftGenerator } from "./DraftGenerator";
 import { DraftDisplay } from "./DraftDisplay";
+import { MediaPlanning } from "./MediaPlanning";
+import { Newspaper } from "lucide-react";
 
 interface DraftEditorProps {
   draft: LegislativeDraft | null;
@@ -17,7 +19,20 @@ interface DraftEditorProps {
 export const DraftEditor = ({ draft, onDraftChange, onProgressChange, saveTrigger }: DraftEditorProps) => {
   const [idea, setIdea] = useState("");
   const [draftContent, setDraftContent] = useState("");
+  const [problemStatement, setProblemStatement] = useState("");
+  const [showMediaPlanning, setShowMediaPlanning] = useState(false);
   const { toast } = useToast();
+  
+  const ideationRef = useRef<HTMLDivElement>(null);
+  const mediaPlanningRef = useRef<HTMLDivElement>(null);
+
+  const smoothScrollTo = (ref: React.RefObject<HTMLDivElement>) => {
+    ref.current?.scrollIntoView({ 
+      behavior: 'smooth', 
+      block: 'start',
+      inline: 'nearest'
+    });
+  };
 
   useEffect(() => {
     if (draft) {
@@ -73,7 +88,18 @@ export const DraftEditor = ({ draft, onDraftChange, onProgressChange, saveTrigge
   };
 
   const handleDraftBill = (problemStatement: string) => {
+    setProblemStatement(problemStatement);
     setIdea(problemStatement);
+    setTimeout(() => smoothScrollTo(ideationRef), 100);
+  };
+
+  const handleEnterPressroom = () => {
+    setShowMediaPlanning(true);
+    setTimeout(() => smoothScrollTo(mediaPlanningRef), 100);
+  };
+
+  const handleProblemGenerated = (problem: string) => {
+    setProblemStatement(problem);
   };
 
   const handleSaveAndSubmit = () => {
@@ -86,29 +112,51 @@ export const DraftEditor = ({ draft, onDraftChange, onProgressChange, saveTrigge
   };
 
   return (
-    <div className="space-y-6 workflow-container">
+    <div className="space-y-6 workflow-container smooth-scroll">
       <ProblemGenerator 
-        onProblemGenerated={() => {}} 
+        onProblemGenerated={handleProblemGenerated} 
         onDraftBill={handleDraftBill}
       />
       
-      <DraftGenerator
-        idea={idea}
-        onIdeaChange={setIdea}
-        onDraftGenerated={setDraftContent}
-        onProgressChange={onProgressChange}
-      />
+      <div ref={ideationRef}>
+        <DraftGenerator
+          idea={idea}
+          onIdeaChange={setIdea}
+          onDraftGenerated={setDraftContent}
+          onProgressChange={onProgressChange}
+        />
+      </div>
 
       <DraftDisplay draftContent={draftContent} />
 
       {(idea || draftContent) && (
-        <div className="flex gap-3 pt-4 border-t">
-          <Button onClick={saveDraft} variant="outline">
-            Save Draft
+        <div className="flex justify-between items-center pt-4 border-t">
+          <div className="flex gap-3">
+            <Button onClick={saveDraft} variant="outline" className="touch-manipulation">
+              Save Draft
+            </Button>
+            <Button onClick={handleSaveAndSubmit} className="touch-manipulation">
+              Save & Submit to Gallery
+            </Button>
+          </div>
+          
+          <Button 
+            onClick={handleEnterPressroom}
+            variant="outline"
+            className="touch-manipulation"
+          >
+            <Newspaper className="mr-2 h-4 w-4" />
+            Enter Pressroom
           </Button>
-          <Button onClick={handleSaveAndSubmit}>
-            Save & Submit to Gallery
-          </Button>
+        </div>
+      )}
+
+      {showMediaPlanning && (
+        <div ref={mediaPlanningRef}>
+          <MediaPlanning 
+            problemStatement={problemStatement}
+            legislativeIdea={idea}
+          />
         </div>
       )}
     </div>

@@ -109,14 +109,14 @@ Use proper legislative language and formatting. Make it comprehensive but focuse
                 generateDraft();
               }
             }}
-            className="min-h-[120px] resize-none form-input"
+            className="textarea-auto resize-none form-input"
           />
         </div>
 
         <Button
           onClick={generateDraft}
           disabled={isGeneratingDraft}
-          className="button-generate"
+          className="button-generate touch-manipulation"
         >
           {isGeneratingDraft ? (
             <>

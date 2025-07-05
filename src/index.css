@@ -113,6 +113,19 @@
   .workflow-container {
     @apply space-y-6;
   }
+  
+  .textarea-auto {
+    resize: vertical;
+    min-height: 120px;
+  }
+  
+  .smooth-scroll {
+    scroll-behavior: smooth;
+  }
+  
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
 }
 
 @layer base {

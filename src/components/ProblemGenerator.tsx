@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Lightbulb, Copy, FileText } from "lucide-react";
 import { generateProblemFromScenario } from "@/utils/problemStatementHelpers";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ProblemGeneratorProps {
   onProblemGenerated?: (problem: string) => void;
@@ -29,10 +30,33 @@ export const ProblemGenerator = ({ onProblemGenerated, onDraftBill }: ProblemGen
     }
 
     setIsGeneratingProblem(true);
+    setProblemStatement("");
+    
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      
-      const generated = await generateProblemFromScenario(scenarioInput);
+      const prompt = `Based on this real-life scenario, generate a clear, structured problem statement that identifies issues requiring legislative action. Focus on the problem, its impact, and why legislation is needed:
+
+Scenario: ${scenarioInput}
+
+Please create a comprehensive problem statement that:
+1. Clearly defines the problem
+2. Explains the impact on society/individuals
+3. Identifies why current solutions are inadequate
+4. Justifies the need for legislative intervention
+5. Suggests the scope of legislative action needed
+
+Format it as a professional problem statement suitable for legislative drafting.`;
+
+      const { data, error } = await supabase.functions.invoke('generate-with-openai', {
+        body: { prompt, type: 'problem', stream: true }
+      });
+
+      if (error) {
+        console.error('Error calling OpenAI function:', error);
+        throw new Error('Failed to generate problem statement');
+      }
+
+      // For now, handle non-streaming response
+      const generated = data.generatedText || await generateProblemFromScenario(scenarioInput);
       setProblemStatement(generated);
       onProblemGenerated?.(generated);
 
@@ -41,6 +65,7 @@ export const ProblemGenerator = ({ onProblemGenerated, onDraftBill }: ProblemGen
         description: "Review and copy the statement to use in your legislative idea.",
       });
     } catch (error) {
+      console.error('Problem generation error:', error);
       toast({
         title: "Error generating problem statement",
         description: "Please try again later",
@@ -97,7 +122,7 @@ export const ProblemGenerator = ({ onProblemGenerated, onDraftBill }: ProblemGen
         <Button
           onClick={generateProblemStatement}
           disabled={isGeneratingProblem}
-          className="button-generate"
+          className="button-generate touch-manipulation"
         >
           {isGeneratingProblem ? (
             <>
