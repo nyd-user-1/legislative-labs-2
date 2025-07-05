@@ -38,6 +38,8 @@ serve(async (req) => {
               ? 'You are a legislative policy expert. Generate clear, structured problem statements that identify issues requiring legislative action. Focus on the problem, its impact, and why legislation is needed.'
               : type === 'media'
               ? 'You are a legislative communications expert. Generate comprehensive media materials including press releases, talking points, and social media content. Use professional language that is accessible to the public.'
+              : type === 'analysis'
+              ? 'You are a legislative analysis expert. Analyze the provided legislative draft and return a comprehensive analysis in JSON format. Include fiscal impact (cost estimates with confidence levels and breakdown), implementation timeline (phases with durations), similar legislation (state bills with similarity percentages and status), stakeholder analysis (groups with impact levels and positions), and risk assessment (risks with probability and impact levels). Be realistic and specific in your analysis.'
               : 'You are a legislative drafting expert. Generate well-structured legislative bills with proper sections, findings, definitions, and operative provisions. Follow standard legislative format and language.'
           },
           { role: 'user', content: prompt }
