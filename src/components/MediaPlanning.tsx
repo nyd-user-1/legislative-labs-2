@@ -78,96 +78,30 @@ Generate all three deliverables as distinct, clearly labeled sections. Base cont
 
 ${planningInput}`;
 
-      // Request streaming response
-      const response = await fetch(`https://kwyjohorlngujoqypyvu.supabase.co/functions/v1/generate-with-openai`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt3eWpvaG9ybmxndWpvcXlweXZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MTAyODcsImV4cCI6MjA2NzE4NjI4N30.nPewQZse07MkYAK5W9wCEwYhnndHkA8pKmedgHkvD9M`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          prompt, 
-          type: 'media',
-          stream: true 
-        }),
+      const { data, error } = await supabase.functions.invoke('generate-with-openai', {
+        body: { prompt, type: 'media' }
       });
 
-      if (!response.ok) {
+      if (error) {
+        console.error('Error calling OpenAI function:', error);
         throw new Error('Failed to generate media content');
       }
 
-      const reader = response.body?.getReader();
-      if (!reader) {
-        throw new Error('No response stream available');
-      }
+      const content = data.generatedText || "Media content generation failed. Please try again.";
+      setMediaContent(content);
 
-      const decoder = new TextDecoder();
-      let accumulatedContent = '';
-
-      try {
-        while (true) {
-          const { done, value } = await reader.read();
-          
-          if (done) break;
-          
-          const chunk = decoder.decode(value, { stream: true });
-          const lines = chunk.split('\n');
-          
-          for (const line of lines) {
-            if (line.startsWith('data: ')) {
-              try {
-                const jsonData = JSON.parse(line.slice(6));
-                if (jsonData.choices?.[0]?.delta?.content) {
-                  const newContent = jsonData.choices[0].delta.content;
-                  accumulatedContent += newContent;
-                  setMediaContent(accumulatedContent);
-                }
-              } catch (e) {
-                // Skip invalid JSON lines
-                continue;
-              }
-            }
-          }
-        }
-      } finally {
-        reader.releaseLock();
-      }
-
-      if (accumulatedContent) {
-        toast({
-          title: "Media content generated!",
-          description: "Your media materials are ready for review.",
-        });
-      } else {
-        throw new Error('No content was generated');
-      }
+      toast({
+        title: "Media content generated!",
+        description: "Your media materials are ready for review.",
+      });
       
     } catch (error) {
       console.error('Media generation error:', error);
-      
-      // Fallback to non-streaming if streaming fails
-      try {
-        const { data, error: fallbackError } = await supabase.functions.invoke('generate-with-openai', {
-          body: { prompt, type: 'media' }
-        });
-
-        if (fallbackError) throw fallbackError;
-        
-        const content = data.generatedText || "Media content generation failed. Please try again.";
-        setMediaContent(content);
-        
-        toast({
-          title: "Media content generated!",
-          description: "Your media materials are ready for review.",
-        });
-      } catch (fallbackError) {
-        console.error('Fallback generation error:', fallbackError);
-        toast({
-          title: "Error generating media content",
-          description: "Please try again later",
-          variant: "destructive",
-        });
-      }
+      toast({
+        title: "Error generating media content", 
+        description: "Please try again later",
+        variant: "destructive",
+      });
     } finally {
       setIsGenerating(false);
     }
