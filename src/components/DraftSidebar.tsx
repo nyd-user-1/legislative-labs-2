@@ -107,10 +107,10 @@ export const DraftSidebar = ({ currentDraft, onDraftSelect, onSaveDraft }: Draft
         <div className="container px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Button onClick={createNewDraft} size="sm">
-                <Plus className="mr-2 h-4 w-4" />
-                New Draft
-              </Button>
+                <Button onClick={createNewDraft} size="sm">
+                  <Plus className="mr-2 h-4 w-4" />
+                  New
+                </Button>
               <CollapsibleTrigger asChild>
                 <Button variant="outline" size="sm">
                   <FileText className="mr-2 h-4 w-4" />
