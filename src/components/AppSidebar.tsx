@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { NavLink, useLocation } from "react-router-dom";
-import { Search, Settings, User, FileText, Lightbulb, BarChart3, LogOut } from "lucide-react";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { Search, Settings, User, FileText, Lightbulb, BarChart3, LogOut, Clock, X } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -19,6 +19,8 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useSearch, SearchResult } from "@/hooks/useSearch";
+import { Badge } from "@/components/ui/badge";
 
 const mainNavItems = [
   { title: "Problems", url: "/problems", icon: Search },
@@ -36,8 +38,9 @@ const bottomNavItems = [
 export function AppSidebar() {
   const { state } = useSidebar();
   const location = useLocation();
-  const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
   const { toast } = useToast();
+  const { searchTerm, setSearchTerm, searchResults, clearSearch } = useSearch();
 
   const currentPath = location.pathname;
 
@@ -66,6 +69,31 @@ export function AppSidebar() {
         description: "There was a problem signing you out.",
         variant: "destructive",
       });
+    }
+  };
+
+  const handleSearchResultClick = (result: SearchResult) => {
+    navigate(result.url);
+    clearSearch();
+  };
+
+  const getTypeIcon = (type: SearchResult['type']) => {
+    switch (type) {
+      case 'problem': return Search;
+      case 'idea': return Lightbulb;
+      case 'draft': return FileText;
+      case 'media': return BarChart3;
+      default: return FileText;
+    }
+  };
+
+  const getTypeBadgeVariant = (type: SearchResult['type']) => {
+    switch (type) {
+      case 'problem': return 'secondary';
+      case 'idea': return 'outline';
+      case 'draft': return 'default';
+      case 'media': return 'destructive';
+      default: return 'secondary';
     }
   };
 
@@ -100,32 +128,79 @@ export function AppSidebar() {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10 h-9"
                 />
+                {searchTerm && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={clearSearch}
+                    className="absolute right-2 top-2 h-5 w-5 p-0"
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                )}
               </div>
             </div>
           </SidebarGroup>
         )}
 
-        {/* Main Navigation */}
-        <SidebarGroup>
-          <SidebarGroupLabel>Workflow</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {mainNavItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink 
-                      to={item.url} 
-                      className={getNavClassName(item.url)}
-                    >
-                      <item.icon className="mr-2 h-4 w-4" />
-                      {!collapsed && <span>{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {/* Search Results */}
+        {!collapsed && searchResults.length > 0 && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Search Results</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {searchResults.map((result) => {
+                  const TypeIcon = getTypeIcon(result.type);
+                  return (
+                    <SidebarMenuItem key={result.id}>
+                      <SidebarMenuButton
+                        onClick={() => handleSearchResultClick(result)}
+                        className="cursor-pointer hover:bg-accent hover:text-accent-foreground"
+                      >
+                        <TypeIcon className="mr-2 h-4 w-4" />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-medium truncate">{result.title}</span>
+                            <Badge variant={getTypeBadgeVariant(result.type)} className="ml-2 text-xs">
+                              {result.type}
+                            </Badge>
+                          </div>
+                          <p className="text-xs text-muted-foreground truncate">
+                            {result.content.substring(0, 50)}...
+                          </p>
+                        </div>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+
+        {/* Main Navigation - Hidden when searching */}
+        {(!searchTerm || searchResults.length === 0) && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Workflow</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {mainNavItems.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <NavLink 
+                        to={item.url} 
+                        className={getNavClassName(item.url)}
+                      >
+                        <item.icon className="mr-2 h-4 w-4" />
+                        {!collapsed && <span>{item.title}</span>}
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
 
         {/* Account Navigation */}
         <SidebarGroup>
