@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, Wand2, FileText } from "lucide-react";
 import { DraftProgress } from "@/types/legislation";
 import { detectLegislativeCategory, generateLegislativeDraft } from "@/utils/legislativeHelpers";
+import { supabase } from "@/integrations/supabase/client";
 
 interface DraftGeneratorProps {
   idea: string;
@@ -31,11 +32,38 @@ export const DraftGenerator = ({ idea, onIdeaChange, onDraftGenerated, onProgres
 
     setIsGeneratingDraft(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 3000));
-      
       // Automatically detect the legislative category from the content
       const detectedCategory = detectLegislativeCategory(idea);
-      const draft = generateLegislativeDraft(idea, detectedCategory);
+      
+      const prompt = `Generate a complete legislative bill based on this idea:
+
+Legislative Idea: ${idea}
+
+Category: ${detectedCategory}
+
+Please create a well-structured bill that includes:
+1. Proper bill title and number placeholder
+2. Short title section
+3. Findings and purpose section explaining the need for this legislation
+4. Definitions section for key terms
+5. Operative provisions that address the legislative idea
+6. Enforcement mechanisms and penalties if applicable
+7. Funding provisions
+8. Effective date
+9. Severability clause
+
+Use proper legislative language and formatting. Make it comprehensive but focused on the core idea provided.`;
+
+      const { data, error } = await supabase.functions.invoke('generate-with-openai', {
+        body: { prompt, type: 'draft' }
+      });
+
+      if (error) {
+        console.error('Error calling OpenAI function:', error);
+        throw new Error('Failed to generate legislative draft');
+      }
+
+      const draft = data.generatedText || generateLegislativeDraft(idea, detectedCategory);
       onDraftGenerated(draft);
       
       onProgressChange({
@@ -49,6 +77,7 @@ export const DraftGenerator = ({ idea, onIdeaChange, onDraftGenerated, onProgres
         description: "Your legislative draft is ready for review.",
       });
     } catch (error) {
+      console.error('Draft generation error:', error);
       toast({
         title: "Error generating draft",
         description: "Please try again later",
