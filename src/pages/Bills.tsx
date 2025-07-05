@@ -10,6 +10,8 @@ import { Tables } from "@/integrations/supabase/types";
 
 type Bill = Tables<"Bills">;
 
+console.log("Bills.tsx file is loading");
+
 const Bills = () => {
   console.log("Bills page component rendering");
   const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
