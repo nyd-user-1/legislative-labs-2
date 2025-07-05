@@ -1,5 +1,8 @@
 import { useState, useRef } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { FileText } from "lucide-react";
 import { DraftEditor } from "./DraftEditor";
 import { AnalysisPanel } from "./AnalysisPanel";
 import { ExportPanel } from "./ExportPanel";
@@ -33,6 +36,12 @@ const LegislationGenerator = () => {
             <p className="text-xs text-muted-foreground truncate hidden sm:block">Democratized legislative ideation & voting.</p>
           </div>
           <div className="flex items-center gap-4">
+            <Link to="/bills">
+              <Button variant="outline" size="sm" className="hidden sm:flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                Bills
+              </Button>
+            </Link>
             <div className="flex-shrink-0">
               <ProgressIndicator progress={progress} />
             </div>
