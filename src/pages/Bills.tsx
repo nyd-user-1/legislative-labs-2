@@ -16,15 +16,17 @@ const Bills = () => {
   console.log("Bills page component rendering");
   const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
   const [committees, setCommittees] = useState<string[]>([]);
+  const [sponsors, setSponsors] = useState<string[]>([]);
   const [filters, setFilters] = useState({
     search: "",
-    status: "",
+    sponsor: "",
     committee: "",
     dateRange: ""
   });
 
   useEffect(() => {
     fetchCommittees();
+    fetchSponsors();
   }, []);
 
   const fetchCommittees = async () => {
@@ -43,6 +45,25 @@ const Bills = () => {
       }
     } catch (error) {
       console.error("Error fetching committees:", error);
+    }
+  };
+
+  const fetchSponsors = async () => {
+    try {
+      const { data } = await supabase
+        .from("People")
+        .select("name")
+        .not("name", "is", null)
+        .order("name");
+
+      if (data) {
+        const uniqueSponsors = Array.from(
+          new Set(data.map(item => item.name).filter(Boolean))
+        ) as string[];
+        setSponsors(uniqueSponsors);
+      }
+    } catch (error) {
+      console.error("Error fetching sponsors:", error);
     }
   };
 
@@ -118,6 +139,7 @@ const Bills = () => {
           <BillFilters 
             onFiltersChange={handleFiltersChange}
             committees={committees}
+            sponsors={sponsors}
           />
 
           <BillsList 

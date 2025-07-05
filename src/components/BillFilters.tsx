@@ -9,17 +9,18 @@ import { Search, Filter, X } from "lucide-react";
 interface BillFiltersProps {
   onFiltersChange: (filters: {
     search: string;
-    status: string;
+    sponsor: string;
     committee: string;
     dateRange: string;
   }) => void;
   committees: string[];
+  sponsors: string[];
 }
 
-export const BillFilters = ({ onFiltersChange, committees }: BillFiltersProps) => {
+export const BillFilters = ({ onFiltersChange, committees, sponsors }: BillFiltersProps) => {
   const [filters, setFilters] = useState({
     search: "",
-    status: "all",
+    sponsor: "all",
     committee: "all",
     dateRange: "all"
   });
@@ -31,7 +32,7 @@ export const BillFilters = ({ onFiltersChange, committees }: BillFiltersProps) =
     // Convert "all" back to empty strings when passing to parent
     const filtersForParent = {
       ...newFilters,
-      status: newFilters.status === "all" ? "" : newFilters.status,
+      sponsor: newFilters.sponsor === "all" ? "" : newFilters.sponsor,
       committee: newFilters.committee === "all" ? "" : newFilters.committee,
       dateRange: newFilters.dateRange === "all" ? "" : newFilters.dateRange,
     };
@@ -41,7 +42,7 @@ export const BillFilters = ({ onFiltersChange, committees }: BillFiltersProps) =
   const clearFilters = () => {
     const emptyFilters = {
       search: "",
-      status: "all",
+      sponsor: "all",
       committee: "all",
       dateRange: "all"
     };
@@ -50,7 +51,7 @@ export const BillFilters = ({ onFiltersChange, committees }: BillFiltersProps) =
     // Convert "all" back to empty strings when passing to parent
     const filtersForParent = {
       search: "",
-      status: "",
+      sponsor: "",
       committee: "",
       dateRange: ""
     };
@@ -58,7 +59,7 @@ export const BillFilters = ({ onFiltersChange, committees }: BillFiltersProps) =
   };
 
   const hasActiveFilters = filters.search !== "" || 
-    (filters.status !== "all" && filters.status !== "") ||
+    (filters.sponsor !== "all" && filters.sponsor !== "") ||
     (filters.committee !== "all" && filters.committee !== "") ||
     (filters.dateRange !== "all" && filters.dateRange !== "");
 
@@ -98,19 +99,18 @@ export const BillFilters = ({ onFiltersChange, committees }: BillFiltersProps) =
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="space-y-2">
-            <Label>Status</Label>
-            <Select value={filters.status} onValueChange={(value) => handleFilterChange("status", value)}>
+            <Label>Sponsors</Label>
+            <Select value={filters.sponsor} onValueChange={(value) => handleFilterChange("sponsor", value)}>
               <SelectTrigger>
-                <SelectValue placeholder="All Statuses" />
+                <SelectValue placeholder="All Sponsors" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="1">Introduced</SelectItem>
-                <SelectItem value="2">Committee</SelectItem>
-                <SelectItem value="3">Floor</SelectItem>
-                <SelectItem value="4">Passed</SelectItem>
-                <SelectItem value="5">Failed</SelectItem>
-                <SelectItem value="6">Signed</SelectItem>
+                <SelectItem value="all">All Sponsors</SelectItem>
+                {sponsors.map((sponsor) => (
+                  <SelectItem key={sponsor} value={sponsor}>
+                    {sponsor}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

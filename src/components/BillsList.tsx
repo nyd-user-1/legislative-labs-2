@@ -13,7 +13,7 @@ type Bill = Tables<"Bills">;
 interface BillsListProps {
   filters: {
     search: string;
-    status: string;
+    sponsor: string;
     committee: string;
     dateRange: string;
   };
@@ -42,9 +42,22 @@ export const BillsList = ({ filters, onBillSelect }: BillsListProps) => {
         query = query.or(`title.ilike.%${filters.search}%,bill_number.ilike.%${filters.search}%,description.ilike.%${filters.search}%`);
       }
 
-      // Apply status filter
-      if (filters.status) {
-        query = query.eq("status", parseInt(filters.status));
+      // Apply sponsor filter  
+      if (filters.sponsor) {
+        // First get bills that have sponsors matching the filter
+        const { data: sponsorBills } = await supabase
+          .from("Sponsors")
+          .select("bill_id, People!inner(name)")
+          .eq("People.name", filters.sponsor);
+        
+        if (sponsorBills && sponsorBills.length > 0) {
+          const billIds = sponsorBills.map(sb => sb.bill_id);
+          query = query.in("bill_id", billIds);
+        } else {
+          // No bills found for this sponsor, return empty result
+          setBills([]);
+          return;
+        }
       }
 
       // Apply committee filter
@@ -141,32 +154,22 @@ export const BillsList = ({ filters, onBillSelect }: BillsListProps) => {
           </span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="h-full p-0">
-        <ScrollArea className="h-[600px] px-6 pb-6">
+      <CardContent className="h-full p-6">
+        <ScrollArea className="h-[600px]">
           {bills.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-muted-foreground">No bills found matching your criteria.</p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {bills.map((bill) => (
-                <Card key={bill.bill_id} className="hover:shadow-md transition-shadow cursor-pointer border-l-4 border-l-primary/20">
+                <Card key={bill.bill_id} className="hover:shadow-md transition-shadow cursor-pointer">
                   <CardContent className="p-4">
                     <div className="space-y-3">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-lg leading-tight">
-                            {bill.bill_number && (
-                              <span className="text-primary mr-2">{bill.bill_number}</span>
-                            )}
-                            {bill.title || "Untitled Bill"}
-                          </h3>
-                          {bill.description && (
-                            <p className="text-muted-foreground text-sm mt-1 line-clamp-2">
-                              {bill.description}
-                            </p>
-                          )}
-                        </div>
+                      <div className="flex items-start justify-between gap-2">
+                        <h3 className="font-semibold text-lg leading-tight">
+                          {bill.bill_number || "No Number"}
+                        </h3>
                         <div className="flex-shrink-0">
                           {bill.status !== null && (
                             <BillStatusBadge status={bill.status} statusDesc={bill.status_desc} />
@@ -174,28 +177,26 @@ export const BillsList = ({ filters, onBillSelect }: BillsListProps) => {
                         </div>
                       </div>
 
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                      {bill.description && (
+                        <p className="text-muted-foreground text-sm line-clamp-3">
+                          {bill.description}
+                        </p>
+                      )}
+
+                      <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
                         {bill.committee && (
                           <div className="flex items-center gap-1">
-                            <User className="h-4 w-4" />
-                            <span>{bill.committee}</span>
+                            <User className="h-3 w-3" />
+                            <span className="truncate">{bill.committee}</span>
                           </div>
                         )}
                         {bill.last_action_date && (
                           <div className="flex items-center gap-1">
-                            <Calendar className="h-4 w-4" />
+                            <Calendar className="h-3 w-3" />
                             <span>{formatDate(bill.last_action_date)}</span>
                           </div>
                         )}
                       </div>
-
-                      {bill.last_action && (
-                        <div className="bg-muted/50 rounded-md p-2">
-                          <p className="text-sm">
-                            <span className="font-medium">Last Action:</span> {bill.last_action}
-                          </p>
-                        </div>
-                      )}
 
                       <div className="flex items-center gap-2 pt-2">
                         <Button
