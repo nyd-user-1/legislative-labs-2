@@ -99,7 +99,7 @@ Format it as a professional problem statement suitable for legislative drafting.
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Lightbulb className="h-5 w-5" />
-          Problem Statement Generator
+          Problem Statement
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
