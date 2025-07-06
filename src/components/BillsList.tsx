@@ -145,12 +145,6 @@ export const BillsList = ({
                   </div>
                 </div>
 
-                {bill.title && (
-                  <div className="flex items-center gap-2 text-sm">
-                    <Building className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                )}
-
                 {bill.committee && (
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <User className="h-4 w-4" />
