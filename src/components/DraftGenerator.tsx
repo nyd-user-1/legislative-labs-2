@@ -4,7 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Wand2, FileText } from "lucide-react";
+import { Loader2, Wand2, FileText, Lightbulb } from "lucide-react";
 import { DraftProgress } from "@/types/legislation";
 import { detectLegislativeCategory, generateLegislativeDraft } from "@/utils/legislativeHelpers";
 import { supabase } from "@/integrations/supabase/client";
@@ -127,8 +127,8 @@ Use proper legislative language and formatting. Make it comprehensive but focuse
             </>
           ) : (
             <>
-              <FileText className="mr-2 h-4 w-4" />
-              Generate Draft
+              <Lightbulb className="mr-2 h-4 w-4" />
+              Generate
             </>
           )}
         </Button>

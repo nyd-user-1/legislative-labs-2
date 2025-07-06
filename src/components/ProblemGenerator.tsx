@@ -4,7 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Lightbulb, Copy, FileText } from "lucide-react";
+import { Loader2, Lightbulb, Copy, FileText, Target } from "lucide-react";
 import { generateProblemFromScenario } from "@/utils/problemStatementHelpers";
 import { supabase } from "@/integrations/supabase/client";
 import { useModel } from "@/contexts/ModelContext";
@@ -129,12 +129,12 @@ Format it as a professional problem statement suitable for legislative drafting.
           {isGeneratingProblem ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Generating Problem Statement...
+              Generating...
             </>
           ) : (
             <>
-              <Lightbulb className="mr-2 h-4 w-4" />
-              Generate Problem Statement
+              <Target className="mr-2 h-4 w-4" />
+              Generate
             </>
           )}
         </Button>

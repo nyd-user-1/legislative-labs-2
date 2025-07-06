@@ -21,8 +21,8 @@ const models: Record<ModelProvider, { name: string; models: { id: ModelType; nam
   openai: {
     name: "OpenAI",
     models: [
-      { id: "gpt-4", name: "GPT-4", description: "Most capable model" },
-      { id: "gpt-3.5-turbo", name: "GPT-3.5 Turbo", description: "Fast and efficient" },
+      { id: "gpt-4", name: "ChatGPT-4", description: "Most capable model" },
+      { id: "gpt-3.5-turbo", name: "ChatGPT-3.5 Turbo", description: "Fast and efficient" },
     ]
   },
   claude: {
@@ -60,7 +60,7 @@ export const ModelSelector = ({ selectedModel, onModelChange }: ModelSelectorPro
         <Button variant="outline" className="min-w-[200px] justify-between">
           <div className="flex items-center space-x-2">
             <Bot className="h-4 w-4" />
-            <span className="truncate">{currentModel.name}</span>
+            <span className="truncate">Model</span>
           </div>
           <ChevronDown className="h-4 w-4" />
         </Button>

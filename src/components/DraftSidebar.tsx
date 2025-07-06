@@ -113,6 +113,7 @@ export const DraftSidebar = ({ currentDraft, onDraftSelect, onSaveDraft }: Draft
                 </Button>
               <CollapsibleTrigger asChild>
                 <Button variant="outline" size="sm">
+                  <FileText className="mr-2 h-4 w-4" />
                   Drafts ({drafts.length})
                   {isOpen ? <ChevronUp className="ml-2 h-4 w-4" /> : <ChevronDown className="ml-2 h-4 w-4" />}
                 </Button>
