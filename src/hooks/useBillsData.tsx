@@ -1,0 +1,96 @@
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Tables } from "@/integrations/supabase/types";
+
+type Bill = Tables<"Bills">;
+
+interface BillFilters {
+  search: string;
+  sponsor: string;
+  committee: string;
+  dateRange: string;
+}
+
+export const useBillsData = (filters: BillFilters) => {
+  const [bills, setBills] = useState<Bill[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchBills = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      console.log("Fetching bills with filters:", filters);
+      let query = supabase.from("Bills").select("*");
+
+      // Apply search filter
+      if (filters.search) {
+        query = query.or(`title.ilike.%${filters.search}%,bill_number.ilike.%${filters.search}%,description.ilike.%${filters.search}%`);
+      }
+
+      // Apply sponsor filter  
+      if (filters.sponsor) {
+        // First get bills that have sponsors matching the filter
+        const {
+          data: sponsorBills
+        } = await supabase.from("Sponsors").select("bill_id, People!inner(name)").eq("People.name", filters.sponsor);
+        if (sponsorBills && sponsorBills.length > 0) {
+          const billIds = sponsorBills.map(sb => sb.bill_id);
+          query = query.in("bill_id", billIds);
+        } else {
+          // No bills found for this sponsor, return empty result
+          setBills([]);
+          return;
+        }
+      }
+
+      // Apply committee filter
+      if (filters.committee) {
+        query = query.eq("committee", filters.committee);
+      }
+
+      // Apply date filter
+      if (filters.dateRange) {
+        const daysAgo = parseInt(filters.dateRange);
+        const cutoffDate = new Date();
+        cutoffDate.setDate(cutoffDate.getDate() - daysAgo);
+        query = query.gte("last_action_date", cutoffDate.toISOString().split('T')[0]);
+      }
+
+      // Order by last action date, most recent first
+      query = query.order("last_action_date", {
+        ascending: false,
+        nullsFirst: false
+      });
+
+      // Limit results for performance
+      query = query.limit(100);
+      const {
+        data,
+        error
+      } = await query;
+      if (error) {
+        console.error("Query error:", error);
+        throw error;
+      }
+      console.log("Bills fetched successfully:", data?.length || 0, "bills");
+      setBills(data || []);
+    } catch (err) {
+      console.error("Error fetching bills:", err);
+      setError("Failed to load bills. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchBills();
+  }, [filters]);
+
+  return {
+    bills,
+    loading,
+    error,
+    fetchBills
+  };
+};
