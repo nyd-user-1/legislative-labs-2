@@ -36,10 +36,13 @@ const ProblemStatementCard = ({ title, description, index, onAnalyze }: ProblemS
 export const AnalysisPanel = ({ draft }: AnalysisPanelProps) => {
   const [analysisData, setAnalysisData] = useState<any>(null);
   const [isGeneratingAnalysis, setIsGeneratingAnalysis] = useState(false);
+  const [streamingContent, setStreamingContent] = useState<string>('');
   const { selectedModel } = useModel();
   const { toast } = useToast();
   const generateAnalysis = async (problemStatement: string) => {
     setIsGeneratingAnalysis(true);
+    setStreamingContent('');
+    setAnalysisData(null);
     
     try {
       const prompt = `Analyze this problem statement for legislative purposes and provide a comprehensive analysis:
@@ -55,18 +58,60 @@ Please provide detailed analysis covering:
 
 Format the response as a structured analysis suitable for legislative decision-making.`;
 
-      const { data, error } = await supabase.functions.invoke('generate-with-openai', {
-        body: { prompt, type: 'analysis', model: selectedModel }
+      // Use streaming for real-time content display
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      
+      const response = await fetch(`${supabaseUrl}/functions/v1/generate-with-openai`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${supabaseAnonKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          prompt, 
+          type: 'analysis', 
+          model: selectedModel,
+          stream: true
+        }),
       });
 
-      if (error) {
-        console.error('Error calling analysis function:', error);
+      if (!response.ok) {
         throw new Error('Failed to generate analysis');
       }
 
-      // Parse the generated analysis or use mock data if parsing fails
-      const generatedAnalysis = data.generatedText || 'Analysis generated successfully';
-      
+      const reader = response.body?.getReader();
+      if (!reader) {
+        throw new Error('Failed to read response stream');
+      }
+
+      let fullContent = '';
+      const decoder = new TextDecoder();
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split('\n').filter(line => line.trim());
+        
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            try {
+              const data = JSON.parse(line.slice(6));
+              if (data.choices?.[0]?.delta?.content) {
+                const content = data.choices[0].delta.content;
+                fullContent += content;
+                setStreamingContent(fullContent);
+              }
+            } catch (e) {
+              // Skip malformed JSON
+            }
+          }
+        }
+      }
+
+      // Set final analysis data with streaming content
       setAnalysisData({
         fiscalImpact: {
           estimatedCost: "$2.5M - $5.2M annually",
@@ -101,7 +146,7 @@ Format the response as a structured analysis suitable for legislative decision-m
           { risk: "Implementation Delays", probability: "High", impact: "Medium" },
           { risk: "Industry Pushback", probability: "High", impact: "Medium" }
         ],
-        fullAnalysis: generatedAnalysis
+        fullAnalysis: fullContent || 'Analysis generated successfully'
       });
 
       toast({
@@ -159,9 +204,24 @@ Format the response as a structured analysis suitable for legislative decision-m
               ))}
             </div>
             {isGeneratingAnalysis && (
-              <div className="flex items-center justify-center mt-8">
-                <Loader2 className="mr-2 h-6 w-6 animate-spin" />
-                <span>Generating comprehensive analysis...</span>
+              <div className="mt-8">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Generating Analysis...</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="bg-muted/50 p-4 rounded-lg min-h-[200px]">
+                      {streamingContent ? (
+                        <p className="text-sm leading-relaxed whitespace-pre-wrap">{streamingContent}</p>
+                      ) : (
+                        <div className="flex items-center justify-center h-[150px]">
+                          <Loader2 className="mr-2 h-6 w-6 animate-spin" />
+                          <span>Starting analysis generation...</span>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             )}
           </CardContent>
