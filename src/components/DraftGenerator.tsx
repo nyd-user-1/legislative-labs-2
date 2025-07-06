@@ -8,6 +8,7 @@ import { Loader2, Wand2, FileText } from "lucide-react";
 import { DraftProgress } from "@/types/legislation";
 import { detectLegislativeCategory, generateLegislativeDraft } from "@/utils/legislativeHelpers";
 import { supabase } from "@/integrations/supabase/client";
+import { useModel } from "@/contexts/ModelContext";
 
 interface DraftGeneratorProps {
   idea: string;
@@ -19,6 +20,7 @@ interface DraftGeneratorProps {
 export const DraftGenerator = ({ idea, onIdeaChange, onDraftGenerated, onProgressChange }: DraftGeneratorProps) => {
   const [isGeneratingDraft, setIsGeneratingDraft] = useState(false);
   const { toast } = useToast();
+  const { selectedModel } = useModel();
 
   const generateDraft = async () => {
     if (!idea.trim()) {
@@ -55,7 +57,7 @@ Please create a well-structured bill that includes:
 Use proper legislative language and formatting. Make it comprehensive but focused on the core idea provided.`;
 
       const { data, error } = await supabase.functions.invoke('generate-with-openai', {
-        body: { prompt, type: 'draft' }
+        body: { prompt, type: 'draft', model: selectedModel }
       });
 
       if (error) {

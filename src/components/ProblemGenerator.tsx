@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, Lightbulb, Copy, FileText } from "lucide-react";
 import { generateProblemFromScenario } from "@/utils/problemStatementHelpers";
 import { supabase } from "@/integrations/supabase/client";
+import { useModel } from "@/contexts/ModelContext";
 
 interface ProblemGeneratorProps {
   onProblemGenerated?: (problem: string) => void;
@@ -18,6 +19,7 @@ export const ProblemGenerator = ({ onProblemGenerated, onDraftBill }: ProblemGen
   const [problemStatement, setProblemStatement] = useState("");
   const [isGeneratingProblem, setIsGeneratingProblem] = useState(false);
   const { toast } = useToast();
+  const { selectedModel } = useModel();
 
   const generateProblemStatement = async () => {
     if (!scenarioInput.trim()) {
@@ -47,7 +49,7 @@ Please create a comprehensive problem statement that:
 Format it as a professional problem statement suitable for legislative drafting.`;
 
       const { data, error } = await supabase.functions.invoke('generate-with-openai', {
-        body: { prompt, type: 'problem', stream: true }
+        body: { prompt, type: 'problem', model: selectedModel, stream: true }
       });
 
       if (error) {

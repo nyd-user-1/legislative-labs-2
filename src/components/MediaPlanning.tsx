@@ -7,6 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Pen, Copy } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useModel } from "@/contexts/ModelContext";
 
 interface MediaPlanningProps {
   problemStatement: string;
@@ -19,6 +20,7 @@ export const MediaPlanning = ({ problemStatement, legislativeIdea, shouldPopulat
   const [mediaContent, setMediaContent] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
+  const { selectedModel } = useModel();
 
   // Auto-populate input when component is shown
   useEffect(() => {
@@ -79,7 +81,7 @@ Generate all three deliverables as distinct, clearly labeled sections. Base cont
 ${planningInput}`;
 
       const { data, error } = await supabase.functions.invoke('generate-with-openai', {
-        body: { prompt, type: 'media' }
+        body: { prompt, type: 'media', model: selectedModel }
       });
 
       if (error) {
