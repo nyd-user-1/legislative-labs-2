@@ -7,10 +7,10 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown, Bot, Zap } from "lucide-react";
+import { ChevronDown, Bot, Zap, Search } from "lucide-react";
 
-export type ModelProvider = "openai" | "claude";
-export type ModelType = "gpt-4" | "gpt-3.5-turbo" | "claude-3-opus" | "claude-3-sonnet" | "claude-3-haiku";
+export type ModelProvider = "openai" | "claude" | "perplexity";
+export type ModelType = "gpt-4" | "gpt-3.5-turbo" | "claude-3-opus" | "claude-3-sonnet" | "claude-3-haiku" | "llama-3.1-sonar-small-128k-online" | "llama-3.1-sonar-large-128k-online" | "llama-3.1-sonar-huge-128k-online";
 
 interface ModelSelectorProps {
   selectedModel: ModelType;
@@ -31,6 +31,14 @@ const models: Record<ModelProvider, { name: string; models: { id: ModelType; nam
       { id: "claude-3-opus", name: "Claude 3 Opus", description: "Most powerful reasoning" },
       { id: "claude-3-sonnet", name: "Claude 3 Sonnet", description: "Balanced performance" },
       { id: "claude-3-haiku", name: "Claude 3 Haiku", description: "Fastest responses" },
+    ]
+  },
+  perplexity: {
+    name: "Perplexity AI",
+    models: [
+      { id: "llama-3.1-sonar-small-128k-online", name: "Sonar Small", description: "Fast with real-time search" },
+      { id: "llama-3.1-sonar-large-128k-online", name: "Sonar Large", description: "Balanced with web access" },
+      { id: "llama-3.1-sonar-huge-128k-online", name: "Sonar Huge", description: "Most capable with search" },
     ]
   }
 };
@@ -74,6 +82,10 @@ export const ModelSelector = ({ selectedModel, onModelChange }: ModelSelectorPro
                     {providerId === 'openai' ? (
                       <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
                         <Zap className="h-3 w-3 text-green-600" />
+                      </div>
+                    ) : providerId === 'perplexity' ? (
+                      <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                        <Search className="h-3 w-3 text-blue-600" />
                       </div>
                     ) : (
                       <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center">

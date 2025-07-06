@@ -3,6 +3,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 const anthropicApiKey = Deno.env.get('ANTHROPIC_API_KEY');
+const perplexityApiKey = Deno.env.get('PERPLEXITY_API_KEY');
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -33,14 +34,19 @@ serve(async (req) => {
 
     console.log('Generating content:', { type, model, promptLength: prompt?.length, stream });
 
-    // Determine if this is a Claude model
+    // Determine model provider
     const isClaudeModel = model.startsWith('claude-');
+    const isPerplexityModel = model.startsWith('llama-') && model.includes('sonar');
     
     if (isClaudeModel && !anthropicApiKey) {
       throw new Error('Anthropic API key not configured');
     }
     
-    if (!isClaudeModel && !openAIApiKey) {
+    if (isPerplexityModel && !perplexityApiKey) {
+      throw new Error('Perplexity API key not configured');
+    }
+    
+    if (!isClaudeModel && !isPerplexityModel && !openAIApiKey) {
       throw new Error('OpenAI API key not configured');
     }
 
@@ -63,6 +69,34 @@ serve(async (req) => {
             content: `${getSystemPrompt(type)}\n\n${prompt}`
           }],
           temperature: 0.7,
+          stream: stream,
+        }),
+      });
+    } else if (isPerplexityModel) {
+      // Use Perplexity API
+      response = await fetch('https://api.perplexity.ai/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${perplexityApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: model,
+          messages: [
+            { 
+              role: 'system', 
+              content: getSystemPrompt(type)
+            },
+            { role: 'user', content: prompt }
+          ],
+          temperature: 0.2,
+          top_p: 0.9,
+          max_tokens: 2000,
+          return_images: false,
+          return_related_questions: false,
+          search_recency_filter: 'month',
+          frequency_penalty: 1,
+          presence_penalty: 0,
           stream: stream,
         }),
       });
@@ -92,8 +126,9 @@ serve(async (req) => {
 
     if (!response.ok) {
       const error = await response.text();
-      console.error(`${isClaudeModel ? 'Claude' : 'OpenAI'} API error:`, error);
-      throw new Error(`${isClaudeModel ? 'Claude' : 'OpenAI'} API error: ${response.status}`);
+      const providerName = isClaudeModel ? 'Claude' : isPerplexityModel ? 'Perplexity' : 'OpenAI';
+      console.error(`${providerName} API error:`, error);
+      throw new Error(`${providerName} API error: ${response.status}`);
     }
 
     if (stream) {
@@ -113,6 +148,7 @@ serve(async (req) => {
       if (isClaudeModel) {
         generatedText = data.content[0].text;
       } else {
+        // OpenAI and Perplexity use the same response format
         generatedText = data.choices[0].message.content;
       }
 
