@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Eye, ExternalLink, Calendar, User } from "lucide-react";
+import { Eye, ExternalLink, Calendar, User, BookOpen, MapPin, Building } from "lucide-react";
 import { BillStatusBadge } from "./BillStatusBadge";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
@@ -132,8 +132,8 @@ export const BillsList = ({
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {bills.map(bill => (
-            <Card key={bill.bill_id} className="p-6 hover:shadow-md transition-shadow">
-              <div className="space-y-4">
+            <Card key={bill.bill_id} className="relative p-6 pb-16 hover:shadow-md transition-shadow">
+              <div className="space-y-3">
                 <div className="flex items-start justify-between gap-2">
                   <h3 className="font-semibold text-xl">
                     {bill.bill_number || "No Number"}
@@ -145,28 +145,55 @@ export const BillsList = ({
                   </div>
                 </div>
 
+                {bill.title && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <Building className="h-4 w-4 text-muted-foreground" />
+                    <span className="font-medium">{bill.title}</span>
+                  </div>
+                )}
+
+                {bill.committee && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <User className="h-4 w-4" />
+                    <span>{bill.committee}</span>
+                  </div>
+                )}
+
+                {bill.last_action_date && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Calendar className="h-4 w-4" />
+                    <span>{formatDate(bill.last_action_date)}</span>
+                  </div>
+                )}
+
+                {bill.last_action && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <MapPin className="h-4 w-4" />
+                    <span>{bill.last_action}</span>
+                  </div>
+                )}
+
+                {bill.url && (
+                  <button 
+                    className="flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      window.open(bill.url!, '_blank');
+                    }}
+                  >
+                    <BookOpen className="h-4 w-4" />
+                    <span>View full text</span>
+                  </button>
+                )}
+
                 {bill.description && (
-                  <p className="text-muted-foreground text-sm line-clamp-3">
+                  <p className="text-muted-foreground text-xs line-clamp-2 mt-2">
                     {bill.description}
                   </p>
                 )}
 
-                <div className="space-y-2">
-                  {bill.committee && (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <User className="h-4 w-4" />
-                      <span>{bill.committee}</span>
-                    </div>
-                  )}
-                  {bill.last_action_date && (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Calendar className="h-4 w-4" />
-                      <span>{formatDate(bill.last_action_date)}</span>
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex items-center gap-2 pt-2">
+                {/* Eye button positioned at bottom right */}
+                <div className="absolute bottom-4 right-4">
                   <Button 
                     size="sm" 
                     variant="outline"
@@ -174,18 +201,6 @@ export const BillsList = ({
                   >
                     <Eye className="h-4 w-4" />
                   </Button>
-                  {bill.url && (
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        window.open(bill.url!, '_blank');
-                      }}
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                    </Button>
-                  )}
                 </div>
               </div>
             </Card>
