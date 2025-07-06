@@ -166,16 +166,8 @@ export const BillsList = ({
                   )}
                 </div>
 
-                <div className="flex items-center gap-2 pt-2">
-                  <Button 
-                    size="sm" 
-                    onClick={() => onBillSelect(bill)} 
-                    className="flex-1 bg-gray-900 hover:bg-gray-800 text-white"
-                  >
-                    <Eye className="h-4 w-4 mr-2" />
-                    View Details
-                  </Button>
-                  {bill.url && (
+                {bill.url && (
+                  <div className="flex items-center gap-2 pt-2">
                     <Button 
                       size="sm" 
                       variant="outline" 
@@ -186,8 +178,8 @@ export const BillsList = ({
                     >
                       <ExternalLink className="h-4 w-4" />
                     </Button>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             </Card>
           ))}
