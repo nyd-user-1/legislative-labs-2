@@ -7,9 +7,7 @@ import { Eye, ExternalLink, Calendar, User } from "lucide-react";
 import { BillStatusBadge } from "./BillStatusBadge";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
-
 type Bill = Tables<"Bills">;
-
 interface BillsListProps {
   filters: {
     search: string;
@@ -19,22 +17,21 @@ interface BillsListProps {
   };
   onBillSelect: (bill: Bill) => void;
 }
-
-export const BillsList = ({ filters, onBillSelect }: BillsListProps) => {
+export const BillsList = ({
+  filters,
+  onBillSelect
+}: BillsListProps) => {
   const [bills, setBills] = useState<Bill[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
   useEffect(() => {
     fetchBills();
   }, [filters]);
-
   const fetchBills = async () => {
     try {
       setLoading(true);
       setError(null);
       console.log("Fetching bills with filters:", filters);
-
       let query = supabase.from("Bills").select("*");
 
       // Apply search filter
@@ -45,11 +42,9 @@ export const BillsList = ({ filters, onBillSelect }: BillsListProps) => {
       // Apply sponsor filter  
       if (filters.sponsor) {
         // First get bills that have sponsors matching the filter
-        const { data: sponsorBills } = await supabase
-          .from("Sponsors")
-          .select("bill_id, People!inner(name)")
-          .eq("People.name", filters.sponsor);
-        
+        const {
+          data: sponsorBills
+        } = await supabase.from("Sponsors").select("bill_id, People!inner(name)").eq("People.name", filters.sponsor);
         if (sponsorBills && sponsorBills.length > 0) {
           const billIds = sponsorBills.map(sb => sb.bill_id);
           query = query.in("bill_id", billIds);
@@ -74,18 +69,21 @@ export const BillsList = ({ filters, onBillSelect }: BillsListProps) => {
       }
 
       // Order by last action date, most recent first
-      query = query.order("last_action_date", { ascending: false, nullsFirst: false });
+      query = query.order("last_action_date", {
+        ascending: false,
+        nullsFirst: false
+      });
 
       // Limit results for performance
       query = query.limit(100);
-
-      const { data, error } = await query;
-
+      const {
+        data,
+        error
+      } = await query;
       if (error) {
         console.error("Query error:", error);
         throw error;
       }
-
       console.log("Bills fetched successfully:", data?.length || 0, "bills");
       setBills(data || []);
     } catch (err) {
@@ -95,7 +93,6 @@ export const BillsList = ({ filters, onBillSelect }: BillsListProps) => {
       setLoading(false);
     }
   };
-
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "No date";
     try {
@@ -104,31 +101,24 @@ export const BillsList = ({ filters, onBillSelect }: BillsListProps) => {
       return dateString;
     }
   };
-
   if (loading) {
-    return (
-      <Card>
+    return <Card>
         <CardHeader>
           <CardTitle>Bills</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {[...Array(5)].map((_, i) => (
-              <div key={i} className="space-y-2">
+            {[...Array(5)].map((_, i) => <div key={i} className="space-y-2">
                 <Skeleton className="h-6 w-3/4" />
                 <Skeleton className="h-4 w-full" />
                 <Skeleton className="h-4 w-1/2" />
-              </div>
-            ))}
+              </div>)}
           </div>
         </CardContent>
-      </Card>
-    );
+      </Card>;
   }
-
   if (error) {
-    return (
-      <Card>
+    return <Card>
         <CardHeader>
           <CardTitle>Bills</CardTitle>
         </CardHeader>
@@ -140,22 +130,23 @@ export const BillsList = ({ filters, onBillSelect }: BillsListProps) => {
             </Button>
           </div>
         </CardContent>
-      </Card>
-    );
+      </Card>;
   }
-
-  return (
-    <Card className="h-full">
+  return <Card className="h-full">
+      <CardHeader className="rounded-md">
+        <CardTitle className="flex items-center justify-between">
+          Bills
+          <span className="text-sm font-normal text-muted-foreground">
+            {bills.length} result{bills.length !== 1 ? 's' : ''}
+          </span>
+        </CardTitle>
+      </CardHeader>
       <CardContent className="h-full p-6">
         <ScrollArea className="h-[600px]">
-          {bills.length === 0 ? (
-            <div className="text-center py-8">
+          {bills.length === 0 ? <div className="text-center py-8">
               <p className="text-muted-foreground">No bills found matching your criteria.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {bills.map((bill) => (
-                <Card key={bill.bill_id} className="hover:shadow-md transition-shadow cursor-pointer">
+            </div> : <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {bills.map(bill => <Card key={bill.bill_id} className="hover:shadow-md transition-shadow cursor-pointer">
                   <CardContent className="p-4">
                     <div className="space-y-3">
                       <div className="flex items-start justify-between gap-2">
@@ -163,63 +154,42 @@ export const BillsList = ({ filters, onBillSelect }: BillsListProps) => {
                           {bill.bill_number || "No Number"}
                         </h3>
                         <div className="flex-shrink-0">
-                          {bill.status !== null && (
-                            <BillStatusBadge status={bill.status} statusDesc={bill.status_desc} />
-                          )}
+                          {bill.status !== null && <BillStatusBadge status={bill.status} statusDesc={bill.status_desc} />}
                         </div>
                       </div>
 
-                      {bill.description && (
-                        <p className="text-muted-foreground text-sm line-clamp-3 break-words">
+                      {bill.description && <p className="text-muted-foreground text-sm line-clamp-3 break-words">
                           {bill.description}
-                        </p>
-                      )}
+                        </p>}
 
                       <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-                        {bill.committee && (
-                          <div className="flex items-center gap-1">
+                        {bill.committee && <div className="flex items-center gap-1">
                             <User className="h-3 w-3" />
                             <span className="truncate">{bill.committee}</span>
-                          </div>
-                        )}
-                        {bill.last_action_date && (
-                          <div className="flex items-center gap-1">
+                          </div>}
+                        {bill.last_action_date && <div className="flex items-center gap-1">
                             <Calendar className="h-3 w-3" />
                             <span>{formatDate(bill.last_action_date)}</span>
-                          </div>
-                        )}
+                          </div>}
                       </div>
 
                       <div className="flex items-center gap-2 pt-2">
-                        <Button
-                          size="sm"
-                          onClick={() => onBillSelect(bill)}
-                          className="flex-1"
-                        >
+                        <Button size="sm" onClick={() => onBillSelect(bill)} className="flex-1">
                           <Eye className="h-4 w-4 mr-2" />
                           View Details
                         </Button>
-                        {bill.url && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              window.open(bill.url!, '_blank');
-                            }}
-                          >
+                        {bill.url && <Button size="sm" variant="outline" onClick={e => {
+                    e.stopPropagation();
+                    window.open(bill.url!, '_blank');
+                  }}>
                             <ExternalLink className="h-4 w-4" />
-                          </Button>
-                        )}
+                          </Button>}
                       </div>
                     </div>
                   </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
+                </Card>)}
+            </div>}
         </ScrollArea>
       </CardContent>
-    </Card>
-  );
+    </Card>;
 };
