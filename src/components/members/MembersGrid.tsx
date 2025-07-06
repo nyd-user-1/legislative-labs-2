@@ -65,12 +65,6 @@ export const MembersGrid = ({ members }: MembersGridProps) => {
           
           <CardContent className="pt-0">
             <div className="space-y-3">
-              {member.bio_short && (
-                <p className="text-sm text-muted-foreground line-clamp-2">
-                  {member.bio_short}
-                </p>
-              )}
-              
               <div className="space-y-2 pt-2 border-t">
                 {member.district && (
                   <div className="flex items-center gap-2 text-sm">
