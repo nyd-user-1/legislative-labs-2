@@ -131,7 +131,6 @@ const Ideas = () => {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Legislative Ideas</h1>
-              <p className="text-gray-600 mt-2">Transform problems into actionable legislative solutions</p>
             </div>
             <Button onClick={() => setShowNewForm(true)}>
               <Plus className="h-4 w-4 mr-2" />

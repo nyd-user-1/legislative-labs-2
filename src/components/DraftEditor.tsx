@@ -12,7 +12,7 @@ import { Newspaper } from "lucide-react";
 interface DraftEditorProps {
   draft: LegislativeDraft | null;
   onDraftChange: (draft: LegislativeDraft) => void;
-  onProgressChange: (progress: DraftProgress) => void;
+  onProgressChange?: (progress: DraftProgress) => void;
   saveTrigger?: number;
 }
 
@@ -123,7 +123,7 @@ export const DraftEditor = ({ draft, onDraftChange, onProgressChange, saveTrigge
           idea={idea}
           onIdeaChange={setIdea}
           onDraftGenerated={setDraftContent}
-          onProgressChange={onProgressChange}
+          onProgressChange={(progress) => onProgressChange?.(progress)}
         />
       </div>
 

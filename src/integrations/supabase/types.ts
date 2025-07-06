@@ -60,6 +60,45 @@ export type Database = {
         }
         Relationships: []
       }
+      co_authors: {
+        Row: {
+          accepted_at: string | null
+          created_at: string
+          id: string
+          invited_at: string
+          invited_by: string
+          legislative_draft_id: string
+          role: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string
+          id?: string
+          invited_at?: string
+          invited_by: string
+          legislative_draft_id: string
+          role?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string
+          id?: string
+          invited_at?: string
+          invited_by?: string
+          legislative_draft_id?: string
+          role?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       Documents: {
         Row: {
           bill_id: number | null
@@ -120,6 +159,7 @@ export type Database = {
       legislative_drafts: {
         Row: {
           analysis: Json | null
+          co_author_count: number | null
           created_at: string
           draft_content: string
           id: string
@@ -134,6 +174,7 @@ export type Database = {
         }
         Insert: {
           analysis?: Json | null
+          co_author_count?: number | null
           created_at?: string
           draft_content: string
           id?: string
@@ -148,6 +189,7 @@ export type Database = {
         }
         Update: {
           analysis?: Json | null
+          co_author_count?: number | null
           created_at?: string
           draft_content?: string
           id?: string

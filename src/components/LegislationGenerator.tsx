@@ -7,18 +7,12 @@ import { DraftEditor } from "./DraftEditor";
 import { AnalysisPanel } from "./AnalysisPanel";
 import { ExportPanel } from "./ExportPanel";
 import { DraftSidebar } from "./DraftSidebar";
-import { ProgressIndicator } from "./ProgressIndicator";
 import { PublicGallery } from "./PublicGallery";
 import { UserMenu } from "./UserMenu";
 import { LegislativeDraft, DraftProgress } from "@/types/legislation";
 
 const LegislationGenerator = () => {
   const [currentDraft, setCurrentDraft] = useState<LegislativeDraft | null>(null);
-  const [progress, setProgress] = useState<DraftProgress>({
-    currentStep: 1,
-    totalSteps: 4,
-    stepNames: ["Idea Input", "Analysis", "Draft Generation", "Review & Export"]
-  });
   const [activeTab, setActiveTab] = useState("draft");
   const [saveTrigger, setSaveTrigger] = useState(0);
 
@@ -29,10 +23,6 @@ const LegislationGenerator = () => {
   return (
     <div className="page-container min-h-screen bg-gray-50 p-6">
       <div className="content-wrapper max-w-6xl mx-auto">
-        {/* Progress Indicator */}
-        <div className="mb-6">
-          <ProgressIndicator progress={progress} />
-        </div>
 
         {/* Collapsible Sidebar */}
         <DraftSidebar 
@@ -55,7 +45,6 @@ const LegislationGenerator = () => {
             <DraftEditor 
               draft={currentDraft}
               onDraftChange={setCurrentDraft}
-              onProgressChange={setProgress}
               saveTrigger={saveTrigger}
             />
           </TabsContent>
