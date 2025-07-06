@@ -148,7 +148,6 @@ export const BillsList = ({
                 {bill.title && (
                   <div className="flex items-center gap-2 text-sm">
                     <Building className="h-4 w-4 text-muted-foreground" />
-                    <span className="font-medium">{bill.title}</span>
                   </div>
                 )}
 
