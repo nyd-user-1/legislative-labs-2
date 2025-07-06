@@ -30,8 +30,8 @@ const Members = () => {
   const hasFilters = searchTerm !== "" || chamberFilter !== "all";
 
   return (
-    <div className="page-container">
-      <div className="content-wrapper">
+    <div className="container mx-auto px-4 sm:px-6 py-6">
+      <div className="space-y-6">
         <MembersHeader 
           membersCount={members.length} 
           chambersCount={chambers.length} 
