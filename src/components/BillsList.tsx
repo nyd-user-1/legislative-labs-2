@@ -133,7 +133,7 @@ export const BillsList = ({
       </Card>;
   }
   return <Card className="h-full">
-      <CardContent className="h-full p-6">
+      <CardContent className="p-6">
         <ScrollArea className="h-[600px]">
           {bills.length === 0 ? <div className="text-center py-8">
               <p className="text-muted-foreground">No bills found matching your criteria.</p>
