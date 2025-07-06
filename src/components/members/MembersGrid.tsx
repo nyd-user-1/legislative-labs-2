@@ -37,6 +37,18 @@ export const MembersGrid = ({ members }: MembersGridProps) => {
     return "bg-muted text-muted-foreground";
   };
 
+  const getChamberColor = (chamber: string) => {
+    if (!chamber) return "bg-muted text-muted-foreground";
+    const chamberLower = chamber.toLowerCase();
+    if (chamberLower.includes("senate")) {
+      return "bg-purple-100 text-purple-800 border-purple-200";
+    }
+    if (chamberLower.includes("assembly")) {
+      return "bg-green-100 text-green-800 border-green-200";
+    }
+    return "bg-muted text-muted-foreground";
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {members.map((member) => (
@@ -50,7 +62,7 @@ export const MembersGrid = ({ members }: MembersGridProps) => {
               </div>
               
               {member.chamber && (
-                <Badge variant="secondary" className="ml-2 flex-shrink-0">
+                <Badge variant="outline" className={`${getChamberColor(member.chamber)} ml-2 flex-shrink-0`}>
                   {member.chamber}
                 </Badge>
               )}
