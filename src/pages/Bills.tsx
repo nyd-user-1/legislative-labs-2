@@ -1,7 +1,4 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Home } from "lucide-react";
 import { BillFilters } from "@/components/BillFilters";
 import { BillsList } from "@/components/BillsList";
 import { BillDetail } from "@/components/BillDetail";
@@ -82,25 +79,12 @@ const Bills = () => {
   if (selectedBill) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-background to-brand-50/30">
-        {/* Header */}
-        <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40">
-          <div className="container flex h-16 items-center justify-between px-4 sm:px-6">
-            <div className="flex items-center gap-4">
-              <Link to="/">
-                <Button variant="outline" size="sm" className="flex items-center gap-2">
-                  <Home className="h-4 w-4" />
-                  Home
-                </Button>
-              </Link>
-              <div className="flex flex-col min-w-0">
-                <h1 className="text-lg sm:text-xl font-bold truncate">Bill Details</h1>
-                <p className="text-xs text-muted-foreground truncate hidden sm:block">Detailed view of legislative bill</p>
-              </div>
-            </div>
-          </div>
-        </header>
-
         <div className="container mx-auto px-4 sm:px-6 py-6">
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">
+              Bill Details
+            </h1>
+          </div>
           <BillDetail bill={selectedBill} onBack={handleBackToBills} />
         </div>
       </div>
@@ -109,26 +93,14 @@ const Bills = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-brand-50/30">
-      {/* Header */}
-      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40">
-        <div className="container flex h-16 items-center justify-between px-4 sm:px-6">
-          <div className="flex items-center gap-4">
-            <Link to="/">
-              <Button variant="outline" size="sm" className="flex items-center gap-2">
-                <Home className="h-4 w-4" />
-                Home
-              </Button>
-            </Link>
-            <div className="flex flex-col min-w-0">
-              <h1 className="text-lg sm:text-xl font-bold truncate">Legislative Bills</h1>
-              <p className="text-xs text-muted-foreground truncate hidden sm:block">Track legislative progress and details</p>
-            </div>
-          </div>
-        </div>
-      </header>
-
       <div className="container mx-auto px-4 sm:px-6 py-6">
         <div className="space-y-6">
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">
+              Bills
+            </h1>
+          </div>
+
           <BillFilters
             onFiltersChange={handleFiltersChange}
             committees={committees}

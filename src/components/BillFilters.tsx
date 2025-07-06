@@ -1,10 +1,8 @@
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Search, Filter, X } from "lucide-react";
+import { Search, X } from "lucide-react";
 
 interface BillFiltersProps {
   onFiltersChange: (filters: {
@@ -64,91 +62,82 @@ export const BillFilters = ({ onFiltersChange, committees, sponsors }: BillFilte
     (filters.dateRange !== "all" && filters.dateRange !== "");
 
   return (
-    <Card>
-      <CardHeader className="pb-4">
-        <CardTitle className="flex items-center gap-2 text-lg">
-          <Filter className="h-5 w-5" />
-          Filter Bills
-          {hasActiveFilters && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={clearFilters}
-              className="ml-auto"
-            >
-              <X className="h-4 w-4 mr-1" />
-              Clear
-            </Button>
-          )}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="search">Search Bills</Label>
-          <div className="relative">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input
-              id="search"
-              placeholder="Search by title, number, or description..."
-              value={filters.search}
-              onChange={(e) => handleFilterChange("search", e.target.value)}
-              className="pl-9"
-            />
-          </div>
+    <div className="mb-8 space-y-4">
+      {/* Search and Dropdowns Row */}
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
+        {/* Search Bar */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search by bill number or title..."
+            value={filters.search}
+            onChange={(e) => handleFilterChange("search", e.target.value)}
+            className="pl-10"
+          />
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="space-y-2">
-            <Label>Sponsors</Label>
-            <Select value={filters.sponsor} onValueChange={(value) => handleFilterChange("sponsor", value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="All Sponsors" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Sponsors</SelectItem>
-                {sponsors.map((sponsor) => (
-                  <SelectItem key={sponsor} value={sponsor}>
-                    {sponsor}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Committee</Label>
-            <Select value={filters.committee} onValueChange={(value) => handleFilterChange("committee", value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="All Committees" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Committees</SelectItem>
-                {committees.map((committee) => (
-                  <SelectItem key={committee} value={committee}>
-                    {committee}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Date Range</Label>
-            <Select value={filters.dateRange} onValueChange={(value) => handleFilterChange("dateRange", value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="All Time" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Time</SelectItem>
-                <SelectItem value="7">Last 7 days</SelectItem>
-                <SelectItem value="30">Last 30 days</SelectItem>
-                <SelectItem value="90">Last 3 months</SelectItem>
-                <SelectItem value="365">Last year</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+        {/* Sponsors Filter Dropdown */}
+        <div>
+          <Select value={filters.sponsor} onValueChange={(value) => handleFilterChange("sponsor", value)}>
+            <SelectTrigger>
+              <SelectValue placeholder="All Sponsors" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Sponsors</SelectItem>
+              {sponsors.map((sponsor) => (
+                <SelectItem key={sponsor} value={sponsor}>
+                  {sponsor}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
-      </CardContent>
-    </Card>
+
+        {/* Committee Filter Dropdown */}
+        <div>
+          <Select value={filters.committee} onValueChange={(value) => handleFilterChange("committee", value)}>
+            <SelectTrigger>
+              <SelectValue placeholder="All Committees" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Committees</SelectItem>
+              {committees.map((committee) => (
+                <SelectItem key={committee} value={committee}>
+                  {committee}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Date Range Filter Dropdown */}
+        <div>
+          <Select value={filters.dateRange} onValueChange={(value) => handleFilterChange("dateRange", value)}>
+            <SelectTrigger>
+              <SelectValue placeholder="All Time" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Time</SelectItem>
+              <SelectItem value="7">Last 7 days</SelectItem>
+              <SelectItem value="30">Last 30 days</SelectItem>
+              <SelectItem value="90">Last 3 months</SelectItem>
+              <SelectItem value="365">Last year</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {/* Clear Button */}
+      {hasActiveFilters && (
+        <Button
+          variant="default"
+          onClick={clearFilters}
+          className="bg-black text-white hover:bg-black/90"
+        >
+          <X className="h-4 w-4 mr-1" />
+          Clear
+        </Button>
+      )}
+    </div>
   );
 };
