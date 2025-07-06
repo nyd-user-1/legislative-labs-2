@@ -329,64 +329,121 @@ export type Database = {
       }
       People: {
         Row: {
+          address: string | null
+          archived: boolean | null
           ballotpedia: string | null
+          bio_long: string | null
+          bio_short: string | null
+          chamber: string | null
           committee_id: string | null
           district: string | null
+          draft: boolean | null
+          email: string | null
           first_name: string | null
           followthemoney_eid: number | null
           knowwho_pid: number | null
           last_name: string | null
+          legiscan_legislation_url: string | null
+          legiscan_rss_url: string | null
           middle_name: string | null
           name: string | null
           nickname: string | null
+          nys_bio_url: string | null
           opensecrets_id: string | null
           party: string | null
           party_id: number | null
           people_id: number
+          phone_capitol: string | null
+          phone_district: string | null
+          photo_url: string | null
           role: string | null
           role_id: number | null
           suffix: string | null
           votesmart_id: number | null
+          webflow_collection_id: string | null
+          webflow_created_on: string | null
+          webflow_item_id: string | null
+          webflow_published_on: string | null
+          webflow_slug: string | null
+          webflow_updated_on: string | null
         }
         Insert: {
+          address?: string | null
+          archived?: boolean | null
           ballotpedia?: string | null
+          bio_long?: string | null
+          bio_short?: string | null
+          chamber?: string | null
           committee_id?: string | null
           district?: string | null
+          draft?: boolean | null
+          email?: string | null
           first_name?: string | null
           followthemoney_eid?: number | null
           knowwho_pid?: number | null
           last_name?: string | null
+          legiscan_legislation_url?: string | null
+          legiscan_rss_url?: string | null
           middle_name?: string | null
           name?: string | null
           nickname?: string | null
+          nys_bio_url?: string | null
           opensecrets_id?: string | null
           party?: string | null
           party_id?: number | null
           people_id: number
+          phone_capitol?: string | null
+          phone_district?: string | null
+          photo_url?: string | null
           role?: string | null
           role_id?: number | null
           suffix?: string | null
           votesmart_id?: number | null
+          webflow_collection_id?: string | null
+          webflow_created_on?: string | null
+          webflow_item_id?: string | null
+          webflow_published_on?: string | null
+          webflow_slug?: string | null
+          webflow_updated_on?: string | null
         }
         Update: {
+          address?: string | null
+          archived?: boolean | null
           ballotpedia?: string | null
+          bio_long?: string | null
+          bio_short?: string | null
+          chamber?: string | null
           committee_id?: string | null
           district?: string | null
+          draft?: boolean | null
+          email?: string | null
           first_name?: string | null
           followthemoney_eid?: number | null
           knowwho_pid?: number | null
           last_name?: string | null
+          legiscan_legislation_url?: string | null
+          legiscan_rss_url?: string | null
           middle_name?: string | null
           name?: string | null
           nickname?: string | null
+          nys_bio_url?: string | null
           opensecrets_id?: string | null
           party?: string | null
           party_id?: number | null
           people_id?: number
+          phone_capitol?: string | null
+          phone_district?: string | null
+          photo_url?: string | null
           role?: string | null
           role_id?: number | null
           suffix?: string | null
           votesmart_id?: number | null
+          webflow_collection_id?: string | null
+          webflow_created_on?: string | null
+          webflow_item_id?: string | null
+          webflow_published_on?: string | null
+          webflow_slug?: string | null
+          webflow_updated_on?: string | null
         }
         Relationships: []
       }
