@@ -1,13 +1,16 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Search, Mail, Phone, MapPin, ExternalLink, Users } from "lucide-react";
+import { Search, Users, MapPin, Mail, Phone, ExternalLink } from "lucide-react";
+import { MemberFilters } from "@/components/MemberFilters";
+import { MemberCard } from "@/components/MemberCard";
+import { MemberDetail } from "@/components/MemberDetail";
 
 interface Member {
   people_id: number;
@@ -27,24 +30,56 @@ interface Member {
   ballotpedia: string;
 }
 
-export default function Members() {
+const Members = () => {
   const [members, setMembers] = useState<Member[]>([]);
+  const [filteredMembers, setFilteredMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
+  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+  const [chambers, setChambers] = useState<string[]>([]);
+  const [parties, setParties] = useState<string[]>([]);
+  const [districts, setDistricts] = useState<string[]>([]);
+  const [filters, setFilters] = useState({
+    searchTerm: "",
+    chamber: "",
+    party: "",
+    district: ""
+  });
   const [searchTerm, setSearchTerm] = useState("");
-  const [chamberFilter, setChamberFilter] = useState<string>("all");
+  const [chamberFilter, setChamberFilter] = useState("all");
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
+
+  const getPartyColor = (party: string) => {
+    if (!party) return "bg-muted";
+    const partyLower = party.toLowerCase();
+    if (partyLower.includes("republican") || partyLower.includes("r")) {
+      return "bg-red-100 text-red-800 border-red-200";
+    }
+    if (partyLower.includes("democratic") || partyLower.includes("d")) {
+      return "bg-blue-100 text-blue-800 border-blue-200";
+    }
+    return "bg-muted text-muted-foreground";
+  };
 
   useEffect(() => {
     fetchMembers();
+    fetchChambers();
+    fetchParties();
+    fetchDistricts();
   }, []);
+
+  useEffect(() => {
+    filterMembers();
+  }, [members, filters]);
 
   const fetchMembers = async () => {
     try {
       setLoading(true);
-      setError(null);
+      console.log("Fetching members with filters:", filters);
 
-      const { data, error: fetchError } = await supabase
+      let query = supabase
         .from("People")
         .select(`
           people_id,
@@ -64,20 +99,49 @@ export default function Members() {
           ballotpedia
         `)
         .not("chamber", "is", null)
-        .not("name", "is", null)
-        .order("last_name", { ascending: true });
+        .not("name", "is", null);
 
-      if (fetchError) {
-        throw fetchError;
+      // Apply search filter
+      if (filters.searchTerm) {
+        query = query.or(`name.ilike.%${filters.searchTerm}%,first_name.ilike.%${filters.searchTerm}%,last_name.ilike.%${filters.searchTerm}%,party.ilike.%${filters.searchTerm}%,district.ilike.%${filters.searchTerm}%,role.ilike.%${filters.searchTerm}%`);
       }
 
+      // Apply chamber filter
+      if (filters.chamber) {
+        query = query.eq("chamber", filters.chamber);
+      }
+
+      // Apply party filter
+      if (filters.party) {
+        query = query.eq("party", filters.party);
+      }
+
+      // Apply district filter
+      if (filters.district) {
+        query = query.eq("district", filters.district);
+      }
+
+      // Order by name
+      query = query.order("last_name", { ascending: true });
+
+      // Limit results for performance
+      query = query.limit(100);
+
+      const { data, error } = await query;
+
+      if (error) {
+        console.error("Query error:", error);
+        throw error;
+      }
+
+      console.log("Members fetched successfully:", data?.length || 0, "members");
       setMembers(data || []);
+      setHasMore((data?.length || 0) >= 100);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to fetch members";
-      setError(errorMessage);
+      console.error("Error fetching members:", err);
       toast({
         title: "Error",
-        description: errorMessage,
+        description: "Failed to load members. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -85,19 +149,68 @@ export default function Members() {
     }
   };
 
-  const filteredMembers = useMemo(() => {
+  const fetchChambers = async () => {
+    try {
+      const { data } = await supabase
+        .from("People")
+        .select("chamber")
+        .not("chamber", "is", null)
+        .order("chamber");
+
+      if (data) {
+        const uniqueChambers = Array.from(
+          new Set(data.map(item => item.chamber).filter(Boolean))
+        ) as string[];
+        setChambers(uniqueChambers);
+      }
+    } catch (error) {
+      console.error("Error fetching chambers:", error);
+    }
+  };
+
+  const fetchParties = async () => {
+    try {
+      const { data } = await supabase
+        .from("People")
+        .select("party")
+        .not("party", "is", null)
+        .order("party");
+
+      if (data) {
+        const uniqueParties = Array.from(
+          new Set(data.map(item => item.party).filter(Boolean))
+        ) as string[];
+        setParties(uniqueParties);
+      }
+    } catch (error) {
+      console.error("Error fetching parties:", error);
+    }
+  };
+
+  const fetchDistricts = async () => {
+    try {
+      const { data } = await supabase
+        .from("People")
+        .select("district")
+        .not("district", "is", null)
+        .order("district");
+
+      if (data) {
+        const uniqueDistricts = Array.from(
+          new Set(data.map(item => item.district).filter(Boolean))
+        ) as string[];
+        setDistricts(uniqueDistricts.sort((a, b) => parseInt(a) - parseInt(b)));
+      }
+    } catch (error) {
+      console.error("Error fetching districts:", error);
+    }
+  };
+
+  const filterMembers = () => {
     let filtered = members;
 
-    // Filter by chamber
-    if (chamberFilter !== "all") {
-      filtered = filtered.filter(member => 
-        member.chamber?.toLowerCase() === chamberFilter.toLowerCase()
-      );
-    }
-
-    // Filter by search term
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
+    if (filters.searchTerm) {
+      const term = filters.searchTerm.toLowerCase();
       filtered = filtered.filter(member =>
         member.name?.toLowerCase().includes(term) ||
         member.first_name?.toLowerCase().includes(term) ||
@@ -108,25 +221,34 @@ export default function Members() {
       );
     }
 
-    return filtered;
-  }, [members, searchTerm, chamberFilter]);
+    if (filters.chamber) {
+      filtered = filtered.filter(member => member.chamber === filters.chamber);
+    }
 
-  const getPartyColor = (party: string) => {
-    if (!party) return "bg-muted";
-    const partyLower = party.toLowerCase();
-    if (partyLower.includes("republican") || partyLower.includes("r")) {
-      return "bg-red-100 text-red-800 border-red-200";
+    if (filters.party) {
+      filtered = filtered.filter(member => member.party === filters.party);
     }
-    if (partyLower.includes("democratic") || partyLower.includes("d")) {
-      return "bg-blue-100 text-blue-800 border-blue-200";
+
+    if (filters.district) {
+      filtered = filtered.filter(member => member.district === filters.district);
     }
-    return "bg-muted text-muted-foreground";
+
+    setFilteredMembers(filtered);
   };
 
-  const chambers = useMemo(() => {
-    const uniqueChambers = [...new Set(members.map(m => m.chamber).filter(Boolean))];
-    return uniqueChambers.sort();
-  }, [members]);
+  const openMemberDetail = (member: Member) => {
+    setSelectedMember(member);
+  };
+
+  const loadMoreMembers = async () => {
+    setLoadingMore(true);
+    // Implementation for pagination would go here
+    setLoadingMore(false);
+  };
+
+  const handleFiltersChange = (newFilters: typeof filters) => {
+    setFilters(newFilters);
+  };
 
   if (loading) {
     return (
@@ -349,3 +471,5 @@ export default function Members() {
     </div>
   );
 }
+
+export default Members;
