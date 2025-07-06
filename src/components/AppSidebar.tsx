@@ -27,7 +27,7 @@ const mainNavItems = [
   { title: "Ideas", url: "/ideas", icon: Lightbulb },
   { title: "Drafts", url: "/", icon: FileText },
   { title: "Media Kits", url: "/media-kits", icon: BarChart3 },
-  { title: "Bills Database", url: "/bills", icon: FileText },
+  { title: "Bills", url: "/bills", icon: FileText },
 ];
 
 const bottomNavItems = [
