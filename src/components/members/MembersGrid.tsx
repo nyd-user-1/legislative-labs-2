@@ -38,96 +38,89 @@ export const MembersGrid = ({ members }: MembersGridProps) => {
   };
 
   return (
-    <div className="grid-container">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {members.map((member) => (
-        <Card key={member.people_id} className="card-interactive">
-          <CardHeader className="card-header">
-            <div className="flex items-start gap-4">
-              <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center flex-shrink-0 overflow-hidden">
-                {member.photo_url ? (
-                  <img
-                    src={member.photo_url}
-                    alt={member.name}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                      e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                    }}
-                  />
-                ) : null}
-                <div className={`${member.photo_url ? 'hidden' : ''} text-lg font-semibold text-muted-foreground`}>
-                  {member.first_name?.[0]}{member.last_name?.[0]}
-                </div>
-              </div>
-              
-              <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-lg leading-tight mb-1">
+        <Card key={member.people_id} className="card hover:shadow-md transition-shadow cursor-pointer">
+          <CardHeader className="pb-3">
+            <div className="flex justify-between items-start">
+              <div className="flex-1">
+                <h3 className="font-semibold text-lg leading-tight mb-2">
                   {member.name}
                 </h3>
-                <div className="flex flex-wrap items-center gap-2 mb-2">
-                  {member.party && (
-                    <Badge variant="outline" className={getPartyColor(member.party)}>
-                      {member.party}
-                    </Badge>
-                  )}
-                  {member.chamber && (
-                    <Badge variant="secondary">
-                      {member.chamber}
-                    </Badge>
-                  )}
-                </div>
                 {member.role && (
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-muted-foreground font-medium">
                     {member.role}
                   </p>
                 )}
               </div>
+              
+              {member.chamber && (
+                <Badge variant="secondary" className="ml-2 flex-shrink-0">
+                  {member.chamber}
+                </Badge>
+              )}
             </div>
+            
+            {member.party && (
+              <Badge variant="outline" className={`${getPartyColor(member.party)} w-fit`}>
+                {member.party}
+              </Badge>
+            )}
           </CardHeader>
           
-          <CardContent className="card-body">
+          <CardContent className="pt-0">
             <div className="space-y-3">
-              {member.district && (
-                <div className="flex items-center gap-2 text-sm">
-                  <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                  <span>District {member.district}</span>
-                </div>
+              {member.bio_short && (
+                <p className="text-sm text-muted-foreground line-clamp-2">
+                  {member.bio_short}
+                </p>
               )}
               
-              {member.email && (
-                <div className="flex items-center gap-2 text-sm">
-                  <Mail className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                  <a
-                    href={`mailto:${member.email}`}
-                    className="text-primary hover:underline truncate"
-                  >
-                    {member.email}
-                  </a>
-                </div>
-              )}
-              
-              {(member.phone_capitol || member.phone_district) && (
-                <div className="flex items-center gap-2 text-sm">
-                  <Phone className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                  <span>
-                    {member.phone_capitol || member.phone_district}
-                  </span>
-                </div>
-              )}
-              
-              {member.ballotpedia && (
-                <div className="pt-2">
-                  <a
-                    href={member.ballotpedia}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
-                  >
-                    <ExternalLink className="h-3 w-3" />
-                    View Full Bio
-                  </a>
-                </div>
-              )}
+              <div className="space-y-2 pt-2 border-t">
+                {member.district && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                    <span>District {member.district}</span>
+                  </div>
+                )}
+                
+                {member.email && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <Mail className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                    <a
+                      href={`mailto:${member.email}`}
+                      className="text-primary hover:underline truncate"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {member.email}
+                    </a>
+                  </div>
+                )}
+                
+                {(member.phone_capitol || member.phone_district) && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <Phone className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                    <span>
+                      {member.phone_capitol || member.phone_district}
+                    </span>
+                  </div>
+                )}
+                
+                {member.ballotpedia && (
+                  <div className="pt-1">
+                    <a
+                      href={member.ballotpedia}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <ExternalLink className="h-3 w-3" />
+                      View Full Bio
+                    </a>
+                  </div>
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>
