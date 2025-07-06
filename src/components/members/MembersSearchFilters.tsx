@@ -32,7 +32,6 @@ export const MembersSearchFilters = ({
 
       {/* Chamber Filter */}
       <div className="flex items-center gap-4">
-        <span className="text-sm font-medium">Chamber:</span>
         <ToggleGroup
           type="single"
           value={chamberFilter}
