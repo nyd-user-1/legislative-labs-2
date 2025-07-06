@@ -6,8 +6,6 @@ export function SidebarHeader() {
 
   return (
     <div className="flex items-center justify-center space-x-2">
-      <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-      </div>
       {!collapsed && (
         <div className="text-center">
           <h1 className="text-lg font-bold">Idea Lab</h1>
