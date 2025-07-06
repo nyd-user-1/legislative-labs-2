@@ -133,14 +133,6 @@ export const BillsList = ({
       </Card>;
   }
   return <Card className="h-full">
-      <CardHeader className="rounded-md">
-        <CardTitle className="flex items-center justify-between">
-          Bills
-          <span className="text-sm font-normal text-muted-foreground">
-            {bills.length} result{bills.length !== 1 ? 's' : ''}
-          </span>
-        </CardTitle>
-      </CardHeader>
       <CardContent className="h-full p-6">
         <ScrollArea className="h-[600px]">
           {bills.length === 0 ? <div className="text-center py-8">
