@@ -1,15 +1,9 @@
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   ArrowLeft, 
   ExternalLink, 
-  Calendar, 
-  User, 
   FileText, 
   History,
   Users,
@@ -18,9 +12,7 @@ import {
   Phone,
   Mail
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
-import { formatDate } from "@/utils/dateUtils";
 
 type Member = Tables<"People">;
 
@@ -30,14 +22,14 @@ interface MemberDetailProps {
 }
 
 export const MemberDetail = ({ member, onBack }: MemberDetailProps) => {
-  const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState("history");
 
   const getMemberStatusSteps = () => {
     const steps = [
       { label: "Registered", status: "completed" },
-      { label: "Verified", status: member.chamber ? "completed" : "current" },
-      { label: "Committee Assigned", status: member.committee_id ? "completed" : "pending" },
-      { label: "Active", status: member.role ? "completed" : "pending" },
+      { label: "Verified", status: "completed" },
+      { label: "Committee", status: member.committee_id ? "completed" : "pending" },
+      { label: "Active", status: "current" },
       { label: "Leadership", status: member.role?.toLowerCase().includes("leader") || member.role?.toLowerCase().includes("chair") ? "completed" : "pending" }
     ];
     return steps;
@@ -52,272 +44,245 @@ export const MemberDetail = ({ member, onBack }: MemberDetailProps) => {
   const statusSteps = getMemberStatusSteps();
 
   return (
-    <div className="member-detail-container space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="outline" onClick={onBack} className="back-button">
-          <ArrowLeft className="h-4 w-4 mr-2" />
+    <div className="member-detail-page">
+      {/* Back Navigation */}
+      <div className="back-navigation mb-6">
+        <Button 
+          variant="outline" 
+          onClick={onBack} 
+          className="back-btn flex items-center gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
           Back to Members
         </Button>
       </div>
 
-      <div className="member-content-grid grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
-          <Card className="member-info-card">
-            <CardHeader>
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <CardTitle className="member-id text-2xl leading-tight">
-                    {member.name || `${member.first_name || ''} ${member.last_name || ''}`.trim() || `Member #${member.people_id}`}
-                  </CardTitle>
-                  {member.bio_short && (
-                    <p className="member-description text-muted-foreground mt-2 text-lg">{member.bio_short}</p>
-                  )}
-                </div>
-                <div className="flex-shrink-0">
-                  <Badge variant="outline" className="status-badge active">
-                    Active
-                  </Badge>
-                </div>
+      {/* Member Header Section */}
+      <div className="member-header-section mb-8">
+        <div className="member-name-row flex items-center justify-between mb-4">
+          <h1 className="member-name">
+            {member.name || `${member.first_name || ''} ${member.last_name || ''}`.trim() || `Member #${member.people_id}`}
+          </h1>
+          <span className="status-badge active">Active</span>
+        </div>
+      </div>
+
+      {/* Main Content Grid */}
+      <div className="member-content-grid mb-8">
+        {/* Left Column */}
+        <div className="member-info-left space-y-6">
+          {/* Member Identity Section */}
+          <div className="member-identity card">
+            <h2 className="text-xl font-semibold mb-4">Member Information</h2>
+            
+            <div className="info-row">
+              <span className="info-label">Party & Chamber</span>
+              <span className="info-value">
+                {member.party && member.chamber ? `${member.party} - ${member.chamber}` : member.party || member.chamber || "Not specified"}
+              </span>
+            </div>
+            
+            <div className="info-row">
+              <span className="info-label">District</span>
+              <span className="info-value">
+                {member.district ? `District ${member.district}` : "Not assigned"}
+              </span>
+            </div>
+            
+            <div className="info-row">
+              <span className="info-label">Role</span>
+              <span className="info-value">
+                {member.role || "Not specified"}
+              </span>
+            </div>
+
+            {member.bio_short && (
+              <div className="mt-4 pt-4 border-t">
+                <span className="info-label">Bio</span>
+                <p className="text-sm text-gray-700 mt-2">{member.bio_short}</p>
               </div>
-            </CardHeader>
-            <CardContent>
-              <div className="member-info-grid grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div className="info-item committee space-y-2">
-                    <h4 className="font-medium flex items-center gap-2">
-                      <User className="h-4 w-4" />
-                      Party & Chamber
-                    </h4>
-                    <p className="text-muted-foreground">
-                      {member.party && member.chamber ? `${member.party} - ${member.chamber}` : member.party || member.chamber || "Not specified"}
-                    </p>
+            )}
+          </div>
+
+          {/* Status Progress Section */}
+          <div className="member-status-section card">
+            <div className="section-header mb-6">
+              <h2 className="text-xl font-semibold">Current Member Status</h2>
+            </div>
+            
+            <div className="status-progress-container mb-6">
+              <div className="flex items-center justify-between">
+                {statusSteps.map((step, index) => (
+                  <div key={step.label} className="flex flex-col items-center flex-1">
+                    <div className={`status-step w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${step.status}`}>
+                      {step.status === 'completed' ? '' : index + 1}
+                    </div>
+                    <span className="text-xs text-center mt-2 max-w-16">{step.label}</span>
+                    {index < statusSteps.length - 1 && (
+                      <div className="status-connector absolute w-full h-0.5 bg-gray-200 top-5 left-1/2 transform -translate-y-1/2 z-0"></div>
+                    )}
                   </div>
-
-                  <div className="info-item last-activity space-y-2">
-                    <h4 className="font-medium flex items-center gap-2">
-                      <MapPin className="h-4 w-4" />
-                      District
-                    </h4>
-                    <p className="text-muted-foreground">
-                      {member.district ? `District ${member.district}` : "Not assigned"}
-                    </p>
-                  </div>
-
-                  {member.email && (
-                    <div className="info-item space-y-2">
-                      <h4 className="font-medium flex items-center gap-2">
-                        <Mail className="h-4 w-4" />
-                        Email
-                      </h4>
-                      <p className="text-muted-foreground">{member.email}</p>
-                    </div>
-                  )}
-                </div>
-
-                <div className="space-y-4">
-                  <div className="info-item session-id space-y-2">
-                    <h4 className="font-medium">Role</h4>
-                    <p className="text-muted-foreground">
-                      {member.role || "Not specified"}
-                    </p>
-                  </div>
-
-                  {member.phone_capitol && (
-                    <div className="info-item space-y-2">
-                      <h4 className="font-medium flex items-center gap-2">
-                        <Phone className="h-4 w-4" />
-                        Capitol Phone
-                      </h4>
-                      <p className="text-muted-foreground">{member.phone_capitol}</p>
-                    </div>
-                  )}
-
-                  {(member.ballotpedia || member.photo_url) && (
-                    <div className="info-item external-link space-y-2">
-                      <h4 className="font-medium">External Link</h4>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => window.open(member.ballotpedia || '#', '_blank')}
-                        className="external-link-button flex items-center gap-2"
-                        disabled={!member.ballotpedia}
-                      >
-                        <ExternalLink className="h-4 w-4" />
-                        View Profile
-                      </Button>
-                    </div>
-                  )}
-                </div>
+                ))}
               </div>
-            </CardContent>
-          </Card>
+            </div>
 
-          <Card className="member-status-section">
-            <CardHeader>
-              <CardTitle>Current Member Status</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="status-progress space-y-4">
-                <div className="flex items-center justify-between">
-                  {statusSteps.map((step, index) => (
-                    <div key={step.label} className="flex flex-col items-center flex-1">
-                      <div className={`status-step w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium border-2 ${
-                        step.status === 'completed' 
-                          ? 'bg-green-500 border-green-500 text-white' 
-                          : step.status === 'current'
-                          ? 'bg-blue-500 border-blue-500 text-white'
-                          : 'bg-gray-100 border-gray-300 text-gray-500'
-                      }`}>
-                        {index + 1}
-                      </div>
-                      <span className="text-xs text-center mt-2 max-w-16">{step.label}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="latest-action mt-6 p-4 bg-muted rounded-lg">
-                <h4 className="font-medium mb-2">Latest Action</h4>
-                <p className="action-text text-sm font-medium text-primary">
-                  {getLatestAction()}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+            {/* Latest Action */}
+            <div className="latest-action-card card bg-gray-50">
+              <div className="action-label text-sm font-medium text-gray-600 mb-1">Latest Action</div>
+              <div className="action-text">{getLatestAction()}</div>
+            </div>
+          </div>
         </div>
 
-        <div className="space-y-6">
-          {member.photo_url && (
-            <Card>
-              <CardContent className="p-6">
+        {/* Right Column - Contact Information */}
+        <div className="member-info-right">
+          <div className="contact-info-card card">
+            <div className="section-header mb-4">
+              <h2 className="text-lg font-semibold">Contact Information</h2>
+            </div>
+            
+            {member.email && (
+              <div className="contact-item">
+                <Mail className="contact-icon h-4 w-4" />
+                <div className="contact-details">
+                  <a href={`mailto:${member.email}`}>{member.email}</a>
+                </div>
+              </div>
+            )}
+            
+            {member.phone_capitol && (
+              <div className="contact-item">
+                <Phone className="contact-icon h-4 w-4" />
+                <div className="contact-details">
+                  <a href={`tel:${member.phone_capitol}`}>Capitol: {member.phone_capitol}</a>
+                </div>
+              </div>
+            )}
+            
+            {member.phone_district && (
+              <div className="contact-item">
+                <Phone className="contact-icon h-4 w-4" />
+                <div className="contact-details">
+                  <a href={`tel:${member.phone_district}`}>District: {member.phone_district}</a>
+                </div>
+              </div>
+            )}
+            
+            {member.address && (
+              <div className="contact-item">
+                <MapPin className="contact-icon h-4 w-4" />
+                <div className="contact-details">
+                  <span>{member.address}</span>
+                </div>
+              </div>
+            )}
+            
+            {member.ballotpedia && (
+              <div className="mt-4 pt-4 border-t">
+                <Button
+                  variant="outline"
+                  onClick={() => window.open(member.ballotpedia, '_blank')}
+                  className="btn-secondary w-full flex items-center gap-2"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  View Profile
+                </Button>
+              </div>
+            )}
+
+            {member.photo_url && (
+              <div className="mt-4 pt-4 border-t">
                 <img 
                   src={member.photo_url} 
                   alt={`${member.name || 'Member'} photo`}
-                  className="w-full h-48 object-cover rounded-lg"
+                  className="w-full h-32 object-cover rounded-lg"
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
                   }}
                 />
-              </CardContent>
-            </Card>
-          )}
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Contact Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {member.phone_district && (
-                <div className="flex items-center gap-2 text-sm">
-                  <Phone className="h-4 w-4 text-muted-foreground" />
-                  <span>District: {member.phone_district}</span>
-                </div>
-              )}
-              {member.address && (
-                <div className="flex items-start gap-2 text-sm">
-                  <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
-                  <span>{member.address}</span>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      <Tabs defaultValue="history" className="tab-navigation space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="history" className="tab-button flex items-center gap-2">
-            <History className="h-4 w-4" />
-            History
-          </TabsTrigger>
-          <TabsTrigger value="documents" className="tab-button flex items-center gap-2">
-            <FileText className="h-4 w-4" />
-            Documents
-          </TabsTrigger>
-          <TabsTrigger value="committees" className="tab-button flex items-center gap-2">
-            <Users className="h-4 w-4" />
-            Committees
-          </TabsTrigger>
-          <TabsTrigger value="voting" className="tab-button flex items-center gap-2">
-            <Vote className="h-4 w-4" />
-            Voting Record
-          </TabsTrigger>
-        </TabsList>
+      {/* Tab Navigation */}
+      <div className="tab-navigation">
+        <div className="flex border-b border-gray-200 mb-6">
+          {[
+            { id: 'history', label: 'History', icon: History },
+            { id: 'documents', label: 'Documents', icon: FileText },
+            { id: 'committees', label: 'Committees', icon: Users },
+            { id: 'voting', label: 'Voting Record', icon: Vote }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`tab-button flex items-center gap-2 ${activeTab === tab.id ? 'active' : ''}`}
+            >
+              <tab.icon className="h-4 w-4" />
+              {tab.label}
+            </button>
+          ))}
+        </div>
 
-        <TabsContent value="history">
-          <Card className="member-history">
-            <CardHeader>
-              <CardTitle className="section-title">Member History</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="history-entry flex gap-4 pb-4 border-b border-border">
-                  <div className="history-date flex-shrink-0 w-24 text-sm text-muted-foreground">
-                    Recent
-                  </div>
+        {/* Tab Content */}
+        {activeTab === 'history' && (
+          <div className="card">
+            <div className="section-title text-xl font-semibold mb-4">Member History</div>
+            <div className="space-y-4">
+              <div className="history-entry">
+                <div className="flex gap-4">
+                  <div className="w-20 text-sm text-gray-500 flex-shrink-0">Recent</div>
                   <div className="flex-1">
-                    <p className="history-action text-sm font-medium">{getLatestAction()}</p>
-                    <p className="history-details text-sm text-muted-foreground mt-1">
-                      Current status in legislative system
-                    </p>
+                    <div className="text-sm font-medium">{getLatestAction()}</div>
+                    <div className="text-sm text-gray-600 mt-1">Current status in legislative system</div>
                   </div>
                 </div>
-                <p className="text-muted-foreground text-center py-8">
-                  Detailed member history tracking coming soon.
+              </div>
+              <p className="text-gray-500 text-center py-8">
+                Detailed member history tracking coming soon.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'documents' && (
+          <div className="card">
+            <div className="section-title text-xl font-semibold mb-4">Member Documents</div>
+            <p className="text-gray-500 text-center py-8">
+              Document management coming soon.
+            </p>
+          </div>
+        )}
+
+        {activeTab === 'committees' && (
+          <div className="card">
+            <div className="section-title text-xl font-semibold mb-4">Committee Assignments</div>
+            {member.committee_id ? (
+              <div className="space-y-2">
+                <p className="font-medium">Committee ID: {member.committee_id}</p>
+                <p className="text-gray-600 text-sm">
+                  Full committee details coming soon.
                 </p>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="documents">
-          <Card>
-            <CardHeader>
-              <CardTitle>Member Documents</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground text-center py-8">
-                Document management coming soon.
+            ) : (
+              <p className="text-gray-500 text-center py-8">
+                No committee assignments found.
               </p>
-            </CardContent>
-          </Card>
-        </TabsContent>
+            )}
+          </div>
+        )}
 
-        <TabsContent value="committees">
-          <Card>
-            <CardHeader>
-              <CardTitle>Committee Assignments</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {member.committee_id ? (
-                <div className="space-y-2">
-                  <p className="font-medium">Committee ID: {member.committee_id}</p>
-                  <p className="text-muted-foreground text-sm">
-                    Full committee details coming soon.
-                  </p>
-                </div>
-              ) : (
-                <p className="text-muted-foreground text-center py-8">
-                  No committee assignments found.
-                </p>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="voting">
-          <Card>
-            <CardHeader>
-              <CardTitle>Voting Records</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground text-center py-8">
-                Vote tracking functionality coming soon.
-              </p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+        {activeTab === 'voting' && (
+          <div className="card">
+            <div className="section-title text-xl font-semibold mb-4">Voting Records</div>
+            <p className="text-gray-500 text-center py-8">
+              Vote tracking functionality coming soon.
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
