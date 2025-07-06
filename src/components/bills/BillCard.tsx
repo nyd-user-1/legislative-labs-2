@@ -21,11 +21,6 @@ export const BillCard = ({ bill, onBillSelect }: BillCardProps) => {
             <h3 className="font-semibold text-lg text-foreground mb-1">
               {bill.bill_number || "No Number"}
             </h3>
-            {bill.title && (
-              <p className="text-sm text-muted-foreground line-clamp-2">
-                {bill.title}
-              </p>
-            )}
           </div>
           <div className="flex-shrink-0">
             {bill.status !== null && (
