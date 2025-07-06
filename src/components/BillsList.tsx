@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Eye, ExternalLink, Calendar, User } from "lucide-react";
 import { BillStatusBadge } from "./BillStatusBadge";
 import { supabase } from "@/integrations/supabase/client";
@@ -102,86 +101,98 @@ export const BillsList = ({
     }
   };
   if (loading) {
-    return <Card>
-        <CardHeader>
-          <CardTitle>Bills</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {[...Array(5)].map((_, i) => <div key={i} className="space-y-2">
-                <Skeleton className="h-6 w-3/4" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-1/2" />
-              </div>)}
+    return (
+      <div className="space-y-4">
+        {[...Array(5)].map((_, i) => (
+          <div key={i} className="space-y-2 p-6 border rounded-lg">
+            <Skeleton className="h-6 w-3/4" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-1/2" />
           </div>
-        </CardContent>
-      </Card>;
+        ))}
+      </div>
+    );
   }
   if (error) {
-    return <Card>
-        <CardHeader>
-          <CardTitle>Bills</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-8">
-            <p className="text-muted-foreground mb-4">{error}</p>
-            <Button onClick={fetchBills} variant="outline">
-              Try Again
-            </Button>
-          </div>
-        </CardContent>
-      </Card>;
+    return (
+      <div className="text-center py-8">
+        <p className="text-muted-foreground mb-4">{error}</p>
+        <Button onClick={fetchBills} variant="outline">
+          Try Again
+        </Button>
+      </div>
+    );
   }
-  return <Card className="h-full">
-      <CardContent className="p-6">
-        <ScrollArea className="h-[600px]">
-          {bills.length === 0 ? <div className="text-center py-8">
-              <p className="text-muted-foreground">No bills found matching your criteria.</p>
-            </div> : <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {bills.map(bill => <Card key={bill.bill_id} className="hover:shadow-md transition-shadow cursor-pointer">
-                  <CardContent className="p-4">
-                    <div className="space-y-3">
-                      <div className="flex items-start justify-between gap-2">
-                        <h3 className="font-semibold text-lg leading-tight">
-                          {bill.bill_number || "No Number"}
-                        </h3>
-                        <div className="flex-shrink-0">
-                          {bill.status !== null && <BillStatusBadge status={bill.status} statusDesc={bill.status_desc} />}
-                        </div>
-                      </div>
+  return (
+    <div className="space-y-4">
+      {bills.length === 0 ? (
+        <div className="text-center py-8">
+          <p className="text-muted-foreground">No bills found matching your criteria.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {bills.map(bill => (
+            <Card key={bill.bill_id} className="p-6 hover:shadow-md transition-shadow">
+              <div className="space-y-4">
+                <div className="flex items-start justify-between gap-2">
+                  <h3 className="font-semibold text-xl">
+                    {bill.bill_number || "No Number"}
+                  </h3>
+                  <div className="flex-shrink-0">
+                    {bill.status !== null && (
+                      <BillStatusBadge status={bill.status} statusDesc={bill.status_desc} />
+                    )}
+                  </div>
+                </div>
 
-                      {bill.description && <p className="text-muted-foreground text-sm line-clamp-3 break-words">
-                          {bill.description}
-                        </p>}
+                {bill.description && (
+                  <p className="text-muted-foreground text-sm line-clamp-3">
+                    {bill.description}
+                  </p>
+                )}
 
-                      <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-                        {bill.committee && <div className="flex items-center gap-1">
-                            <User className="h-3 w-3" />
-                            <span className="truncate">{bill.committee}</span>
-                          </div>}
-                        {bill.last_action_date && <div className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
-                            <span>{formatDate(bill.last_action_date)}</span>
-                          </div>}
-                      </div>
-
-                      <div className="flex items-center gap-2 pt-2">
-                        <Button size="sm" onClick={() => onBillSelect(bill)} className="flex-1">
-                          <Eye className="h-4 w-4 mr-2" />
-                          View Details
-                        </Button>
-                        {bill.url && <Button size="sm" variant="outline" onClick={e => {
-                    e.stopPropagation();
-                    window.open(bill.url!, '_blank');
-                  }}>
-                            <ExternalLink className="h-4 w-4" />
-                          </Button>}
-                      </div>
+                <div className="space-y-2">
+                  {bill.committee && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <User className="h-4 w-4" />
+                      <span>{bill.committee}</span>
                     </div>
-                  </CardContent>
-                </Card>)}
-            </div>}
-        </ScrollArea>
-      </CardContent>
-    </Card>;
+                  )}
+                  {bill.last_action_date && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Calendar className="h-4 w-4" />
+                      <span>{formatDate(bill.last_action_date)}</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2 pt-2">
+                  <Button 
+                    size="sm" 
+                    onClick={() => onBillSelect(bill)} 
+                    className="flex-1 bg-gray-900 hover:bg-gray-800 text-white"
+                  >
+                    <Eye className="h-4 w-4 mr-2" />
+                    View Details
+                  </Button>
+                  {bill.url && (
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        window.open(bill.url!, '_blank');
+                      }}
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 };
