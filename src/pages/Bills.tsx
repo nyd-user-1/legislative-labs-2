@@ -129,14 +129,7 @@ const Bills = () => {
 
       <div className="container mx-auto px-4 sm:px-6 py-6">
         <div className="space-y-6">
-          <div className="text-center space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight">Legislative Bills</h1>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Explore and track legislative bills, their progress, and related information.
-            </p>
-          </div>
-
-          <BillFilters 
+          <BillFilters
             onFiltersChange={handleFiltersChange}
             committees={committees}
             sponsors={sponsors}
