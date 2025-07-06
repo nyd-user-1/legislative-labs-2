@@ -47,11 +47,6 @@ export const MembersGrid = ({ members }: MembersGridProps) => {
                 <h3 className="font-semibold text-lg leading-tight mb-2">
                   {member.name}
                 </h3>
-                {member.role && (
-                  <p className="text-sm text-muted-foreground font-medium">
-                    {member.role}
-                  </p>
-                )}
               </div>
               
               {member.chamber && (
