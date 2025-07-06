@@ -22,9 +22,10 @@ interface Member {
 
 interface MembersGridProps {
   members: Member[];
+  onMemberSelect?: (member: Member) => void;
 }
 
-export const MembersGrid = ({ members }: MembersGridProps) => {
+export const MembersGrid = ({ members, onMemberSelect }: MembersGridProps) => {
   const getPartyColor = (party: string) => {
     if (!party) return "bg-muted";
     const partyLower = party.toLowerCase();
@@ -52,7 +53,11 @@ export const MembersGrid = ({ members }: MembersGridProps) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {members.map((member) => (
-        <Card key={member.people_id} className="card hover:shadow-md transition-shadow cursor-pointer">
+        <Card 
+          key={member.people_id} 
+          className="card hover:shadow-md transition-shadow cursor-pointer"
+          onClick={() => onMemberSelect?.(member)}
+        >
           <CardHeader className="pb-3">
             <div className="flex justify-between items-start">
               <div className="flex-1">
