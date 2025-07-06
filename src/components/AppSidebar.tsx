@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { Search, Settings, User, FileText, Lightbulb, BarChart3, LogOut, X } from "lucide-react";
+import { Search, Settings, User, FileText, Lightbulb, BarChart3, LogOut, X, Users } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -28,6 +28,7 @@ const mainNavItems = [
   { title: "Drafts", url: "/", icon: FileText },
   { title: "Media Kits", url: "/media-kits", icon: BarChart3 },
   { title: "Bills", url: "/bills", icon: FileText },
+  { title: "Members", url: "/members", icon: Users },
 ];
 
 const bottomNavItems = [
