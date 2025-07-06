@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Eye, ExternalLink, Calendar, User, BookOpen, MapPin, Building } from "lucide-react";
@@ -102,13 +102,24 @@ export const BillsList = ({
   };
   if (loading) {
     return (
-      <div className="space-y-4">
-        {[...Array(5)].map((_, i) => (
-          <div key={i} className="space-y-2 p-6 border rounded-lg">
-            <Skeleton className="h-6 w-3/4" />
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-1/2" />
-          </div>
+      <div className="grid-container">
+        {Array.from({ length: 12 }).map((_, i) => (
+          <Card key={i} className="card">
+            <CardHeader className="card-header">
+              <div className="flex items-start justify-between gap-2">
+                <Skeleton className="h-6 w-32" />
+                <Skeleton className="h-5 w-16 rounded-full" />
+              </div>
+            </CardHeader>
+            <CardContent className="card-body">
+              <div className="space-y-3">
+                <Skeleton className="h-4 w-28" />
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-4 w-36" />
+                <Skeleton className="h-16 w-full" />
+              </div>
+            </CardContent>
+          </Card>
         ))}
       </div>
     );
@@ -124,78 +135,91 @@ export const BillsList = ({
     );
   }
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {bills.length === 0 ? (
-        <div className="text-center py-8">
+        <div className="text-center py-12">
           <p className="text-muted-foreground">No bills found matching your criteria.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid-container">
           {bills.map(bill => (
-            <Card key={bill.bill_id} className="relative p-6 pb-16 hover:shadow-md transition-shadow">
-              <div className="space-y-3">
-                <div className="flex items-start justify-between gap-2">
-                  <h3 className="font-semibold text-xl">
-                    {bill.bill_number || "No Number"}
-                  </h3>
+            <Card key={bill.bill_id} className="card-interactive">
+              <CardHeader className="card-header">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-lg text-foreground mb-1">
+                      {bill.bill_number || "No Number"}
+                    </h3>
+                    {bill.title && (
+                      <p className="text-sm text-muted-foreground line-clamp-2">
+                        {bill.title}
+                      </p>
+                    )}
+                  </div>
                   <div className="flex-shrink-0">
                     {bill.status !== null && (
                       <BillStatusBadge status={bill.status} statusDesc={bill.status_desc} />
                     )}
                   </div>
                 </div>
+              </CardHeader>
+              
+              <CardContent className="card-body">
+                <div className="space-y-3">
+                  {bill.committee && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <User className="h-4 w-4" />
+                      <span className="truncate">{bill.committee}</span>
+                    </div>
+                  )}
 
-                {bill.committee && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <User className="h-4 w-4" />
-                    <span>{bill.committee}</span>
+                  {bill.last_action_date && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Calendar className="h-4 w-4" />
+                      <span>{formatDate(bill.last_action_date)}</span>
+                    </div>
+                  )}
+
+                  {bill.last_action && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <MapPin className="h-4 w-4" />
+                      <span className="truncate">{bill.last_action}</span>
+                    </div>
+                  )}
+
+                  {bill.description && (
+                    <p className="text-sm text-muted-foreground line-clamp-3 mt-3">
+                      {bill.description}
+                    </p>
+                  )}
+
+                  <div className="flex items-center justify-between pt-3 mt-4 border-t border-border">
+                    {bill.url ? (
+                      <button 
+                        className="flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          window.open(bill.url!, '_blank');
+                        }}
+                      >
+                        <BookOpen className="h-4 w-4" />
+                        <span>View text</span>
+                      </button>
+                    ) : (
+                      <div />
+                    )}
+                    
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      className="btn-icon"
+                      onClick={() => onBillSelect(bill)} 
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
                   </div>
-                )}
-
-                {bill.last_action_date && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Calendar className="h-4 w-4" />
-                    <span>{formatDate(bill.last_action_date)}</span>
-                  </div>
-                )}
-
-                {bill.last_action && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <MapPin className="h-4 w-4" />
-                    <span>{bill.last_action}</span>
-                  </div>
-                )}
-
-                {bill.url && (
-                  <button 
-                    className="flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      window.open(bill.url!, '_blank');
-                    }}
-                  >
-                    <BookOpen className="h-4 w-4" />
-                    <span>View full text</span>
-                  </button>
-                )}
-
-                {bill.description && (
-                  <p className="text-muted-foreground text-xs line-clamp-2 mt-2">
-                    {bill.description}
-                  </p>
-                )}
-
-                {/* Eye button positioned at bottom right */}
-                <div className="absolute bottom-4 right-4">
-                  <Button 
-                    size="sm" 
-                    variant="outline"
-                    onClick={() => onBillSelect(bill)} 
-                  >
-                    <Eye className="h-4 w-4" />
-                  </Button>
                 </div>
-              </div>
+              </CardContent>
             </Card>
           ))}
         </div>
