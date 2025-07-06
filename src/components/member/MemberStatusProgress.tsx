@@ -44,18 +44,18 @@ export const MemberStatusProgress = ({ member }: MemberStatusProgressProps) => {
           </Badge>
         </div>
         
-        <div className="relative px-4">
-          <div className="flex items-center justify-between mb-6 overflow-x-auto">
+        <div className="w-full overflow-hidden">
+          <div className="flex items-center justify-between mb-6 gap-2 min-w-0">
             {statusSteps.map((step, index) => (
-              <div key={step.label} className="flex flex-col items-center flex-shrink-0 min-w-16">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold border-2 ${
+              <div key={step.label} className="flex flex-col items-center flex-1 min-w-0">
+                <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-xs font-bold border-2 ${
                   step.active 
                     ? 'bg-primary text-primary-foreground border-primary' 
                     : 'bg-muted text-muted-foreground border-muted'
                 }`}>
                   {step.active ? '✓' : step.number}
                 </div>
-                <span className="text-xs text-center mt-2 px-1">{step.label}</span>
+                <span className="text-xs text-center mt-2 truncate w-full">{step.label}</span>
               </div>
             ))}
           </div>
@@ -63,7 +63,7 @@ export const MemberStatusProgress = ({ member }: MemberStatusProgressProps) => {
 
         <div className="bg-muted/50 rounded-lg p-4">
           <div className="text-sm font-medium text-muted-foreground mb-1">Latest Action</div>
-          <div className="font-semibold text-primary">{getLatestAction()}</div>
+          <div className="font-semibold text-primary break-words">{getLatestAction()}</div>
         </div>
       </div>
     </div>

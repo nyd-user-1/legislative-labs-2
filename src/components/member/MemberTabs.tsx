@@ -23,23 +23,23 @@ export const MemberTabs = ({ member }: MemberTabsProps) => {
   };
 
   return (
-    <Tabs defaultValue="history" className="space-y-4 w-full">
-      <TabsList className="grid w-full grid-cols-4 h-auto flex-wrap sm:flex-nowrap">
-        <TabsTrigger value="history" className="flex items-center gap-2 text-xs sm:text-sm p-2">
-          <History className="h-4 w-4" />
-          <span className="hidden sm:inline">History</span>
+    <Tabs defaultValue="history" className="space-y-4 w-full max-w-full">
+      <TabsList className="grid w-full grid-cols-4 h-auto">
+        <TabsTrigger value="history" className="flex items-center justify-center gap-1 text-xs p-2 min-w-0">
+          <History className="h-4 w-4 flex-shrink-0" />
+          <span className="hidden xs:inline truncate">History</span>
         </TabsTrigger>
-        <TabsTrigger value="documents" className="flex items-center gap-2 text-xs sm:text-sm p-2">
-          <FileText className="h-4 w-4" />
-          <span className="hidden sm:inline">Documents</span>
+        <TabsTrigger value="documents" className="flex items-center justify-center gap-1 text-xs p-2 min-w-0">
+          <FileText className="h-4 w-4 flex-shrink-0" />
+          <span className="hidden xs:inline truncate">Documents</span>
         </TabsTrigger>
-        <TabsTrigger value="committees" className="flex items-center gap-2 text-xs sm:text-sm p-2">
-          <Users className="h-4 w-4" />
-          <span className="hidden sm:inline">Committees</span>
+        <TabsTrigger value="committees" className="flex items-center justify-center gap-1 text-xs p-2 min-w-0">
+          <Users className="h-4 w-4 flex-shrink-0" />
+          <span className="hidden xs:inline truncate">Committees</span>
         </TabsTrigger>
-        <TabsTrigger value="votes" className="flex items-center gap-2 text-xs sm:text-sm p-2">
-          <Vote className="h-4 w-4" />
-          <span className="hidden sm:inline">Votes</span>
+        <TabsTrigger value="votes" className="flex items-center justify-center gap-1 text-xs p-2 min-w-0">
+          <Vote className="h-4 w-4 flex-shrink-0" />
+          <span className="hidden xs:inline truncate">Votes</span>
         </TabsTrigger>
       </TabsList>
 
