@@ -18,17 +18,17 @@ interface MemberDetailProps {
 
 export const MemberDetail = ({ member, onBack }: MemberDetailProps) => {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-4 sm:px-6">
       <div className="flex items-center gap-4">
-        <Button variant="outline" onClick={onBack}>
+        <Button variant="outline" onClick={onBack} className="flex-shrink-0">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Members
         </Button>
       </div>
 
-      <Card>
+      <Card className="overflow-hidden">
         <MemberHeader member={member} />
-        <CardContent>
+        <CardContent className="p-4 sm:p-6">
           <MemberInformation member={member} />
           <MemberStatusProgress member={member} />
         </CardContent>

@@ -40,7 +40,7 @@ const Members = () => {
   // Show member detail if one is selected
   if (selectedMember) {
     return (
-      <div className="container mx-auto px-4 sm:px-6 py-6">
+      <div className="min-h-screen">
         <MemberDetail 
           member={selectedMember} 
           onBack={() => setSelectedMember(null)} 
