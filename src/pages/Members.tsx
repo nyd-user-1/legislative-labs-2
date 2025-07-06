@@ -12,10 +12,16 @@ const Members = () => {
     loading,
     error,
     chambers,
+    parties,
+    districts,
     searchTerm,
     setSearchTerm,
     chamberFilter,
     setChamberFilter,
+    partyFilter,
+    setPartyFilter,
+    districtFilter,
+    setDistrictFilter,
     fetchMembers,
   } = useMembersData();
 
@@ -27,7 +33,7 @@ const Members = () => {
     return <MembersErrorState error={error} onRetry={fetchMembers} />;
   }
 
-  const hasFilters = searchTerm !== "" || chamberFilter !== "all";
+  const hasFilters = searchTerm !== "" || chamberFilter !== "all" || partyFilter !== "all" || districtFilter !== "all";
 
   return (
     <div className="container mx-auto px-4 sm:px-6 py-6">
@@ -42,7 +48,13 @@ const Members = () => {
           setSearchTerm={setSearchTerm}
           chamberFilter={chamberFilter}
           setChamberFilter={setChamberFilter}
+          partyFilter={partyFilter}
+          setPartyFilter={setPartyFilter}
+          districtFilter={districtFilter}
+          setDistrictFilter={setDistrictFilter}
           chambers={chambers}
+          parties={parties}
+          districts={districts}
         />
 
         {members.length === 0 ? (

@@ -26,18 +26,24 @@ export const useMembersData = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [chambers, setChambers] = useState<string[]>([]);
+  const [parties, setParties] = useState<string[]>([]);
+  const [districts, setDistricts] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [chamberFilter, setChamberFilter] = useState("all");
+  const [partyFilter, setPartyFilter] = useState("all");
+  const [districtFilter, setDistrictFilter] = useState("all");
   const { toast } = useToast();
 
   useEffect(() => {
     fetchMembers();
     fetchChambers();
+    fetchParties();
+    fetchDistricts();
   }, []);
 
   useEffect(() => {
     filterMembers();
-  }, [members, searchTerm, chamberFilter]);
+  }, [members, searchTerm, chamberFilter, partyFilter, districtFilter]);
 
   const fetchMembers = async () => {
     try {
@@ -103,6 +109,44 @@ export const useMembersData = () => {
     }
   };
 
+  const fetchParties = async () => {
+    try {
+      const { data } = await supabase
+        .from("People")
+        .select("party")
+        .not("party", "is", null)
+        .order("party");
+
+      if (data) {
+        const uniqueParties = Array.from(
+          new Set(data.map(item => item.party).filter(Boolean))
+        ) as string[];
+        setParties(uniqueParties);
+      }
+    } catch (error) {
+      console.error("Error fetching parties:", error);
+    }
+  };
+
+  const fetchDistricts = async () => {
+    try {
+      const { data } = await supabase
+        .from("People")
+        .select("district")
+        .not("district", "is", null)
+        .order("district");
+
+      if (data) {
+        const uniqueDistricts = Array.from(
+          new Set(data.map(item => item.district).filter(Boolean))
+        ) as string[];
+        setDistricts(uniqueDistricts);
+      }
+    } catch (error) {
+      console.error("Error fetching districts:", error);
+    }
+  };
+
   const filterMembers = () => {
     let filtered = members;
 
@@ -122,6 +166,14 @@ export const useMembersData = () => {
       filtered = filtered.filter(member => member.chamber === chamberFilter);
     }
 
+    if (partyFilter !== "all") {
+      filtered = filtered.filter(member => member.party === partyFilter);
+    }
+
+    if (districtFilter !== "all") {
+      filtered = filtered.filter(member => member.district === districtFilter);
+    }
+
     setFilteredMembers(filtered);
   };
 
@@ -130,10 +182,16 @@ export const useMembersData = () => {
     loading,
     error,
     chambers,
+    parties,
+    districts,
     searchTerm,
     setSearchTerm,
     chamberFilter,
     setChamberFilter,
+    partyFilter,
+    setPartyFilter,
+    districtFilter,
+    setDistrictFilter,
     fetchMembers,
   };
 };
