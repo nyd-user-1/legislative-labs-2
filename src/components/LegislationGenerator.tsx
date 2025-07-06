@@ -41,7 +41,7 @@ const LegislationGenerator = () => {
             <TabsTrigger value="gallery">Public Gallery</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="draft" className="mt-0">
+          <TabsContent value="draft" className="mt-6">
             <DraftEditor 
               draft={currentDraft}
               onDraftChange={setCurrentDraft}
@@ -49,15 +49,15 @@ const LegislationGenerator = () => {
             />
           </TabsContent>
           
-          <TabsContent value="analysis" className="mt-0">
+          <TabsContent value="analysis" className="mt-6">
             <AnalysisPanel draft={currentDraft} />
           </TabsContent>
           
-          <TabsContent value="export" className="mt-0">
+          <TabsContent value="export" className="mt-6">
             <ExportPanel draft={currentDraft} />
           </TabsContent>
           
-          <TabsContent value="gallery" className="mt-0">
+          <TabsContent value="gallery" className="mt-6">
             <PublicGallery onDraftSelect={setCurrentDraft} />
           </TabsContent>
         </Tabs>

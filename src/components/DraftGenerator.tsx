@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -21,6 +21,16 @@ export const DraftGenerator = ({ idea, onIdeaChange, onDraftGenerated, onProgres
   const [isGeneratingDraft, setIsGeneratingDraft] = useState(false);
   const { toast } = useToast();
   const { selectedModel } = useModel();
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Auto-resize textarea based on content
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+  }, [idea]);
 
   const generateDraft = async () => {
     if (!idea.trim()) {
@@ -100,8 +110,8 @@ Use proper legislative language and formatting. Make it comprehensive but focuse
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="idea">Your Legislative Idea (What problem do you want to solve?)</Label>
           <Textarea
+            ref={textareaRef}
             id="idea"
             placeholder="Enter your idea for legislation or policy here. Be as detailed as possible and include a problem statement."
             value={idea}
@@ -111,7 +121,8 @@ Use proper legislative language and formatting. Make it comprehensive but focuse
                 generateDraft();
               }
             }}
-            className="textarea-auto resize-none form-input"
+            className="min-h-[100px] overflow-hidden form-input"
+            style={{ resize: 'none' }}
           />
         </div>
 

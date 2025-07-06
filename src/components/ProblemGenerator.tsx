@@ -106,7 +106,6 @@ Format it as a professional problem statement suitable for legislative drafting.
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="scenario">Describe a Real-Life Scenario</Label>
           <Textarea
             id="scenario"
             placeholder="Describe a real-life situation or scenario that illustrates the problem you want to address with legislation..."

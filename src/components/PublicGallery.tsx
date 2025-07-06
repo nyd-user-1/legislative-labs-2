@@ -83,14 +83,8 @@ export const PublicGallery = ({ onDraftSelect }: PublicGalleryProps) => {
   };
 
   const extractBillTitle = (draft: LegislativeDraft) => {
-    // Extract bill title from draft content if available
-    if (draft.draftContent) {
-      const match = draft.draftContent.match(/\*\*([^*]+Act[^*]*)\*\*/);
-      if (match) {
-        return match[1];
-      }
-    }
-    return draft.title;
+    // Use the stored title directly instead of parsing draft content
+    return draft.title || "Untitled Draft";
   };
   const getTypeColor = (type: string) => {
     switch (type) {
