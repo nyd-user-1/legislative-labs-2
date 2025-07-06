@@ -7,7 +7,7 @@ export const MembersHeader = ({ membersCount, chambersCount }: MembersHeaderProp
   return (
     <div className="mb-8">
       <h1 className="text-4xl font-bold text-gray-900 mb-2">
-        Members Directory
+        Members
       </h1>
       <p className="text-lg text-muted-foreground">
         Connect with elected officials and their contact information
