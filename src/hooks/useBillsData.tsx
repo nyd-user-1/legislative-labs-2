@@ -25,7 +25,17 @@ export const useBillsData = () => {
       setLoading(true);
       setError(null);
       console.log("Fetching bills with filters:", { searchTerm, sponsorFilter, committeeFilter, dateRangeFilter });
-      let query = supabase.from("Bills").select("*");
+      
+      // Enhanced query to include sponsor information
+      let query = supabase
+        .from("Bills")
+        .select(`
+          *,
+          sponsor:Sponsors!left(
+            position,
+            sponsor_info:People!left(name, party, chamber)
+          )
+        `);
 
       // Apply search filter
       if (searchTerm) {

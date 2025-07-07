@@ -28,19 +28,19 @@ export const BillStatusBadge = ({ status, statusDesc }: BillStatusBadgeProps) =>
   const getStatusColor = (status: number) => {
     switch (status) {
       case 1:
-        return "bg-brand-100 text-brand-700 border-brand-200"; // Introduced
+        return "bg-green-100 text-green-700 border-green-200"; // Introduced - Green
       case 2:
-        return "bg-blue-100 text-blue-700 border-blue-200"; // Committee
+        return "bg-orange-100 text-orange-700 border-orange-200"; // Committee - Orange
       case 3:
-        return "bg-yellow-100 text-yellow-700 border-yellow-200"; // Floor
+        return "bg-blue-100 text-blue-700 border-blue-200"; // Floor - Blue
       case 4:
-        return "bg-green-100 text-green-700 border-green-200"; // Passed
+        return "bg-blue-100 text-blue-700 border-blue-200"; // Passed - Blue
       case 5:
-        return "bg-red-100 text-red-700 border-red-200"; // Failed
+        return "bg-red-100 text-red-700 border-red-200"; // Failed - Red
       case 6:
-        return "bg-purple-100 text-purple-700 border-purple-200"; // Signed
+        return "bg-purple-100 text-purple-700 border-purple-200"; // Signed - Purple
       default:
-        return "bg-muted text-muted-foreground border-border";
+        return "bg-gray-100 text-gray-700 border-gray-200"; // Default - Gray
     }
   };
 

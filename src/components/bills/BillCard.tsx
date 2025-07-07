@@ -1,11 +1,20 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Eye, Calendar, User, BookOpen, MapPin } from "lucide-react";
+import { Target, Calendar, User, FileText } from "lucide-react";
 import { BillStatusBadge } from "@/components/BillStatusBadge";
 import { Tables } from "@/integrations/supabase/types";
 import { formatDate } from "@/utils/dateUtils";
 
-type Bill = Tables<"Bills">;
+type Bill = Tables<"Bills"> & {
+  sponsor?: Array<{
+    position: number | null;
+    sponsor_info: {
+      name: string | null;
+      party: string | null;
+      chamber: string | null;
+    } | null;
+  }>;
+};
 
 interface BillCardProps {
   bill: Bill;
@@ -13,6 +22,10 @@ interface BillCardProps {
 }
 
 export const BillCard = ({ bill, onBillSelect }: BillCardProps) => {
+  // Get primary sponsor (usually position 1 or first one)
+  const primarySponsor = bill.sponsor?.find(s => s.position === 1 || s.position === 0) || bill.sponsor?.[0];
+  const sponsorName = primarySponsor?.sponsor_info?.name;
+
   return (
     <Card 
       className="card hover:shadow-md transition-shadow cursor-pointer"
@@ -41,9 +54,16 @@ export const BillCard = ({ bill, onBillSelect }: BillCardProps) => {
       <CardContent className="pt-0">
         <div className="space-y-3">
           <div className="space-y-2 pt-2 border-t">
-            {bill.committee && (
+            {sponsorName && (
               <div className="flex items-center gap-2 text-sm">
                 <User className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                <span className="truncate font-medium">{sponsorName}</span>
+              </div>
+            )}
+
+            {bill.committee && (
+              <div className="flex items-center gap-2 text-sm">
+                <Target className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                 <span className="truncate">{bill.committee}</span>
               </div>
             )}
@@ -52,13 +72,6 @@ export const BillCard = ({ bill, onBillSelect }: BillCardProps) => {
               <div className="flex items-center gap-2 text-sm">
                 <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                 <span>{formatDate(bill.last_action_date)}</span>
-              </div>
-            )}
-
-            {bill.last_action && (
-              <div className="flex items-center gap-2 text-sm">
-                <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                <span className="truncate">{bill.last_action}</span>
               </div>
             )}
 
@@ -71,7 +84,7 @@ export const BillCard = ({ bill, onBillSelect }: BillCardProps) => {
                   className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <BookOpen className="h-3 w-3" />
+                  <FileText className="h-3 w-3" />
                   View Full Text
                 </a>
               </div>
