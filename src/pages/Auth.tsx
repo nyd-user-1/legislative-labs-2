@@ -81,7 +81,7 @@ const Auth = () => {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">New York Digital</CardTitle>
-          <p className="text-muted-foreground">Welcome to democratized legislative ideation</p>
+          <p className="text-muted-foreground">Welcome back to democracy.</p>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="signin" className="w-full">
