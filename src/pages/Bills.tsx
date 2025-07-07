@@ -108,55 +108,37 @@ const Bills = () => {
   }
 
   if (loading) {
-    return (
-      <div className="page-container min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
-        <div className="content-wrapper max-w-7xl mx-auto">
-          <div className="space-y-6">
-            <BillsHeader billsCount={0} />
-            <BillsLoadingSkeleton />
-          </div>
-        </div>
-      </div>
-    );
+    return <BillsLoadingSkeleton />;
   }
 
   if (error) {
-    return (
-      <div className="page-container min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
-        <div className="content-wrapper max-w-7xl mx-auto">
-          <div className="space-y-6">
-            <BillsHeader billsCount={0} />
-            <BillsErrorState error={error} onRetry={fetchBills} />
-          </div>
-        </div>
-      </div>
-    );
+    return <BillsErrorState error={error} onRetry={fetchBills} />;
   }
 
-  return (
-    <div className="page-container min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
-      <div className="content-wrapper max-w-7xl mx-auto">
-        <div className="space-y-6">
-          <BillsHeader billsCount={totalBills} />
-          
-          <BillsSearchFilters
-            filters={{
-              search: searchTerm,
-              sponsor: sponsorFilter,
-              committee: committeeFilter,
-              dateRange: dateRangeFilter,
-            }}
-            onFiltersChange={handleFiltersChange}
-            committees={committees}
-            sponsors={sponsors}
-          />
+  const hasFilters = searchTerm !== "" || sponsorFilter !== "" || committeeFilter !== "" || dateRangeFilter !== "";
 
-          {bills.length === 0 ? (
-            <BillsEmptyState />
-          ) : (
-            <BillsGrid bills={bills} onBillSelect={handleBillSelect} />
-          )}
-        </div>
+  return (
+    <div className="container mx-auto px-4 sm:px-6 py-6">
+      <div className="space-y-6">
+        <BillsHeader billsCount={totalBills} />
+        
+        <BillsSearchFilters
+          filters={{
+            search: searchTerm,
+            sponsor: sponsorFilter,
+            committee: committeeFilter,
+            dateRange: dateRangeFilter,
+          }}
+          onFiltersChange={handleFiltersChange}
+          committees={committees}
+          sponsors={sponsors}
+        />
+
+        {bills.length === 0 ? (
+          <BillsEmptyState hasFilters={hasFilters} />
+        ) : (
+          <BillsGrid bills={bills} onBillSelect={handleBillSelect} />
+        )}
       </div>
     </div>
   );
