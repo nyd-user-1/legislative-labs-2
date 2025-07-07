@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Target, Calendar, User, FileText } from "lucide-react";
+import { Target, Calendar, User, FileText, MapPin } from "lucide-react";
 import { BillStatusBadge } from "@/components/BillStatusBadge";
 import { Tables } from "@/integrations/supabase/types";
 import { formatDate } from "@/utils/dateUtils";
@@ -64,6 +64,13 @@ export const BillCard = ({ bill, onBillSelect }: BillCardProps) => {
               <div className="flex items-center gap-2 text-sm">
                 <Target className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                 <span className="truncate">{bill.committee}</span>
+              </div>
+            )}
+
+            {bill.last_action && (
+              <div className="flex items-center gap-2 text-sm">
+                <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                <span className="truncate">{bill.last_action}</span>
               </div>
             )}
 
