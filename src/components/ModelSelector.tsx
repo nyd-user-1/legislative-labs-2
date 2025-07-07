@@ -58,10 +58,7 @@ export const ModelSelector = ({ selectedModel, onModelChange }: ModelSelectorPro
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className="min-w-[200px] justify-between">
-          <div className="flex items-center space-x-2">
-            <Bot className="h-4 w-4" />
-            <span className="truncate">{currentModel.name}</span>
-          </div>
+          <span className="truncate">{currentModel.name}</span>
           <ChevronDown className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
