@@ -65,47 +65,64 @@ export const ModelSelector = ({ selectedModel, onModelChange }: ModelSelectorPro
           <ChevronDown className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-80">
-        {Object.entries(models).map(([providerId, provider]) => (
-          <div key={providerId}>
-            <div className="px-2 py-1.5 text-sm font-semibold text-muted-foreground">
-              {provider.name}
-            </div>
-            {provider.models.map((model) => (
-              <DropdownMenuItem
-                key={model.id}
-                onClick={() => onModelChange(model.id)}
-                className={`cursor-pointer ${selectedModel === model.id ? 'bg-accent' : ''}`}
-              >
-                <div className="flex items-start space-x-3 w-full">
-                  <div className="flex-shrink-0 mt-0.5">
-                    {providerId === 'openai' ? (
-                      <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                        <Zap className="h-3 w-3 text-green-600" />
-                      </div>
-                    ) : providerId === 'perplexity' ? (
-                      <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
-                        <Search className="h-3 w-3 text-blue-600" />
-                      </div>
-                    ) : (
-                      <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center">
-                        <Bot className="h-3 w-3 text-purple-600" />
-                      </div>
-                    )}
+      <DropdownMenuContent align="end" className="w-80 bg-popover border border-border shadow-lg">
+        {Object.entries(models).map(([providerId, provider], index) => (
+          <div key={providerId} className={index > 0 ? "mt-2" : ""}>
+            <div className="px-3 py-2 bg-muted/50 border-b border-border">
+              <div className="flex items-center space-x-2">
+                {providerId === 'openai' ? (
+                  <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
+                    <Zap className="h-3 w-3 text-green-600" />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm font-medium truncate">{model.name}</p>
-                      {selectedModel === model.id && (
-                        <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0 ml-2" />
+                ) : providerId === 'perplexity' ? (
+                  <div className="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center">
+                    <Search className="h-3 w-3 text-blue-600" />
+                  </div>
+                ) : (
+                  <div className="w-5 h-5 bg-purple-100 rounded-full flex items-center justify-center">
+                    <Bot className="h-3 w-3 text-purple-600" />
+                  </div>
+                )}
+                <span className="text-sm font-semibold text-foreground">{provider.name}</span>
+              </div>
+            </div>
+            <div className="py-1">
+              {provider.models.map((model) => (
+                <DropdownMenuItem
+                  key={model.id}
+                  onClick={() => onModelChange(model.id)}
+                  className={`cursor-pointer mx-1 rounded-md ${selectedModel === model.id ? 'bg-accent' : ''}`}
+                >
+                  <div className="flex items-start space-x-3 w-full py-1">
+                    <div className="flex-shrink-0 mt-0.5">
+                      {providerId === 'openai' ? (
+                        <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                          <Zap className="h-3 w-3 text-green-600" />
+                        </div>
+                      ) : providerId === 'perplexity' ? (
+                        <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                          <Search className="h-3 w-3 text-blue-600" />
+                        </div>
+                      ) : (
+                        <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center">
+                          <Bot className="h-3 w-3 text-purple-600" />
+                        </div>
                       )}
                     </div>
-                    <p className="text-xs text-muted-foreground">{model.description}</p>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm font-medium truncate">{model.name}</p>
+                        {selectedModel === model.id && (
+                          <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0 ml-2" />
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground">{model.description}</p>
+                    </div>
                   </div>
-                </div>
-              </DropdownMenuItem>
-            ))}
-            <DropdownMenuSeparator />
+                </DropdownMenuItem>
+              ))}
+            </div>
+            {index < Object.entries(models).length - 1 && <DropdownMenuSeparator className="my-1" />}
           </div>
         ))}
       </DropdownMenuContent>
