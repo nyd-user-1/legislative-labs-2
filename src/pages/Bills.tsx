@@ -1,9 +1,16 @@
 import { useState, useEffect } from "react";
-import { BillFilters } from "@/components/BillFilters";
-import { BillsList } from "@/components/BillsList";
 import { BillDetail } from "@/components/BillDetail";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
+import { useBillsData } from "@/hooks/useBillsData";
+import { 
+  BillsHeader, 
+  BillsSearchFilters, 
+  BillsGrid, 
+  BillsLoadingSkeleton, 
+  BillsErrorState, 
+  BillsEmptyState 
+} from "@/components/bills";
 
 type Bill = Tables<"Bills">;
 
@@ -14,12 +21,22 @@ const Bills = () => {
   const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
   const [committees, setCommittees] = useState<string[]>([]);
   const [sponsors, setSponsors] = useState<string[]>([]);
-  const [filters, setFilters] = useState({
-    search: "",
-    sponsor: "",
-    committee: "",
-    dateRange: ""
-  });
+  
+  const {
+    bills,
+    loading,
+    error,
+    searchTerm,
+    setSearchTerm,
+    sponsorFilter,
+    setSponsorFilter,
+    committeeFilter,
+    setCommitteeFilter,
+    dateRangeFilter,
+    setDateRangeFilter,
+    fetchBills,
+    totalBills,
+  } = useBillsData();
 
   useEffect(() => {
     fetchCommittees();
@@ -72,8 +89,16 @@ const Bills = () => {
     setSelectedBill(null);
   };
 
-  const handleFiltersChange = (newFilters: typeof filters) => {
-    setFilters(newFilters);
+  const handleFiltersChange = (newFilters: {
+    search: string;
+    sponsor: string;
+    committee: string;
+    dateRange: string;
+  }) => {
+    setSearchTerm(newFilters.search);
+    setSponsorFilter(newFilters.sponsor);
+    setCommitteeFilter(newFilters.committee);
+    setDateRangeFilter(newFilters.dateRange);
   };
 
   if (selectedBill) {
@@ -82,26 +107,55 @@ const Bills = () => {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-brand-50/30">
-      <div className="container mx-auto px-4 sm:px-6 py-6">
-        <div className="space-y-6">
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">
-              Bills
-            </h1>
+  if (loading) {
+    return (
+      <div className="page-container min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
+        <div className="content-wrapper max-w-7xl mx-auto">
+          <div className="space-y-6">
+            <BillsHeader billsCount={0} />
+            <BillsLoadingSkeleton />
           </div>
+        </div>
+      </div>
+    );
+  }
 
-          <BillFilters
+  if (error) {
+    return (
+      <div className="page-container min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
+        <div className="content-wrapper max-w-7xl mx-auto">
+          <div className="space-y-6">
+            <BillsHeader billsCount={0} />
+            <BillsErrorState error={error} onRetry={fetchBills} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="page-container min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
+      <div className="content-wrapper max-w-7xl mx-auto">
+        <div className="space-y-6">
+          <BillsHeader billsCount={totalBills} />
+          
+          <BillsSearchFilters
+            filters={{
+              search: searchTerm,
+              sponsor: sponsorFilter,
+              committee: committeeFilter,
+              dateRange: dateRangeFilter,
+            }}
             onFiltersChange={handleFiltersChange}
             committees={committees}
             sponsors={sponsors}
           />
 
-          <BillsList 
-            filters={filters}
-            onBillSelect={handleBillSelect}
-          />
+          {bills.length === 0 ? (
+            <BillsEmptyState />
+          ) : (
+            <BillsGrid bills={bills} onBillSelect={handleBillSelect} />
+          )}
         </div>
       </div>
     </div>

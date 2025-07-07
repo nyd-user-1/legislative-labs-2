@@ -11,29 +11,33 @@ interface BillFilters {
   dateRange: string;
 }
 
-export const useBillsData = (filters: BillFilters) => {
+export const useBillsData = () => {
   const [bills, setBills] = useState<Bill[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sponsorFilter, setSponsorFilter] = useState("");
+  const [committeeFilter, setCommitteeFilter] = useState("");
+  const [dateRangeFilter, setDateRangeFilter] = useState("");
 
   const fetchBills = async () => {
     try {
       setLoading(true);
       setError(null);
-      console.log("Fetching bills with filters:", filters);
+      console.log("Fetching bills with filters:", { searchTerm, sponsorFilter, committeeFilter, dateRangeFilter });
       let query = supabase.from("Bills").select("*");
 
       // Apply search filter
-      if (filters.search) {
-        query = query.or(`title.ilike.%${filters.search}%,bill_number.ilike.%${filters.search}%,description.ilike.%${filters.search}%`);
+      if (searchTerm) {
+        query = query.or(`title.ilike.%${searchTerm}%,bill_number.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
       }
 
       // Apply sponsor filter  
-      if (filters.sponsor) {
+      if (sponsorFilter) {
         // First get bills that have sponsors matching the filter
         const {
           data: sponsorBills
-        } = await supabase.from("Sponsors").select("bill_id, People!inner(name)").eq("People.name", filters.sponsor);
+        } = await supabase.from("Sponsors").select("bill_id, People!inner(name)").eq("People.name", sponsorFilter);
         if (sponsorBills && sponsorBills.length > 0) {
           const billIds = sponsorBills.map(sb => sb.bill_id);
           query = query.in("bill_id", billIds);
@@ -45,13 +49,13 @@ export const useBillsData = (filters: BillFilters) => {
       }
 
       // Apply committee filter
-      if (filters.committee) {
-        query = query.eq("committee", filters.committee);
+      if (committeeFilter) {
+        query = query.eq("committee", committeeFilter);
       }
 
       // Apply date filter
-      if (filters.dateRange) {
-        const daysAgo = parseInt(filters.dateRange);
+      if (dateRangeFilter) {
+        const daysAgo = parseInt(dateRangeFilter);
         const cutoffDate = new Date();
         cutoffDate.setDate(cutoffDate.getDate() - daysAgo);
         query = query.gte("last_action_date", cutoffDate.toISOString().split('T')[0]);
@@ -85,12 +89,31 @@ export const useBillsData = (filters: BillFilters) => {
 
   useEffect(() => {
     fetchBills();
-  }, [filters]);
+  }, [searchTerm, sponsorFilter, committeeFilter, dateRangeFilter]);
+
+  // Filter bills based on current filters
+  const filteredBills = bills.filter(bill => {
+    if (searchTerm && !bill.title?.toLowerCase().includes(searchTerm.toLowerCase()) && 
+        !bill.bill_number?.toLowerCase().includes(searchTerm.toLowerCase()) &&
+        !bill.description?.toLowerCase().includes(searchTerm.toLowerCase())) {
+      return false;
+    }
+    return true;
+  });
 
   return {
-    bills,
+    bills: filteredBills,
     loading,
     error,
-    fetchBills
+    searchTerm,
+    setSearchTerm,
+    sponsorFilter,
+    setSponsorFilter,
+    committeeFilter,
+    setCommitteeFilter,
+    dateRangeFilter,
+    setDateRangeFilter,
+    fetchBills,
+    totalBills: bills.length,
   };
 };
