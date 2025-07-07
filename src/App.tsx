@@ -17,6 +17,7 @@ import Problems from "./pages/Problems";
 import Ideas from "./pages/Ideas";
 import MediaKits from "./pages/MediaKits";
 import Members from "./pages/Members";
+import Committees from "./pages/Committees";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +48,7 @@ const AppLayout = () => {
                 <Route path="/media-kits" element={<MediaKits />} />
                 <Route path="/bills" element={<Bills />} />
                 <Route path="/members" element={<Members />} />
+                <Route path="/committees" element={<Committees />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/" element={<Index />} />
               </Routes>
