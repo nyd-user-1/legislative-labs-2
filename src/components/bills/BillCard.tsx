@@ -5,16 +5,7 @@ import { BillStatusBadge } from "@/components/BillStatusBadge";
 import { Tables } from "@/integrations/supabase/types";
 import { formatDate } from "@/utils/dateUtils";
 
-type Bill = Tables<"Bills"> & {
-  sponsor?: Array<{
-    position: number | null;
-    sponsor_info: {
-      name: string | null;
-      party: string | null;
-      chamber: string | null;
-    } | null;
-  }>;
-};
+type Bill = Tables<"Bills">;
 
 interface BillCardProps {
   bill: Bill;
@@ -22,9 +13,6 @@ interface BillCardProps {
 }
 
 export const BillCard = ({ bill, onBillSelect }: BillCardProps) => {
-  // Get primary sponsor (usually position 1 or first one)
-  const primarySponsor = bill.sponsor?.find(s => s.position === 1 || s.position === 0) || bill.sponsor?.[0];
-  const sponsorName = primarySponsor?.sponsor_info?.name;
 
   return (
     <Card 
@@ -54,13 +42,6 @@ export const BillCard = ({ bill, onBillSelect }: BillCardProps) => {
       <CardContent className="pt-0">
         <div className="space-y-3">
           <div className="space-y-2 pt-2 border-t">
-            {sponsorName && (
-              <div className="flex items-center gap-2 text-sm">
-                <User className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                <span className="truncate font-medium">{sponsorName}</span>
-              </div>
-            )}
-
             {bill.committee && (
               <div className="flex items-center gap-2 text-sm">
                 <Target className="h-4 w-4 text-muted-foreground flex-shrink-0" />

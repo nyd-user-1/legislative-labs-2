@@ -26,37 +26,18 @@ export const useBillsData = () => {
       setError(null);
       console.log("Fetching bills with filters:", { searchTerm, sponsorFilter, committeeFilter, dateRangeFilter });
       
-      // Enhanced query to include sponsor information
+      // Start with basic bills query first
       let query = supabase
         .from("Bills")
-        .select(`
-          *,
-          sponsor:Sponsors!left(
-            position,
-            sponsor_info:People!left(name, party, chamber)
-          )
-        `);
+        .select("*");
 
       // Apply search filter
       if (searchTerm) {
         query = query.or(`title.ilike.%${searchTerm}%,bill_number.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
       }
 
-      // Apply sponsor filter  
-      if (sponsorFilter) {
-        // First get bills that have sponsors matching the filter
-        const {
-          data: sponsorBills
-        } = await supabase.from("Sponsors").select("bill_id, People!inner(name)").eq("People.name", sponsorFilter);
-        if (sponsorBills && sponsorBills.length > 0) {
-          const billIds = sponsorBills.map(sb => sb.bill_id);
-          query = query.in("bill_id", billIds);
-        } else {
-          // No bills found for this sponsor, return empty result
-          setBills([]);
-          return;
-        }
-      }
+      // Skip sponsor filter for now - sponsor data not loaded
+      // TODO: Re-implement sponsor filtering when sponsor data is properly joined
 
       // Apply committee filter
       if (committeeFilter) {
