@@ -80,7 +80,7 @@ const Auth = () => {
     <div className="min-h-screen bg-gradient-to-b from-background to-brand-50/30 flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">Legislative Labs</CardTitle>
+          <CardTitle className="text-2xl font-bold">New York Digital</CardTitle>
           <p className="text-muted-foreground">Welcome to democratized legislative ideation</p>
         </CardHeader>
         <CardContent>
