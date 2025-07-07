@@ -78,16 +78,7 @@ const Bills = () => {
 
   if (selectedBill) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-background to-brand-50/30">
-        <div className="container mx-auto px-4 sm:px-6 py-6">
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">
-              Bill Details
-            </h1>
-          </div>
-          <BillDetail bill={selectedBill} onBack={handleBackToBills} />
-        </div>
-      </div>
+      <BillDetail bill={selectedBill} onBack={handleBackToBills} />
     );
   }
 
