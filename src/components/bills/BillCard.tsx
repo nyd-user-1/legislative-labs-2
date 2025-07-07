@@ -67,17 +67,17 @@ export const BillCard = ({ bill, onBillSelect }: BillCardProps) => {
               </div>
             )}
 
-            {bill.last_action && (
-              <div className="flex items-center gap-2 text-sm">
-                <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                <span className="truncate">{bill.last_action}</span>
-              </div>
-            )}
-
             {bill.last_action_date && (
               <div className="flex items-center gap-2 text-sm">
                 <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                 <span>{formatDate(bill.last_action_date)}</span>
+              </div>
+            )}
+
+            {bill.last_action && (
+              <div className="flex items-center gap-2 text-sm">
+                <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                <span className="truncate">{bill.last_action}</span>
               </div>
             )}
 
