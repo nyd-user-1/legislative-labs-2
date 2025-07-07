@@ -1,5 +1,13 @@
-import { useState, useRef, useEffect } from "react";
-import { ChevronDown } from "lucide-react";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown, Bot, Zap, Search } from "lucide-react";
 
 export type ModelProvider = "openai" | "claude" | "perplexity";
 export type ModelType = "gpt-4" | "gpt-3.5-turbo" | "claude-3-opus" | "claude-3-sonnet" | "claude-3-haiku" | "llama-3.1-sonar-small-128k-online" | "llama-3.1-sonar-large-128k-online" | "llama-3.1-sonar-huge-128k-online";
@@ -36,9 +44,6 @@ const models: Record<ModelProvider, { name: string; models: { id: ModelType; nam
 };
 
 export const ModelSelector = ({ selectedModel, onModelChange }: ModelSelectorProps) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
   const getCurrentModelInfo = () => {
     for (const provider of Object.values(models)) {
       const model = provider.models.find(m => m.id === selectedModel);
@@ -49,112 +54,78 @@ export const ModelSelector = ({ selectedModel, onModelChange }: ModelSelectorPro
 
   const currentModel = getCurrentModelInfo();
 
-  // Click outside to close
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isOpen]);
-
-  const handleModelSelect = (model: ModelType) => {
-    onModelChange(model);
-    setIsOpen(false);
-  };
-
   return (
-    <div className="relative" ref={dropdownRef}>
-      {/* Trigger button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="inline-flex items-center justify-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 hover:border-gray-500 transition-colors"
-      >
-        <span className="truncate">{currentModel.name}</span>
-        <ChevronDown className="h-4 w-4" />
-      </button>
-
-      {/* Dropdown menu */}
-      {isOpen && (
-        <div className="absolute left-0 mt-2 w-56 rounded-md border border-gray-200 bg-white shadow-lg z-50">
-          {/* OpenAI section */}
-          <div>
-            <div className="px-3 py-2 text-xs font-medium text-gray-500">
-              OpenAI
-            </div>
-            {models.openai.models.map((model) => (
-              <button
-                key={model.id}
-                onClick={() => handleModelSelect(model.id)}
-                className="flex w-full items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              >
-                <div className="flex items-center justify-between w-full">
-                  <span>{model.name}</span>
-                  {selectedModel === model.id && (
-                    <div className="w-2 h-2 bg-blue-600 rounded-full" />
-                  )}
-                </div>
-              </button>
-            ))}
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" className="min-w-[200px] justify-between">
+          <div className="flex items-center space-x-2">
+            <Bot className="h-4 w-4" />
+            <span className="truncate">{currentModel.name}</span>
           </div>
-
-          {/* Separator */}
-          <div className="border-t border-gray-100 mt-1 pt-1" />
-
-          {/* Anthropic Claude section */}
-          <div>
-            <div className="px-3 py-2 text-xs font-medium text-gray-500">
-              Anthropic Claude
+          <ChevronDown className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-80 bg-popover border border-border shadow-lg">
+        {Object.entries(models).map(([providerId, provider], index) => (
+          <div key={providerId} className={index > 0 ? "mt-2" : ""}>
+            <div className="px-3 py-2 bg-muted/50 border-b border-border">
+              <div className="flex items-center space-x-2">
+                {providerId === 'openai' ? (
+                  <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
+                    <Zap className="h-3 w-3 text-green-600" />
+                  </div>
+                ) : providerId === 'perplexity' ? (
+                  <div className="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center">
+                    <Search className="h-3 w-3 text-blue-600" />
+                  </div>
+                ) : (
+                  <div className="w-5 h-5 bg-purple-100 rounded-full flex items-center justify-center">
+                    <Bot className="h-3 w-3 text-purple-600" />
+                  </div>
+                )}
+                <span className="text-sm font-semibold text-foreground">{provider.name}</span>
+              </div>
             </div>
-            {models.claude.models.map((model) => (
-              <button
-                key={model.id}
-                onClick={() => handleModelSelect(model.id)}
-                className="flex w-full items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              >
-                <div className="flex items-center justify-between w-full">
-                  <span>{model.name}</span>
-                  {selectedModel === model.id && (
-                    <div className="w-2 h-2 bg-blue-600 rounded-full" />
-                  )}
-                </div>
-              </button>
-            ))}
-          </div>
-
-          {/* Separator */}
-          <div className="border-t border-gray-100 mt-1 pt-1" />
-
-          {/* Perplexity AI section */}
-          <div>
-            <div className="px-3 py-2 text-xs font-medium text-gray-500">
-              Perplexity AI
+            <div className="py-1">
+              {provider.models.map((model) => (
+                <DropdownMenuItem
+                  key={model.id}
+                  onClick={() => onModelChange(model.id)}
+                  className={`cursor-pointer mx-1 rounded-md ${selectedModel === model.id ? 'bg-accent' : ''}`}
+                >
+                  <div className="flex items-start space-x-3 w-full py-1">
+                    <div className="flex-shrink-0 mt-0.5">
+                      {providerId === 'openai' ? (
+                        <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                          <Zap className="h-3 w-3 text-green-600" />
+                        </div>
+                      ) : providerId === 'perplexity' ? (
+                        <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                          <Search className="h-3 w-3 text-blue-600" />
+                        </div>
+                      ) : (
+                        <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center">
+                          <Bot className="h-3 w-3 text-purple-600" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm font-medium truncate">{model.name}</p>
+                        {selectedModel === model.id && (
+                          <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0 ml-2" />
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground">{model.description}</p>
+                    </div>
+                  </div>
+                </DropdownMenuItem>
+              ))}
             </div>
-            {models.perplexity.models.map((model) => (
-              <button
-                key={model.id}
-                onClick={() => handleModelSelect(model.id)}
-                className="flex w-full items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              >
-                <div className="flex items-center justify-between w-full">
-                  <span>{model.name}</span>
-                  {selectedModel === model.id && (
-                    <div className="w-2 h-2 bg-blue-600 rounded-full" />
-                  )}
-                </div>
-              </button>
-            ))}
+            {index < Object.entries(models).length - 1 && <DropdownMenuSeparator className="my-1" />}
           </div>
-        </div>
-      )}
-    </div>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
