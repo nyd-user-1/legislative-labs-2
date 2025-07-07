@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { ChevronDown, Bot, Zap, Search } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 export type ModelProvider = "openai" | "claude" | "perplexity";
 export type ModelType = "gpt-4" | "gpt-3.5-turbo" | "claude-3-opus" | "claude-3-sonnet" | "claude-3-haiku" | "llama-3.1-sonar-small-128k-online" | "llama-3.1-sonar-large-128k-online" | "llama-3.1-sonar-huge-128k-online";
@@ -78,7 +78,6 @@ export const ModelSelector = ({ selectedModel, onModelChange }: ModelSelectorPro
         onClick={() => setIsOpen(!isOpen)}
         className="inline-flex items-center justify-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 hover:border-gray-500 transition-colors"
       >
-        <Bot className="h-4 w-4" />
         <span className="truncate">{currentModel.name}</span>
         <ChevronDown className="h-4 w-4" />
       </button>
@@ -89,10 +88,7 @@ export const ModelSelector = ({ selectedModel, onModelChange }: ModelSelectorPro
           {/* OpenAI section */}
           <div>
             <div className="px-3 py-2 text-xs font-medium text-gray-500">
-              <div className="flex items-center gap-2">
-                <Zap className="h-3 w-3" />
-                OpenAI
-              </div>
+              OpenAI
             </div>
             {models.openai.models.map((model) => (
               <button
@@ -116,10 +112,7 @@ export const ModelSelector = ({ selectedModel, onModelChange }: ModelSelectorPro
           {/* Anthropic Claude section */}
           <div>
             <div className="px-3 py-2 text-xs font-medium text-gray-500">
-              <div className="flex items-center gap-2">
-                <Bot className="h-3 w-3" />
-                Anthropic Claude
-              </div>
+              Anthropic Claude
             </div>
             {models.claude.models.map((model) => (
               <button
@@ -143,10 +136,7 @@ export const ModelSelector = ({ selectedModel, onModelChange }: ModelSelectorPro
           {/* Perplexity AI section */}
           <div>
             <div className="px-3 py-2 text-xs font-medium text-gray-500">
-              <div className="flex items-center gap-2">
-                <Search className="h-3 w-3" />
-                Perplexity AI
-              </div>
+              Perplexity AI
             </div>
             {models.perplexity.models.map((model) => (
               <button
