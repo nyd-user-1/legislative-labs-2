@@ -1,14 +1,15 @@
 import { useState } from "react";
-import { useCommitteesData } from "@/hooks/useCommitteesData";
+import { useEnhancedCommitteesData } from "@/hooks/useEnhancedCommitteesData";
 import { CommitteesHeader } from "@/components/committees/CommitteesHeader";
 import { CommitteesSearchFilters } from "@/components/committees/CommitteesSearchFilters";
 import { CommitteesGrid } from "@/components/committees/CommitteesGrid";
 import { CommitteesEmptyState } from "@/components/committees/CommitteesEmptyState";
 import { CommitteesLoadingSkeleton } from "@/components/committees/CommitteesLoadingSkeleton";
 import { CommitteesErrorState } from "@/components/committees/CommitteesErrorState";
-import { CommitteeDetail } from "@/components/CommitteeDetail";
+import { EnhancedCommitteeDetail } from "@/components/EnhancedCommitteeDetail";
+import { NYSMember } from "@/types/nysApi";
 
-type Committee = {
+type EnhancedCommittee = {
   name: string;
   memberCount: number;
   billCount: number;
@@ -17,10 +18,20 @@ type Committee = {
   ranking_member_name?: string;
   committee_type: string;
   chamber: string;
+  meetingDateTime?: string;
+  location?: string;
+  agendaNo?: number;
+  year?: number;
+  members?: NYSMember[];
+  upcomingMeetings?: Array<{
+    date: string;
+    location: string;
+    agenda: any;
+  }>;
 };
 
 const Committees = () => {
-  const [selectedCommittee, setSelectedCommittee] = useState<Committee | null>(null);
+  const [selectedCommittee, setSelectedCommittee] = useState<EnhancedCommittee | null>(null);
 
   const {
     committees,
@@ -36,7 +47,7 @@ const Committees = () => {
     totalCommittees,
     chambers,
     committeeTypes,
-  } = useCommitteesData();
+  } = useEnhancedCommitteesData();
 
   if (loading) {
     return <CommitteesLoadingSkeleton />;
@@ -49,7 +60,7 @@ const Committees = () => {
   // Show committee detail if one is selected
   if (selectedCommittee) {
     return (
-      <CommitteeDetail 
+      <EnhancedCommitteeDetail 
         committee={selectedCommittee} 
         onBack={() => setSelectedCommittee(null)} 
       />

@@ -1,6 +1,7 @@
 import { CommitteeCard } from "./CommitteeCard";
+import { NYSMember } from "@/types/nysApi";
 
-type Committee = {
+type EnhancedCommittee = {
   name: string;
   memberCount: number;
   billCount: number;
@@ -9,11 +10,21 @@ type Committee = {
   ranking_member_name?: string;
   committee_type: string;
   chamber: string;
+  meetingDateTime?: string;
+  location?: string;
+  agendaNo?: number;
+  year?: number;
+  members?: NYSMember[];
+  upcomingMeetings?: Array<{
+    date: string;
+    location: string;
+    agenda: any;
+  }>;
 };
 
 interface CommitteesGridProps {
-  committees: Committee[];
-  onCommitteeSelect: (committee: Committee) => void;
+  committees: EnhancedCommittee[];
+  onCommitteeSelect: (committee: EnhancedCommittee) => void;
 }
 
 export const CommitteesGrid = ({ committees, onCommitteeSelect }: CommitteesGridProps) => {
