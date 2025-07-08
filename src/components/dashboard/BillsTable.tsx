@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Bot } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 type Bill = Tables<"Bills"> & {
@@ -138,6 +138,17 @@ export const BillsTable = ({ bills, onBillSelect }: BillsTableProps) => {
                       </a>
                     </Button>
                   )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // AI analysis functionality would go here
+                    }}
+                    title="AI Analysis"
+                  >
+                    <Bot className="h-3 w-3" />
+                  </Button>
                 </div>
               </TableCell>
             </TableRow>
