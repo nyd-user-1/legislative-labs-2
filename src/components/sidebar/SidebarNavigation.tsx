@@ -1,4 +1,4 @@
-import { Search, Settings, User, FileText, Lightbulb, BarChart3, Users, Building2 } from "lucide-react";
+import { Search, Settings, User, FileText, Lightbulb, BarChart3, Users, Building2, TrendingUp } from "lucide-react";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -9,12 +9,12 @@ import { NavigationItem } from "./NavigationItem";
 import { useNavigation } from "@/hooks/useNavigation";
 
 const mainNavItems = [
+  { title: "Dashboard", url: "/", icon: TrendingUp },
   { title: "Bills", url: "/bills", icon: FileText },
   { title: "Members", url: "/members", icon: Users },
   { title: "Committees", url: "/committees", icon: Building2 },
   { title: "Problems", url: "/problems", icon: Search },
   { title: "Ideas", url: "/ideas", icon: Lightbulb },
-  { title: "Drafts", url: "/", icon: FileText },
   { title: "Media Kits", url: "/media-kits", icon: BarChart3 },
 ];
 

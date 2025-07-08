@@ -37,7 +37,11 @@ export const BillsTable = ({ bills, onBillSelect }: BillsTableProps) => {
     if (!dateString) return "No date";
     try {
       const date = new Date(dateString);
-      return formatDistanceToNow(date, { addSuffix: true });
+      return date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
+      });
     } catch {
       return "Invalid date";
     }
@@ -58,24 +62,23 @@ export const BillsTable = ({ bills, onBillSelect }: BillsTableProps) => {
         <TableHeader>
           <TableRow>
             <TableHead>Bill Number</TableHead>
-            <TableHead>Title</TableHead>
             <TableHead>Chamber</TableHead>
             <TableHead>Sponsor</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Last Action</TableHead>
+            <TableHead>Title</TableHead>
             <TableHead className="w-[100px]">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {bills.map((bill) => (
-            <TableRow key={bill.bill_id} className="cursor-pointer hover:bg-muted/50">
+            <TableRow 
+              key={bill.bill_id} 
+              className="cursor-pointer hover:bg-muted/50"
+              onClick={() => onBillSelect && onBillSelect(bill)}
+            >
               <TableCell className="font-medium">
                 {bill.bill_number || "No Number"}
-              </TableCell>
-              <TableCell>
-                <div className="max-w-xs truncate" title={bill.title || ""}>
-                  {bill.title || "No Title"}
-                </div>
               </TableCell>
               <TableCell>
                 <Badge variant="outline">
@@ -84,16 +87,9 @@ export const BillsTable = ({ bills, onBillSelect }: BillsTableProps) => {
               </TableCell>
               <TableCell>
                 {bill.sponsors && bill.sponsors.length > 0 ? (
-                  <div className="flex flex-col gap-1">
-                    <span className="text-sm font-medium">
-                      {bill.sponsors[0].name}
-                    </span>
-                    {bill.sponsors[0].party && (
-                      <Badge variant="secondary" className="text-xs w-fit">
-                        {bill.sponsors[0].party}
-                      </Badge>
-                    )}
-                  </div>
+                  <span className="text-sm font-medium">
+                    {bill.sponsors[0].name}
+                  </span>
                 ) : (
                   <span className="text-muted-foreground">No Sponsor</span>
                 )}
@@ -107,12 +103,20 @@ export const BillsTable = ({ bills, onBillSelect }: BillsTableProps) => {
                 {formatLastAction(bill.last_action_date)}
               </TableCell>
               <TableCell>
+                <div className="max-w-xs truncate" title={bill.title || ""}>
+                  {bill.title || "No Title"}
+                </div>
+              </TableCell>
+              <TableCell>
                 <div className="flex gap-2">
                   {onBillSelect && (
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => onBillSelect(bill)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onBillSelect(bill);
+                      }}
                     >
                       View
                     </Button>
@@ -128,6 +132,7 @@ export const BillsTable = ({ bills, onBillSelect }: BillsTableProps) => {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center gap-1"
+                        onClick={(e) => e.stopPropagation()}
                       >
                         <ExternalLink className="h-3 w-3" />
                       </a>
