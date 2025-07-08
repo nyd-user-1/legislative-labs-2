@@ -253,7 +253,7 @@ serve(async (req) => {
 
     switch (action) {
       case 'getBill': {
-        const sessionYear = parseInt(params.sessionYear || '2023');
+        const sessionYear = parseInt(params.sessionYear || '2025');
         const printNo = params.printNo;
         if (!printNo) throw new Error('printNo parameter is required');
         result = await client.getBill(sessionYear, printNo);
@@ -270,7 +270,7 @@ serve(async (req) => {
       }
 
       case 'getAgenda': {
-        const year = parseInt(params.year || '2023');
+        const year = parseInt(params.year || '2025');
         const agendaNo = parseInt(params.agendaNo || '1');
         const committeeName = params.committeeName || undefined;
         result = await client.getAgenda(year, agendaNo, committeeName);
@@ -278,7 +278,7 @@ serve(async (req) => {
       }
 
       case 'listAgendas': {
-        const year = parseInt(params.year || '2023');
+        const year = parseInt(params.year || '2025');
         const limit = parseInt(params.limit || '50');
         const offset = parseInt(params.offset || '0');
         result = await client.listAgendas(year, limit, offset);
@@ -294,7 +294,7 @@ serve(async (req) => {
       }
 
       case 'listMembers': {
-        const sessionYear = parseInt(params.sessionYear || '2023');
+        const sessionYear = parseInt(params.sessionYear || '2025');
         const chamber = params.chamber || undefined;
         const limit = parseInt(params.limit || '50');
         const offset = parseInt(params.offset || '0');
@@ -311,7 +311,7 @@ serve(async (req) => {
       }
 
       case 'getMember': {
-        const sessionYear = parseInt(params.sessionYear || '2023');
+        const sessionYear = parseInt(params.sessionYear || '2025');
         const id = parseInt(params.id || '0');
         if (!id) throw new Error('id parameter is required');
         result = await client.getMember(sessionYear, id);
@@ -319,7 +319,7 @@ serve(async (req) => {
       }
 
       case 'listCalendars': {
-        const year = parseInt(params.year || '2023');
+        const year = parseInt(params.year || '2025');
         const limit = parseInt(params.limit || '50');
         const offset = parseInt(params.offset || '0');
         result = await client.listCalendars(year, limit, offset);
@@ -327,7 +327,7 @@ serve(async (req) => {
       }
 
       case 'getCalendar': {
-        const year = parseInt(params.year || '2023');
+        const year = parseInt(params.year || '2025');
         const calendarNumber = parseInt(params.calendarNumber || '1');
         result = await client.getCalendar(year, calendarNumber);
         break;
