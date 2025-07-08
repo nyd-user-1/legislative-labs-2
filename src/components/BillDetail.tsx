@@ -16,7 +16,7 @@ import {
   Vote
 } from "lucide-react";
 import { BillStatusBadge } from "./BillStatusBadge";
-import { BillJourney } from "./BillJourney";
+import { BillProgress } from "./BillProgress";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
 
@@ -118,32 +118,32 @@ export const BillDetail = ({ bill, onBack }: BillDetailProps) => {
   };
 
   return (
-    <div className="page-container min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
-      <div className="content-wrapper max-w-7xl mx-auto">
-        <div className="space-y-6">
-          {/* Navigation Section */}
-          <section className="section-container bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center gap-4">
-              <Button 
-                variant="outline" 
-                onClick={onBack}
-                className="btn-secondary border border-gray-300 hover:border-gray-400 active:border-gray-500 bg-white hover:bg-gray-50 text-gray-700 font-medium py-3 px-6 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Bills
-              </Button>
-            </div>
-          </section>
+    <div className="container mx-auto px-4 sm:px-6 py-6">
+      <div className="space-y-6">
+        {/* Navigation */}
+        <Card>
+          <CardContent className="p-6">
+            <Button 
+              variant="outline" 
+              onClick={onBack}
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Bills
+            </Button>
+          </CardContent>
+        </Card>
 
-          {/* Bill Header Section */}
-          <section className="section-container bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        {/* Bill Header */}
+        <Card>
+          <CardContent className="p-6">
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1">
-                <CardTitle className="text-2xl leading-tight">
+                <h1 className="text-3xl font-bold mb-2">
                   {bill.bill_number || "No Bill Number"}
-                </CardTitle>
+                </h1>
                 {bill.title && (
-                  <p className="text-muted-foreground mt-2 text-lg">{bill.title}</p>
+                  <p className="text-lg text-muted-foreground">{bill.title}</p>
                 )}
               </div>
               <div className="flex-shrink-0">
@@ -152,83 +152,22 @@ export const BillDetail = ({ bill, onBack }: BillDetailProps) => {
                 )}
               </div>
             </div>
-          </section>
+          </CardContent>
+        </Card>
 
-          {/* Bill Metadata Section */}
-          <section className="section-container bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <h4 className="font-medium flex items-center gap-2">
-                    <User className="h-4 w-4" />
-                    Committee
-                  </h4>
-                  <p className="text-muted-foreground">
-                    {bill.committee || "Not assigned"}
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <h4 className="font-medium flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
-                    Last Action Date
-                  </h4>
-                  <p className="text-muted-foreground">
-                    {formatDate(bill.last_action_date)}
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <h4 className="font-medium">Session ID</h4>
-                  <p className="text-muted-foreground">
-                    {bill.session_id || "Not specified"}
-                  </p>
-                </div>
-
-                {bill.url && (
-                  <div className="space-y-2">
-                    <h4 className="font-medium">External Link</h4>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => window.open(bill.url!, '_blank')}
-                      className="btn-secondary border border-gray-300 hover:border-gray-400 bg-white hover:bg-gray-50 text-gray-700 font-medium py-3 px-6 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 flex items-center gap-2"
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                      View on Official Site
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </div>
-          </section>
-
-          {/* Bill Status Progress Section */}
-          <section className="section-container bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <BillJourney 
-              status={bill.status}
-              statusDesc={bill.status_desc}
-              lastAction={bill.last_action}
-            />
-          </section>
-
-          {/* Bill Tabs Section */}
-          <section className="section-container bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <Tabs defaultValue="history" className="space-y-4">
+        {/* Bill Content Tabs */}
+        <Card>
+          <CardContent className="p-6">
+            <Tabs defaultValue="overview" className="space-y-6">
               <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="history" className="flex items-center gap-2">
-                  <History className="h-4 w-4" />
-                  History
-                </TabsTrigger>
-                <TabsTrigger value="documents" className="flex items-center gap-2">
-                  <FileText className="h-4 w-4" />
-                  Documents
-                </TabsTrigger>
+                <TabsTrigger value="overview">Overview</TabsTrigger>
                 <TabsTrigger value="sponsors" className="flex items-center gap-2">
                   <Users className="h-4 w-4" />
                   Sponsors
+                </TabsTrigger>
+                <TabsTrigger value="history" className="flex items-center gap-2">
+                  <History className="h-4 w-4" />
+                  History
                 </TabsTrigger>
                 <TabsTrigger value="votes" className="flex items-center gap-2">
                   <Vote className="h-4 w-4" />
@@ -236,174 +175,177 @@ export const BillDetail = ({ bill, onBack }: BillDetailProps) => {
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="history">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Bill History</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {loading ? (
-                      <div className="space-y-4">
-                        {[...Array(3)].map((_, i) => (
-                          <Skeleton key={i} className="h-16 w-full" />
-                        ))}
-                      </div>
-                    ) : history.length === 0 ? (
-                      <p className="text-muted-foreground text-center py-8">
-                        No history available for this bill.
-                      </p>
-                    ) : (
-                      <ScrollArea className="h-[400px]">
-                        <div className="space-y-4">
-                          {history.map((entry, index) => (
-                            <div key={`${entry.date}-${entry.sequence}`} className="flex gap-4 pb-4 border-b border-border last:border-b-0">
-                              <div className="flex-shrink-0 w-24 text-sm text-muted-foreground">
-                                {formatDate(entry.date)}
-                              </div>
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-1">
-                                  {entry.chamber && (
-                                    <Badge variant="outline" className="text-xs">
-                                      {entry.chamber}
-                                    </Badge>
-                                  )}
-                                  <span className="text-xs text-muted-foreground">
-                                    Seq: {entry.sequence}
-                                  </span>
-                                </div>
-                                <p className="text-sm">{entry.action || "No action recorded"}</p>
-                              </div>
-                            </div>
-                          ))}
+              <TabsContent value="overview">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  {/* Left Column - Bill Details */}
+                  <div className="space-y-6">
+                    <div className="space-y-4">
+                      <div>
+                        <h3 className="font-semibold text-sm text-muted-foreground mb-1">CURRENT STATUS</h3>
+                        <div className="flex items-center gap-2">
+                          {bill.status !== null && (
+                            <BillStatusBadge status={bill.status} statusDesc={bill.status_desc} />
+                          )}
                         </div>
-                      </ScrollArea>
-                    )}
-                  </CardContent>
-                </Card>
-              </TabsContent>
+                      </div>
 
-              <TabsContent value="documents">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Related Documents</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {loading ? (
-                      <div className="space-y-4">
-                        {[...Array(3)].map((_, i) => (
-                          <Skeleton key={i} className="h-20 w-full" />
-                        ))}
+                      <div>
+                        <h3 className="font-semibold text-sm text-muted-foreground mb-1">LAST ACTION</h3>
+                        <p className="text-sm">
+                          {bill.last_action || "No recent action"}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {formatDate(bill.last_action_date)}
+                        </p>
                       </div>
-                    ) : documents.length === 0 ? (
-                      <p className="text-muted-foreground text-center py-8">
-                        No documents available for this bill.
-                      </p>
-                    ) : (
-                      <div className="space-y-4">
-                        {documents.map((doc) => (
-                          <div key={doc.document_id} className="flex items-center justify-between p-4 border rounded-lg">
-                            <div className="space-y-1">
-                              <h4 className="font-medium">
-                                {doc.document_desc || `Document ${doc.document_id}`}
-                              </h4>
-                              <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                                {doc.document_type && (
-                                  <Badge variant="outline" className="text-xs">
-                                    {doc.document_type}
-                                  </Badge>
-                                )}
-                                {doc.document_mime && (
-                                  <span>{doc.document_mime}</span>
-                                )}
-                                {doc.document_size && (
-                                  <span>{formatFileSize(doc.document_size)}</span>
-                                )}
-                              </div>
-                            </div>
-                            {doc.url && (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => window.open(doc.url!, '_blank')}
-                                className="btn-secondary border border-gray-300 hover:border-gray-400 bg-white hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-                              >
-                                <ExternalLink className="h-4 w-4" />
-                              </Button>
-                            )}
-                          </div>
-                        ))}
+
+                      <div>
+                        <h3 className="font-semibold text-sm text-muted-foreground mb-1">COMMITTEE</h3>
+                        <p className="text-sm">
+                          {bill.committee || "Not assigned"}
+                        </p>
                       </div>
-                    )}
-                  </CardContent>
-                </Card>
+
+                      <div>
+                        <h3 className="font-semibold text-sm text-muted-foreground mb-1">SESSION</h3>
+                        <p className="text-sm">
+                          {bill.session_id || "Not specified"}
+                        </p>
+                      </div>
+
+                      {bill.url && (
+                        <Button
+                          variant="outline"
+                          onClick={() => window.open(bill.url!, '_blank')}
+                          className="w-full flex items-center gap-2"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                          View on Legislature Site
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Right Column - Bill Progress */}
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className="font-semibold text-sm text-muted-foreground mb-4">BILL PROGRESS</h3>
+                      <BillProgress status={bill.status} />
+                    </div>
+                  </div>
+                </div>
               </TabsContent>
 
               <TabsContent value="sponsors">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Bill Sponsors</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {loading ? (
-                      <div className="space-y-4">
-                        {[...Array(3)].map((_, i) => (
-                          <Skeleton key={i} className="h-16 w-full" />
-                        ))}
-                      </div>
-                    ) : sponsors.length === 0 ? (
-                      <p className="text-muted-foreground text-center py-8">
-                        No sponsors information available for this bill.
-                      </p>
-                    ) : (
-                      <div className="space-y-4">
-                        {sponsors.map((sponsor) => (
-                          <div key={sponsor.id} className="flex items-center justify-between p-4 border rounded-lg">
-                            <div className="space-y-1">
-                              <h4 className="font-medium">
-                                {sponsor.person?.name || 
-                                 `${sponsor.person?.first_name || ''} ${sponsor.person?.last_name || ''}`.trim() ||
-                                 `Person ID: ${sponsor.people_id}`}
-                              </h4>
-                              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                <div className="space-y-4">
+                  {loading ? (
+                    <div className="space-y-4">
+                      {[...Array(3)].map((_, i) => (
+                        <Skeleton key={i} className="h-16 w-full" />
+                      ))}
+                    </div>
+                  ) : sponsors.length === 0 ? (
+                    <p className="text-muted-foreground text-center py-8">
+                      No sponsors information available for this bill.
+                    </p>
+                  ) : (
+                    <div className="space-y-3">
+                      {sponsors.map((sponsor, index) => (
+                        <div key={sponsor.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <div className="flex flex-col">
+                              <div className="flex items-center gap-2">
+                                <h4 className="font-medium text-sm">
+                                  {sponsor.person?.name || 
+                                   `${sponsor.person?.first_name || ''} ${sponsor.person?.last_name || ''}`.trim() ||
+                                   `Person ID: ${sponsor.people_id}`}
+                                </h4>
+                                <Badge variant={sponsor.position === 1 ? "default" : "secondary"} className="text-xs">
+                                  {sponsor.position === 1 ? "Primary Sponsor" : "Co-Sponsor"}
+                                </Badge>
+                              </div>
+                              <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
                                 {sponsor.person?.party && (
-                                  <Badge variant="outline" className="text-xs">
-                                    {sponsor.person.party}
-                                  </Badge>
-                                )}
-                                {sponsor.person?.role && (
-                                  <span>{sponsor.person.role}</span>
+                                  <span>{sponsor.person.party}</span>
                                 )}
                                 {sponsor.person?.district && (
-                                  <span>District {sponsor.person.district}</span>
+                                  <span>• District {sponsor.person.district}</span>
                                 )}
-                                {sponsor.position && (
-                                  <span>Position {sponsor.position}</span>
+                                {sponsor.person?.chamber && (
+                                  <span>• {sponsor.person.chamber}</span>
                                 )}
                               </div>
                             </div>
                           </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="history">
+                <div className="space-y-4">
+                  {loading ? (
+                    <div className="space-y-4">
+                      {[...Array(3)].map((_, i) => (
+                        <Skeleton key={i} className="h-16 w-full" />
+                      ))}
+                    </div>
+                  ) : history.length === 0 ? (
+                    <p className="text-muted-foreground text-center py-8">
+                      No history available for this bill.
+                    </p>
+                  ) : (
+                    <ScrollArea className="h-[500px]">
+                      <div className="space-y-4">
+                        {history.map((entry, index) => (
+                          <div key={`${entry.date}-${entry.sequence}`} className="relative pl-8 pb-6 last:pb-0">
+                            {/* Timeline line */}
+                            {index !== history.length - 1 && (
+                              <div className="absolute left-2 top-6 w-px h-full bg-border"></div>
+                            )}
+                            
+                            {/* Timeline dot */}
+                            <div className="absolute left-0 top-2 w-4 h-4 bg-primary rounded-full border-2 border-background"></div>
+                            
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-medium">
+                                  {formatDate(entry.date)}
+                                </span>
+                                {entry.chamber && (
+                                  <Badge variant="outline" className="text-xs">
+                                    {entry.chamber}
+                                  </Badge>
+                                )}
+                              </div>
+                              <p className="text-sm text-muted-foreground">
+                                {entry.action || "No action recorded"}
+                              </p>
+                            </div>
+                          </div>
                         ))}
                       </div>
-                    )}
-                  </CardContent>
-                </Card>
+                    </ScrollArea>
+                  )}
+                </div>
               </TabsContent>
 
               <TabsContent value="votes">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Voting Records</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground text-center py-8">
-                      Vote tracking functionality coming soon.
+                <div className="space-y-6">
+                  <div className="text-center py-12">
+                    <Vote className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">Voting Records</h3>
+                    <p className="text-muted-foreground">
+                      Detailed voting records and roll call information will be available here once the bill reaches the voting stage.
                     </p>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               </TabsContent>
             </Tabs>
-          </section>
-        </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
