@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
+import { useDebounce } from "./useDebounce";
 
 type Bill = Tables<"Bills"> & {
   sponsors?: Array<{
@@ -25,6 +26,9 @@ export const useBillsData = () => {
   const [sponsorFilter, setSponsorFilter] = useState("");
   const [committeeFilter, setCommitteeFilter] = useState("");
   const [dateRangeFilter, setDateRangeFilter] = useState("");
+  
+  // Debounce search to avoid excessive API calls
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
   const fetchBills = async () => {
     try {
@@ -37,9 +41,9 @@ export const useBillsData = () => {
         .from("Bills")
         .select("*");
 
-      // Apply search filter
-      if (searchTerm) {
-        query = query.or(`title.ilike.%${searchTerm}%,bill_number.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
+      // Apply search filter - only search if term is at least 2 characters
+      if (debouncedSearchTerm && debouncedSearchTerm.length >= 2) {
+        query = query.or(`title.ilike.%${debouncedSearchTerm}%,bill_number.ilike.%${debouncedSearchTerm}%,description.ilike.%${debouncedSearchTerm}%`);
       }
 
       // Apply sponsor filter
@@ -152,17 +156,10 @@ export const useBillsData = () => {
 
   useEffect(() => {
     fetchBills();
-  }, [searchTerm, sponsorFilter, committeeFilter, dateRangeFilter]);
+  }, [debouncedSearchTerm, sponsorFilter, committeeFilter, dateRangeFilter]);
 
-  // Filter bills based on current filters
-  const filteredBills = bills.filter(bill => {
-    if (searchTerm && !bill.title?.toLowerCase().includes(searchTerm.toLowerCase()) && 
-        !bill.bill_number?.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        !bill.description?.toLowerCase().includes(searchTerm.toLowerCase())) {
-      return false;
-    }
-    return true;
-  });
+  // No need for client-side filtering since we're doing it server-side now
+  const filteredBills = bills;
 
   return {
     bills: filteredBills,

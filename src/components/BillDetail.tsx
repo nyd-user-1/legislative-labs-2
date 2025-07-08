@@ -25,6 +25,8 @@ type Document = Tables<"Documents">;
 type HistoryEntry = Tables<"History Table">;
 type Sponsor = Tables<"Sponsors">;
 type Person = Tables<"People">;
+type RollCall = Tables<"Roll Call">;
+type Vote = Tables<"Votes">;
 
 interface BillDetailProps {
   bill: Bill;
@@ -35,6 +37,7 @@ export const BillDetail = ({ bill, onBack }: BillDetailProps) => {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [sponsors, setSponsors] = useState<(Sponsor & { person?: Person })[]>([]);
+  const [rollCalls, setRollCalls] = useState<(RollCall & { votes?: (Vote & { person?: Person })[] })[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -86,9 +89,51 @@ export const BillDetail = ({ bill, onBack }: BillDetailProps) => {
         }
       }
 
+      // Fetch roll call votes for this bill
+      const { data: rollCallData } = await supabase
+        .from("Roll Call")
+        .select("*")
+        .eq("bill_id", bill.bill_id)
+        .order("date", { ascending: false });
+
+      // Fetch detailed vote records for each roll call
+      let rollCallsWithVotes: (RollCall & { votes?: (Vote & { person?: Person })[] })[] = [];
+      if (rollCallData && rollCallData.length > 0) {
+        rollCallsWithVotes = await Promise.all(
+          rollCallData.map(async (rollCall) => {
+            // Get votes for this roll call
+            const { data: votesData } = await supabase
+              .from("Votes")
+              .select("*")
+              .eq("roll_call_id", rollCall.roll_call_id);
+
+            // Get person data for the votes
+            let votesWithPeople: (Vote & { person?: Person })[] = [];
+            if (votesData && votesData.length > 0) {
+              const voterIds = votesData.map(v => v.people_id);
+              const { data: votersData } = await supabase
+                .from("People")
+                .select("*")
+                .in("people_id", voterIds);
+
+              votesWithPeople = votesData.map(vote => ({
+                ...vote,
+                person: votersData?.find(p => p.people_id === vote.people_id)
+              }));
+            }
+
+            return {
+              ...rollCall,
+              votes: votesWithPeople
+            };
+          })
+        );
+      }
+
       setDocuments(documentsData || []);
       setHistory(historyData || []);
       setSponsors(sponsorsWithPeople);
+      setRollCalls(rollCallsWithVotes);
 
     } catch (error) {
       console.error("Error fetching bill details:", error);
@@ -491,16 +536,110 @@ export const BillDetail = ({ bill, onBack }: BillDetailProps) => {
               <TabsContent value="votes" className="mt-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-lg">Voting Records</CardTitle>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-lg">Voting Records</CardTitle>
+                      <Badge variant="secondary" className="text-xs">
+                        {rollCalls.length} {rollCalls.length === 1 ? 'Vote' : 'Votes'}
+                      </Badge>
+                    </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-center py-12">
-                      <Vote className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                      <h3 className="text-lg font-medium mb-2">Vote Tracking Coming Soon</h3>
-                      <p className="text-muted-foreground text-sm max-w-md mx-auto">
-                        We're working on bringing you detailed voting records and roll call information for this bill.
-                      </p>
-                    </div>
+                    {loading ? (
+                      <div className="space-y-4">
+                        {[...Array(3)].map((_, i) => (
+                          <Skeleton key={i} className="h-20 w-full" />
+                        ))}
+                      </div>
+                    ) : rollCalls.length === 0 ? (
+                      <div className="text-center py-12">
+                        <Vote className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                        <h3 className="text-lg font-medium mb-2">No Voting Records</h3>
+                        <p className="text-muted-foreground text-sm max-w-md mx-auto">
+                          No roll call votes have been recorded for this bill yet.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-6">
+                        {rollCalls.map((rollCall, index) => (
+                          <div key={rollCall.roll_call_id} className="border border-border rounded-lg p-4">
+                            <div className="flex items-start justify-between mb-4">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-3 mb-2">
+                                  <h4 className="font-medium text-sm">
+                                    {formatDate(rollCall.date)}
+                                  </h4>
+                                  {rollCall.chamber && (
+                                    <Badge variant="outline" className="text-xs">
+                                      {rollCall.chamber}
+                                    </Badge>
+                                  )}
+                                </div>
+                                {rollCall.description && (
+                                  <p className="text-sm text-muted-foreground mb-3">
+                                    {rollCall.description}
+                                  </p>
+                                )}
+                                
+                                <div className="flex items-center gap-4 text-sm">
+                                  <div className="flex items-center gap-2">
+                                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                                    <span className="font-medium">{rollCall.yea || 0} Yes</span>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                                    <span className="font-medium">{rollCall.nay || 0} No</span>
+                                  </div>
+                                  {rollCall.absent && (
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
+                                      <span className="font-medium">{rollCall.absent} Absent</span>
+                                    </div>
+                                  )}
+                                  {rollCall.nv && (
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                                      <span className="font-medium">{rollCall.nv} NV</span>
+                                    </div>
+                                  )}
+                                  <div className="text-muted-foreground">
+                                    Total: {rollCall.total || 0}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            {rollCall.votes && rollCall.votes.length > 0 && (
+                              <div className="border-t border-border pt-4">
+                                <h5 className="font-medium text-sm mb-3">Individual Votes</h5>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 max-h-40 overflow-y-auto">
+                                  {rollCall.votes.map((vote, voteIndex) => (
+                                    <div key={`${vote.people_id}-${vote.roll_call_id}`} className="flex items-center justify-between text-xs p-2 bg-muted/30 rounded">
+                                      <span className="font-medium">
+                                        {vote.person?.name || `Person ${vote.people_id}`}
+                                      </span>
+                                      <div className="flex items-center gap-1">
+                                        {vote.person?.party && (
+                                          <Badge variant="outline" className="text-xs px-1 py-0">
+                                            {vote.person.party}
+                                          </Badge>
+                                        )}
+                                        <span className={`px-2 py-1 rounded text-xs font-medium ${
+                                          vote.vote_desc === 'Yes' || vote.vote_desc === 'Yea' ? 'bg-green-100 text-green-800' :
+                                          vote.vote_desc === 'No' || vote.vote_desc === 'Nay' ? 'bg-red-100 text-red-800' :
+                                          'bg-gray-100 text-gray-800'
+                                        }`}>
+                                          {vote.vote_desc || 'Unknown'}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>

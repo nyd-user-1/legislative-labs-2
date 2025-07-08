@@ -1,6 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Search, X } from "lucide-react";
 
 interface BillsSearchFiltersProps {
@@ -16,8 +17,8 @@ interface BillsSearchFiltersProps {
     committee: string;
     dateRange: string;
   }) => void;
-  committees: string[];
-  sponsors: string[];
+  committees: Array<{ name: string; chamber: string }>;
+  sponsors: Array<{ name: string; chamber: string; party: string }>;
 }
 
 export const BillsSearchFilters = ({
@@ -52,7 +53,7 @@ export const BillsSearchFilters = ({
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
-            placeholder="Search bills..."
+            placeholder="Search bills (min 2 chars)..."
             value={filters.search}
             onChange={(e) => handleFilterChange("search", e.target.value)}
             className="pl-10"
@@ -67,8 +68,20 @@ export const BillsSearchFilters = ({
             <SelectContent>
               <SelectItem value="all">All Sponsors</SelectItem>
               {sponsors.map((sponsor) => (
-                <SelectItem key={sponsor} value={sponsor}>
-                  {sponsor}
+                <SelectItem key={sponsor.name} value={sponsor.name}>
+                  <div className="flex items-center gap-2">
+                    <span>{sponsor.name}</span>
+                    {sponsor.chamber && (
+                      <Badge variant="outline" className="text-xs">
+                        {sponsor.chamber}
+                      </Badge>
+                    )}
+                    {sponsor.party && (
+                      <Badge variant="secondary" className="text-xs">
+                        {sponsor.party}
+                      </Badge>
+                    )}
+                  </div>
                 </SelectItem>
               ))}
             </SelectContent>
@@ -83,8 +96,15 @@ export const BillsSearchFilters = ({
             <SelectContent>
               <SelectItem value="all">All Committees</SelectItem>
               {committees.map((committee) => (
-                <SelectItem key={committee} value={committee}>
-                  {committee}
+                <SelectItem key={committee.name} value={committee.name}>
+                  <div className="flex items-center gap-2">
+                    <span className="truncate max-w-48">{committee.name}</span>
+                    {committee.chamber && (
+                      <Badge variant="outline" className="text-xs">
+                        {committee.chamber}
+                      </Badge>
+                    )}
+                  </div>
                 </SelectItem>
               ))}
             </SelectContent>

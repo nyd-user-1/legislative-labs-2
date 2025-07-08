@@ -19,8 +19,8 @@ console.log("Bills.tsx file is loading");
 const Bills = () => {
   console.log("Bills page component rendering");
   const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
-  const [committees, setCommittees] = useState<string[]>([]);
-  const [sponsors, setSponsors] = useState<string[]>([]);
+  const [committees, setCommittees] = useState<Array<{ name: string; chamber: string }>>([]);
+  const [sponsors, setSponsors] = useState<Array<{ name: string; chamber: string; party: string }>>([]);
   
   const {
     bills,
@@ -46,16 +46,17 @@ const Bills = () => {
   const fetchCommittees = async () => {
     try {
       const { data } = await supabase
-        .from("Bills")
-        .select("committee")
-        .not("committee", "is", null)
-        .order("committee");
+        .from("Committees")
+        .select("committee_name, chamber")
+        .not("committee_name", "is", null)
+        .order("committee_name");
 
       if (data) {
-        const uniqueCommittees = Array.from(
-          new Set(data.map(item => item.committee).filter(Boolean))
-        ) as string[];
-        setCommittees(uniqueCommittees);
+        const committees = data.map(item => ({
+          name: item.committee_name || "",
+          chamber: item.chamber || ""
+        })).filter(c => c.name);
+        setCommittees(committees);
       }
     } catch (error) {
       console.error("Error fetching committees:", error);
@@ -66,15 +67,17 @@ const Bills = () => {
     try {
       const { data } = await supabase
         .from("People")
-        .select("name")
+        .select("name, chamber, party")
         .not("name", "is", null)
         .order("name");
 
       if (data) {
-        const uniqueSponsors = Array.from(
-          new Set(data.map(item => item.name).filter(Boolean))
-        ) as string[];
-        setSponsors(uniqueSponsors);
+        const sponsors = data.map(item => ({
+          name: item.name || "",
+          chamber: item.chamber || "",
+          party: item.party || ""
+        })).filter(s => s.name);
+        setSponsors(sponsors);
       }
     } catch (error) {
       console.error("Error fetching sponsors:", error);
