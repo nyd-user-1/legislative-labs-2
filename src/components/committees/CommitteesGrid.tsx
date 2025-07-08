@@ -1,14 +1,20 @@
 import { CommitteeCard } from "./CommitteeCard";
 
 type Committee = {
+  committee_id: number;
   name: string;
-  memberCount: number;
-  billCount: number;
+  memberCount: string;
+  billCount: string;
   description?: string;
   chair_name?: string;
-  ranking_member_name?: string;
-  committee_type: string;
+  chair_email?: string;
   chamber: string;
+  committee_url?: string;
+  meeting_schedule?: string;
+  next_meeting?: string;
+  upcoming_agenda?: string;
+  address?: string;
+  slug?: string;
 };
 
 interface CommitteesGridProps {

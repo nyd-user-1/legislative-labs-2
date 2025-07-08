@@ -104,6 +104,60 @@ export type Database = {
         }
         Relationships: []
       }
+      Committees: {
+        Row: {
+          active_bills_count: string | null
+          address: string | null
+          chair_email: string | null
+          chair_name: string | null
+          chamber: string | null
+          committee_id: number
+          committee_members: string | null
+          committee_name: string | null
+          committee_url: string | null
+          description: string | null
+          meeting_schedule: string | null
+          member_count: string | null
+          next_meeting: string | null
+          slug: string | null
+          upcoming_agenda: string | null
+        }
+        Insert: {
+          active_bills_count?: string | null
+          address?: string | null
+          chair_email?: string | null
+          chair_name?: string | null
+          chamber?: string | null
+          committee_id?: number
+          committee_members?: string | null
+          committee_name?: string | null
+          committee_url?: string | null
+          description?: string | null
+          meeting_schedule?: string | null
+          member_count?: string | null
+          next_meeting?: string | null
+          slug?: string | null
+          upcoming_agenda?: string | null
+        }
+        Update: {
+          active_bills_count?: string | null
+          address?: string | null
+          chair_email?: string | null
+          chair_name?: string | null
+          chamber?: string | null
+          committee_id?: number
+          committee_members?: string | null
+          committee_name?: string | null
+          committee_url?: string | null
+          description?: string | null
+          meeting_schedule?: string | null
+          member_count?: string | null
+          next_meeting?: string | null
+          slug?: string | null
+          upcoming_agenda?: string | null
+        }
+        Relationships: []
+      }
       Documents: {
         Row: {
           bill_id: number | null

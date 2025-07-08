@@ -1,16 +1,22 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { User, Target, Folder, ExternalLink } from "lucide-react";
+import { User, Users, FileText, ExternalLink } from "lucide-react";
 
 type Committee = {
+  committee_id: number;
   name: string;
-  memberCount: number;
-  billCount: number;
+  memberCount: string;
+  billCount: string;
   description?: string;
   chair_name?: string;
-  ranking_member_name?: string;
-  committee_type: string;
+  chair_email?: string;
   chamber: string;
+  committee_url?: string;
+  meeting_schedule?: string;
+  next_meeting?: string;
+  upcoming_agenda?: string;
+  address?: string;
+  slug?: string;
 };
 
 interface CommitteeCardProps {
@@ -57,38 +63,40 @@ export const CommitteeCard = ({ committee, onCommitteeSelect }: CommitteeCardPro
       
       <CardContent className="pt-0">
         <div className="space-y-3">
-          <div className="space-y-2 pt-2 border-t">
-            {committee.chair_name && (
-              <div className="flex items-center gap-2 text-sm">
-                <User className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                <span className="truncate font-medium">{committee.chair_name}</span>
-                <span className="text-muted-foreground">(Chair)</span>
-              </div>
-            )}
+          {/* Row 1: Chair */}
+          {committee.chair_name && (
+            <div className="flex items-center gap-2 text-sm">
+              <User className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+              <span className="truncate font-medium">{committee.chair_name}</span>
+              <span className="text-muted-foreground">(Chair)</span>
+            </div>
+          )}
 
-            {committee.ranking_member_name && (
-              <div className="flex items-center gap-2 text-sm">
-                <Target className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                <span className="truncate">{committee.ranking_member_name}</span>
-                <span className="text-muted-foreground">(Ranking Member)</span>
-              </div>
-            )}
+          {/* Row 2: Member Count */}
+          <div className="flex items-center gap-2 text-sm">
+            <Users className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+            <span className="truncate">{committee.memberCount} members</span>
+          </div>
 
-            {committee.committee_type && (
-              <div className="flex items-center gap-2 text-sm">
-                <Folder className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                <span className="truncate">{committee.committee_type}</span>
-              </div>
-            )}
+          {/* Row 3: Bill Count */}
+          <div className="flex items-center gap-2 text-sm">
+            <FileText className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+            <span className="truncate">{committee.billCount} active bills</span>
+          </div>
 
-            <div className="pt-1">
-              <div
-                className="inline-flex items-center gap-1 text-sm text-primary hover:underline cursor-pointer"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <ExternalLink className="h-3 w-3" />
-                View Committee Page
-              </div>
+          {/* Row 4: External Link */}
+          <div className="pt-1">
+            <div
+              className="inline-flex items-center gap-1 text-sm text-primary hover:underline cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (committee.committee_url) {
+                  window.open(committee.committee_url, '_blank');
+                }
+              }}
+            >
+              <ExternalLink className="h-3 w-3" />
+              View Committee Page
             </div>
           </div>
         </div>

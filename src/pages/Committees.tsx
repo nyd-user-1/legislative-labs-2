@@ -9,14 +9,20 @@ import { CommitteesErrorState } from "@/components/committees/CommitteesErrorSta
 import { CommitteeDetail } from "@/components/CommitteeDetail";
 
 type Committee = {
+  committee_id: number;
   name: string;
-  memberCount: number;
-  billCount: number;
+  memberCount: string;
+  billCount: string;
   description?: string;
   chair_name?: string;
-  ranking_member_name?: string;
-  committee_type: string;
+  chair_email?: string;
   chamber: string;
+  committee_url?: string;
+  meeting_schedule?: string;
+  next_meeting?: string;
+  upcoming_agenda?: string;
+  address?: string;
+  slug?: string;
 };
 
 const Committees = () => {
@@ -30,12 +36,9 @@ const Committees = () => {
     setSearchTerm,
     chamberFilter,
     setChamberFilter,
-    committeeTypeFilter,
-    setCommitteeTypeFilter,
     fetchCommittees,
     totalCommittees,
     chambers,
-    committeeTypes,
   } = useCommitteesData();
 
   if (loading) {
@@ -58,30 +61,27 @@ const Committees = () => {
 
   const handleFiltersChange = (newFilters: {
     search: string;
-    chamber: string;
-    committeeType: string;
   }) => {
     setSearchTerm(newFilters.search);
-    setChamberFilter(newFilters.chamber);
-    setCommitteeTypeFilter(newFilters.committeeType);
   };
 
-  const hasFilters = searchTerm !== "" || chamberFilter !== "" || committeeTypeFilter !== "";
+  const hasFilters = searchTerm !== "";
 
   return (
     <div className="container mx-auto px-4 sm:px-6 py-6">
       <div className="space-y-6">
-        <CommitteesHeader committeesCount={totalCommittees} />
+        <CommitteesHeader 
+          committeesCount={totalCommittees}
+          chamberFilter={chamberFilter}
+          onChamberFilterChange={setChamberFilter}
+          chambers={chambers}
+        />
 
         <CommitteesSearchFilters
           filters={{
             search: searchTerm,
-            chamber: chamberFilter,
-            committeeType: committeeTypeFilter,
           }}
           onFiltersChange={handleFiltersChange}
-          chambers={chambers}
-          committeeTypes={committeeTypes}
         />
 
         {committees.length === 0 ? (
