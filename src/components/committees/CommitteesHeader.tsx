@@ -2,14 +2,16 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 
 interface CommitteesHeaderProps {
-  committeesCount: number;
+  filteredCount: number;
+  totalCount: number;
   chamberFilter: string;
   onChamberFilterChange: (value: string) => void;
   chambers: string[];
 }
 
 export const CommitteesHeader = ({ 
-  committeesCount, 
+  filteredCount,
+  totalCount,
   chamberFilter, 
   onChamberFilterChange, 
   chambers 
@@ -21,7 +23,9 @@ export const CommitteesHeader = ({
           Committees
         </h1>
         <p className="text-muted-foreground">
-          {committeesCount} committees found
+          {chamberFilter === "all" 
+            ? `${totalCount} committees` 
+            : `${filteredCount} of ${totalCount} committees`}
         </p>
       </div>
 
@@ -30,16 +34,16 @@ export const CommitteesHeader = ({
         onValueChange={onChamberFilterChange}
         className="flex flex-wrap gap-4"
       >
-        <div className="flex items-center space-x-2">
-          <RadioGroupItem value="all" id="all" />
-          <Label htmlFor="all">All Chambers</Label>
-        </div>
         {chambers.map((chamber) => (
           <div key={chamber} className="flex items-center space-x-2">
             <RadioGroupItem value={chamber} id={chamber} />
             <Label htmlFor={chamber}>{chamber}</Label>
           </div>
         ))}
+        <div className="flex items-center space-x-2">
+          <RadioGroupItem value="all" id="all" />
+          <Label htmlFor="all">All</Label>
+        </div>
       </RadioGroup>
     </div>
   );

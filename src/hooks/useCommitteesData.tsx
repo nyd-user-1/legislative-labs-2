@@ -78,8 +78,13 @@ export const useCommitteesData = () => {
     return matchesSearch && matchesChamber;
   });
 
-  // Get unique chambers for filter options
-  const chambers = Array.from(new Set(committees.map(c => c.chamber).filter(Boolean))).sort();
+  // Get unique chambers for filter options (ordered: Assembly, Senate)
+  const allChambers = Array.from(new Set(committees.map(c => c.chamber).filter(Boolean)));
+  const chambers = allChambers.sort((a, b) => {
+    if (a === "Assembly" && b === "Senate") return -1;
+    if (a === "Senate" && b === "Assembly") return 1;
+    return a.localeCompare(b);
+  });
 
   return {
     committees: filteredCommittees,
@@ -91,6 +96,7 @@ export const useCommitteesData = () => {
     setChamberFilter,
     fetchCommittees,
     totalCommittees: committees.length,
+    filteredCount: filteredCommittees.length,
     chambers,
   };
 };

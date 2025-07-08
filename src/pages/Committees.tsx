@@ -38,6 +38,7 @@ const Committees = () => {
     setChamberFilter,
     fetchCommittees,
     totalCommittees,
+    filteredCount,
     chambers,
   } = useCommitteesData();
 
@@ -71,7 +72,8 @@ const Committees = () => {
     <div className="container mx-auto px-4 sm:px-6 py-6">
       <div className="space-y-6">
         <CommitteesHeader 
-          committeesCount={totalCommittees}
+          filteredCount={filteredCount}
+          totalCount={totalCommittees}
           chamberFilter={chamberFilter}
           onChamberFilterChange={setChamberFilter}
           chambers={chambers}
