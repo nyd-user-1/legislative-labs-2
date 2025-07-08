@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ExternalLink, Bot } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 type Bill = Tables<"Bills"> & {
@@ -39,8 +39,8 @@ export const BillsTable = ({ bills, onBillSelect }: BillsTableProps) => {
       const date = new Date(dateString);
       return date.toLocaleDateString('en-US', { 
         year: 'numeric', 
-        month: 'short', 
-        day: 'numeric' 
+        month: '2-digit', 
+        day: '2-digit' 
       });
     } catch {
       return "Invalid date";
@@ -147,7 +147,7 @@ export const BillsTable = ({ bills, onBillSelect }: BillsTableProps) => {
                     }}
                     title="AI Analysis"
                   >
-                    <Bot className="h-3 w-3" />
+                    <img src="/lovable-uploads/fd30b785-93ea-4279-8d06-a01c03c7e11d.png" alt="AI" className="h-3 w-3" />
                   </Button>
                 </div>
               </TableCell>
