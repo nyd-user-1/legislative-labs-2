@@ -63,9 +63,6 @@ export const MembersGrid = ({ members, onMemberSelect }: MembersGridProps) => {
               <div className="flex-1">
                 <h3 className="font-semibold text-lg leading-tight mb-2">
                   {member.name}
-                  {member.party && (
-                    <span className="text-muted-foreground ml-1">({member.party})</span>
-                  )}
                 </h3>
               </div>
             </div>
