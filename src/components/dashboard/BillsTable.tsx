@@ -148,7 +148,7 @@ export const BillsTable = ({ bills, onBillSelect }: BillsTableProps) => {
                     }}
                     title="AI Analysis"
                   >
-                    <AIIcon size={12} />
+                    <AIIcon size={16} />
                   </Button>
                 </div>
               </TableCell>
