@@ -24,7 +24,7 @@ export const useCommitteesData = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [chamberFilter, setChamberFilter] = useState("all");
+  const [chamberFilter, setChamberFilter] = useState("Assembly");
 
   const fetchCommittees = async () => {
     try {
