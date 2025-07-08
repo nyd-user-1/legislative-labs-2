@@ -1,7 +1,7 @@
-import LegislationGenerator from "@/components/LegislationGenerator";
+import { Dashboard } from "@/components/Dashboard";
 
 const Index = () => {
-  return <LegislationGenerator />;
+  return <Dashboard />;
 };
 
 export default Index;
