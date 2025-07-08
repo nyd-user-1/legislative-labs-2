@@ -7,6 +7,10 @@ type Committee = {
   memberCount: number;
   billCount: number;
   description?: string;
+  chair_name?: string;
+  ranking_member_name?: string;
+  committee_type: string;
+  chamber: string;
 };
 
 export const useCommitteesData = () => {
@@ -14,6 +18,8 @@ export const useCommitteesData = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [chamberFilter, setChamberFilter] = useState("");
+  const [committeeTypeFilter, setCommitteeTypeFilter] = useState("");
 
   const fetchCommittees = async () => {
     try {
@@ -39,6 +45,25 @@ export const useCommitteesData = () => {
       // Process and combine the data
       const committeeMap = new Map<string, Committee>();
 
+      // Helper function to determine chamber from committee name
+      const getChamber = (committeeName: string): string => {
+        const name = committeeName.toLowerCase();
+        if (name.includes('senate')) return 'Senate';
+        if (name.includes('assembly')) return 'Assembly';
+        if (name.includes('joint')) return 'Joint';
+        return 'Unknown';
+      };
+
+      // Helper function to determine committee type
+      const getCommitteeType = (committeeName: string): string => {
+        const name = committeeName.toLowerCase();
+        if (name.includes('commission')) return 'Legislative Commission';
+        if (name.includes('subcommittee')) return 'Subcommittee';
+        if (name.includes('task force') || name.includes('working group')) return 'Task Force & Other Entities';
+        if (name.includes('caucus')) return 'Caucuses';
+        return 'Standing Committee';
+      };
+
       // Process bill committees
       billCommittees?.forEach((bill) => {
         if (bill.committee) {
@@ -47,7 +72,11 @@ export const useCommitteesData = () => {
             name: bill.committee,
             memberCount: existing?.memberCount || 0,
             billCount: (existing?.billCount || 0) + 1,
-            description: `Legislative committee handling ${bill.committee.toLowerCase()} matters`
+            description: `Legislative committee handling ${bill.committee.toLowerCase()} matters`,
+            chair_name: existing?.chair_name,
+            ranking_member_name: existing?.ranking_member_name,
+            committee_type: getCommitteeType(bill.committee),
+            chamber: getChamber(bill.committee)
           });
         }
       });
@@ -71,7 +100,11 @@ export const useCommitteesData = () => {
             name: committeeName,
             memberCount: (committee?.memberCount || 0) + 1,
             billCount: committee?.billCount || 0,
-            description: committee?.description || `Legislative committee with ID: ${member.committee_id}`
+            description: committee?.description || `Legislative committee with ID: ${member.committee_id}`,
+            chair_name: committee?.chair_name,
+            ranking_member_name: committee?.ranking_member_name,
+            committee_type: committee?.committee_type || getCommitteeType(committeeName),
+            chamber: committee?.chamber || getChamber(committeeName)
           });
         }
       });
@@ -93,10 +126,18 @@ export const useCommitteesData = () => {
     fetchCommittees();
   }, []);
 
-  // Filter committees based on search term
-  const filteredCommittees = committees.filter(committee =>
-    committee.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filter committees based on search term, chamber, and committee type
+  const filteredCommittees = committees.filter(committee => {
+    const matchesSearch = committee.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesChamber = chamberFilter === "" || committee.chamber === chamberFilter;
+    const matchesType = committeeTypeFilter === "" || committee.committee_type === committeeTypeFilter;
+    
+    return matchesSearch && matchesChamber && matchesType;
+  });
+
+  // Get unique chambers and committee types for filter options
+  const chambers = Array.from(new Set(committees.map(c => c.chamber).filter(Boolean))).sort();
+  const committeeTypes = Array.from(new Set(committees.map(c => c.committee_type).filter(Boolean))).sort();
 
   return {
     committees: filteredCommittees,
@@ -104,7 +145,13 @@ export const useCommitteesData = () => {
     error,
     searchTerm,
     setSearchTerm,
+    chamberFilter,
+    setChamberFilter,
+    committeeTypeFilter,
+    setCommitteeTypeFilter,
     fetchCommittees,
     totalCommittees: committees.length,
+    chambers,
+    committeeTypes,
   };
 };

@@ -13,6 +13,10 @@ type Committee = {
   memberCount: number;
   billCount: number;
   description?: string;
+  chair_name?: string;
+  ranking_member_name?: string;
+  committee_type: string;
+  chamber: string;
 };
 
 const Committees = () => {
@@ -24,8 +28,14 @@ const Committees = () => {
     error,
     searchTerm,
     setSearchTerm,
+    chamberFilter,
+    setChamberFilter,
+    committeeTypeFilter,
+    setCommitteeTypeFilter,
     fetchCommittees,
     totalCommittees,
+    chambers,
+    committeeTypes,
   } = useCommitteesData();
 
   if (loading) {
@@ -46,26 +56,42 @@ const Committees = () => {
     );
   }
 
-  const hasFilters = searchTerm !== "";
+  const handleFiltersChange = (newFilters: {
+    search: string;
+    chamber: string;
+    committeeType: string;
+  }) => {
+    setSearchTerm(newFilters.search);
+    setChamberFilter(newFilters.chamber);
+    setCommitteeTypeFilter(newFilters.committeeType);
+  };
+
+  const hasFilters = searchTerm !== "" || chamberFilter !== "" || committeeTypeFilter !== "";
 
   return (
     <div className="container mx-auto px-4 sm:px-6 py-6">
       <div className="space-y-6">
-          <CommitteesHeader committeesCount={totalCommittees} />
+        <CommitteesHeader committeesCount={totalCommittees} />
 
-          <CommitteesSearchFilters
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
+        <CommitteesSearchFilters
+          filters={{
+            search: searchTerm,
+            chamber: chamberFilter,
+            committeeType: committeeTypeFilter,
+          }}
+          onFiltersChange={handleFiltersChange}
+          chambers={chambers}
+          committeeTypes={committeeTypes}
+        />
+
+        {committees.length === 0 ? (
+          <CommitteesEmptyState hasFilters={hasFilters} />
+        ) : (
+          <CommitteesGrid 
+            committees={committees} 
+            onCommitteeSelect={setSelectedCommittee}
           />
-
-          {committees.length === 0 ? (
-            <CommitteesEmptyState hasFilters={hasFilters} />
-          ) : (
-            <CommitteesGrid 
-              committees={committees} 
-              onCommitteeSelect={setSelectedCommittee}
-            />
-          )}
+        )}
       </div>
     </div>
   );

@@ -5,6 +5,10 @@ type Committee = {
   memberCount: number;
   billCount: number;
   description?: string;
+  chair_name?: string;
+  ranking_member_name?: string;
+  committee_type: string;
+  chamber: string;
 };
 
 interface CommitteesGridProps {
