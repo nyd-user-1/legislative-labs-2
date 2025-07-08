@@ -1,15 +1,14 @@
 import { useState } from "react";
-import { useEnhancedCommitteesData } from "@/hooks/useEnhancedCommitteesData";
+import { useCommitteesData } from "@/hooks/useCommitteesData";
 import { CommitteesHeader } from "@/components/committees/CommitteesHeader";
 import { CommitteesSearchFilters } from "@/components/committees/CommitteesSearchFilters";
 import { CommitteesGrid } from "@/components/committees/CommitteesGrid";
 import { CommitteesEmptyState } from "@/components/committees/CommitteesEmptyState";
 import { CommitteesLoadingSkeleton } from "@/components/committees/CommitteesLoadingSkeleton";
 import { CommitteesErrorState } from "@/components/committees/CommitteesErrorState";
-import { EnhancedCommitteeDetail } from "@/components/EnhancedCommitteeDetail";
-import { NYSMember } from "@/types/nysApi";
+import { CommitteeDetail } from "@/components/CommitteeDetail";
 
-type EnhancedCommittee = {
+type Committee = {
   name: string;
   memberCount: number;
   billCount: number;
@@ -18,20 +17,10 @@ type EnhancedCommittee = {
   ranking_member_name?: string;
   committee_type: string;
   chamber: string;
-  meetingDateTime?: string;
-  location?: string;
-  agendaNo?: number;
-  year?: number;
-  members?: NYSMember[];
-  upcomingMeetings?: Array<{
-    date: string;
-    location: string;
-    agenda: any;
-  }>;
 };
 
 const Committees = () => {
-  const [selectedCommittee, setSelectedCommittee] = useState<EnhancedCommittee | null>(null);
+  const [selectedCommittee, setSelectedCommittee] = useState<Committee | null>(null);
 
   const {
     committees,
@@ -47,7 +36,7 @@ const Committees = () => {
     totalCommittees,
     chambers,
     committeeTypes,
-  } = useEnhancedCommitteesData();
+  } = useCommitteesData();
 
   if (loading) {
     return <CommitteesLoadingSkeleton />;
@@ -60,7 +49,7 @@ const Committees = () => {
   // Show committee detail if one is selected
   if (selectedCommittee) {
     return (
-      <EnhancedCommitteeDetail 
+      <CommitteeDetail 
         committee={selectedCommittee} 
         onBack={() => setSelectedCommittee(null)} 
       />
