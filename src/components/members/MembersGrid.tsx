@@ -63,19 +63,16 @@ export const MembersGrid = ({ members, onMemberSelect }: MembersGridProps) => {
               <div className="flex-1">
                 <h3 className="font-semibold text-lg leading-tight mb-2">
                   {member.name}
+                  {member.party && (
+                    <span className="text-muted-foreground ml-1">({member.party})</span>
+                  )}
                 </h3>
               </div>
-              
-              {member.chamber && (
-                <Badge variant="outline" className={`${getChamberColor(member.chamber)} ml-2 flex-shrink-0`}>
-                  {member.chamber}
-                </Badge>
-              )}
             </div>
             
-            {member.party && (
-              <Badge variant="outline" className={`${getPartyColor(member.party)} w-fit`}>
-                {member.party}
+            {member.chamber && (
+              <Badge variant="outline" className={`${getChamberColor(member.chamber)} w-fit`}>
+                {member.chamber}
               </Badge>
             )}
           </CardHeader>
