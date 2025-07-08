@@ -49,8 +49,7 @@ export const useNYSApi = (): UseNYSApiReturn => {
     setError(null);
 
     try {
-      // Build query parameters for the edge function call
-      const queryParams = new URLSearchParams({ action, ...params });
+      console.log('Making NYS API call:', action, params);
       
       const { data, error: functionError } = await supabase.functions.invoke('nys-legislation-api', {
         body: { action, params },
@@ -59,19 +58,28 @@ export const useNYSApi = (): UseNYSApiReturn => {
         },
       });
 
+      console.log('NYS API response:', { data, error: functionError });
+
       if (functionError) {
-        throw new Error(functionError.message);
+        console.error('Supabase function error:', functionError);
+        throw new Error(`Function error: ${functionError.message}`);
+      }
+
+      if (!data) {
+        throw new Error('No data returned from API');
       }
 
       if (!data.success) {
+        console.error('API call failed:', data);
         throw new Error(data.error || 'API call failed');
       }
 
+      console.log('API call successful:', data.data);
       return data.data as T;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
+      console.error('NYS API Error:', errorMessage, err);
       setError(errorMessage);
-      console.error('NYS API Error:', errorMessage);
       return null;
     } finally {
       setLoading(false);

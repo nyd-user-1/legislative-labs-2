@@ -60,13 +60,21 @@ interface BillResponse {
 interface AgendaResponse {
   year: number;
   agendaNo: number;
-  committees: {
-    items: {
-      name: string;
-      chair: string;
-      meetingDateTime: string;
-      location: string;
-      bills: {
+  committeeId?: {
+    name: string;
+    chamber: string;
+  };
+  committees?: {
+    items: Array<{
+      name?: string;
+      committeeId?: {
+        name: string;
+        chamber: string;
+      };
+      chair?: string;
+      meetingDateTime?: string;
+      location?: string;
+      bills?: {
         items: Array<{
           billId: {
             basePrintNo: string;
@@ -75,7 +83,7 @@ interface AgendaResponse {
           billCalNo: string;
         }>;
       };
-    }[];
+    }>;
   };
 }
 
@@ -158,7 +166,7 @@ class NYSApiClient {
   }
 
   async listAgendas(year: number, limit: number = 50, offset: number = 0): Promise<any> {
-    return this.makeRequest(`/agendas/${year}`, { limit, offset });
+    return this.makeRequest(`/agendas/${year}`, { limit, offset, sort: 'agendaNo:DESC' });
   }
 
   async getCommitteeMeetings(fromDate: string, toDate: string): Promise<any> {

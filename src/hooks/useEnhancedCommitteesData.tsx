@@ -46,17 +46,26 @@ export const useEnhancedCommitteesData = () => {
 
       const currentYear = new Date().getFullYear();
       
+      console.log('Fetching committees data...');
+      
       // Get recent agendas to extract committee information
-      const agendasResult = await listAgendas(currentYear, 100, 0);
+      console.log('Fetching agendas...');
+      const agendasResult = await listAgendas(currentYear, 50, 0);
+      console.log('Agendas result:', agendasResult);
       
       // Get committee meetings for the next 30 days
       const fromDate = new Date().toISOString().split('T')[0];
       const toDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      console.log('Fetching committee meetings from', fromDate, 'to', toDate);
       const meetingsResult = await getCommitteeMeetings({ fromDate, toDate });
+      console.log('Meetings result:', meetingsResult);
       
       // Get members for both chambers
-      const senateMembers = await listMembers(currentYear, 'SENATE', 100, 0);
-      const assemblyMembers = await listMembers(currentYear, 'ASSEMBLY', 100, 0);
+      console.log('Fetching members...');
+      const senateMembers = await listMembers(currentYear, 'SENATE', 50, 0);
+      const assemblyMembers = await listMembers(currentYear, 'ASSEMBLY', 50, 0);
+      console.log('Senate members:', senateMembers);
+      console.log('Assembly members:', assemblyMembers);
       
       const allMembers = [
         ...(senateMembers?.result?.items || []),
@@ -85,12 +94,15 @@ export const useEnhancedCommitteesData = () => {
       };
 
       // Process agendas if available
+      console.log('Processing agendas...');
       if (agendasResult?.result?.items) {
+        console.log('Found', agendasResult.result.items.length, 'agendas');
         agendasResult.result.items.forEach((agenda: any) => {
           if (agenda.committees?.items) {
             agenda.committees.items.forEach((committee: any) => {
               const committeeName = committee.name || committee.committeeId?.name;
               if (committeeName) {
+                console.log('Processing committee:', committeeName);
                 const chamber = committee.committeeId?.chamber || getChamber(committeeName);
                 const billCount = committee.bills?.items?.length || 0;
                 
@@ -129,7 +141,9 @@ export const useEnhancedCommitteesData = () => {
       }
 
       // Add default committees if we don't have enough data from API
+      console.log('Committee map size:', committeeMap.size);
       if (committeeMap.size === 0) {
+        console.log('No committees found from API, using default committees');
         const defaultCommittees = [
           { name: 'Senate Finance Committee', chamber: 'Senate', type: 'Standing Committee' },
           { name: 'Assembly Ways and Means Committee', chamber: 'Assembly', type: 'Standing Committee' },
@@ -181,10 +195,23 @@ export const useEnhancedCommitteesData = () => {
         a.name.localeCompare(b.name)
       );
 
+      console.log('Final committees array:', committeesArray.length, 'committees');
       setCommittees(committeesArray);
     } catch (error: any) {
       console.error("Error fetching enhanced committees:", error);
       setError(error.message || "Failed to fetch committees");
+      
+      // Set fallback committees on error
+      const fallbackCommittees = [
+        { name: 'Senate Finance Committee', chamber: 'Senate', type: 'Standing Committee', memberCount: 15, billCount: 25 },
+        { name: 'Assembly Ways and Means Committee', chamber: 'Assembly', type: 'Standing Committee', memberCount: 18, billCount: 30 },
+      ].map(committee => ({
+        ...committee,
+        committee_type: committee.type,
+        upcomingMeetings: []
+      }));
+      
+      setCommittees(fallbackCommittees);
     } finally {
       setLoading(false);
     }
