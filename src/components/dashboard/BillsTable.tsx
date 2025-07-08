@@ -1,4 +1,5 @@
 import { Tables } from "@/integrations/supabase/types";
+import { AIIcon } from "@/components/AIIcon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -147,7 +148,7 @@ export const BillsTable = ({ bills, onBillSelect }: BillsTableProps) => {
                     }}
                     title="AI Analysis"
                   >
-                    <img src="/lovable-uploads/fd30b785-93ea-4279-8d06-a01c03c7e11d.png" alt="AI" className="h-3 w-3" />
+                    <AIIcon size={12} />
                   </Button>
                 </div>
               </TableCell>
