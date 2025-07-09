@@ -676,6 +676,42 @@ export type Database = {
         }
         Relationships: []
       }
+      subscribers: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          stripe_customer_id: string | null
+          subscribed: boolean
+          subscription_end: string | null
+          subscription_tier: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          stripe_customer_id?: string | null
+          subscribed?: boolean
+          subscription_end?: string | null
+          subscription_tier?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          stripe_customer_id?: string | null
+          subscribed?: boolean
+          subscription_end?: string | null
+          subscription_tier?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       user_favorites: {
         Row: {
           bill_id: number
@@ -729,7 +765,14 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      subscription_tier_enum:
+        | "free"
+        | "student"
+        | "staffer"
+        | "researcher"
+        | "professional"
+        | "enterprise"
+        | "government"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -856,6 +899,16 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      subscription_tier_enum: [
+        "free",
+        "student",
+        "staffer",
+        "researcher",
+        "professional",
+        "enterprise",
+        "government",
+      ],
+    },
   },
 } as const

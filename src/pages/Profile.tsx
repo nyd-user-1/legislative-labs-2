@@ -5,12 +5,16 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Crown, Settings } from 'lucide-react';
+import { useSubscription } from '@/hooks/useSubscription';
+import { SubscriptionPlans } from '@/components/SubscriptionPlans';
 
 interface Profile {
   id: string;
@@ -28,6 +32,7 @@ const Profile = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { subscription, openCustomerPortal } = useSubscription();
 
   useEffect(() => {
     if (user) {
@@ -95,10 +100,48 @@ const Profile = () => {
     }
   };
 
+  const getTierDisplayName = (tier: string) => {
+    const tierNames: Record<string, string> = {
+      free: 'Free',
+      student: 'Student',
+      staffer: 'Staffer',
+      researcher: 'Researcher',
+      professional: 'Professional',
+      enterprise: 'Enterprise',
+      government: 'Government'
+    };
+    return tierNames[tier] || tier;
+  };
+
+  const getTierColor = (tier: string) => {
+    const tierColors: Record<string, string> = {
+      free: 'secondary',
+      student: 'outline',
+      staffer: 'default',
+      researcher: 'secondary',
+      professional: 'default',
+      enterprise: 'destructive',
+      government: 'outline'
+    };
+    return tierColors[tier] || 'secondary';
+  };
+
+  const handleManageSubscription = async () => {
+    try {
+      await openCustomerPortal();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to open subscription management portal",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-background to-brand-50/30 p-4">
-        <div className="container max-w-2xl mx-auto space-y-6">
+        <div className="container max-w-4xl mx-auto space-y-6">
           <Skeleton className="h-8 w-32" />
           <Card>
             <CardHeader>
@@ -122,7 +165,7 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-brand-50/30 p-4">
-      <div className="container max-w-2xl mx-auto space-y-6">
+      <div className="container max-w-4xl mx-auto space-y-6">
         <div className="flex items-center gap-4">
           <Button
             variant="ghost"
@@ -135,94 +178,125 @@ const Profile = () => {
           </Button>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Profile Settings</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={updateProfile} className="space-y-6">
-              <div className="flex items-center gap-6">
-                <Avatar className="h-20 w-20">
-                  <AvatarImage src={profile?.avatar_url || ''} alt="Profile picture" />
-                  <AvatarFallback className="text-lg">
-                    {user ? getInitials(user.email || '') : '?'}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="space-y-2">
-                  <Label htmlFor="avatar-url">Avatar URL</Label>
-                  <Input
-                    id="avatar-url"
-                    type="url"
-                    placeholder="https://example.com/avatar.jpg"
-                    value={profile?.avatar_url || ''}
-                    onChange={(e) => setProfile(prev => prev ? {...prev, avatar_url: e.target.value} : null)}
-                  />
-                </div>
-              </div>
+        <Tabs defaultValue="profile" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="profile">Profile</TabsTrigger>
+            <TabsTrigger value="subscription">Subscription</TabsTrigger>
+          </TabsList>
 
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={user?.email || ''}
-                  disabled
-                  className="bg-muted"
-                />
-                <p className="text-xs text-muted-foreground">Email cannot be changed</p>
-              </div>
+          <TabsContent value="profile">
+            <Card>
+              <CardHeader>
+                <CardTitle>Profile Settings</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={updateProfile} className="space-y-6">
+                  <div className="flex items-center gap-6">
+                    <Avatar className="h-20 w-20">
+                      <AvatarImage src={profile?.avatar_url || ''} alt="Profile picture" />
+                      <AvatarFallback className="text-lg">
+                        {user ? getInitials(user.email || '') : '?'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="space-y-2">
+                      <Label htmlFor="avatar-url">Avatar URL</Label>
+                      <Input
+                        id="avatar-url"
+                        type="url"
+                        placeholder="https://example.com/avatar.jpg"
+                        value={profile?.avatar_url || ''}
+                        onChange={(e) => setProfile(prev => prev ? {...prev, avatar_url: e.target.value} : null)}
+                      />
+                    </div>
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
-                <Input
-                  id="username"
-                  type="text"
-                  placeholder="Enter your username"
-                  value={profile?.username || ''}
-                  onChange={(e) => setProfile(prev => prev ? {...prev, username: e.target.value} : null)}
-                />
-              </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={user?.email || ''}
+                      disabled
+                      className="bg-muted"
+                    />
+                    <p className="text-xs text-muted-foreground">Email cannot be changed</p>
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="display-name">Display Name</Label>
-                <Input
-                  id="display-name"
-                  type="text"
-                  placeholder="Enter your display name"
-                  value={profile?.display_name || ''}
-                  onChange={(e) => setProfile(prev => prev ? {...prev, display_name: e.target.value} : null)}
-                />
-              </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="subscription_tier">Subscription Tier</Label>
+                    <div className="flex items-center gap-3">
+                      <Badge variant={getTierColor(subscription.subscription_tier) as any} className="flex items-center gap-1">
+                        <Crown className="w-3 h-3" />
+                        {getTierDisplayName(subscription.subscription_tier)}
+                      </Badge>
+                      {subscription.subscription_end && (
+                        <span className="text-sm text-muted-foreground">
+                          Expires: {new Date(subscription.subscription_end).toLocaleDateString()}
+                        </span>
+                      )}
+                    </div>
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="bio">Bio</Label>
-                <Textarea
-                  id="bio"
-                  placeholder="Tell us about yourself..."
-                  value={profile?.bio || ''}
-                  onChange={(e) => setProfile(prev => prev ? {...prev, bio: e.target.value} : null)}
-                  rows={4}
-                />
-              </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="username">Username</Label>
+                    <Input
+                      id="username"
+                      type="text"
+                      placeholder="Enter your username"
+                      value={profile?.username || ''}
+                      onChange={(e) => setProfile(prev => prev ? {...prev, username: e.target.value} : null)}
+                    />
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="role">Role</Label>
-                <Input
-                  id="role"
-                  type="text"
-                  value={profile?.role || 'user'}
-                  disabled
-                  className="bg-muted"
-                />
-                <p className="text-xs text-muted-foreground">Role is managed by administrators</p>
-              </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="display-name">Display Name</Label>
+                    <Input
+                      id="display-name"
+                      type="text"
+                      placeholder="Enter your display name"
+                      value={profile?.display_name || ''}
+                      onChange={(e) => setProfile(prev => prev ? {...prev, display_name: e.target.value} : null)}
+                    />
+                  </div>
 
-              <Button type="submit" disabled={saving} className="w-full">
-                {saving ? "Saving..." : "Save Profile"}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+                  <div className="space-y-2">
+                    <Label htmlFor="bio">Bio</Label>
+                    <Textarea
+                      id="bio"
+                      placeholder="Tell us about yourself..."
+                      value={profile?.bio || ''}
+                      onChange={(e) => setProfile(prev => prev ? {...prev, bio: e.target.value} : null)}
+                      rows={4}
+                    />
+                  </div>
+
+                  <div className="flex gap-3">
+                    <Button type="submit" disabled={saving} className="flex-1">
+                      {saving ? "Saving..." : "Save Profile"}
+                    </Button>
+                    {subscription.subscribed && (
+                      <Button type="button" variant="outline" onClick={handleManageSubscription}>
+                        <Settings className="w-4 h-4 mr-2" />
+                        Manage Subscription
+                      </Button>
+                    )}
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="subscription">
+            <Card>
+              <CardHeader>
+                <CardTitle>Subscription Management</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <SubscriptionPlans />
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

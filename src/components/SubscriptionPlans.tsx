@@ -1,0 +1,186 @@
+import { useState } from 'react';
+import { SubscriptionTierCard } from './SubscriptionTierCard';
+import { useSubscription } from '@/hooks/useSubscription';
+import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { RefreshCw } from 'lucide-react';
+
+const subscriptionTiers = [
+  {
+    tier: 'free',
+    name: 'Free',
+    price: '$0/month',
+    description: 'Perfect for getting started',
+    features: [
+      'View public bills and legislation',
+      'Basic search functionality',
+      'Read-only access to committee information',
+      'Limited chat sessions (5 per month)'
+    ]
+  },
+  {
+    tier: 'student',
+    name: 'Student',
+    price: '$9.99/month',
+    description: 'Designed for students and academics',
+    features: [
+      'All Free features',
+      'Unlimited chat sessions',
+      'Legislative draft creation (up to 5)',
+      'Basic analysis tools',
+      'Email support',
+      'Student verification required'
+    ]
+  },
+  {
+    tier: 'staffer',
+    name: 'Staffer',
+    price: '$19.99/month',
+    description: 'Built for legislative staff',
+    features: [
+      'All Student features',
+      'Unlimited legislative drafts',
+      'Co-authoring capabilities',
+      'Advanced bill tracking',
+      'Committee agenda access',
+      'Priority email support'
+    ],
+    isPopular: true
+  },
+  {
+    tier: 'researcher',
+    name: 'Researcher',
+    price: '$29.99/month',
+    description: 'Advanced tools for researchers',
+    features: [
+      'All Staffer features',
+      'Advanced analytics dashboard',
+      'Historical data access',
+      'Export capabilities (PDF, CSV)',
+      'API access (limited)',
+      'Research templates'
+    ]
+  },
+  {
+    tier: 'professional',
+    name: 'Professional',
+    price: '$49.99/month',
+    description: 'For professional advocates and consultants',
+    features: [
+      'All Researcher features',
+      'Full API access',
+      'Custom integrations',
+      'White-label options',
+      'Priority support',
+      'Advanced collaboration tools'
+    ]
+  },
+  {
+    tier: 'enterprise',
+    name: 'Enterprise',
+    price: '$99.99/month',
+    description: 'Comprehensive solution for organizations',
+    features: [
+      'All Professional features',
+      'Multi-user management',
+      'Custom workflows',
+      'Dedicated account manager',
+      'SLA guarantee',
+      'Custom training sessions'
+    ]
+  },
+  {
+    tier: 'government',
+    name: 'Government',
+    price: '$199.99/month',
+    description: 'Specialized for government entities',
+    features: [
+      'All Enterprise features',
+      'Government-grade security',
+      'Compliance reporting',
+      'Custom government workflows',
+      'On-premise deployment options',
+      'Government verification required'
+    ]
+  }
+];
+
+export const SubscriptionPlans = () => {
+  const { subscription, loading, checkSubscription, createCheckout } = useSubscription();
+  const { toast } = useToast();
+  const [processingTier, setProcessingTier] = useState<string | null>(null);
+
+  const handleTierSelect = async (tier: string) => {
+    if (tier === 'free') {
+      toast({
+        title: "Free Plan",
+        description: "You're already on the free plan!",
+      });
+      return;
+    }
+
+    try {
+      setProcessingTier(tier);
+      await createCheckout(tier);
+      toast({
+        title: "Redirecting to Checkout",
+        description: "Please complete your subscription in the new tab.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to create checkout session",
+        variant: "destructive",
+      });
+    } finally {
+      setProcessingTier(null);
+    }
+  };
+
+  const handleRefresh = async () => {
+    await checkSubscription();
+    toast({
+      title: "Refreshed",
+      description: "Subscription status updated",
+    });
+  };
+
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="h-96 bg-gray-200 animate-pulse rounded-lg" />
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-semibold">Choose Your Plan</h2>
+          <p className="text-muted-foreground">
+            Current tier: <span className="font-medium capitalize">{subscription.subscription_tier}</span>
+          </p>
+        </div>
+        <Button variant="outline" onClick={handleRefresh} disabled={loading}>
+          <RefreshCw className="w-4 h-4 mr-2" />
+          Refresh Status
+        </Button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {subscriptionTiers.map((tierData) => (
+          <SubscriptionTierCard
+            key={tierData.tier}
+            {...tierData}
+            isCurrentTier={subscription.subscription_tier === tierData.tier}
+            onSelect={() => handleTierSelect(tierData.tier)}
+            disabled={processingTier === tierData.tier}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};

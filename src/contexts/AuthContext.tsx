@@ -37,6 +37,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+        
+        // Check subscription status on auth state change
+        if (session?.user) {
+          supabase.functions.invoke('check-subscription').catch(console.error);
+        }
       }
     );
 
@@ -45,6 +50,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+      
+      // Check subscription status when user logs in
+      if (session?.user) {
+        supabase.functions.invoke('check-subscription').catch(console.error);
+      }
     });
 
     return () => subscription.unsubscribe();
