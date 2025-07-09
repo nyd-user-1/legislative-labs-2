@@ -43,7 +43,7 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="text-xl">
-            {isSignUp ? 'Create an account' : 'Welcome back'}
+            {isSignUp ? 'Create an account' : 'Welcome home'}
           </CardTitle>
           <CardDescription>
             {isSignUp 
