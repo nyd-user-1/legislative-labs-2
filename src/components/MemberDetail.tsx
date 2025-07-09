@@ -45,8 +45,14 @@ export const MemberDetail = ({ member, onBack }: MemberDetailProps) => {
               )}
             </div>
             <div className="flex-shrink-0 self-start">
-              <Badge variant="secondary" className="bg-green-100 text-green-700 border-green-200">
-                Active
+              <Badge 
+                variant="secondary" 
+                className={member.chamber?.toLowerCase() === 'senate' 
+                  ? "bg-purple-100 text-purple-700 border-purple-200" 
+                  : "bg-green-100 text-green-700 border-green-200"
+                }
+              >
+                {member.chamber || "Active"}
               </Badge>
             </div>
           </div>
