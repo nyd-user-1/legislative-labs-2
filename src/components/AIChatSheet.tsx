@@ -17,6 +17,7 @@ import { Send, Save, User, Bot } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useChatSession } from "@/hooks/useChatSession";
 import { ModelSelector } from "@/components/ModelSelector";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type Bill = Tables<"Bills">;
 
@@ -25,6 +26,7 @@ interface Message {
   role: "user" | "assistant";
   content: string;
   timestamp: Date;
+  isStreaming?: boolean;
 }
 
 interface AIChatSheetProps {
@@ -41,6 +43,7 @@ const SUGGESTED_PROMPTS = [
 export const AIChatSheet = ({ open, onOpenChange, bill }: AIChatSheetProps) => {
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const { selectedModel, setSelectedModel } = useModel();
@@ -85,6 +88,19 @@ export const AIChatSheet = ({ open, onOpenChange, bill }: AIChatSheetProps) => {
       
       saveMessage(userMessage);
 
+      // Create streaming assistant message
+      const assistantMessageId = crypto.randomUUID();
+      const assistantMessage: Message = {
+        id: assistantMessageId,
+        role: "assistant",
+        content: "",
+        timestamp: new Date(),
+        isStreaming: true
+      };
+      
+      saveMessage(assistantMessage);
+      setStreamingMessageId(assistantMessageId);
+
       // Prepare context about the bill
       const billContext = bill ? `
         Bill Information:
@@ -97,12 +113,13 @@ export const AIChatSheet = ({ open, onOpenChange, bill }: AIChatSheetProps) => {
         User Question: ${content}
       ` : content;
 
-      // Call OpenAI edge function using Supabase client
+      // Call edge function with streaming
       const { data: responseData, error: functionError } = await supabase.functions.invoke('generate-with-openai', {
         body: {
           prompt: billContext,
           model: selectedModel,
-          type: 'default'
+          type: 'default',
+          stream: true
         }
       });
 
@@ -110,19 +127,44 @@ export const AIChatSheet = ({ open, onOpenChange, bill }: AIChatSheetProps) => {
         throw new Error(functionError.message || "Failed to get AI response");
       }
 
-      if (!responseData?.generatedText) {
+      // For now, handle non-streaming response
+      // TODO: Implement actual streaming when the edge function supports it
+      if (responseData?.generatedText) {
+        // Simulate streaming by updating the message content gradually
+        const fullText = responseData.generatedText;
+        const words = fullText.split(' ');
+        let currentContent = '';
+        
+        for (let i = 0; i < words.length; i++) {
+          currentContent += (i > 0 ? ' ' : '') + words[i];
+          
+          // Update the streaming message
+          const updatedMessage: Message = {
+            ...assistantMessage,
+            content: currentContent,
+            isStreaming: i < words.length - 1
+          };
+          
+          // Update the messages state by finding and replacing the streaming message
+          setStreamingMessageId(i < words.length - 1 ? assistantMessageId : null);
+          
+          // Add delay to simulate streaming
+          if (i < words.length - 1) {
+            await new Promise(resolve => setTimeout(resolve, 50));
+          }
+        }
+
+        // Final update - mark as complete
+        const finalMessage: Message = {
+          ...assistantMessage,
+          content: fullText,
+          isStreaming: false
+        };
+        
+        saveMessage(finalMessage);
+      } else {
         throw new Error("No response received from AI");
       }
-      
-      // Add AI response
-      const assistantMessage: Message = {
-        id: crypto.randomUUID(),
-        role: "assistant",
-        content: responseData.generatedText,
-        timestamp: new Date()
-      };
-      
-      saveMessage(assistantMessage);
       
     } catch (error) {
       console.error("Error sending message:", error);
@@ -133,6 +175,7 @@ export const AIChatSheet = ({ open, onOpenChange, bill }: AIChatSheetProps) => {
       });
     } finally {
       setIsLoading(false);
+      setStreamingMessageId(null);
       setInputValue("");
     }
   };
@@ -217,14 +260,15 @@ export const AIChatSheet = ({ open, onOpenChange, bill }: AIChatSheetProps) => {
               {messages.map((message) => (
                 <div
                   key={message.id}
-                  className={`flex gap-3 ${
+                  className={`flex w-full ${
                     message.role === "user" ? "justify-end" : "justify-start"
                   }`}
                 >
                   <div
-                    className={`flex gap-3 max-w-[80%] ${
+                    className={`flex gap-3 w-full max-w-[95vw] ${
                       message.role === "user" ? "flex-row-reverse" : "flex-row"
                     }`}
+                    style={{ margin: "0 2rem" }}
                   >
                     <div className="flex-shrink-0">
                       {message.role === "user" ? (
@@ -237,32 +281,37 @@ export const AIChatSheet = ({ open, onOpenChange, bill }: AIChatSheetProps) => {
                         </div>
                       )}
                     </div>
-                    <Card className={message.role === "user" ? "bg-primary text-primary-foreground" : ""}>
-                      <CardContent className="p-3">
-                        <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                    <div className={`flex-1 ${message.role === "user" ? "bg-primary text-primary-foreground rounded-lg" : "bg-transparent"}`}>
+                      <div className="p-3">
+                        <div className="text-sm whitespace-pre-wrap">
+                          {message.content}
+                          {message.isStreaming && (
+                            <div className="inline-flex items-center gap-1 ml-1">
+                              <Skeleton className="h-4 w-12 inline-block" />
+                            </div>
+                          )}
+                        </div>
                         <p className="text-xs opacity-70 mt-2">
                           {message.timestamp.toLocaleTimeString()}
                         </p>
-                      </CardContent>
-                    </Card>
+                      </div>
+                    </div>
                   </div>
                 </div>
               ))}
-              {isLoading && (
-                <div className="flex gap-3 justify-start">
-                  <div className="flex gap-3">
+              {isLoading && !streamingMessageId && (
+                <div className="flex w-full justify-start" style={{ margin: "0 2rem" }}>
+                  <div className="flex gap-3 w-full">
                     <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
                       <Bot className="w-4 h-4 text-muted-foreground" />
                     </div>
-                    <Card>
-                      <CardContent className="p-3">
-                        <div className="flex gap-1">
-                          <div className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce"></div>
-                          <div className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: "0.1s" }}></div>
-                          <div className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: "0.2s" }}></div>
-                        </div>
-                      </CardContent>
-                    </Card>
+                    <div className="p-3">
+                      <div className="flex gap-1">
+                        <div className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce"></div>
+                        <div className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: "0.1s" }}></div>
+                        <div className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
