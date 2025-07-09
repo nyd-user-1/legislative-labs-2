@@ -210,9 +210,6 @@ export const Dashboard = () => {
                   View All Bills
                 </Button>
               </div>
-              <CardDescription className="text-sm">
-                Latest bills with recent legislative activity
-              </CardDescription>
             </CardHeader>
             <CardContent className="px-4 sm:px-6">
               <BillsTable bills={recentBills} onBillSelect={handleBillSelect} />
