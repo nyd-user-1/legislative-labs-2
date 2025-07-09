@@ -1,5 +1,4 @@
 import { Tables } from "@/integrations/supabase/types";
-import { AIIcon } from "@/components/AIIcon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Sparkles } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 type Bill = Tables<"Bills"> & {
@@ -136,7 +135,7 @@ export const BillsTable = ({ bills, onBillSelect }: BillsTableProps) => {
                   }}
                   title="AI Analysis"
                 >
-                  <AIIcon size={16} />
+                  <Sparkles className="h-4 w-4" />
                 </Button>
               </div>
             </CardContent>
@@ -246,7 +245,7 @@ export const BillsTable = ({ bills, onBillSelect }: BillsTableProps) => {
                         }}
                         title="AI Analysis"
                       >
-                        <AIIcon size={16} />
+                        <Sparkles className="h-4 w-4" />
                       </Button>
                     </div>
                   </TableCell>
