@@ -4,40 +4,42 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
-import {
-  ArrowRight,
-  BookOpen,
-  Calendar,
-  FileText,
-  Users,
-  Target,
-  Clock,
-  MapPin,
-  User,
-  Building2,
-  CheckCircle,
-  Scale,
-  TrendingUp
-} from "lucide-react";
+import { Clock, Heart, Sparkles } from "lucide-react";
 import { useBillDetailData } from "@/hooks/useBillDetailData";
 import { useState } from "react";
+import { AIChatSheet } from "@/components/AIChatSheet";
+import { useFavorites } from "@/hooks/useFavorites";
 
 export default function BillDetail() {
   const { id } = useParams();
   const { bill, loading, error, journeyEvents, analysisCategories } = useBillDetailData(id);
-  const [activeCategory, setActiveCategory] = useState("impact");
+  const [activeCategory, setActiveCategory] = useState("summary");
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const [chatOpen, setChatOpen] = useState(false);
+  const { favoriteBillIds, toggleFavorite } = useFavorites();
 
   if (loading) return <div className="container mx-auto px-4 sm:px-6 py-6">Loading...</div>;
   if (error) return <div className="container mx-auto px-4 sm:px-6 py-6">Error: {error}</div>;
   if (!bill) return <div className="container mx-auto px-4 sm:px-6 py-6">Bill not found</div>;
+
+  const isFavorited = favoriteBillIds.has(bill.bill_id);
+
+  const handleFavorite = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    await toggleFavorite(bill.bill_id);
+  };
+
+  const handleAIAnalysis = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setChatOpen(true);
+  };
 
   return (
     <div className="container mx-auto px-4 sm:px-6 py-6">
       {/* Header Section */}
       <div className="mb-12 text-center">
         <Badge variant="outline" className="mx-auto px-3 py-1 text-xs font-medium tracking-wide uppercase mb-4">
-          Legislative Analysis
+          {bill.bill_number || "Bill"}
         </Badge>
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl mb-4">
           {bill.title}
@@ -51,9 +53,8 @@ export default function BillDetail() {
       <div className="grid gap-8 lg:grid-cols-2">
         {/* Timeline Column - LEFT SIDE */}
         <div>
-          <div className="mb-6 flex items-center gap-2">
-            <Clock className="h-5 w-5 text-blue-600" />
-            <h3 className="text-2xl font-bold">Legislative Journey</h3>
+          <div className="mb-6">
+            <h3 className="text-2xl font-bold">Bill Journey</h3>
           </div>
 
           {/* Vertical Timeline - EXACT COPY */}
@@ -104,9 +105,8 @@ export default function BillDetail() {
 
         {/* Analysis Column - RIGHT SIDE */}
         <div>
-          <div className="mb-6 flex items-center gap-2">
-            <Target className="h-5 w-5 text-purple-600" />
-            <h3 className="text-2xl font-bold">Analysis by Category</h3>
+          <div className="mb-6">
+            <h3 className="text-2xl font-bold">Bill Details</h3>
           </div>
 
           <Tabs
@@ -121,7 +121,6 @@ export default function BillDetail() {
                   value={category.id}
                   className="flex items-center gap-2"
                 >
-                  {category.icon}
                   <span className="hidden sm:inline">{category.name}</span>
                 </TabsTrigger>
               ))}
@@ -134,7 +133,6 @@ export default function BillDetail() {
                 className="bg-white space-y-4 rounded-lg border p-6"
               >
                 <div className="flex items-center gap-2">
-                  {category.icon}
                   <h4 className="text-lg font-semibold">{category.name} Analysis</h4>
                 </div>
 
@@ -172,17 +170,30 @@ export default function BillDetail() {
         </div>
       </div>
 
-      {/* Call to Action */}
+      {/* Action Buttons */}
       <div className="mt-16 flex flex-col items-center justify-center gap-4 sm:flex-row">
-        <Button className="gap-2">
-          <FileText className="h-4 w-4" />
-          View Full Text
+        <Button 
+          variant="outline" 
+          className="gap-2"
+          onClick={handleFavorite}
+        >
+          <Heart className={`h-4 w-4 ${isFavorited ? 'fill-red-500 text-red-500' : ''}`} />
+          {isFavorited ? 'Remove from Favorites' : 'Add to Favorites'}
         </Button>
-        <Button variant="outline" className="gap-2">
-          <MapPin className="h-4 w-4" />
-          Track This Bill
+        <Button 
+          className="gap-2"
+          onClick={handleAIAnalysis}
+        >
+          <Sparkles className="h-4 w-4" />
+          AI Chat
         </Button>
       </div>
+
+      <AIChatSheet
+        open={chatOpen}
+        onOpenChange={setChatOpen}
+        bill={bill}
+      />
     </div>
   );
 }

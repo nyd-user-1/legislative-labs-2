@@ -1,11 +1,19 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
-import { FileText, Users, Building2, CheckCircle, Target, Scale, TrendingUp } from "lucide-react";
+import { FileText, Users, Building2, CheckCircle } from "lucide-react";
 
 interface BillWithSponsor extends Tables<"Bills"> {
   sponsor_name?: string;
   sponsor_id?: string;
+}
+
+interface HistoryEntry {
+  action: string;
+  bill_id: number;
+  chamber: string | null;
+  date: string;
+  sequence: number;
 }
 
 interface JourneyEvent {
@@ -33,53 +41,30 @@ interface AnalysisCategory {
 
 export const useBillDetailData = (billId: string | undefined) => {
   const [bill, setBill] = useState<BillWithSponsor | null>(null);
+  const [historyData, setHistoryData] = useState<HistoryEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const journeyEvents: JourneyEvent[] = [
-    {
-      id: 1,
-      date: "2024",
-      title: "Bill Introduced",
-      subtitle: "Senate Floor",
-      description: "Bill formally introduced in the New York State Legislature with initial sponsor assignment",
-      icon: <FileText className="h-4 w-4 text-white" />,
-      status: "completed",
-    },
-    {
-      id: 2,
-      date: "2024",
-      title: "Committee Assignment",
-      subtitle: bill?.committee || "Committee Review",
-      description: "Bill assigned to appropriate legislative committee for detailed review and stakeholder input",
-      icon: <Building2 className="h-4 w-4 text-white" />,
-      status: "completed",
-    },
-    {
-      id: 3,
-      date: "2024",
-      title: "Committee Hearings",
-      subtitle: "In Progress",
-      description: "Committee conducting public hearings and expert testimony on bill provisions",
-      icon: <Users className="h-4 w-4 text-white" />,
-      status: "current",
-    },
-    {
-      id: 4,
-      date: "TBD",
-      title: "Floor Vote",
-      subtitle: "Pending",
-      description: "Full chamber consideration and voting on final bill passage",
-      icon: <CheckCircle className="h-4 w-4 text-white" />,
-      status: "pending",
-    },
-  ];
+  // Create journey events from history data
+  const journeyEvents: JourneyEvent[] = historyData.map((entry, index) => ({
+    id: entry.sequence,
+    date: new Date(entry.date).toLocaleDateString(),
+    title: entry.action || "Unknown Action",
+    subtitle: entry.chamber || "Unknown Chamber",
+    description: `Legislative action taken: ${entry.action}`,
+    icon: index === 0 ? <FileText className="h-4 w-4 text-white" /> :
+          index === 1 ? <Building2 className="h-4 w-4 text-white" /> :
+          index === 2 ? <Users className="h-4 w-4 text-white" /> :
+          <CheckCircle className="h-4 w-4 text-white" />,
+    status: index < historyData.length - 1 ? "completed" as const : 
+            index === historyData.length - 1 ? "current" as const : "pending" as const,
+  }));
 
   const analysisCategories: AnalysisCategory[] = [
     {
-      id: "impact",
-      name: "Impact",
-      icon: <Target className="h-5 w-5 text-blue-500" />,
+      id: "summary",
+      name: "Summary",
+      icon: null,
       description: "Fiscal and social impact analysis for this legislative proposal",
       items: [
         {
@@ -121,9 +106,9 @@ export const useBillDetailData = (billId: string | undefined) => {
       ],
     },
     {
-      id: "history",
-      name: "History",
-      icon: <Scale className="h-5 w-5 text-purple-500" />,
+      id: "sponsors",
+      name: "Sponsors",
+      icon: null,
       description: "Legislative history and precedent for similar proposals",
       items: [
         {
@@ -165,9 +150,9 @@ export const useBillDetailData = (billId: string | undefined) => {
       ],
     },
     {
-      id: "politics",
-      name: "Politics",
-      icon: <TrendingUp className="h-5 w-5 text-orange-500" />,
+      id: "co-sponsors",
+      name: "Co-Sponsors",
+      icon: null,
       description: "Political dynamics and stakeholder positions on the proposal",
       items: [
         {
@@ -219,15 +204,27 @@ export const useBillDetailData = (billId: string | undefined) => {
       }
 
       try {
-        const { data, error } = await supabase
+        // Fetch bill data
+        const { data: billData, error: billError } = await supabase
           .from("Bills")
           .select("*")
           .eq("bill_id", parseInt(billId))
           .single();
 
-        if (error) throw error;
+        if (billError) throw billError;
 
-        setBill(data);
+        setBill(billData);
+
+        // Fetch history data
+        const { data: historyData, error: historyError } = await supabase
+          .from("History Table")
+          .select("*")
+          .eq("bill_id", parseInt(billId))
+          .order("sequence", { ascending: true });
+
+        if (historyError) throw historyError;
+
+        setHistoryData(historyData || []);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to fetch bill");
       } finally {
