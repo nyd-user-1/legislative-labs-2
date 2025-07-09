@@ -75,7 +75,7 @@ export const BillsTable = ({ bills, onBillSelect }: BillsTableProps) => {
                     <span className="font-medium text-sm">
                       {bill.bill_number || "No Number"}
                     </span>
-                    <Badge variant="outline" className="text-xs hidden sm:inline-flex">
+                    <Badge variant="outline" className="text-xs">
                       {getChamberFromBillNumber(bill.bill_number)}
                     </Badge>
                   </div>
@@ -89,7 +89,7 @@ export const BillsTable = ({ bills, onBillSelect }: BillsTableProps) => {
               </div>
               
               <div className="space-y-2 text-xs text-muted-foreground">
-                <div className="hidden sm:flex items-center justify-between text-xs text-muted-foreground">
+                <div className="flex items-center justify-between">
                   <span>
                     Sponsor: {bill.sponsors && bill.sponsors.length > 0 ? bill.sponsors[0].name : "No Sponsor"}
                   </span>
@@ -136,7 +136,7 @@ export const BillsTable = ({ bills, onBillSelect }: BillsTableProps) => {
                   }}
                   title="AI Analysis"
                 >
-                  <AIIcon size={12} />
+                  <AIIcon size={16} />
                 </Button>
               </div>
             </CardContent>
