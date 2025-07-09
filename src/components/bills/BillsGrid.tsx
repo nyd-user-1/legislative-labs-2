@@ -5,7 +5,7 @@ type Bill = Tables<"Bills">;
 
 interface BillsGridProps {
   bills: Bill[];
-  onBillSelect?: (bill: Bill) => void;
+  onBillSelect: (bill: Bill) => void;
 }
 
 export const BillsGrid = ({ bills, onBillSelect }: BillsGridProps) => {

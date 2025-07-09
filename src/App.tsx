@@ -13,7 +13,6 @@ import Index from "./pages/Index";
 import { Auth } from "./pages/Auth";
 import Profile from "./pages/Profile";
 import Bills from "./pages/Bills";
-import BillDetail from "./pages/BillDetail";
 import Problems from "./pages/Problems";
 import Ideas from "./pages/Ideas";
 import MediaKits from "./pages/MediaKits";
@@ -51,7 +50,6 @@ const AppLayout = () => {
                 <Route path="/problems" element={<Problems />} />
                 <Route path="/ideas" element={<Ideas />} />
                 <Route path="/media-kits" element={<MediaKits />} />
-                <Route path="/bills/:id" element={<BillDetail />} />
                 <Route path="/bills" element={<Bills />} />
                 <Route path="/members" element={<Members />} />
                 <Route path="/committees" element={<Committees />} />
