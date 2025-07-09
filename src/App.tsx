@@ -10,7 +10,7 @@ import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/s
 import { AppSidebar } from "@/components/AppSidebar";
 import { ModelSelector } from "@/components/ModelSelector";
 import Index from "./pages/Index";
-import Auth from "./pages/Auth";
+import { Auth } from "./pages/Auth";
 import Profile from "./pages/Profile";
 import Bills from "./pages/Bills";
 import Problems from "./pages/Problems";
