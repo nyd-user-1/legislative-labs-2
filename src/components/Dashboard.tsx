@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Activity, FileText, Users, Building2, TrendingUp, Calendar, Eye } from "lucide-react";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { BillsTable } from "@/components/dashboard/BillsTable";
@@ -153,7 +153,7 @@ export const Dashboard = () => {
             <CardContent className="px-4 sm:px-6">
               <div className="h-[250px] sm:h-[300px] lg:h-[350px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                  <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                     <XAxis 
                       dataKey="month" 
@@ -175,15 +175,17 @@ export const Dashboard = () => {
                         fontSize: '12px'
                       }}
                     />
-                    <Line 
+                    <Area 
                       type="monotone" 
                       dataKey="bills" 
                       stroke="hsl(var(--primary))" 
                       strokeWidth={2}
+                      fill="hsl(var(--muted))"
+                      fillOpacity={0.3}
                       dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 3 }}
                       activeDot={{ r: 5, stroke: 'hsl(var(--primary))', strokeWidth: 2 }}
                     />
-                  </LineChart>
+                  </AreaChart>
                 </ResponsiveContainer>
               </div>
             </CardContent>
