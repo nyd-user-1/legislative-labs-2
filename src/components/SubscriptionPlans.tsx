@@ -4,12 +4,15 @@ import { useSubscription } from '@/hooks/useSubscription';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 
 const subscriptionTiers = [
   {
     tier: 'free',
     name: 'Free',
-    price: '$0/month',
+    monthlyPrice: '$0',
+    annualPrice: '$0',
     description: 'Perfect for getting started',
     features: [
       'View public bills and legislation',
@@ -21,7 +24,8 @@ const subscriptionTiers = [
   {
     tier: 'student',
     name: 'Student',
-    price: '$9.99/month',
+    monthlyPrice: '$9.99',
+    annualPrice: '$7.99',
     description: 'Designed for students and academics',
     features: [
       'All Free features',
@@ -35,7 +39,8 @@ const subscriptionTiers = [
   {
     tier: 'staffer',
     name: 'Staffer',
-    price: '$19.99/month',
+    monthlyPrice: '$19.99',
+    annualPrice: '$15.99',
     description: 'Built for legislative staff',
     features: [
       'All Student features',
@@ -50,7 +55,8 @@ const subscriptionTiers = [
   {
     tier: 'researcher',
     name: 'Researcher',
-    price: '$29.99/month',
+    monthlyPrice: '$29.99',
+    annualPrice: '$23.99',
     description: 'Advanced tools for researchers',
     features: [
       'All Staffer features',
@@ -64,7 +70,8 @@ const subscriptionTiers = [
   {
     tier: 'professional',
     name: 'Professional',
-    price: '$49.99/month',
+    monthlyPrice: '$49.99',
+    annualPrice: '$39.99',
     description: 'For professional advocates and consultants',
     features: [
       'All Researcher features',
@@ -78,7 +85,8 @@ const subscriptionTiers = [
   {
     tier: 'enterprise',
     name: 'Enterprise',
-    price: '$99.99/month',
+    monthlyPrice: '$99.99',
+    annualPrice: '$79.99',
     description: 'Comprehensive solution for organizations',
     features: [
       'All Professional features',
@@ -92,7 +100,8 @@ const subscriptionTiers = [
   {
     tier: 'government',
     name: 'Government',
-    price: '$199.99/month',
+    monthlyPrice: '$199.99',
+    annualPrice: '$159.99',
     description: 'Specialized for government entities',
     features: [
       'All Enterprise features',
@@ -109,6 +118,7 @@ export const SubscriptionPlans = () => {
   const { subscription, loading, checkSubscription, createCheckout } = useSubscription();
   const { toast } = useToast();
   const [processingTier, setProcessingTier] = useState<string | null>(null);
+  const [isAnnual, setIsAnnual] = useState(false);
 
   const handleTierSelect = async (tier: string) => {
     if (tier === 'free') {
@@ -121,7 +131,7 @@ export const SubscriptionPlans = () => {
 
     try {
       setProcessingTier(tier);
-      await createCheckout(tier);
+      await createCheckout(tier, isAnnual ? 'annually' : 'monthly');
       toast({
         title: "Redirecting to Checkout",
         description: "Please complete your subscription in the new tab.",
@@ -170,11 +180,30 @@ export const SubscriptionPlans = () => {
         </Button>
       </div>
 
+      <div className="flex items-center justify-center space-x-4 mb-8">
+        <Label htmlFor="billing-toggle" className={!isAnnual ? "font-semibold" : ""}>
+          Monthly
+        </Label>
+        <Switch
+          id="billing-toggle"
+          checked={isAnnual}
+          onCheckedChange={setIsAnnual}
+        />
+        <Label htmlFor="billing-toggle" className={isAnnual ? "font-semibold" : ""}>
+          Annual
+          <span className="ml-1 text-sm bg-green-100 text-green-800 px-2 py-1 rounded-full">
+            Save 20%
+          </span>
+        </Label>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {subscriptionTiers.map((tierData) => (
           <SubscriptionTierCard
             key={tierData.tier}
             {...tierData}
+            price={isAnnual ? tierData.annualPrice : tierData.monthlyPrice}
+            billingCycle={isAnnual ? 'annually' : 'monthly'}
             isCurrentTier={subscription.subscription_tier === tierData.tier}
             onSelect={() => handleTierSelect(tierData.tier)}
             disabled={processingTier === tierData.tier}

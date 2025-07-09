@@ -9,12 +9,12 @@ const corsHeaders = {
 
 // Subscription tier pricing (in cents)
 const tierPricing = {
-  student: 999,      // $9.99/month
-  staffer: 1999,     // $19.99/month
-  researcher: 2999,  // $29.99/month
-  professional: 4999, // $49.99/month
-  enterprise: 9999,  // $99.99/month
-  government: 19999  // $199.99/month
+  student: { monthly: 999, annually: 799 },      // $9.99/month, $7.99/month billed annually
+  staffer: { monthly: 1999, annually: 1599 },    // $19.99/month, $15.99/month billed annually
+  researcher: { monthly: 2999, annually: 2399 }, // $29.99/month, $23.99/month billed annually
+  professional: { monthly: 4999, annually: 3999 }, // $49.99/month, $39.99/month billed annually
+  enterprise: { monthly: 9999, annually: 7999 }, // $99.99/month, $79.99/month billed annually
+  government: { monthly: 19999, annually: 15999 } // $199.99/month, $159.99/month billed annually
 };
 
 const tierNames = {
@@ -37,10 +37,14 @@ serve(async (req) => {
   );
 
   try {
-    const { tier } = await req.json();
+    const { tier, billingCycle = 'monthly' } = await req.json();
     
     if (!tier || !tierPricing[tier as keyof typeof tierPricing]) {
       throw new Error("Invalid subscription tier provided");
+    }
+
+    if (billingCycle !== 'monthly' && billingCycle !== 'annually') {
+      throw new Error("Invalid billing cycle provided");
     }
 
     const authHeader = req.headers.get("Authorization")!;
@@ -56,6 +60,10 @@ serve(async (req) => {
       customerId = customers.data[0].id;
     }
 
+    const tierData = tierPricing[tier as keyof typeof tierPricing];
+    const unitAmount = billingCycle === 'annually' ? tierData.annually : tierData.monthly;
+    const interval = billingCycle === 'annually' ? 'year' : 'month';
+
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
@@ -63,9 +71,11 @@ serve(async (req) => {
         {
           price_data: {
             currency: "usd",
-            product_data: { name: tierNames[tier as keyof typeof tierNames] },
-            unit_amount: tierPricing[tier as keyof typeof tierPricing],
-            recurring: { interval: "month" },
+            product_data: { 
+              name: `${tierNames[tier as keyof typeof tierNames]} (${billingCycle === 'annually' ? 'Annual' : 'Monthly'})` 
+            },
+            unit_amount: unitAmount,
+            recurring: { interval: interval as 'month' | 'year' },
           },
           quantity: 1,
         },
@@ -75,6 +85,7 @@ serve(async (req) => {
       cancel_url: `${req.headers.get("origin")}/profile?canceled=true`,
       metadata: {
         tier: tier,
+        billing_cycle: billingCycle,
         user_id: user.id
       }
     });

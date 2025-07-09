@@ -15,12 +15,21 @@ const logStep = (step: string, details?: any) => {
 
 // Map price amounts to subscription tiers
 const getTierFromAmount = (amount: number): string => {
-  if (amount <= 999) return "student";     // $9.99
-  if (amount <= 1999) return "staffer";    // $19.99
-  if (amount <= 2999) return "researcher"; // $29.99
-  if (amount <= 4999) return "professional"; // $49.99
-  if (amount <= 9999) return "enterprise"; // $99.99
-  return "government"; // $199.99+
+  // Check for annual pricing first (lower amounts)
+  if (amount === 799 || amount === 999) return "student";
+  if (amount === 1599 || amount === 1999) return "staffer";
+  if (amount === 2399 || amount === 2999) return "researcher";
+  if (amount === 3999 || amount === 4999) return "professional";
+  if (amount === 7999 || amount === 9999) return "enterprise";
+  if (amount === 15999 || amount === 19999) return "government";
+  
+  // Fallback logic for unknown amounts
+  if (amount <= 999) return "student";
+  if (amount <= 1999) return "staffer";
+  if (amount <= 2999) return "researcher";
+  if (amount <= 4999) return "professional";
+  if (amount <= 9999) return "enterprise";
+  return "government";
 };
 
 serve(async (req) => {

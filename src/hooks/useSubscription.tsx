@@ -50,13 +50,13 @@ export const useSubscription = () => {
     }
   };
 
-  const createCheckout = async (tier: string) => {
+  const createCheckout = async (tier: string, billingCycle: 'monthly' | 'annually' = 'monthly') => {
     if (!user) {
       throw new Error('User must be authenticated to create checkout');
     }
 
     const { data, error } = await supabase.functions.invoke('create-checkout', {
-      body: { tier }
+      body: { tier, billingCycle }
     });
 
     if (error) {

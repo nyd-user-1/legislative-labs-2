@@ -7,6 +7,9 @@ interface SubscriptionTierCardProps {
   tier: string;
   name: string;
   price: string;
+  monthlyPrice?: string;
+  annualPrice?: string;
+  billingCycle?: 'monthly' | 'annually';
   description: string;
   features: string[];
   isCurrentTier?: boolean;
@@ -19,6 +22,9 @@ export const SubscriptionTierCard = ({
   tier,
   name,
   price,
+  monthlyPrice,
+  annualPrice,
+  billingCycle = 'monthly',
   description,
   features,
   isCurrentTier = false,
@@ -26,6 +32,12 @@ export const SubscriptionTierCard = ({
   onSelect,
   disabled = false
 }: SubscriptionTierCardProps) => {
+  const displayPrice = tier === 'free' ? '$0' : price;
+  const billingText = tier === 'free' ? '' : `/${billingCycle === 'annually' ? 'month (billed annually)' : 'month'}`;
+  
+  const monthlyEquivalent = billingCycle === 'annually' && monthlyPrice && annualPrice
+    ? ` (${monthlyPrice}/month if paid monthly)`
+    : '';
   return (
     <Card className={`relative ${isCurrentTier ? 'ring-2 ring-primary' : ''} ${isPopular ? 'border-primary' : ''}`}>
       {isPopular && (
@@ -45,7 +57,13 @@ export const SubscriptionTierCard = ({
 
       <CardHeader className="text-center">
         <CardTitle className="text-xl">{name}</CardTitle>
-        <div className="text-3xl font-bold text-primary">{price}</div>
+        <div className="text-3xl font-bold text-primary">
+          {displayPrice}
+          <span className="text-lg font-normal text-muted-foreground">{billingText}</span>
+        </div>
+        {monthlyEquivalent && (
+          <p className="text-xs text-muted-foreground">{monthlyEquivalent}</p>
+        )}
         <p className="text-sm text-muted-foreground">{description}</p>
       </CardHeader>
       
