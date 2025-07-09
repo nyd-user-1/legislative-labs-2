@@ -177,13 +177,25 @@ export const Dashboard = () => {
                     />
                     <Area 
                       type="monotone" 
-                      dataKey="bills" 
+                      dataKey="assembly" 
+                      stackId="1"
                       stroke="hsl(var(--primary))" 
                       strokeWidth={2}
                       fill="hsl(var(--muted))"
-                      fillOpacity={0.3}
+                      fillOpacity={0.45}
                       dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 3 }}
                       activeDot={{ r: 5, stroke: 'hsl(var(--primary))', strokeWidth: 2 }}
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="senate" 
+                      stackId="1"
+                      stroke="hsl(var(--muted-foreground))" 
+                      strokeWidth={2}
+                      fill="hsl(var(--muted-foreground))"
+                      fillOpacity={0.3}
+                      dot={{ fill: 'hsl(var(--muted-foreground))', strokeWidth: 2, r: 3 }}
+                      activeDot={{ r: 5, stroke: 'hsl(var(--muted-foreground))', strokeWidth: 2 }}
                     />
                   </AreaChart>
                 </ResponsiveContainer>

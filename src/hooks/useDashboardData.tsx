@@ -19,7 +19,8 @@ interface DashboardStats {
 
 interface ChartDataPoint {
   month: string;
-  bills: number;
+  assembly: number;
+  senate: number;
 }
 
 export const useDashboardData = () => {
@@ -113,9 +114,13 @@ export const useDashboardData = () => {
         for (let i = 5; i >= 0; i--) {
           const date = new Date();
           date.setMonth(date.getMonth() - i);
+          const totalBills = Math.floor(Math.random() * 50) + 20;
+          const assemblyBills = Math.floor(totalBills * (0.4 + Math.random() * 0.2)); // 40-60% of total
+          const senateBills = totalBills - assemblyBills;
           months.push({
             month: date.toLocaleDateString('en-US', { month: 'short' }),
-            bills: Math.floor(Math.random() * 50) + 20,
+            assembly: assemblyBills,
+            senate: senateBills,
           });
         }
         return months;
