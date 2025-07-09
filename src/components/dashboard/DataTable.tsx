@@ -160,7 +160,7 @@ export function DataTable<TData, TValue>({
               
               <div className="flex items-center gap-2">
                 <Badge variant="outline" className="text-xs">
-                  {table.getFilteredRowModel().rows.length} {data.length}
+                  {table.getFilteredRowModel().rows.length} of {data.length} rows
                 </Badge>
               </div>
             </div>
