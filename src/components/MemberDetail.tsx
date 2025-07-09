@@ -53,24 +53,14 @@ export const MemberDetail = ({ member, onBack }: MemberDetailProps) => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
+          <div className="p-6">
             {/* Member Information Card */}
-            <Card className="min-h-[300px] flex flex-col">
+            <Card className="min-h-[300px] flex flex-col max-w-2xl">
               <CardHeader>
                 <CardTitle>Member Summary</CardTitle>
               </CardHeader>
               <CardContent className="flex-1">
                 <MemberInformation member={member} />
-              </CardContent>
-            </Card>
-
-            {/* Current Status Card */}
-            <Card className="min-h-[300px] flex flex-col">
-              <CardHeader>
-                <CardTitle>Current Status</CardTitle>
-              </CardHeader>
-              <CardContent className="flex-1">
-                <MemberStatusProgress member={member} />
               </CardContent>
             </Card>
           </div>
