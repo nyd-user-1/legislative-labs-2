@@ -103,7 +103,6 @@ export const Dashboard = () => {
             <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={handleViewAllBills}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
                 <CardTitle className="text-xs sm:text-sm font-medium truncate">Total Bills</CardTitle>
-                <FileText className="h-4 w-4 text-muted-foreground flex-shrink-0" />
               </CardHeader>
               <CardContent className="px-4 pb-4">
                 <div className="text-xl sm:text-2xl font-bold">{stats.totalBills.toLocaleString()}</div>
@@ -116,7 +115,6 @@ export const Dashboard = () => {
             <Card className="hover:shadow-md transition-shadow">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
                 <CardTitle className="text-xs sm:text-sm font-medium truncate">Active Bills</CardTitle>
-                <Activity className="h-4 w-4 text-muted-foreground flex-shrink-0" />
               </CardHeader>
               <CardContent className="px-4 pb-4">
                 <div className="text-xl sm:text-2xl font-bold">{stats.activeBills.toLocaleString()}</div>
@@ -129,7 +127,6 @@ export const Dashboard = () => {
             <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={handleViewAllCommittees}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
                 <CardTitle className="text-xs sm:text-sm font-medium truncate">Committees</CardTitle>
-                <Building2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
               </CardHeader>
               <CardContent className="px-4 pb-4">
                 <div className="text-xl sm:text-2xl font-bold">{stats.totalCommittees.toLocaleString()}</div>
@@ -142,7 +139,6 @@ export const Dashboard = () => {
             <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={handleViewAllMembers}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
                 <CardTitle className="text-xs sm:text-sm font-medium truncate">Legislators</CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground flex-shrink-0" />
               </CardHeader>
               <CardContent className="px-4 pb-4">
                 <div className="text-xl sm:text-2xl font-bold">{stats.totalMembers.toLocaleString()}</div>
