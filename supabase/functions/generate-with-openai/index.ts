@@ -30,13 +30,15 @@ serve(async (req) => {
   }
 
   try {
-    const { prompt, type, stream = false, model = 'gpt-4o-mini' } = await req.json();
+    const { prompt, type, stream = false, model = 'gpt-4.1-mini-2025-04-14' } = await req.json();
 
     console.log('Generating content:', { type, model, promptLength: prompt?.length, stream });
 
     // Determine model provider
     const isClaudeModel = model.startsWith('claude-');
     const isPerplexityModel = model.startsWith('llama-') && model.includes('sonar');
+    
+    console.log('Model detection:', { model, isClaudeModel, isPerplexityModel });
     
     if (isClaudeModel && !anthropicApiKey) {
       console.error('Anthropic API key not configured');
