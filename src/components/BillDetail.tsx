@@ -330,65 +330,17 @@ export const BillDetail = ({ bill, onBack }: BillDetailProps) => {
                   </Card>
                 </div>
 
-                {/* Recent Activity */}
-                <Card className="mt-6">
-                  <CardHeader>
-                    <CardTitle className="text-lg">Recent Activity</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {loading ? (
-                      <div className="space-y-3">
-                        {[...Array(3)].map((_, i) => (
-                          <Skeleton key={i} className="h-12 w-full" />
-                        ))}
-                      </div>
-                    ) : history.length === 0 ? (
-                      <p className="text-muted-foreground text-center py-8">
-                        No recent activity available.
-                      </p>
-                    ) : (
-                      <div className="space-y-3">
-                        {history.slice(0, 5).map((entry, index) => (
-                          <div key={`${entry.date}-${entry.sequence}`} className="flex items-start gap-4 p-3 rounded-lg bg-muted/30">
-                            <div className="flex-shrink-0 w-20 text-xs text-muted-foreground mt-1">
-                              {formatDate(entry.date)}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 mb-1">
-                                {entry.chamber && (
-                                  <Badge variant="outline" className="text-xs">
-                                    {entry.chamber}
-                                  </Badge>
-                                )}
-                              </div>
-                              <p className="text-sm text-foreground break-words">{entry.action || "No action recorded"}</p>
-                            </div>
-                          </div>
-                        ))}
-                        {history.length > 5 && (
-                          <div className="text-center pt-2">
-                            <Button variant="ghost" size="sm" className="text-sm text-muted-foreground">
-                              View all history ({history.length} total)
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
               </TabsContent>
 
               <TabsContent value="sponsors" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-lg">Bill Sponsors</CardTitle>
-                      <Badge variant="secondary" className="text-xs">
-                        {sponsors.length} {sponsors.length === 1 ? 'Sponsor' : 'Sponsors'}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-lg font-semibold">Bill Sponsors</h2>
+                    <Badge variant="secondary" className="text-xs">
+                      {sponsors.length} {sponsors.length === 1 ? 'Sponsor' : 'Sponsors'}
+                    </Badge>
+                  </div>
+                  <div>
                     {loading ? (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {[...Array(4)].map((_, i) => (
@@ -452,21 +404,19 @@ export const BillDetail = ({ bill, onBack }: BillDetailProps) => {
                         ))}
                       </div>
                     )}
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               </TabsContent>
 
               <TabsContent value="history" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-lg">Legislative History</CardTitle>
-                      <Badge variant="secondary" className="text-xs">
-                        {history.length} {history.length === 1 ? 'Action' : 'Actions'}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-lg font-semibold">Legislative History</h2>
+                    <Badge variant="secondary" className="text-xs">
+                      {history.length} {history.length === 1 ? 'Action' : 'Actions'}
+                    </Badge>
+                  </div>
+                  <div>
                     {loading ? (
                       <div className="space-y-4">
                         {[...Array(5)].map((_, i) => (
@@ -513,21 +463,19 @@ export const BillDetail = ({ bill, onBack }: BillDetailProps) => {
                         </div>
                       </ScrollArea>
                     )}
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               </TabsContent>
 
               <TabsContent value="votes" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-lg">Voting Records</CardTitle>
-                      <Badge variant="secondary" className="text-xs">
-                        {rollCalls.length} {rollCalls.length === 1 ? 'Vote' : 'Votes'}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-lg font-semibold">Voting Records</h2>
+                    <Badge variant="secondary" className="text-xs">
+                      {rollCalls.length} {rollCalls.length === 1 ? 'Vote' : 'Votes'}
+                    </Badge>
+                  </div>
+                  <div>
                     {loading ? (
                       <div className="space-y-4">
                         {[...Array(3)].map((_, i) => (
@@ -624,8 +572,8 @@ export const BillDetail = ({ bill, onBack }: BillDetailProps) => {
                         ))}
                       </div>
                     )}
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               </TabsContent>
             </Tabs>
           </section>
