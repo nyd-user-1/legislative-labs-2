@@ -1,8 +1,9 @@
 import { LogOut } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface SidebarFooterProps {
   collapsed: boolean;
@@ -10,6 +11,7 @@ interface SidebarFooterProps {
 
 export function SidebarFooter({ collapsed }: SidebarFooterProps) {
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const handleSignOut = async () => {
     try {
@@ -27,15 +29,28 @@ export function SidebarFooter({ collapsed }: SidebarFooterProps) {
     }
   };
 
+  const getInitials = (email: string) => {
+    return email.charAt(0).toUpperCase();
+  };
+
+  const getDisplayName = () => {
+    if (user?.user_metadata?.full_name) return user.user_metadata.full_name;
+    if (user?.user_metadata?.username) return user.user_metadata.username;
+    return user?.email?.split('@')[0] || 'User';
+  };
+
   return (
     <div className="flex items-center space-x-3">
       <Avatar className="h-8 w-8">
-        <AvatarFallback>U</AvatarFallback>
+        <AvatarImage src={user?.user_metadata?.avatar_url} alt="Profile picture" />
+        <AvatarFallback>
+          {user ? getInitials(user.email || '') : 'U'}
+        </AvatarFallback>
       </Avatar>
       {!collapsed && (
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium truncate">User</p>
-          <p className="text-xs text-muted-foreground truncate">user@example.com</p>
+          <p className="text-sm font-medium truncate">{getDisplayName()}</p>
+          <p className="text-xs text-muted-foreground truncate">{user?.email || 'user@example.com'}</p>
         </div>
       )}
       <Button
