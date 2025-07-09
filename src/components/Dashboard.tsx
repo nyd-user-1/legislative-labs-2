@@ -90,8 +90,8 @@ export const Dashboard = () => {
           </div>
 
           {/* Statistics Cards Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
-            <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={handleViewAllBills}>
+          <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+            <Card className="hover:shadow-md transition-shadow cursor-pointer max-w-[48dvw] sm:max-w-none" onClick={handleViewAllBills}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
                 <CardTitle className="text-xs sm:text-sm font-medium truncate">Total Bills</CardTitle>
               </CardHeader>
@@ -103,7 +103,7 @@ export const Dashboard = () => {
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-md transition-shadow">
+            <Card className="hover:shadow-md transition-shadow max-w-[48dvw] sm:max-w-none">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
                 <CardTitle className="text-xs sm:text-sm font-medium truncate">Active Bills</CardTitle>
               </CardHeader>
@@ -115,7 +115,7 @@ export const Dashboard = () => {
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={handleViewAllCommittees}>
+            <Card className="hover:shadow-md transition-shadow cursor-pointer max-w-[48dvw] sm:max-w-none" onClick={handleViewAllCommittees}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
                 <CardTitle className="text-xs sm:text-sm font-medium truncate">Committees</CardTitle>
               </CardHeader>
@@ -127,7 +127,7 @@ export const Dashboard = () => {
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={handleViewAllMembers}>
+            <Card className="hover:shadow-md transition-shadow cursor-pointer max-w-[48dvw] sm:max-w-none" onClick={handleViewAllMembers}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
                 <CardTitle className="text-xs sm:text-sm font-medium truncate">Legislators</CardTitle>
               </CardHeader>

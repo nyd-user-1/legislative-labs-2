@@ -14,6 +14,7 @@ import {
 import { ExternalLink, Sparkles, Heart } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { AIChatSheet } from "@/components/AIChatSheet";
+import { useFavorites } from "@/hooks/useFavorites";
 
 type Bill = Tables<"Bills"> & {
   sponsors?: Array<{
@@ -31,7 +32,7 @@ interface BillsTableProps {
 export const BillsTable = ({ bills, onBillSelect }: BillsTableProps) => {
   const [chatOpen, setChatOpen] = useState(false);
   const [selectedBillForChat, setSelectedBillForChat] = useState<Bill | null>(null);
-  const [favoritedBills, setFavoritedBills] = useState<Set<number>>(new Set());
+  const { favoriteBillIds, toggleFavorite } = useFavorites();
 
   const handleAIAnalysis = (bill: Bill, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -39,15 +40,9 @@ export const BillsTable = ({ bills, onBillSelect }: BillsTableProps) => {
     setChatOpen(true);
   };
 
-  const handleFavorite = (bill: Bill, e: React.MouseEvent) => {
+  const handleFavorite = async (bill: Bill, e: React.MouseEvent) => {
     e.stopPropagation();
-    const newFavorites = new Set(favoritedBills);
-    if (newFavorites.has(bill.bill_id)) {
-      newFavorites.delete(bill.bill_id);
-    } else {
-      newFavorites.add(bill.bill_id);
-    }
-    setFavoritedBills(newFavorites);
+    await toggleFavorite(bill.bill_id);
   };
   const getChamberFromBillNumber = (billNumber: string | null): string => {
     if (!billNumber) return "Unknown";
@@ -114,7 +109,7 @@ export const BillsTable = ({ bills, onBillSelect }: BillsTableProps) => {
                   onClick={(e) => handleFavorite(bill, e)}
                   title="Add to Favorites"
                 >
-                  <Heart className={`h-4 w-4 ${favoritedBills.has(bill.bill_id) ? 'fill-red-500 text-red-500' : ''}`} />
+                  <Heart className={`h-4 w-4 ${favoriteBillIds.has(bill.bill_id) ? 'fill-red-500 text-red-500' : ''}`} />
                 </Button>
                 <Button
                   variant="outline"
@@ -183,7 +178,7 @@ export const BillsTable = ({ bills, onBillSelect }: BillsTableProps) => {
                         onClick={(e) => handleFavorite(bill, e)}
                         title="Add to Favorites"
                       >
-                        <Heart className={`h-4 w-4 ${favoritedBills.has(bill.bill_id) ? 'fill-red-500 text-red-500' : ''}`} />
+                        <Heart className={`h-4 w-4 ${favoriteBillIds.has(bill.bill_id) ? 'fill-red-500 text-red-500' : ''}`} />
                       </Button>
                       <Button
                         variant="outline"

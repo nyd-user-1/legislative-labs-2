@@ -19,6 +19,7 @@ import MediaKits from "./pages/MediaKits";
 import Members from "./pages/Members";
 import Committees from "./pages/Committees";
 import Chats from "./pages/Chats";
+import Favorites from "./pages/Favorites";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,7 @@ const AppLayout = () => {
             <main className="flex-1">
               <Routes>
                 <Route path="/chats" element={<Chats />} />
+                <Route path="/favorites" element={<Favorites />} />
                 <Route path="/problems" element={<Problems />} />
                 <Route path="/ideas" element={<Ideas />} />
                 <Route path="/media-kits" element={<MediaKits />} />

@@ -676,6 +676,30 @@ export type Database = {
         }
         Relationships: []
       }
+      user_favorites: {
+        Row: {
+          bill_id: number
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          bill_id: number
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          bill_id?: number
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       Votes: {
         Row: {
           people_id: number
