@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import { TrendingUp, BarChart3, PieChart as PieChartIcon, Activity, Calendar, Download } from "lucide-react";
+import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { TrendingUp, BarChart3, Activity, Calendar, Download } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -19,7 +19,7 @@ interface ChartAreaInteractiveProps {
   title: string;
   description?: string;
   className?: string;
-  allowedChartTypes?: ("line" | "area" | "bar" | "pie")[];
+  allowedChartTypes?: ("area" | "bar")[];
   timeRanges?: { label: string; value: string; }[];
   isLoading?: boolean;
 }
@@ -31,7 +31,7 @@ export const ChartAreaInteractive = ({
   title,
   description,
   className,
-  allowedChartTypes = ["line", "area", "bar"],
+  allowedChartTypes = ["area", "bar"],
   timeRanges = [
     { label: "Last 7 days", value: "7d" },
     { label: "Last 30 days", value: "30d" },
@@ -40,7 +40,7 @@ export const ChartAreaInteractive = ({
   ],
   isLoading = false
 }: ChartAreaInteractiveProps) => {
-  const [chartType, setChartType] = useState<"line" | "area" | "bar" | "pie">(allowedChartTypes[0] || "line");
+  const [chartType, setChartType] = useState<"area" | "bar">(allowedChartTypes[0] || "area");
   const [timeRange, setTimeRange] = useState(timeRanges[1]?.value || "30d");
 
   const renderChart = () => {
@@ -125,39 +125,10 @@ export const ChartAreaInteractive = ({
           </ResponsiveContainer>
         );
 
-      case "pie":
+      default: // area (default)
         return (
           <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={data}
-                cx="50%"
-                cy="50%"
-                outerRadius={80}
-                fill="hsl(var(--primary))"
-                dataKey="value"
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-              >
-                {data.map((_, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip 
-                contentStyle={{
-                  backgroundColor: 'hsl(var(--background))',
-                  border: '1px solid hsl(var(--border))',
-                  borderRadius: 'var(--radius)',
-                  fontSize: '12px'
-                }}
-              />
-            </PieChart>
-          </ResponsiveContainer>
-        );
-
-      default: // line
-        return (
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart {...chartProps}>
+            <AreaChart {...chartProps}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
               <XAxis 
                 dataKey="name" 
@@ -177,15 +148,15 @@ export const ChartAreaInteractive = ({
                   fontSize: '12px'
                 }}
               />
-              <Line 
+              <Area 
                 type="monotone" 
                 dataKey="value" 
                 stroke="hsl(var(--primary))" 
+                fill="hsl(var(--primary))"
+                fillOpacity={0.1}
                 strokeWidth={2}
-                dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 3 }}
-                activeDot={{ r: 5, stroke: 'hsl(var(--primary))', strokeWidth: 2 }}
               />
-            </LineChart>
+            </AreaChart>
           </ResponsiveContainer>
         );
     }
@@ -194,12 +165,9 @@ export const ChartAreaInteractive = ({
   const getChartIcon = (type: string) => {
     switch (type) {
       case "area":
-      case "line":
         return <TrendingUp className="h-4 w-4" />;
       case "bar":
         return <BarChart3 className="h-4 w-4" />;
-      case "pie":
-        return <PieChartIcon className="h-4 w-4" />;
       default:
         return <Activity className="h-4 w-4" />;
     }
@@ -227,7 +195,7 @@ export const ChartAreaInteractive = ({
           {/* Chart Controls */}
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
             <Tabs value={chartType} onValueChange={(value) => setChartType(value as any)}>
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-2">
                 {allowedChartTypes.map((type) => (
                   <TabsTrigger key={type} value={type} className="flex items-center gap-1">
                     {getChartIcon(type)}

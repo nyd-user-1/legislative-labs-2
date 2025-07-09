@@ -259,7 +259,7 @@ export const Dashboard = () => {
             data={enhancedChartData}
             title="Legislative Activity Trends"
             description="Track bills, committee actions, and votes over time"
-            allowedChartTypes={["line", "area", "bar"]}
+            allowedChartTypes={["area", "bar"]}
             timeRanges={[
               { label: "Last 7 days", value: "7d" },
               { label: "Last 30 days", value: "30d" },
