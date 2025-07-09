@@ -204,7 +204,6 @@ export const Dashboard = () => {
             <CardHeader className="px-4 sm:px-6">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div className="flex items-center gap-2">
-                  <Eye className="h-4 sm:h-5 w-4 sm:w-5" />
                   <CardTitle className="text-base sm:text-lg">Recent Legislative Activity</CardTitle>
                 </div>
                 <Button variant="outline" onClick={handleViewAllBills} size="sm" className="self-start sm:self-auto">
