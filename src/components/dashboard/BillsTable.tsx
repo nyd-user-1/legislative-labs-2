@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Tables } from "@/integrations/supabase/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ import {
 } from "@/components/ui/table";
 import { ExternalLink, Sparkles } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { AIChatSheet } from "@/components/AIChatSheet";
 
 type Bill = Tables<"Bills"> & {
   sponsors?: Array<{
@@ -27,6 +29,14 @@ interface BillsTableProps {
 }
 
 export const BillsTable = ({ bills, onBillSelect }: BillsTableProps) => {
+  const [chatOpen, setChatOpen] = useState(false);
+  const [selectedBillForChat, setSelectedBillForChat] = useState<Bill | null>(null);
+
+  const handleAIAnalysis = (bill: Bill, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedBillForChat(bill);
+    setChatOpen(true);
+  };
   const getChamberFromBillNumber = (billNumber: string | null): string => {
     if (!billNumber) return "Unknown";
     if (billNumber.startsWith("S")) return "Senate";
@@ -89,10 +99,7 @@ export const BillsTable = ({ bills, onBillSelect }: BillsTableProps) => {
                   variant="outline"
                   size="sm"
                   className="px-3"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    // AI analysis functionality would go here
-                  }}
+                  onClick={(e) => handleAIAnalysis(bill, e)}
                   title="AI Analysis"
                 >
                   <Sparkles className="h-4 w-4" />
@@ -152,10 +159,7 @@ export const BillsTable = ({ bills, onBillSelect }: BillsTableProps) => {
                         variant="outline"
                         size="sm"
                         className="px-2"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          // AI analysis functionality would go here
-                        }}
+                        onClick={(e) => handleAIAnalysis(bill, e)}
                         title="AI Analysis"
                       >
                         <Sparkles className="h-4 w-4" />
@@ -175,6 +179,13 @@ export const BillsTable = ({ bills, onBillSelect }: BillsTableProps) => {
           </Table>
         </div>
       </div>
+
+      {/* AI Chat Sheet */}
+      <AIChatSheet
+        open={chatOpen}
+        onOpenChange={setChatOpen}
+        bill={selectedBillForChat}
+      />
     </div>
   );
 };

@@ -65,6 +65,36 @@ export type Database = {
         }
         Relationships: []
       }
+      chat_sessions: {
+        Row: {
+          bill_id: number | null
+          created_at: string
+          id: string
+          messages: Json
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          bill_id?: number | null
+          created_at?: string
+          id?: string
+          messages?: Json
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          bill_id?: number | null
+          created_at?: string
+          id?: string
+          messages?: Json
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       co_authors: {
         Row: {
           accepted_at: string | null
