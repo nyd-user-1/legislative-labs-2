@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Tables } from "@/integrations/supabase/types";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Sheet,
   SheetContent,
@@ -93,28 +94,26 @@ export const AIChatSheet = ({ open, onOpenChange, bill }: AIChatSheetProps) => {
         User Question: ${content}
       ` : content;
 
-      // Call OpenAI edge function
-      const response = await fetch("/functions/v1/generate-with-openai", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+      // Call OpenAI edge function using Supabase client
+      const { data: responseData, error: functionError } = await supabase.functions.invoke('generate-with-openai', {
+        body: {
           prompt: billContext
-        }),
+        }
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to get AI response");
+      if (functionError) {
+        throw new Error(functionError.message || "Failed to get AI response");
       }
 
-      const data = await response.json();
+      if (!responseData?.generatedText) {
+        throw new Error("No response received from AI");
+      }
       
       // Add AI response
       const assistantMessage: Message = {
         id: crypto.randomUUID(),
         role: "assistant",
-        content: data.generatedText,
+        content: responseData.generatedText,
         timestamp: new Date()
       };
       
