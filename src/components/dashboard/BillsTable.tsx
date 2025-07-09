@@ -75,7 +75,7 @@ export const BillsTable = ({ bills, onBillSelect }: BillsTableProps) => {
                     <span className="font-medium text-sm">
                       {bill.bill_number || "No Number"}
                     </span>
-                    <Badge variant="outline" className="text-xs">
+                    <Badge variant="outline" className="text-xs hidden sm:inline-flex">
                       {getChamberFromBillNumber(bill.bill_number)}
                     </Badge>
                   </div>
