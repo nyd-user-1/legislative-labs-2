@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ExternalLink, Sparkles } from "lucide-react";
+import { ExternalLink, Sparkles, Heart } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { AIChatSheet } from "@/components/AIChatSheet";
 
@@ -31,11 +31,23 @@ interface BillsTableProps {
 export const BillsTable = ({ bills, onBillSelect }: BillsTableProps) => {
   const [chatOpen, setChatOpen] = useState(false);
   const [selectedBillForChat, setSelectedBillForChat] = useState<Bill | null>(null);
+  const [favoritedBills, setFavoritedBills] = useState<Set<number>>(new Set());
 
   const handleAIAnalysis = (bill: Bill, e: React.MouseEvent) => {
     e.stopPropagation();
     setSelectedBillForChat(bill);
     setChatOpen(true);
+  };
+
+  const handleFavorite = (bill: Bill, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const newFavorites = new Set(favoritedBills);
+    if (newFavorites.has(bill.bill_id)) {
+      newFavorites.delete(bill.bill_id);
+    } else {
+      newFavorites.add(bill.bill_id);
+    }
+    setFavoritedBills(newFavorites);
   };
   const getChamberFromBillNumber = (billNumber: string | null): string => {
     if (!billNumber) return "Unknown";
@@ -94,7 +106,16 @@ export const BillsTable = ({ bills, onBillSelect }: BillsTableProps) => {
                 </Badge>
               </div>
               
-              <div className="flex items-center justify-end pt-3">
+              <div className="flex items-center justify-end gap-2 pt-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="px-3"
+                  onClick={(e) => handleFavorite(bill, e)}
+                  title="Add to Favorites"
+                >
+                  <Heart className={`h-4 w-4 ${favoritedBills.has(bill.bill_id) ? 'fill-red-500 text-red-500' : ''}`} />
+                </Button>
                 <Button
                   variant="outline"
                   size="sm"
@@ -154,7 +175,16 @@ export const BillsTable = ({ bills, onBillSelect }: BillsTableProps) => {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div className="flex justify-end">
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="px-2"
+                        onClick={(e) => handleFavorite(bill, e)}
+                        title="Add to Favorites"
+                      >
+                        <Heart className={`h-4 w-4 ${favoritedBills.has(bill.bill_id) ? 'fill-red-500 text-red-500' : ''}`} />
+                      </Button>
                       <Button
                         variant="outline"
                         size="sm"

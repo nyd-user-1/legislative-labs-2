@@ -1,4 +1,4 @@
-import { Search, Settings, User, FileText, Lightbulb, BarChart3, Users, Building2, TrendingUp } from "lucide-react";
+import { Search, Settings, User, FileText, Lightbulb, BarChart3, Users, Building2, TrendingUp, MessageSquare } from "lucide-react";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -8,11 +8,15 @@ import {
 import { NavigationItem } from "./NavigationItem";
 import { useNavigation } from "@/hooks/useNavigation";
 
-const mainNavItems = [
+const researchNavItems = [
   { title: "Dashboard", url: "/", icon: TrendingUp },
   { title: "Bills", url: "/bills", icon: FileText },
   { title: "Members", url: "/members", icon: Users },
   { title: "Committees", url: "/committees", icon: Building2 },
+];
+
+const workflowNavItems = [
+  { title: "Chats", url: "/chats", icon: MessageSquare },
   { title: "Problems", url: "/problems", icon: Search },
   { title: "Ideas", url: "/ideas", icon: Lightbulb },
   { title: "Media Kits", url: "/media-kits", icon: BarChart3 },
@@ -33,13 +37,34 @@ export function SidebarNavigation({ collapsed, hasSearchResults }: SidebarNaviga
 
   return (
     <>
-      {/* Main Navigation - Hidden when searching */}
+      {/* Research Navigation - Hidden when searching */}
+      {!hasSearchResults && (
+        <SidebarGroup>
+          <SidebarGroupLabel>Research</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {researchNavItems.map((item) => (
+                <NavigationItem
+                  key={item.title}
+                  title={item.title}
+                  url={item.url}
+                  icon={item.icon}
+                  collapsed={collapsed}
+                  getNavClassName={getNavClassName}
+                />
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      )}
+
+      {/* Workflow Navigation - Hidden when searching */}
       {!hasSearchResults && (
         <SidebarGroup>
           <SidebarGroupLabel>Workflow</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {mainNavItems.map((item) => (
+              {workflowNavItems.map((item) => (
                 <NavigationItem
                   key={item.title}
                   title={item.title}
