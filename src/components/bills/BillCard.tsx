@@ -4,6 +4,7 @@ import { Target, Calendar, User, FileText, MapPin } from "lucide-react";
 import { BillStatusBadge } from "@/components/BillStatusBadge";
 import { Tables } from "@/integrations/supabase/types";
 import { formatDate } from "@/utils/dateUtils";
+import { useNavigate } from "react-router-dom";
 
 type Bill = Tables<"Bills"> & {
   sponsors?: Array<{
@@ -15,17 +16,26 @@ type Bill = Tables<"Bills"> & {
 
 interface BillCardProps {
   bill: Bill;
-  onBillSelect: (bill: Bill) => void;
+  onBillSelect?: (bill: Bill) => void;
 }
 
 export const BillCard = ({ bill, onBillSelect }: BillCardProps) => {
+  const navigate = useNavigate();
   // Get primary sponsor (first one)
   const primarySponsor = bill.sponsors?.[0];
+
+  const handleClick = () => {
+    if (onBillSelect) {
+      onBillSelect(bill);
+    } else {
+      navigate(`/bills/${bill.bill_id}`);
+    }
+  };
 
   return (
     <Card 
       className="card hover:shadow-md transition-shadow cursor-pointer"
-      onClick={() => onBillSelect(bill)}
+      onClick={handleClick}
     >
       <CardHeader className="pb-3">
         <div className="flex justify-between items-start">
