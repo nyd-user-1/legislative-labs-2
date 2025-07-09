@@ -1,24 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
+import { LoginForm } from '@/components/LoginForm';
 
 const Auth = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [username, setUsername] = useState('');
-  const [displayName, setDisplayName] = useState('');
-  const { signIn, signUp, user } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -27,161 +14,33 @@ const Auth = () => {
     }
   }, [user, navigate]);
 
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError('');
-
-    const { error } = await signIn(email, password);
-    
-    if (error) {
-      setError(error.message);
-      toast({
-        title: "Sign in failed",
-        description: error.message,
-        variant: "destructive",
-      });
-    } else {
-      toast({
-        title: "Welcome back!",
-        description: "You have been signed in successfully.",
-      });
-      navigate('/');
-    }
-    
-    setIsLoading(false);
-  };
-
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError('');
-
-    const { error } = await signUp(email, password, username, displayName);
-    
-    if (error) {
-      setError(error.message);
-      toast({
-        title: "Sign up failed",
-        description: error.message,
-        variant: "destructive",
-      });
-    } else {
-      toast({
-        title: "Account created!",
-        description: "Please check your email to confirm your account.",
-      });
-    }
-    
-    setIsLoading(false);
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-brand-50/30 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">New York Digital</CardTitle>
-          <p className="text-muted-foreground">Welcome back to democracy.</p>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="signin" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signin">Sign In</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="signin">
-              <form onSubmit={handleSignIn} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="signin-email">Email</Label>
-                  <Input
-                    id="signin-email"
-                    type="email"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signin-password">Password</Label>
-                  <Input
-                    id="signin-password"
-                    type="password"
-                    placeholder="Enter your password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                </div>
-                {error && (
-                  <Alert variant="destructive">
-                    <AlertDescription>{error}</AlertDescription>
-                  </Alert>
-                )}
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Signing in..." : "Sign In"}
-                </Button>
-              </form>
-            </TabsContent>
-            
-            <TabsContent value="signup">
-              <form onSubmit={handleSignUp} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
-                  <Input
-                    id="signup-email"
-                    type="email"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-username">Username</Label>
-                  <Input
-                    id="signup-username"
-                    type="text"
-                    placeholder="Choose a username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-displayname">Display Name</Label>
-                  <Input
-                    id="signup-displayname"
-                    type="text"
-                    placeholder="Enter your display name"
-                    value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-password">Password</Label>
-                  <Input
-                    id="signup-password"
-                    type="password"
-                    placeholder="Create a password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                </div>
-                {error && (
-                  <Alert variant="destructive">
-                    <AlertDescription>{error}</AlertDescription>
-                  </Alert>
-                )}
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Creating account..." : "Sign Up"}
-                </Button>
-              </form>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
+    <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
+      <div className="flex items-center justify-center py-12">
+        <div className="mx-auto grid w-[350px] gap-6">
+          <div className="grid gap-2 text-center">
+            <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-primary">
+              <svg className="h-12 w-12 text-primary-foreground" fill="none" height="24" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                <polyline points="9,22 9,12 15,12 15,22"/>
+              </svg>
+            </div>
+          </div>
+          <LoginForm />
+        </div>
+      </div>
+      <div className="hidden bg-muted lg:block">
+        <div className="flex h-full items-center justify-center p-10">
+          <div className="space-y-2 text-center">
+            <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl xl:text-5xl/none">
+              New York Digital
+            </h1>
+            <p className="max-w-[600px] text-muted-foreground md:text-xl">
+              Welcome back to democracy. Access powerful legislative tools and insights.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
