@@ -9,12 +9,12 @@ const corsHeaders = {
 
 // Subscription tier pricing (in cents)
 const tierPricing = {
-  student: { monthly: 999, annually: 799 },      // $9.99/month, $7.99/month billed annually
-  staffer: { monthly: 1999, annually: 1599 },    // $19.99/month, $15.99/month billed annually
-  researcher: { monthly: 2999, annually: 2399 }, // $29.99/month, $23.99/month billed annually
-  professional: { monthly: 4999, annually: 3999 }, // $49.99/month, $39.99/month billed annually
-  enterprise: { monthly: 9999, annually: 7999 }, // $99.99/month, $79.99/month billed annually
-  government: { monthly: 19999, annually: 15999 } // $199.99/month, $159.99/month billed annually
+  student: { monthly: 1900, annually: 1583 },      // $19.00/month, $15.83/month billed annually (10-month pricing)
+  staffer: { monthly: 9900, annually: 8250 },      // $99.00/month, $82.50/month billed annually (10-month pricing)
+  researcher: { monthly: 14900, annually: 12417 }, // $149.00/month, $124.17/month billed annually (10-month pricing)
+  professional: { monthly: 29900, annually: 24917 }, // $299.00/month, $249.17/month billed annually (10-month pricing)
+  enterprise: { monthly: 49900, annually: 41583 }, // $499.00/month, $415.83/month billed annually (10-month pricing)
+  government: { monthly: 249900, annually: 208250 } // $2499.00/month, $2082.50/month billed annually (10-month pricing)
 };
 
 const tierNames = {

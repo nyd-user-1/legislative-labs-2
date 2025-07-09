@@ -24,8 +24,8 @@ const subscriptionTiers = [
   {
     tier: 'student',
     name: 'Student',
-    monthlyPrice: '$9.99',
-    annualPrice: '$7.99',
+    monthlyPrice: '$19',
+    annualPrice: '$15.83',
     description: 'Designed for students and academics',
     features: [
       'All Free features',
@@ -39,8 +39,8 @@ const subscriptionTiers = [
   {
     tier: 'staffer',
     name: 'Staffer',
-    monthlyPrice: '$19.99',
-    annualPrice: '$15.99',
+    monthlyPrice: '$99',
+    annualPrice: '$82.50',
     description: 'Built for legislative staff',
     features: [
       'All Student features',
@@ -55,8 +55,8 @@ const subscriptionTiers = [
   {
     tier: 'researcher',
     name: 'Researcher',
-    monthlyPrice: '$29.99',
-    annualPrice: '$23.99',
+    monthlyPrice: '$149',
+    annualPrice: '$124.17',
     description: 'Advanced tools for researchers',
     features: [
       'All Staffer features',
@@ -70,8 +70,8 @@ const subscriptionTiers = [
   {
     tier: 'professional',
     name: 'Professional',
-    monthlyPrice: '$49.99',
-    annualPrice: '$39.99',
+    monthlyPrice: '$299',
+    annualPrice: '$249.17',
     description: 'For professional advocates and consultants',
     features: [
       'All Researcher features',
@@ -85,8 +85,8 @@ const subscriptionTiers = [
   {
     tier: 'enterprise',
     name: 'Enterprise',
-    monthlyPrice: '$99.99',
-    annualPrice: '$79.99',
+    monthlyPrice: '$499',
+    annualPrice: '$415.83',
     description: 'Comprehensive solution for organizations',
     features: [
       'All Professional features',
@@ -100,8 +100,8 @@ const subscriptionTiers = [
   {
     tier: 'government',
     name: 'Government',
-    monthlyPrice: '$199.99',
-    annualPrice: '$159.99',
+    monthlyPrice: '$2,499',
+    annualPrice: '$2,082.50',
     description: 'Specialized for government entities',
     features: [
       'All Enterprise features',
