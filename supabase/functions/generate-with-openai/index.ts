@@ -59,15 +59,14 @@ serve(async (req) => {
         headers: {
           'Authorization': `Bearer ${anthropicApiKey}`,
           'Content-Type': 'application/json',
-          'anthropic-version': '2023-06-01',
+          'x-api-version': '2023-06-01',
         },
         body: JSON.stringify({
           model: model,
           max_tokens: 2000,
-          system: getSystemPrompt(type),
           messages: [{
             role: 'user',
-            content: prompt
+            content: `${getSystemPrompt(type)}\n\n${prompt}`
           }],
           temperature: 0.7,
           stream: stream,
