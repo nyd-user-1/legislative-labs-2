@@ -48,7 +48,7 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
           <CardDescription>
             {isSignUp 
               ? 'Enter your email below to create your account' 
-              : 'Welcome back to democracy.'}
+              : 'A space for crowd sourced problem solving.'}
           </CardDescription>
         </CardHeader>
         <CardContent>
