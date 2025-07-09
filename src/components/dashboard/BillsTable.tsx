@@ -89,7 +89,7 @@ export const BillsTable = ({ bills, onBillSelect }: BillsTableProps) => {
               </div>
               
               <div className="space-y-2 text-xs text-muted-foreground">
-                <div className="flex items-center justify-between">
+                <div className="hidden sm:flex items-center justify-between text-xs text-muted-foreground">
                   <span>
                     Sponsor: {bill.sponsors && bill.sponsors.length > 0 ? bill.sponsors[0].name : "No Sponsor"}
                   </span>
