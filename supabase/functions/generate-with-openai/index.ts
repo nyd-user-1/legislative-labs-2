@@ -30,7 +30,7 @@ serve(async (req) => {
   }
 
   try {
-    const { prompt, type, stream = false, model = 'gpt-4.1-mini-2025-04-14' } = await req.json();
+    const { prompt, type, stream = false, model = 'gpt-4o-mini' } = await req.json();
 
     console.log('Generating content:', { type, model, promptLength: prompt?.length, stream });
 
@@ -38,20 +38,15 @@ serve(async (req) => {
     const isClaudeModel = model.startsWith('claude-');
     const isPerplexityModel = model.startsWith('llama-') && model.includes('sonar');
     
-    console.log('Model detection:', { model, isClaudeModel, isPerplexityModel });
-    
     if (isClaudeModel && !anthropicApiKey) {
-      console.error('Anthropic API key not configured');
       throw new Error('Anthropic API key not configured');
     }
     
     if (isPerplexityModel && !perplexityApiKey) {
-      console.error('Perplexity API key not configured');
       throw new Error('Perplexity API key not configured');
     }
     
     if (!isClaudeModel && !isPerplexityModel && !openAIApiKey) {
-      console.error('OpenAI API key not configured');
       throw new Error('OpenAI API key not configured');
     }
 
@@ -133,10 +128,8 @@ serve(async (req) => {
     if (!response.ok) {
       const error = await response.text();
       const providerName = isClaudeModel ? 'Claude' : isPerplexityModel ? 'Perplexity' : 'OpenAI';
-      console.error(`${providerName} API error (${response.status}):`, error);
-      console.error(`Response headers:`, Object.fromEntries(response.headers.entries()));
-      console.error(`Request model:`, model);
-      throw new Error(`${providerName} API error: ${response.status} - ${error}`);
+      console.error(`${providerName} API error:`, error);
+      throw new Error(`${providerName} API error: ${response.status}`);
     }
 
     if (stream) {

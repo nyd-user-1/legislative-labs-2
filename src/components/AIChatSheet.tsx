@@ -224,9 +224,9 @@ export const AIChatSheet = ({ open, onOpenChange, bill }: AIChatSheetProps) => {
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-2xl flex flex-col h-full">
         <SheetHeader className="flex-shrink-0">
-          <SheetTitle>{bill ? `Analyzing ${bill.bill_number || "Bill"}` : "AI Legislative Analysis"}</SheetTitle>
+          <SheetTitle>AI Legislative Analysis</SheetTitle>
           <SheetDescription>
-            Sponsor
+            {bill ? `Analyzing ${bill.bill_number || "Bill"}` : "Chat with AI about legislation"}
           </SheetDescription>
           <div className="pt-2">
             <ModelSelector selectedModel={selectedModel} onModelChange={setSelectedModel} />
