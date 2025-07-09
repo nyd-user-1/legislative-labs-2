@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
-import { Send, Save, User, Bot } from "lucide-react";
+import { Send, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useChatSession } from "@/hooks/useChatSession";
 import { ModelSelector } from "@/components/ModelSelector";
@@ -217,53 +217,31 @@ export const AIChatSheet = ({ open, onOpenChange, bill }: AIChatSheetProps) => {
               {messages.map((message) => (
                 <div
                   key={message.id}
-                  className={`flex gap-3 ${
-                    message.role === "user" ? "justify-end" : "justify-start"
+                  className={`px-4 ${
+                    message.role === "user" ? "flex justify-end" : "flex justify-start"
                   }`}
                 >
-                  <div
-                    className={`flex gap-3 max-w-[80%] ${
-                      message.role === "user" ? "flex-row-reverse" : "flex-row"
-                    }`}
-                  >
-                    <div className="flex-shrink-0">
-                      {message.role === "user" ? (
-                        <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-                          <User className="w-4 h-4 text-primary-foreground" />
-                        </div>
-                      ) : (
-                        <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                          <Bot className="w-4 h-4 text-muted-foreground" />
-                        </div>
-                      )}
-                    </div>
-                    <Card className={message.role === "user" ? "bg-primary text-primary-foreground" : ""}>
-                      <CardContent className="p-3">
-                        <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                        <p className="text-xs opacity-70 mt-2">
-                          {message.timestamp.toLocaleTimeString()}
-                        </p>
-                      </CardContent>
-                    </Card>
-                  </div>
+                  <Card className={`w-full ${message.role === "user" ? "bg-primary text-primary-foreground" : ""}`}>
+                    <CardContent className="p-3">
+                      <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                      <p className="text-xs opacity-70 mt-2">
+                        {message.timestamp.toLocaleTimeString()}
+                      </p>
+                    </CardContent>
+                  </Card>
                 </div>
               ))}
               {isLoading && (
-                <div className="flex gap-3 justify-start">
-                  <div className="flex gap-3">
-                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                      <Bot className="w-4 h-4 text-muted-foreground" />
-                    </div>
-                    <Card>
-                      <CardContent className="p-3">
-                        <div className="flex gap-1">
-                          <div className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce"></div>
-                          <div className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: "0.1s" }}></div>
-                          <div className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: "0.2s" }}></div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
+                <div className="px-4 flex justify-start">
+                  <Card className="w-full">
+                    <CardContent className="p-3">
+                      <div className="flex gap-1">
+                        <div className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce"></div>
+                        <div className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: "0.1s" }}></div>
+                        <div className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
               )}
             </div>
