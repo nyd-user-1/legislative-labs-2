@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { BillDetail } from "@/components/BillDetail";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
 import { useBillsData } from "@/hooks/useBillsData";
@@ -18,7 +17,6 @@ console.log("Bills.tsx file is loading");
 
 const Bills = () => {
   console.log("Bills page component rendering");
-  const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
   const [committees, setCommittees] = useState<Array<{ name: string; chamber: string }>>([]);
   const [sponsors, setSponsors] = useState<Array<{ name: string; chamber: string; party: string }>>([]);
   
@@ -84,14 +82,6 @@ const Bills = () => {
     }
   };
 
-  const handleBillSelect = (bill: Bill) => {
-    setSelectedBill(bill);
-  };
-
-  const handleBackToBills = () => {
-    setSelectedBill(null);
-  };
-
   const handleFiltersChange = (newFilters: {
     search: string;
     sponsor: string;
@@ -103,12 +93,6 @@ const Bills = () => {
     setCommitteeFilter(newFilters.committee);
     setDateRangeFilter(newFilters.dateRange);
   };
-
-  if (selectedBill) {
-    return (
-      <BillDetail bill={selectedBill} onBack={handleBackToBills} />
-    );
-  }
 
   if (loading) {
     return <BillsLoadingSkeleton />;
@@ -140,7 +124,7 @@ const Bills = () => {
         {bills.length === 0 ? (
           <BillsEmptyState hasFilters={hasFilters} />
         ) : (
-          <BillsGrid bills={bills} onBillSelect={handleBillSelect} />
+          <BillsGrid bills={bills} />
         )}
       </div>
     </div>
