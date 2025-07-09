@@ -8,6 +8,7 @@ import {
   Vote
 } from "lucide-react";
 import { Tables } from "@/integrations/supabase/types";
+import { MemberVotesTable } from "./MemberVotesTable";
 
 type Member = Tables<"People">;
 
@@ -23,23 +24,19 @@ export const MemberTabs = ({ member }: MemberTabsProps) => {
   };
 
   return (
-    <Tabs defaultValue="history" className="space-y-4 w-full max-w-full">
-      <TabsList className="grid w-full grid-cols-4 h-auto">
-        <TabsTrigger value="history" className="flex items-center justify-center gap-1 text-xs p-2 min-w-0">
-          <History className="h-4 w-4 flex-shrink-0" />
-          <span className="hidden xs:inline truncate">History</span>
+    <Tabs defaultValue="history" className="space-y-6">
+      <TabsList className="grid w-full grid-cols-4 h-12 p-1 bg-muted rounded-lg">
+        <TabsTrigger value="history" className="flex items-center gap-2 h-10 rounded-md text-sm font-medium">
+          History
         </TabsTrigger>
-        <TabsTrigger value="documents" className="flex items-center justify-center gap-1 text-xs p-2 min-w-0">
-          <FileText className="h-4 w-4 flex-shrink-0" />
-          <span className="hidden xs:inline truncate">Documents</span>
+        <TabsTrigger value="documents" className="flex items-center gap-2 h-10 rounded-md text-sm font-medium">
+          Documents
         </TabsTrigger>
-        <TabsTrigger value="committees" className="flex items-center justify-center gap-1 text-xs p-2 min-w-0">
-          <Users className="h-4 w-4 flex-shrink-0" />
-          <span className="hidden xs:inline truncate">Committees</span>
+        <TabsTrigger value="committees" className="flex items-center gap-2 h-10 rounded-md text-sm font-medium">
+          Committees
         </TabsTrigger>
-        <TabsTrigger value="votes" className="flex items-center justify-center gap-1 text-xs p-2 min-w-0">
-          <Vote className="h-4 w-4 flex-shrink-0" />
-          <span className="hidden xs:inline truncate">Votes</span>
+        <TabsTrigger value="votes" className="flex items-center gap-2 h-10 rounded-md text-sm font-medium">
+          Votes
         </TabsTrigger>
       </TabsList>
 
@@ -110,16 +107,7 @@ export const MemberTabs = ({ member }: MemberTabsProps) => {
       </TabsContent>
 
       <TabsContent value="votes">
-        <Card>
-          <CardHeader>
-            <CardTitle>Voting Records</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground text-center py-8">
-              Vote tracking functionality coming soon.
-            </p>
-          </CardContent>
-        </Card>
+        <MemberVotesTable member={member} />
       </TabsContent>
     </Tabs>
   );

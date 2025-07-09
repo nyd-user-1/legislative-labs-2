@@ -35,36 +35,27 @@ export const MemberStatusProgress = ({ member }: MemberStatusProgressProps) => {
   const statusSteps = getStatusSteps();
 
   return (
-    <div className="mt-6">
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold">Current Member Status</h3>
-          <Badge variant="outline" className="bg-green-100 text-green-700 border-green-200">
-            Active
-          </Badge>
-        </div>
-        
-        <div className="w-full overflow-hidden">
-          <div className="flex items-center justify-between mb-6 gap-2 min-w-0">
-            {statusSteps.map((step, index) => (
-              <div key={step.label} className="flex flex-col items-center flex-1 min-w-0">
-                <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-xs font-bold border-2 ${
-                  step.active 
-                    ? 'bg-primary text-primary-foreground border-primary' 
-                    : 'bg-muted text-muted-foreground border-muted'
-                }`}>
-                  {step.active ? '✓' : step.number}
-                </div>
-                <span className="text-xs text-center mt-2 truncate w-full">{step.label}</span>
+    <div className="space-y-6">
+      <div className="w-full overflow-hidden">
+        <div className="flex items-center justify-between mb-6 gap-2 min-w-0">
+          {statusSteps.map((step, index) => (
+            <div key={step.label} className="flex flex-col items-center flex-1 min-w-0">
+              <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-xs font-bold border-2 ${
+                step.active 
+                  ? 'bg-slate-900 text-white border-slate-900' 
+                  : 'bg-gray-100 text-gray-400 border-gray-200'
+              }`}>
+                {step.active ? '✓' : step.number}
               </div>
-            ))}
-          </div>
+              <span className="text-xs text-center mt-2 truncate w-full">{step.label}</span>
+            </div>
+          ))}
         </div>
+      </div>
 
-        <div className="bg-muted/50 rounded-lg p-4">
-          <div className="text-sm font-medium text-muted-foreground mb-1">Latest Action</div>
-          <div className="font-semibold text-primary break-words">{getLatestAction()}</div>
-        </div>
+      <div className="bg-gray-50 rounded-lg p-4">
+        <div className="text-sm font-medium text-gray-500 mb-1">Latest Action</div>
+        <div className="font-semibold text-slate-900 break-words">{getLatestAction()}</div>
       </div>
     </div>
   );
