@@ -199,18 +199,18 @@ const MediaKits = () => {
             </Card>
             <Card className="text-center p-6">
               <Share className="h-8 w-8 mx-auto mb-3 text-green-500" />
-              <h3 className="font-medium mb-2">Social Media</h3>
-              <p className="text-sm text-gray-600">Engaging posts for various platforms</p>
+              <h3 className="font-medium mb-2">Essay</h3>
+              <p className="text-sm text-gray-600">Engaging essay for various platforms</p>
             </Card>
             <Card className="text-center p-6">
               <FileText className="h-8 w-8 mx-auto mb-3 text-purple-500" />
-              <h3 className="font-medium mb-2">Infographics</h3>
-              <p className="text-sm text-gray-600">Visual summaries of key information</p>
+              <h3 className="font-medium mb-2">Talking Points</h3>
+              <p className="text-sm text-gray-600">Talking points with key information</p>
             </Card>
             <Card className="text-center p-6">
               <FileText className="h-8 w-8 mx-auto mb-3 text-red-500" />
-              <h3 className="font-medium mb-2">Video Scripts</h3>
-              <p className="text-sm text-gray-600">Compelling narratives for video content</p>
+              <h3 className="font-medium mb-2">Speech</h3>
+              <p className="text-sm text-gray-600">Compelling speeches for video content</p>
             </Card>
           </div>
         </div>
