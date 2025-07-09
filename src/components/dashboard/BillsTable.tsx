@@ -67,16 +67,13 @@ export const BillsTable = ({ bills, onBillSelect }: BillsTableProps) => {
             className="cursor-pointer hover:bg-muted/50 transition-colors"
             onClick={() => onBillSelect && onBillSelect(bill)}
           >
-            <CardContent className="p-4 space-y-3">
-              <div className="flex items-start justify-between gap-3">
+            <CardContent className="p-4 min-h-[120px] flex flex-col">
+              <div className="flex items-start justify-between gap-3 flex-1">
                 <div className="space-y-1 min-w-0 flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-medium text-sm">
                       {bill.bill_number || "No Number"}
                     </span>
-                    <Badge variant="outline" className="text-xs">
-                      {getChamberFromBillNumber(bill.bill_number)}
-                    </Badge>
                   </div>
                   <h3 className="font-medium text-sm leading-tight line-clamp-2">
                     {bill.title || "No Title"}
@@ -87,44 +84,7 @@ export const BillsTable = ({ bills, onBillSelect }: BillsTableProps) => {
                 </Badge>
               </div>
               
-              <div className="space-y-2 text-xs text-muted-foreground">
-                <div className="flex items-center justify-between">
-                  <span>
-                    Sponsor: {bill.sponsors && bill.sponsors.length > 0 ? bill.sponsors[0].name : "No Sponsor"}
-                  </span>
-                  <span>{formatLastAction(bill.last_action_date)}</span>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-2 pt-2 border-t">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex-1 text-xs"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onBillSelect && onBillSelect(bill);
-                  }}
-                >
-                  View Details
-                </Button>
-                {bill.state_link && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    asChild
-                    className="px-3"
-                  >
-                    <a
-                      href={bill.state_link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <ExternalLink className="h-3 w-3" />
-                    </a>
-                  </Button>
-                )}
+              <div className="flex items-center justify-end pt-3">
                 <Button
                   variant="outline"
                   size="sm"
@@ -157,12 +117,10 @@ export const BillsTable = ({ bills, onBillSelect }: BillsTableProps) => {
             <TableHeader>
               <TableRow>
                 <TableHead className="min-w-[120px]">Bill Number</TableHead>
-                <TableHead className="min-w-[100px]">Chamber</TableHead>
-                <TableHead className="min-w-[150px]">Sponsor</TableHead>
                 <TableHead className="min-w-[120px]">Status</TableHead>
                 <TableHead className="min-w-[110px]">Last Action</TableHead>
                 <TableHead className="min-w-[200px]">Title</TableHead>
-                <TableHead className="w-[140px] text-right">Actions</TableHead>
+                <TableHead className="w-[80px] text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -174,20 +132,6 @@ export const BillsTable = ({ bills, onBillSelect }: BillsTableProps) => {
                 >
                   <TableCell className="font-medium">
                     {bill.bill_number || "No Number"}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="text-xs">
-                      {getChamberFromBillNumber(bill.bill_number)}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {bill.sponsors && bill.sponsors.length > 0 ? (
-                      <span className="text-sm font-medium">
-                        {bill.sponsors[0].name}
-                      </span>
-                    ) : (
-                      <span className="text-muted-foreground text-sm">No Sponsor</span>
-                    )}
                   </TableCell>
                   <TableCell>
                     <Badge variant={getStatusBadgeVariant(bill.status_desc)} className="text-xs">
@@ -203,38 +147,7 @@ export const BillsTable = ({ bills, onBillSelect }: BillsTableProps) => {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div className="flex gap-1 justify-end">
-                      {onBillSelect && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="text-xs px-2"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onBillSelect(bill);
-                          }}
-                        >
-                          View
-                        </Button>
-                      )}
-                      {bill.state_link && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          asChild
-                          className="px-2"
-                        >
-                          <a
-                            href={bill.state_link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <ExternalLink className="h-3 w-3" />
-                          </a>
-                        </Button>
-                      )}
+                    <div className="flex justify-end">
                       <Button
                         variant="outline"
                         size="sm"
@@ -253,7 +166,7 @@ export const BillsTable = ({ bills, onBillSelect }: BillsTableProps) => {
               ))}
               {bills.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                  <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
                     No recent bills found
                   </TableCell>
                 </TableRow>

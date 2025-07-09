@@ -85,16 +85,7 @@ export const Dashboard = () => {
           {/* Header Section */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="space-y-1">
-              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Legislative Dashboard</h1>
-              <p className="text-sm sm:text-base text-muted-foreground">
-                Overview of New York State legislative activity
-              </p>
-            </div>
-            <div className="flex items-center gap-2 self-start sm:self-auto">
-              <Badge variant="outline" className="flex items-center gap-1 text-xs">
-                <Calendar className="h-3 w-3" />
-                2024 Session
-              </Badge>
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Overview</h1>
             </div>
           </div>
 
@@ -153,8 +144,7 @@ export const Dashboard = () => {
           <Card>
             <CardHeader className="px-4 sm:px-6">
               <div className="flex items-center gap-2">
-                <TrendingUp className="h-4 sm:h-5 w-4 sm:w-5" />
-                <CardTitle className="text-base sm:text-lg">Legislative Activity Trend</CardTitle>
+                <CardTitle className="text-base sm:text-lg">Activity</CardTitle>
               </div>
               <CardDescription className="text-sm">
                 Number of bills introduced over the last 6 months
