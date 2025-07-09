@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Tables } from "@/integrations/supabase/types";
 import { supabase } from "@/integrations/supabase/client";
+import { useModel } from "@/contexts/ModelContext";
 import {
   Sheet,
   SheetContent,
@@ -15,6 +16,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Send, Save, User, Bot } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useChatSession } from "@/hooks/useChatSession";
+import { ModelSelector } from "@/components/ModelSelector";
 
 type Bill = Tables<"Bills">;
 
@@ -41,6 +43,7 @@ export const AIChatSheet = ({ open, onOpenChange, bill }: AIChatSheetProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const { selectedModel, setSelectedModel } = useModel();
   
   const {
     messages,
@@ -97,7 +100,9 @@ export const AIChatSheet = ({ open, onOpenChange, bill }: AIChatSheetProps) => {
       // Call OpenAI edge function using Supabase client
       const { data: responseData, error: functionError } = await supabase.functions.invoke('generate-with-openai', {
         body: {
-          prompt: billContext
+          prompt: billContext,
+          model: selectedModel,
+          type: 'default'
         }
       });
 
@@ -180,6 +185,9 @@ export const AIChatSheet = ({ open, onOpenChange, bill }: AIChatSheetProps) => {
           <SheetDescription>
             {bill ? `Analyzing ${bill.bill_number || "Bill"}` : "Chat with AI about legislation"}
           </SheetDescription>
+          <div className="pt-2">
+            <ModelSelector selectedModel={selectedModel} onModelChange={setSelectedModel} />
+          </div>
         </SheetHeader>
 
         <div className="flex-1 flex flex-col gap-4 min-h-0">

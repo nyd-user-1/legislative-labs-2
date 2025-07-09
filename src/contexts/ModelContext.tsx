@@ -9,7 +9,7 @@ interface ModelContextType {
 const ModelContext = createContext<ModelContextType | undefined>(undefined);
 
 export const ModelProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [selectedModel, setSelectedModel] = useState<ModelType>("gpt-4");
+  const [selectedModel, setSelectedModel] = useState<ModelType>("gpt-4o-mini");
 
   return (
     <ModelContext.Provider value={{ selectedModel, setSelectedModel }}>

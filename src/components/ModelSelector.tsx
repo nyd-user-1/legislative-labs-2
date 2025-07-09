@@ -10,7 +10,7 @@ import {
 import { ChevronDown, Bot, Zap, Search } from "lucide-react";
 
 export type ModelProvider = "openai" | "claude" | "perplexity";
-export type ModelType = "gpt-4" | "gpt-3.5-turbo" | "claude-3-opus" | "claude-3-sonnet" | "claude-3-haiku" | "llama-3.1-sonar-small-128k-online" | "llama-3.1-sonar-large-128k-online" | "llama-3.1-sonar-huge-128k-online";
+export type ModelType = "gpt-4o-mini" | "gpt-4o" | "claude-3-5-sonnet-20241022" | "claude-3-5-haiku-20241022" | "claude-3-opus-20240229" | "llama-3.1-sonar-small-128k-online" | "llama-3.1-sonar-large-128k-online" | "llama-3.1-sonar-huge-128k-online";
 
 interface ModelSelectorProps {
   selectedModel: ModelType;
@@ -21,16 +21,16 @@ const models: Record<ModelProvider, { name: string; models: { id: ModelType; nam
   openai: {
     name: "OpenAI",
     models: [
-      { id: "gpt-4", name: "ChatGPT-4", description: "Most capable model" },
-      { id: "gpt-3.5-turbo", name: "ChatGPT-3.5 Turbo", description: "Fast and efficient" },
+      { id: "gpt-4o", name: "GPT-4o", description: "Most capable model" },
+      { id: "gpt-4o-mini", name: "GPT-4o Mini", description: "Fast and efficient" },
     ]
   },
   claude: {
     name: "Anthropic Claude", 
     models: [
-      { id: "claude-3-opus", name: "Claude 3 Opus", description: "Most powerful reasoning" },
-      { id: "claude-3-sonnet", name: "Claude 3 Sonnet", description: "Balanced performance" },
-      { id: "claude-3-haiku", name: "Claude 3 Haiku", description: "Fastest responses" },
+      { id: "claude-3-opus-20240229", name: "Claude 3 Opus", description: "Most powerful reasoning" },
+      { id: "claude-3-5-sonnet-20241022", name: "Claude 3.5 Sonnet", description: "Balanced performance" },
+      { id: "claude-3-5-haiku-20241022", name: "Claude 3.5 Haiku", description: "Fastest responses" },
     ]
   },
   perplexity: {
@@ -49,7 +49,7 @@ export const ModelSelector = ({ selectedModel, onModelChange }: ModelSelectorPro
       const model = provider.models.find(m => m.id === selectedModel);
       if (model) return model;
     }
-    return models.openai.models[0];
+    return models.openai.models[1]; // gpt-4o-mini as default
   };
 
   const currentModel = getCurrentModelInfo();
