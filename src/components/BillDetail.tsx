@@ -230,10 +230,7 @@ export const BillDetail = ({
           <section className="section-container bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <Tabs defaultValue="overview" className="space-y-6">
               <TabsList className="grid w-full grid-cols-4 h-12 p-1 bg-muted rounded-lg">
-                <TabsTrigger value="overview" className="flex items-center gap-2 h-10 rounded-md text-sm font-medium">
-                  <FileText className="h-4 w-4" />
-                  Overview
-                </TabsTrigger>
+                
                 <TabsTrigger value="sponsors" className="flex items-center gap-2 h-10 rounded-md text-sm font-medium">
                   <Users className="h-4 w-4" />
                   Sponsors
