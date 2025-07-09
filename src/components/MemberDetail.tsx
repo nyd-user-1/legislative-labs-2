@@ -34,35 +34,26 @@ export const MemberDetail = ({ member, onBack }: MemberDetailProps) => {
         </div>
 
         {/* Combined Member Header and Information Section */}
-        <section className="bg-white rounded-xl border shadow-sm">
-          <div className="p-6 pb-0">
-            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
-              <div className="flex-1 min-w-0">
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight break-words mb-2">
-                  {member.name || `${member.first_name || ''} ${member.last_name || ''}`.trim() || `Member #${member.people_id}`}
-                </h1>
-                {member.bio_short && (
-                  <p className="text-gray-600 text-base sm:text-lg break-words">{member.bio_short}</p>
-                )}
-              </div>
-              <div className="flex-shrink-0 self-start">
-                <Badge variant="secondary" className="bg-green-100 text-green-700 border-green-200">
-                  Active
-                </Badge>
-              </div>
+        <section className="bg-white rounded-xl border shadow-sm p-6">
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight break-words mb-2">
+                {member.name || `${member.first_name || ''} ${member.last_name || ''}`.trim() || `Member #${member.people_id}`}
+              </h1>
+              {member.bio_short && (
+                <p className="text-gray-600 text-base sm:text-lg break-words">{member.bio_short}</p>
+              )}
+            </div>
+            <div className="flex-shrink-0 self-start">
+              <Badge variant="secondary" className="bg-green-100 text-green-700 border-green-200">
+                Active
+              </Badge>
             </div>
           </div>
 
-          <div className="p-6">
-            {/* Member Information Card */}
-            <Card className="min-h-[300px] flex flex-col max-w-2xl">
-              <CardHeader>
-                <CardTitle>Member Summary</CardTitle>
-              </CardHeader>
-              <CardContent className="flex-1">
-                <MemberInformation member={member} />
-              </CardContent>
-            </Card>
+          {/* Member Information */}
+          <div className="max-w-2xl">
+            <MemberInformation member={member} />
           </div>
         </section>
 
