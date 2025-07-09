@@ -244,7 +244,7 @@ export const BillDetail = ({ bill, onBack }: BillDetailProps) => {
           </section>
 
           {/* Bill Tabs Section */}
-          <section className="section-container bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <section className="p-6">
             <Tabs defaultValue="overview" className="space-y-6">
               <TabsList className="grid w-full grid-cols-4 h-12 p-1 bg-muted rounded-lg">
                 <TabsTrigger value="overview" className="flex items-center gap-2 h-10 rounded-md text-sm font-medium">
