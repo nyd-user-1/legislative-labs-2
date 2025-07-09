@@ -163,26 +163,22 @@ export const BillDetail = ({ bill, onBack }: BillDetailProps) => {
   };
 
   return (
-    <div className="page-container min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
+    <div className="page-container min-h-screen bg-white p-4 sm:p-6 lg:p-8">
       <div className="content-wrapper max-w-7xl mx-auto">
         <div className="space-y-6">
           {/* Navigation Section */}
-          <section className="section-container bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center gap-4">
-              <Button 
-                variant="outline" 
-                onClick={onBack}
-                className="btn-secondary border border-gray-300 hover:border-gray-400 active:border-gray-500 bg-white hover:bg-gray-50 text-gray-700 font-medium py-3 px-6 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Bills
-              </Button>
-            </div>
-          </section>
+          <Button 
+            variant="outline" 
+            onClick={onBack}
+            className="btn-secondary border border-gray-300 hover:border-gray-400 active:border-gray-500 bg-white hover:bg-gray-50 text-gray-700 font-medium py-3 px-6 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Bills
+          </Button>
 
-          {/* Bill Header Section */}
+          {/* Combined Bill Header and Metadata Section */}
           <section className="section-container bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start justify-between gap-4 mb-6">
               <div className="flex-1">
                 <CardTitle className="text-2xl leading-tight">
                   {bill.bill_number || "No Bill Number"}
@@ -197,10 +193,7 @@ export const BillDetail = ({ bill, onBack }: BillDetailProps) => {
                 )}
               </div>
             </div>
-          </section>
 
-          {/* Bill Metadata Section */}
-          <section className="section-container bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div className="space-y-2">
@@ -248,15 +241,6 @@ export const BillDetail = ({ bill, onBack }: BillDetailProps) => {
                 )}
               </div>
             </div>
-          </section>
-
-          {/* Bill Status Progress Section */}
-          <section className="section-container bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <BillJourney 
-              status={bill.status}
-              statusDesc={bill.status_desc}
-              lastAction={bill.last_action}
-            />
           </section>
 
           {/* Bill Tabs Section */}
