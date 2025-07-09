@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { Tables } from "@/integrations/supabase/types";
 import { MemberVotesTable } from "./MemberVotesTable";
+import { MemberCommitteesTable } from "./MemberCommitteesTable";
 
 type Member = Tables<"People">;
 
@@ -85,25 +86,7 @@ export const MemberTabs = ({ member }: MemberTabsProps) => {
       </TabsContent>
 
       <TabsContent value="committees">
-        <Card>
-          <CardHeader>
-            <CardTitle>Committee Assignments</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {member.committee_id ? (
-              <div className="space-y-2">
-                <p className="font-medium">Committee ID: {member.committee_id}</p>
-                <p className="text-muted-foreground text-sm">
-                  Full committee details coming soon.
-                </p>
-              </div>
-            ) : (
-              <p className="text-muted-foreground text-center py-8">
-                No committee assignments found.
-              </p>
-            )}
-          </CardContent>
-        </Card>
+        <MemberCommitteesTable member={member} />
       </TabsContent>
 
       <TabsContent value="votes">
