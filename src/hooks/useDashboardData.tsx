@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
@@ -12,21 +13,21 @@ type Bill = Tables<"Bills"> & {
 
 interface DashboardStats {
   totalBills: number;
-  activeBills: number;
+  activeChats: number;
   totalCommittees: number;
   totalMembers: number;
 }
 
 interface ChartDataPoint {
-  month: string;
+  period: string;
   assembly: number;
   senate: number;
 }
 
-export const useDashboardData = () => {
+export const useDashboardData = (timePeriod: string = "Month") => {
   const [stats, setStats] = useState<DashboardStats>({
     totalBills: 0,
-    activeBills: 0,
+    activeChats: 0,
     totalCommittees: 0,
     totalMembers: 0,
   });
@@ -47,17 +48,14 @@ export const useDashboardData = () => {
         supabase.from("People").select("*", { count: "exact", head: true }),
       ]);
 
-      // Fetch active bills (bills with recent activity)
-      const sixMonthsAgo = new Date();
-      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-      const { count: activeBillsCount } = await supabase
-        .from("Bills")
-        .select("*", { count: "exact", head: true })
-        .gte("last_action_date", sixMonthsAgo.toISOString().split('T')[0]);
+      // Fetch active chats count (user-specific)
+      const { count: activeChatsCount } = await supabase
+        .from("chat_sessions")
+        .select("*", { count: "exact", head: true });
 
       setStats({
         totalBills: billsResponse.count || 0,
-        activeBills: activeBillsCount || 0,
+        activeChats: activeChatsCount || 0,
         totalCommittees: committeesResponse.count || 0,
         totalMembers: membersResponse.count || 0,
       });
@@ -108,25 +106,83 @@ export const useDashboardData = () => {
         setRecentBills(billsWithSponsors);
       }
 
-      // Generate chart data (mock data for now - in real implementation would fetch from database)
-      const generateChartData = () => {
-        const months = [];
-        for (let i = 5; i >= 0; i--) {
-          const date = new Date();
-          date.setMonth(date.getMonth() - i);
-          const totalBills = Math.floor(Math.random() * 50) + 20;
-          const assemblyBills = Math.floor(totalBills * (0.4 + Math.random() * 0.2)); // 40-60% of total
+      // Generate chart data based on real Supabase data
+      const generateChartData = async () => {
+        const periods = [];
+        const now = new Date();
+        let periodsToShow = 6;
+        let dateFormat: Intl.DateTimeFormatOptions = { month: 'short' };
+        let intervalDays = 30;
+
+        if (timePeriod === "Week") {
+          periodsToShow = 7;
+          dateFormat = { weekday: 'short' };
+          intervalDays = 1;
+        } else if (timePeriod === "Year") {
+          periodsToShow = 5;
+          dateFormat = { year: 'numeric' };
+          intervalDays = 365;
+        }
+
+        for (let i = periodsToShow - 1; i >= 0; i--) {
+          const date = new Date(now);
+          
+          if (timePeriod === "Week") {
+            date.setDate(date.getDate() - i);
+          } else if (timePeriod === "Month") {
+            date.setMonth(date.getMonth() - i);
+          } else if (timePeriod === "Year") {
+            date.setFullYear(date.getFullYear() - i);
+          }
+
+          // Calculate date range for this period
+          const startDate = new Date(date);
+          const endDate = new Date(date);
+          
+          if (timePeriod === "Week") {
+            startDate.setHours(0, 0, 0, 0);
+            endDate.setHours(23, 59, 59, 999);
+          } else if (timePeriod === "Month") {
+            startDate.setDate(1);
+            startDate.setHours(0, 0, 0, 0);
+            endDate.setMonth(endDate.getMonth() + 1);
+            endDate.setDate(0);
+            endDate.setHours(23, 59, 59, 999);
+          } else if (timePeriod === "Year") {
+            startDate.setMonth(0, 1);
+            startDate.setHours(0, 0, 0, 0);
+            endDate.setMonth(11, 31);
+            endDate.setHours(23, 59, 59, 999);
+          }
+
+          // Query bills in this date range
+          const { data: billsInPeriod } = await supabase
+            .from("Bills")
+            .select("bill_number")
+            .gte("last_action_date", startDate.toISOString().split('T')[0])
+            .lte("last_action_date", endDate.toISOString().split('T')[0]);
+
+          const totalBills = billsInPeriod?.length || 0;
+          
+          // Approximate split between Assembly and Senate bills
+          // Assembly bills typically start with 'A', Senate bills with 'S'
+          const assemblyBills = billsInPeriod?.filter(bill => 
+            bill.bill_number?.toUpperCase().startsWith('A')
+          ).length || 0;
           const senateBills = totalBills - assemblyBills;
-          months.push({
-            month: date.toLocaleDateString('en-US', { month: 'short' }),
+
+          periods.push({
+            period: date.toLocaleDateString('en-US', dateFormat),
             assembly: assemblyBills,
             senate: senateBills,
           });
         }
-        return months;
+        
+        return periods;
       };
 
-      setChartData(generateChartData());
+      const chartData = await generateChartData();
+      setChartData(chartData);
 
     } catch (err) {
       console.error("Error fetching dashboard data:", err);
@@ -138,7 +194,7 @@ export const useDashboardData = () => {
 
   useEffect(() => {
     fetchDashboardData();
-  }, []);
+  }, [timePeriod]);
 
   return {
     stats,

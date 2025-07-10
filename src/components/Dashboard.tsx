@@ -1,12 +1,15 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { Activity, FileText, Users, Building2, TrendingUp, Calendar, Eye } from "lucide-react";
+import { Activity, FileText, Users, Building2, TrendingUp, Calendar, Eye, MessageSquare } from "lucide-react";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { BillsTable } from "@/components/dashboard/BillsTable";
 import { Tables } from "@/integrations/supabase/types";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 type Bill = Tables<"Bills"> & {
   sponsors?: Array<{
@@ -17,7 +20,8 @@ type Bill = Tables<"Bills"> & {
 };
 
 export const Dashboard = () => {
-  const { stats, recentBills, chartData, loading, error, refetch } = useDashboardData();
+  const [timePeriod, setTimePeriod] = useState("Month");
+  const { stats, recentBills, chartData, loading, error, refetch } = useDashboardData(timePeriod);
   const navigate = useNavigate();
 
   const handleBillSelect = (bill: Bill) => {
@@ -34,6 +38,10 @@ export const Dashboard = () => {
 
   const handleViewAllCommittees = () => {
     navigate('/committees');
+  };
+
+  const handleViewAllChats = () => {
+    navigate('/chats');
   };
 
   if (loading) {
@@ -96,22 +104,16 @@ export const Dashboard = () => {
                 <CardTitle className="text-xs sm:text-sm font-medium truncate">Total Bills</CardTitle>
               </CardHeader>
               <CardContent className="px-4 pb-4">
-                <div className="text-xl sm:text-2xl font-bold">{stats.totalBills.toLocaleString()}</div>
-                <p className="text-xs text-muted-foreground">
-                  All legislative bills
-                </p>
+                <div className="text-3xl sm:text-4xl font-bold">{stats.totalBills.toLocaleString()}</div>
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-md transition-shadow max-w-[48dvw] sm:max-w-none">
+            <Card className="hover:shadow-md transition-shadow cursor-pointer max-w-[48dvw] sm:max-w-none bg-blue-400 text-white" onClick={handleViewAllChats}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
-                <CardTitle className="text-xs sm:text-sm font-medium truncate">Active Bills</CardTitle>
+                <CardTitle className="text-xs sm:text-sm font-medium truncate text-white">Active Chats</CardTitle>
               </CardHeader>
               <CardContent className="px-4 pb-4">
-                <div className="text-xl sm:text-2xl font-bold">{stats.activeBills.toLocaleString()}</div>
-                <p className="text-xs text-muted-foreground">
-                  Recent activity (6 months)
-                </p>
+                <div className="text-3xl sm:text-4xl font-bold text-white">{stats.activeChats.toLocaleString()}</div>
               </CardContent>
             </Card>
 
@@ -120,10 +122,7 @@ export const Dashboard = () => {
                 <CardTitle className="text-xs sm:text-sm font-medium truncate">Committees</CardTitle>
               </CardHeader>
               <CardContent className="px-4 pb-4">
-                <div className="text-xl sm:text-2xl font-bold">{stats.totalCommittees.toLocaleString()}</div>
-                <p className="text-xs text-muted-foreground">
-                  Active committees
-                </p>
+                <div className="text-3xl sm:text-4xl font-bold">{stats.totalCommittees.toLocaleString()}</div>
               </CardContent>
             </Card>
 
@@ -132,10 +131,7 @@ export const Dashboard = () => {
                 <CardTitle className="text-xs sm:text-sm font-medium truncate">Legislators</CardTitle>
               </CardHeader>
               <CardContent className="px-4 pb-4">
-                <div className="text-xl sm:text-2xl font-bold">{stats.totalMembers.toLocaleString()}</div>
-                <p className="text-xs text-muted-foreground">
-                  Senate & Assembly members
-                </p>
+                <div className="text-3xl sm:text-4xl font-bold">{stats.totalMembers.toLocaleString()}</div>
               </CardContent>
             </Card>
           </div>
@@ -143,11 +139,30 @@ export const Dashboard = () => {
           {/* Chart Section */}
           <Card>
             <CardHeader className="px-4 sm:px-6">
-              <div className="flex items-center gap-2">
-                <CardTitle className="text-base sm:text-lg">Activity</CardTitle>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <CardTitle className="text-base sm:text-lg">Activity</CardTitle>
+                </div>
+                <ToggleGroup 
+                  value={timePeriod} 
+                  onValueChange={(value) => value && setTimePeriod(value)}
+                  type="single"
+                  variant="outline"
+                  size="sm"
+                >
+                  <ToggleGroupItem value="Week" aria-label="Week view">
+                    Week
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="Month" aria-label="Month view">
+                    Month
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="Year" aria-label="Year view">
+                    Year
+                  </ToggleGroupItem>
+                </ToggleGroup>
               </div>
               <CardDescription className="text-sm">
-                Number of bills introduced over the last 6 months
+                Number of bills introduced over the selected time period
               </CardDescription>
             </CardHeader>
             <CardContent className="px-4 sm:px-6">
@@ -156,7 +171,7 @@ export const Dashboard = () => {
                   <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                     <XAxis 
-                      dataKey="month" 
+                      dataKey="period" 
                       className="text-muted-foreground"
                       tick={{ fontSize: 11 }}
                       tickMargin={8}
