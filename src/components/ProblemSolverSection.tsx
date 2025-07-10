@@ -118,8 +118,12 @@ Format it as a professional problem statement suitable for legislative drafting.
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <div className="mb-8 flex justify-center overflow-x-auto">
-          <TabsList className="grid h-fit w-full max-w-2xl justify-normal gap-2 md:grid-cols-3">
-            {tabs.map(tab => <TabsTrigger key={tab.id} value={tab.id} className="flex items-center gap-2 px-4 py-3 whitespace-nowrap">
+          <TabsList className="bg-transparent h-fit w-full max-w-2xl justify-normal gap-4 p-0 md:grid-cols-3">
+            {tabs.map(tab => <TabsTrigger 
+              key={tab.id} 
+              value={tab.id} 
+              className="flex h-10 w-full items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground whitespace-nowrap"
+            >
                 <span className="truncate">{tab.name}</span>
               </TabsTrigger>)}
           </TabsList>
