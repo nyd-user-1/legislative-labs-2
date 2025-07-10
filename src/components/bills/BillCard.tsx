@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Target, Calendar, User, FileText, MapPin, Heart, Sparkles } from "lucide-react";
+import { Calendar, User, FileText, MapPin, Heart, Sparkles } from "lucide-react";
 import { Tables } from "@/integrations/supabase/types";
 import { formatDate } from "@/utils/dateUtils";
 
@@ -35,7 +35,7 @@ export const BillCard = ({
 
   return (
     <Card 
-      className="card hover:shadow-md transition-shadow cursor-pointer"
+      className="card hover:shadow-md transition-shadow cursor-pointer relative"
       onClick={() => onBillSelect(bill)}
     >
       <CardHeader className="pb-3">
@@ -74,16 +74,10 @@ export const BillCard = ({
             </div>
           )}
         </div>
-        
-        {bill.title && (
-          <p className="text-sm text-muted-foreground line-clamp-2">
-            {bill.title}
-          </p>
-        )}
       </CardHeader>
       
       <CardContent className="pt-0">
-        <div className="space-y-3">
+        <div className="space-y-6">
           <div className="space-y-2 pt-2 border-t">
             {primarySponsor?.name && (
               <div className="flex items-center gap-2 text-sm">
@@ -92,13 +86,6 @@ export const BillCard = ({
                 {primarySponsor.party && (
                   <span className="text-muted-foreground">({primarySponsor.party})</span>
                 )}
-              </div>
-            )}
-
-            {bill.committee && (
-              <div className="flex items-center gap-2 text-sm">
-                <Target className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                <span className="truncate">{bill.committee}</span>
               </div>
             )}
 
@@ -115,20 +102,28 @@ export const BillCard = ({
                 <span className="truncate">{bill.last_action}</span>
               </div>
             )}
+          </div>
 
+          {/* Description section with proper spacing */}
+          <div className="relative">
+            {bill.title && (
+              <p className="text-sm text-muted-foreground line-clamp-3 pr-8">
+                {bill.title}
+              </p>
+            )}
+            
+            {/* View Full Text icon positioned at bottom right */}
             {bill.url && (
-              <div className="pt-1">
-                <a
-                  href={bill.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <FileText className="h-3 w-3" />
-                  View Full Text
-                </a>
-              </div>
+              <a
+                href={bill.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="absolute bottom-0 right-0 p-1 text-primary hover:text-primary/80 transition-colors"
+                onClick={(e) => e.stopPropagation()}
+                title="View Full Text"
+              >
+                <FileText className="h-4 w-4" />
+              </a>
             )}
           </div>
         </div>
