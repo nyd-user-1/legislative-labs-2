@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { ChevronDown, ChevronUp, Target, Loader2 } from "lucide-react";
@@ -226,12 +228,39 @@ Format it as a professional problem statement suitable for legislative drafting.
             {/* Expandable Policy Section */}
             {tab.id === "policy" && isPolicyExpanded && (
               <Card className="p-6 space-y-4 border-2 border-primary/20">
-                <div className="space-y-2">
-                  <h4 className="text-lg font-semibold">Policy Development Tools</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Advanced policy development features coming soon. This will include policy analysis, impact assessment, and legislative drafting tools.
-                  </p>
-                </div>
+                <Accordion type="single" collapsible>
+                  <AccordionItem value="policy-content" className="border-none">
+                    <AccordionTrigger className="hover:no-underline py-2">
+                      Policy Development Resources
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <ScrollArea className="h-[300px] w-full rounded-md border p-4">
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <h4 className="text-lg font-semibold">Policy Analysis Tools</h4>
+                            <p className="text-sm text-muted-foreground">
+                              Comprehensive tools for analyzing policy impacts, stakeholder effects, and implementation challenges.
+                            </p>
+                          </div>
+                          <Separator />
+                          <div className="space-y-2">
+                            <h4 className="text-lg font-semibold">Legislative Drafting</h4>
+                            <p className="text-sm text-muted-foreground">
+                              Advanced legislative drafting tools with templates, legal language suggestions, and compliance checking.
+                            </p>
+                          </div>
+                          <Separator />
+                          <div className="space-y-2">
+                            <h4 className="text-lg font-semibold">Impact Assessment</h4>
+                            <p className="text-sm text-muted-foreground">
+                              Tools for assessing economic, social, and environmental impacts of proposed legislation.
+                            </p>
+                          </div>
+                        </div>
+                      </ScrollArea>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
                 <Button disabled className="w-full">
                   Coming Soon
                 </Button>
@@ -241,12 +270,46 @@ Format it as a professional problem statement suitable for legislative drafting.
             {/* Expandable Promote Section */}
             {tab.id === "promote" && isPromoteExpanded && (
               <Card className="p-6 space-y-4 border-2 border-primary/20">
-                <div className="space-y-2">
-                  <h4 className="text-lg font-semibold">Promotion & Advocacy Tools</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Comprehensive advocacy and promotion features coming soon. This will include stakeholder outreach, campaign tools, and public engagement strategies.
-                  </p>
-                </div>
+                <Accordion type="single" collapsible>
+                  <AccordionItem value="promote-content" className="border-none">
+                    <AccordionTrigger className="hover:no-underline py-2">
+                      Promotion & Advocacy Resources
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <ScrollArea className="h-[300px] w-full rounded-md border p-4">
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <h4 className="text-lg font-semibold">Stakeholder Outreach</h4>
+                            <p className="text-sm text-muted-foreground">
+                              Tools for identifying and engaging with key stakeholders, building coalitions, and managing relationships.
+                            </p>
+                          </div>
+                          <Separator />
+                          <div className="space-y-2">
+                            <h4 className="text-lg font-semibold">Campaign Management</h4>
+                            <p className="text-sm text-muted-foreground">
+                              Comprehensive campaign tools for organizing advocacy efforts, tracking progress, and managing communications.
+                            </p>
+                          </div>
+                          <Separator />
+                          <div className="space-y-2">
+                            <h4 className="text-lg font-semibold">Public Engagement</h4>
+                            <p className="text-sm text-muted-foreground">
+                              Strategies and tools for public education, community outreach, and building grassroots support.
+                            </p>
+                          </div>
+                          <Separator />
+                          <div className="space-y-2">
+                            <h4 className="text-lg font-semibold">Media & Communications</h4>
+                            <p className="text-sm text-muted-foreground">
+                              Media kits, press release templates, social media strategies, and communication planning tools.
+                            </p>
+                          </div>
+                        </div>
+                      </ScrollArea>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
                 <Button disabled className="w-full">
                   Coming Soon
                 </Button>
