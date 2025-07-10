@@ -10,59 +10,57 @@ import { useToast } from "@/hooks/use-toast";
 import { generateProblemFromScenario } from "@/utils/problemStatementHelpers";
 import { supabase } from "@/integrations/supabase/client";
 import { useModel } from "@/contexts/ModelContext";
-
 interface ProblemSolverSectionProps {
   onProblemGenerated?: (problem: string) => void;
   onDraftBill?: (problem: string) => void;
 }
 
 // Define the tab data
-const tabs = [
-  {
-    id: "question",
-    name: "Question",
-    title: "Question",
-    subtitle: "What is a problem statement?",
-    description: "A problem statement is a concise description of an issue that needs to be addressed. It identifies the problem, explains why it matters, and sets the foundation for developing effective legislative solutions. A well-crafted problem statement clearly defines the scope, impact, and urgency of the issue at hand."
-  },
-  {
-    id: "policy",
-    name: "Policy",
-    title: "Policy Development",
-    subtitle: "Transform problems into policy solutions",
-    description: "Convert your problem statement into actionable policy recommendations. This section helps you develop comprehensive legislative frameworks that address the root causes while considering implementation challenges and stakeholder impacts."
-  },
-  {
-    id: "promote",
-    name: "Promote",
-    title: "Promote Your Solution",
-    subtitle: "Share and advocate for your legislative ideas",
-    description: "Learn how to effectively communicate your policy solutions to stakeholders, build coalitions, and advocate for implementation. Develop strategies for public engagement and legislative advocacy."
-  }
-];
-
-export const ProblemSolverSection = ({ onProblemGenerated, onDraftBill }: ProblemSolverSectionProps) => {
+const tabs = [{
+  id: "question",
+  name: "Question",
+  title: "Question",
+  subtitle: "What is a problem statement?",
+  description: "A problem statement is a concise description of an issue that needs to be addressed. It identifies the problem, explains why it matters, and sets the foundation for developing effective legislative solutions. A well-crafted problem statement clearly defines the scope, impact, and urgency of the issue at hand."
+}, {
+  id: "policy",
+  name: "Policy",
+  title: "Policy Development",
+  subtitle: "Transform problems into policy solutions",
+  description: "Convert your problem statement into actionable policy recommendations. This section helps you develop comprehensive legislative frameworks that address the root causes while considering implementation challenges and stakeholder impacts."
+}, {
+  id: "promote",
+  name: "Promote",
+  title: "Promote Your Solution",
+  subtitle: "Share and advocate for your legislative ideas",
+  description: "Learn how to effectively communicate your policy solutions to stakeholders, build coalitions, and advocate for implementation. Develop strategies for public engagement and legislative advocacy."
+}];
+export const ProblemSolverSection = ({
+  onProblemGenerated,
+  onDraftBill
+}: ProblemSolverSectionProps) => {
   const [activeTab, setActiveTab] = useState("question");
   const [isExpanded, setIsExpanded] = useState(false);
   const [scenarioInput, setScenarioInput] = useState("");
   const [problemStatement, setProblemStatement] = useState("");
   const [isGeneratingProblem, setIsGeneratingProblem] = useState(false);
-  const { toast } = useToast();
-  const { selectedModel } = useModel();
-
+  const {
+    toast
+  } = useToast();
+  const {
+    selectedModel
+  } = useModel();
   const generateProblemStatement = async () => {
     if (!scenarioInput.trim()) {
       toast({
         title: "Please enter a scenario",
         description: "Describe a real-life scenario to generate a problem statement",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
-
     setIsGeneratingProblem(true);
     setProblemStatement("");
-    
     try {
       const prompt = `Based on this real-life scenario, generate a clear, structured problem statement that identifies issues requiring legislative action. Focus on the problem, its impact, and why legislation is needed:
 
@@ -76,73 +74,58 @@ Please create a comprehensive problem statement that:
 5. Suggests the scope of legislative action needed
 
 Format it as a professional problem statement suitable for legislative drafting.`;
-
-      const { data, error } = await supabase.functions.invoke('generate-with-openai', {
-        body: { prompt, type: 'problem', model: selectedModel, stream: true }
+      const {
+        data,
+        error
+      } = await supabase.functions.invoke('generate-with-openai', {
+        body: {
+          prompt,
+          type: 'problem',
+          model: selectedModel,
+          stream: true
+        }
       });
-
       if (error) {
         console.error('Error calling OpenAI function:', error);
         throw new Error('Failed to generate problem statement');
       }
 
       // For now, handle non-streaming response
-      const generated = data.generatedText || await generateProblemFromScenario(scenarioInput);
+      const generated = data.generatedText || (await generateProblemFromScenario(scenarioInput));
       setProblemStatement(generated);
       onProblemGenerated?.(generated);
-
       toast({
         title: "Problem statement generated!",
-        description: "Review the statement to use in your legislative idea.",
+        description: "Review the statement to use in your legislative idea."
       });
     } catch (error) {
       console.error('Problem generation error:', error);
       toast({
         title: "Error generating problem statement",
         description: "Please try again later",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setIsGeneratingProblem(false);
     }
   };
-
   const handleBeginClick = () => {
     setIsExpanded(!isExpanded);
   };
-
   const currentTab = tabs.find(tab => tab.id === activeTab);
-
-  return (
-    <section className="container mx-auto space-y-16 px-4 py-24 md:px-6 2xl:max-w-[1400px]">
-      <div className="space-y-4 text-center">
-        <h2 className="text-3xl font-bold tracking-tight">Solve a problem</h2>
-        <p className="text-muted-foreground mx-auto max-w-2xl">
-          Transform real-world challenges into actionable legislative solutions through our guided problem-solving framework.
-        </p>
-      </div>
+  return <section className="container mx-auto space-y-16 px-4 py-24 md:px-6 2xl:max-w-[1400px]">
+      
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <div className="mb-8 flex justify-center overflow-x-auto">
           <TabsList className="grid h-fit w-full max-w-2xl justify-normal gap-2 md:grid-cols-3">
-            {tabs.map((tab) => (
-              <TabsTrigger
-                key={tab.id}
-                value={tab.id}
-                className="flex items-center gap-2 px-4 py-3 whitespace-nowrap"
-              >
+            {tabs.map(tab => <TabsTrigger key={tab.id} value={tab.id} className="flex items-center gap-2 px-4 py-3 whitespace-nowrap">
                 <span className="truncate">{tab.name}</span>
-              </TabsTrigger>
-            ))}
+              </TabsTrigger>)}
           </TabsList>
         </div>
 
-        {tabs.map((tab) => (
-          <TabsContent
-            key={tab.id}
-            value={tab.id}
-            className="space-y-12"
-          >
+        {tabs.map(tab => <TabsContent key={tab.id} value={tab.id} className="space-y-12">
             {/* Tab Content */}
             <div className="bg-muted flex flex-col items-center gap-8 rounded-lg p-6 md:flex-row">
               <div className="flex-1 text-center md:text-left">
@@ -151,75 +134,45 @@ Format it as a professional problem statement suitable for legislative drafting.
                 <p className="mb-4">{tab.description}</p>
 
                 <div className="flex justify-center gap-3 md:justify-start">
-                  {tab.id === "question" && (
-                    <Button 
-                      variant="outline" 
-                      onClick={handleBeginClick}
-                      className="flex items-center gap-2"
-                    >
+                  {tab.id === "question" && <Button variant="outline" onClick={handleBeginClick} className="flex items-center gap-2">
                       Begin
-                      {isExpanded ? (
-                        <ChevronUp className="h-4 w-4" />
-                      ) : (
-                        <ChevronDown className="h-4 w-4" />
-                      )}
-                    </Button>
-                  )}
-                  {tab.id === "policy" && (
-                    <Button variant="outline" disabled>
+                      {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                    </Button>}
+                  {tab.id === "policy" && <Button variant="outline" disabled>
                       Coming Soon
-                    </Button>
-                  )}
-                  {tab.id === "promote" && (
-                    <Button variant="outline" disabled>
+                    </Button>}
+                  {tab.id === "promote" && <Button variant="outline" disabled>
                       Coming Soon
-                    </Button>
-                  )}
+                    </Button>}
                 </div>
               </div>
             </div>
 
             {/* Expandable Problem Input Section - Only for Question tab */}
-            {tab.id === "question" && isExpanded && (
-              <Card className="p-6 space-y-4 border-2 border-primary/20">
+            {tab.id === "question" && isExpanded && <Card className="p-6 space-y-4 border-2 border-primary/20">
                 <div className="space-y-2">
                   <h4 className="text-lg font-semibold">Describe Your Problem</h4>
                   <p className="text-sm text-muted-foreground">
                     Describe a real-life situation or scenario that illustrates the problem you want to address with legislation.
                   </p>
-                  <Textarea
-                    placeholder="Example: Small businesses in our community are struggling with outdated zoning laws that prevent them from operating food trucks in commercial districts, limiting entrepreneurship and access to affordable food options..."
-                    value={scenarioInput}
-                    onChange={(e) => setScenarioInput(e.target.value)}
-                    className="min-h-[120px] resize-none"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && e.ctrlKey) {
-                        generateProblemStatement();
-                      }
-                    }}
-                  />
+                  <Textarea placeholder="Example: Small businesses in our community are struggling with outdated zoning laws that prevent them from operating food trucks in commercial districts, limiting entrepreneurship and access to affordable food options..." value={scenarioInput} onChange={e => setScenarioInput(e.target.value)} className="min-h-[120px] resize-none" onKeyDown={e => {
+              if (e.key === 'Enter' && e.ctrlKey) {
+                generateProblemStatement();
+              }
+            }} />
                 </div>
 
-                <Button
-                  onClick={generateProblemStatement}
-                  disabled={isGeneratingProblem || !scenarioInput.trim()}
-                  className="w-full"
-                >
-                  {isGeneratingProblem ? (
-                    <>
+                <Button onClick={generateProblemStatement} disabled={isGeneratingProblem || !scenarioInput.trim()} className="w-full">
+                  {isGeneratingProblem ? <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Generating...
-                    </>
-                  ) : (
-                    <>
+                    </> : <>
                       <Target className="mr-2 h-4 w-4" />
                       Generate Problem Statement
-                    </>
-                  )}
+                    </>}
                 </Button>
 
-                {problemStatement && (
-                  <div className="space-y-4 mt-6 p-4 bg-background rounded-lg border">
+                {problemStatement && <div className="space-y-4 mt-6 p-4 bg-background rounded-lg border">
                     <div className="flex items-center gap-2">
                       <Badge variant="secondary">Generated</Badge>
                       <h5 className="font-medium">Problem Statement</h5>
@@ -227,21 +180,14 @@ Format it as a professional problem statement suitable for legislative drafting.
                     <p className="text-sm leading-relaxed whitespace-pre-wrap text-muted-foreground">
                       {problemStatement}
                     </p>
-                    <Button
-                      onClick={() => onDraftBill?.(problemStatement)}
-                      variant="default"
-                      className="w-full"
-                    >
+                    <Button onClick={() => onDraftBill?.(problemStatement)} variant="default" className="w-full">
                       Continue to Draft Generation
                     </Button>
-                  </div>
-                )}
-              </Card>
-            )}
+                  </div>}
+              </Card>}
 
             {/* Placeholder content for other tabs */}
-            {tab.id !== "question" && (
-              <div>
+            {tab.id !== "question" && <div>
                 <div className="mb-6 flex items-center gap-4">
                   <h3 className="text-xl font-semibold whitespace-nowrap">
                     {tab.title} Resources
@@ -276,11 +222,8 @@ Format it as a professional problem statement suitable for legislative drafting.
                     </div>
                   </Card>
                 </div>
-              </div>
-            )}
-          </TabsContent>
-        ))}
+              </div>}
+          </TabsContent>)}
       </Tabs>
-    </section>
-  );
+    </section>;
 };
