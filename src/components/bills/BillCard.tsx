@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar, User, MapPin, Heart, Sparkles } from "lucide-react";
@@ -34,7 +35,7 @@ export const BillCard = ({
 
   return (
     <Card 
-      className="card hover:shadow-md transition-shadow cursor-pointer relative"
+      className="card-interactive bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer overflow-hidden relative"
       onClick={() => onBillSelect(bill)}
     >
       <CardHeader className="pb-3">
