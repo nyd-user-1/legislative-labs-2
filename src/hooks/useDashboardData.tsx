@@ -24,7 +24,7 @@ interface ChartDataPoint {
   senate: number;
 }
 
-export const useDashboardData = (timePeriod: string = "Month") => {
+export const useDashboardData = (timePeriod: string = "1 Mo.") => {
   const [stats, setStats] = useState<DashboardStats>({
     totalBills: 0,
     activeChats: 0,
@@ -110,48 +110,41 @@ export const useDashboardData = (timePeriod: string = "Month") => {
       const generateChartData = async () => {
         const periods = [];
         const now = new Date();
-        let periodsToShow = 6;
+        let periodsToShow = 1;
         let dateFormat: Intl.DateTimeFormatOptions = { month: 'short' };
-        let intervalDays = 30;
 
-        if (timePeriod === "Week") {
-          periodsToShow = 7;
-          dateFormat = { weekday: 'short' };
-          intervalDays = 1;
-        } else if (timePeriod === "Year") {
-          periodsToShow = 5;
-          dateFormat = { year: 'numeric' };
-          intervalDays = 365;
+        if (timePeriod === "1 Mo.") {
+          periodsToShow = 4; // Show 4 weeks
+          dateFormat = { month: 'short', day: 'numeric' };
+        } else if (timePeriod === "3 Mo.") {
+          periodsToShow = 3;
+          dateFormat = { month: 'short' };
+        } else if (timePeriod === "6 Mo.") {
+          periodsToShow = 6;
+          dateFormat = { month: 'short' };
         }
 
         for (let i = periodsToShow - 1; i >= 0; i--) {
           const date = new Date(now);
           
-          if (timePeriod === "Week") {
-            date.setDate(date.getDate() - i);
-          } else if (timePeriod === "Month") {
+          if (timePeriod === "1 Mo.") {
+            date.setDate(date.getDate() - (i * 7)); // Weekly periods
+          } else {
             date.setMonth(date.getMonth() - i);
-          } else if (timePeriod === "Year") {
-            date.setFullYear(date.getFullYear() - i);
           }
 
           // Calculate date range for this period
           const startDate = new Date(date);
           const endDate = new Date(date);
           
-          if (timePeriod === "Week") {
-            startDate.setHours(0, 0, 0, 0);
+          if (timePeriod === "1 Mo.") {
+            startDate.setDate(startDate.getDate() - 6);
             endDate.setHours(23, 59, 59, 999);
-          } else if (timePeriod === "Month") {
+          } else {
             startDate.setDate(1);
             startDate.setHours(0, 0, 0, 0);
             endDate.setMonth(endDate.getMonth() + 1);
             endDate.setDate(0);
-            endDate.setHours(23, 59, 59, 999);
-          } else if (timePeriod === "Year") {
-            startDate.setMonth(0, 1);
-            startDate.setHours(0, 0, 0, 0);
-            endDate.setMonth(11, 31);
             endDate.setHours(23, 59, 59, 999);
           }
 
@@ -164,7 +157,6 @@ export const useDashboardData = (timePeriod: string = "Month") => {
 
           const totalBills = billsInPeriod?.length || 0;
           
-          // Approximate split between Assembly and Senate bills
           // Assembly bills typically start with 'A', Senate bills with 'S'
           const assemblyBills = billsInPeriod?.filter(bill => 
             bill.bill_number?.toUpperCase().startsWith('A')

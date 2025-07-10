@@ -3,13 +3,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { Activity, FileText, Users, Building2, TrendingUp, Calendar, Eye, MessageSquare } from "lucide-react";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { BillsTable } from "@/components/dashboard/BillsTable";
 import { Tables } from "@/integrations/supabase/types";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { ChartCarousel } from "@/components/dashboard/ChartCarousel";
 
 type Bill = Tables<"Bills"> & {
   sponsors?: Array<{
@@ -20,7 +19,7 @@ type Bill = Tables<"Bills"> & {
 };
 
 export const Dashboard = () => {
-  const [timePeriod, setTimePeriod] = useState("Month");
+  const [timePeriod, setTimePeriod] = useState("1 Mo.");
   const { stats, recentBills, chartData, loading, error, refetch } = useDashboardData(timePeriod);
   const navigate = useNavigate();
 
@@ -99,7 +98,7 @@ export const Dashboard = () => {
 
           {/* Statistics Cards Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
-            <Card className="hover:shadow-md transition-shadow cursor-pointer max-w-[48dvw] sm:max-w-none" onClick={handleViewAllBills}>
+            <Card className="hover:shadow-md hover:bg-muted/50 transition-all cursor-pointer max-w-[48dvw] sm:max-w-none" onClick={handleViewAllBills}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
                 <CardTitle className="text-xs sm:text-sm font-medium truncate">Total Bills</CardTitle>
               </CardHeader>
@@ -108,7 +107,7 @@ export const Dashboard = () => {
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-md transition-shadow cursor-pointer max-w-[48dvw] sm:max-w-none bg-blue-400 text-white" onClick={handleViewAllChats}>
+            <Card className="hover:shadow-md hover:bg-blue-500 transition-all cursor-pointer max-w-[48dvw] sm:max-w-none bg-blue-200 text-white" onClick={handleViewAllChats}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
                 <CardTitle className="text-xs sm:text-sm font-medium truncate text-white">Active Chats</CardTitle>
               </CardHeader>
@@ -117,7 +116,7 @@ export const Dashboard = () => {
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-md transition-shadow cursor-pointer max-w-[48dvw] sm:max-w-none" onClick={handleViewAllCommittees}>
+            <Card className="hover:shadow-md hover:bg-muted/50 transition-all cursor-pointer max-w-[48dvw] sm:max-w-none" onClick={handleViewAllCommittees}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
                 <CardTitle className="text-xs sm:text-sm font-medium truncate">Committees</CardTitle>
               </CardHeader>
@@ -126,7 +125,7 @@ export const Dashboard = () => {
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-md transition-shadow cursor-pointer max-w-[48dvw] sm:max-w-none" onClick={handleViewAllMembers}>
+            <Card className="hover:shadow-md hover:bg-muted/50 transition-all cursor-pointer max-w-[48dvw] sm:max-w-none" onClick={handleViewAllMembers}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
                 <CardTitle className="text-xs sm:text-sm font-medium truncate">Legislators</CardTitle>
               </CardHeader>
@@ -136,7 +135,7 @@ export const Dashboard = () => {
             </Card>
           </div>
 
-          {/* Chart Section */}
+          {/* Chart Carousel Section */}
           <Card>
             <CardHeader className="px-4 sm:px-6">
               <div className="flex items-center justify-between">
@@ -150,71 +149,21 @@ export const Dashboard = () => {
                   variant="outline"
                   size="sm"
                 >
-                  <ToggleGroupItem value="Week" aria-label="Week view">
-                    Week
+                  <ToggleGroupItem value="1 Mo." aria-label="1 month view">
+                    1 Mo.
                   </ToggleGroupItem>
-                  <ToggleGroupItem value="Month" aria-label="Month view">
-                    Month
+                  <ToggleGroupItem value="3 Mo." aria-label="3 months view">
+                    3 Mo.
                   </ToggleGroupItem>
-                  <ToggleGroupItem value="Year" aria-label="Year view">
-                    Year
+                  <ToggleGroupItem value="6 Mo." aria-label="6 months view">
+                    6 Mo.
                   </ToggleGroupItem>
                 </ToggleGroup>
               </div>
-              <CardDescription className="text-sm">
-                Number of bills introduced over the selected time period
-              </CardDescription>
+              <div className="h-4"></div>
             </CardHeader>
             <CardContent className="px-4 sm:px-6">
-              <div className="h-[250px] sm:h-[300px] lg:h-[350px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                    <XAxis 
-                      dataKey="period" 
-                      className="text-muted-foreground"
-                      tick={{ fontSize: 11 }}
-                      tickMargin={8}
-                    />
-                    <YAxis 
-                      className="text-muted-foreground"
-                      tick={{ fontSize: 11 }}
-                      tickMargin={8}
-                      width={40}
-                    />
-                    <Tooltip 
-                      contentStyle={{
-                        backgroundColor: 'hsl(var(--background))',
-                        border: '1px solid hsl(var(--border))',
-                        borderRadius: 'var(--radius)',
-                        fontSize: '12px'
-                      }}
-                    />
-                    <Area 
-                      type="monotone" 
-                      dataKey="assembly" 
-                      stackId="1"
-                      stroke="hsl(var(--primary))" 
-                      strokeWidth={2}
-                      fill="hsl(var(--muted))"
-                      fillOpacity={0.45}
-                      dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 3 }}
-                      activeDot={{ r: 5, stroke: 'hsl(var(--primary))', strokeWidth: 2 }}
-                    />
-                    <Area 
-                      type="monotone" 
-                      dataKey="senate" 
-                      stackId="1"
-                      stroke="hsl(var(--muted-foreground))" 
-                      strokeWidth={2}
-                      fill="hsl(var(--muted-foreground))"
-                      fillOpacity={0.3}
-                      dot={{ fill: 'hsl(var(--muted-foreground))', strokeWidth: 2, r: 3 }}
-                      activeDot={{ r: 5, stroke: 'hsl(var(--muted-foreground))', strokeWidth: 2 }}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
+              <ChartCarousel timePeriod={timePeriod} />
             </CardContent>
           </Card>
 
