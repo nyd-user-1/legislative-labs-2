@@ -20,6 +20,7 @@ import Members from "./pages/Members";
 import Committees from "./pages/Committees";
 import Chats from "./pages/Chats";
 import Favorites from "./pages/Favorites";
+import LegislativeDrafts from "./pages/LegislativeDrafts";
 
 const queryClient = new QueryClient();
 
@@ -53,6 +54,7 @@ const AppLayout = () => {
                 <Route path="/bills" element={<Bills />} />
                 <Route path="/members" element={<Members />} />
                 <Route path="/committees" element={<Committees />} />
+                <Route path="/drafts" element={<LegislativeDrafts />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/" element={<Index />} />
               </Routes>
