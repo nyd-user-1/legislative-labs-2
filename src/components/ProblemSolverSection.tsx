@@ -25,7 +25,7 @@ const tabs = [{
 }, {
   id: "policy",
   name: "Policy",
-  title: "Policy Development",
+  title: "Policy",
   subtitle: "Transform problems into policy solutions",
   description: "Convert your problem statement into actionable policy recommendations. This section helps you develop comprehensive legislative frameworks that address the root causes while considering implementation challenges and stakeholder impacts."
 }, {
