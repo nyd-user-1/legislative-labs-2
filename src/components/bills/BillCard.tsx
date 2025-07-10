@@ -1,7 +1,6 @@
-
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, User, FileText, MapPin, Heart, Sparkles } from "lucide-react";
+import { Calendar, User, MapPin, Heart, Sparkles } from "lucide-react";
 import { Tables } from "@/integrations/supabase/types";
 import { formatDate } from "@/utils/dateUtils";
 
@@ -104,28 +103,14 @@ export const BillCard = ({
             )}
           </div>
 
-          {/* Description section with proper spacing */}
-          <div className="relative">
-            {bill.title && (
-              <p className="text-sm text-muted-foreground line-clamp-3 pr-8">
+          {/* Description section with more breathing room */}
+          {bill.title && (
+            <div>
+              <p className="text-sm text-muted-foreground line-clamp-3">
                 {bill.title}
               </p>
-            )}
-            
-            {/* View Full Text icon positioned at bottom right */}
-            {bill.url && (
-              <a
-                href={bill.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="absolute bottom-0 right-0 p-1 text-primary hover:text-primary/80 transition-colors"
-                onClick={(e) => e.stopPropagation()}
-                title="View Full Text"
-              >
-                <FileText className="h-4 w-4" />
-              </a>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
