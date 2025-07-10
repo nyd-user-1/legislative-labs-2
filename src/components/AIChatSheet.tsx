@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { Tables } from "@/integrations/supabase/types";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
-import { Send, Save } from "lucide-react";
+import { Send, Share } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useChatSession } from "@/hooks/useChatSession";
 import { ModelSelector } from "@/components/ModelSelector";
@@ -41,6 +42,7 @@ const SUGGESTED_PROMPTS = [
 export const AIChatSheet = ({ open, onOpenChange, bill }: AIChatSheetProps) => {
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isSessionCreated, setIsSessionCreated] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const { selectedModel, setSelectedModel } = useModel();
@@ -49,18 +51,38 @@ export const AIChatSheet = ({ open, onOpenChange, bill }: AIChatSheetProps) => {
     messages,
     sessionId,
     saveMessage,
-    saveSession,
-    loadSession,
-    createNewSession
+    createNewSession,
+    updateSession
   } = useChatSession(bill?.bill_id || null);
 
   useEffect(() => {
-    if (open && bill) {
-      // Try to load existing session or create new one
+    if (open && bill && !isSessionCreated) {
+      // Automatically create session when AI chat is opened
       const sessionTitle = `Analysis: ${bill.bill_number || "Unknown Bill"}`;
-      createNewSession(sessionTitle);
+      createNewSession(sessionTitle).then(() => {
+        setIsSessionCreated(true);
+      }).catch((error) => {
+        console.error("Failed to create session:", error);
+        toast({
+          title: "Error",
+          description: "Failed to create chat session",
+          variant: "destructive",
+        });
+      });
     }
-  }, [open, bill]);
+    
+    // Reset session created flag when sheet closes
+    if (!open) {
+      setIsSessionCreated(false);
+    }
+  }, [open, bill, isSessionCreated, createNewSession, toast]);
+
+  // Update the session whenever messages change
+  useEffect(() => {
+    if (sessionId && messages.length > 0) {
+      updateSession(messages);
+    }
+  }, [messages, sessionId, updateSession]);
 
   useEffect(() => {
     // Scroll to bottom when new messages are added
@@ -145,10 +167,10 @@ export const AIChatSheet = ({ open, onOpenChange, bill }: AIChatSheetProps) => {
     sendMessage(prompt);
   };
 
-  const handleSaveChat = async () => {
+  const handleShareChat = async () => {
     if (messages.length === 0) {
       toast({
-        title: "No messages to save",
+        title: "No messages to share",
         description: "Start a conversation first.",
         variant: "destructive",
       });
@@ -156,15 +178,31 @@ export const AIChatSheet = ({ open, onOpenChange, bill }: AIChatSheetProps) => {
     }
 
     try {
-      await saveSession();
-      toast({
-        title: "Chat saved",
-        description: "Your conversation has been saved successfully.",
-      });
+      // Create a shareable text version of the chat
+      const chatText = messages.map(msg => 
+        `${msg.role === 'user' ? 'User' : 'AI'}: ${msg.content}`
+      ).join('\n\n');
+      
+      const shareData = {
+        title: `AI Chat Analysis - ${bill?.bill_number || 'Legislative Discussion'}`,
+        text: chatText,
+      };
+
+      if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+        await navigator.share(shareData);
+      } else {
+        // Fallback to clipboard
+        await navigator.clipboard.writeText(chatText);
+        toast({
+          title: "Chat copied to clipboard",
+          description: "The conversation has been copied to your clipboard.",
+        });
+      }
     } catch (error) {
+      console.error("Error sharing chat:", error);
       toast({
-        title: "Error saving chat",
-        description: "Failed to save the conversation. Please try again.",
+        title: "Error sharing chat",
+        description: "Failed to share the conversation. Please try again.",
         variant: "destructive",
       });
     }
@@ -271,12 +309,12 @@ export const AIChatSheet = ({ open, onOpenChange, bill }: AIChatSheetProps) => {
             <div className="flex gap-2 justify-between">
               <Button
                 variant="outline"
-                onClick={handleSaveChat}
+                onClick={handleShareChat}
                 disabled={messages.length === 0}
                 className="flex items-center gap-2"
               >
-                <Save className="w-4 h-4" />
-                Save Chat
+                <Share className="w-4 h-4" />
+                Share Chat
               </Button>
               <Button variant="outline" onClick={() => onOpenChange(false)}>
                 Close

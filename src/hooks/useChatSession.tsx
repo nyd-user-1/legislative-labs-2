@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -24,11 +25,56 @@ export const useChatSession = (billId?: number | null) => {
     setMessages(prev => [...prev, message]);
   }, []);
 
-  const createNewSession = useCallback((title: string) => {
+  const createNewSession = useCallback(async (title: string) => {
     setMessages([]);
-    setSessionId(null);
     setSessionTitle(title);
-  }, []);
+    
+    // Automatically create and save the session when it's created
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+
+      const sessionData = {
+        user_id: user.id,
+        bill_id: billId,
+        title: title || "AI Chat Session",
+        messages: JSON.stringify([])
+      };
+
+      const { data, error } = await supabase
+        .from("chat_sessions")
+        .insert(sessionData)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      setSessionId(data.id);
+      return data.id;
+    } catch (error) {
+      console.error("Error creating session:", error);
+      throw error;
+    }
+  }, [billId]);
+
+  const updateSession = useCallback(async (newMessages: Message[]) => {
+    if (!sessionId) return;
+
+    try {
+      const { error } = await supabase
+        .from("chat_sessions")
+        .update({
+          messages: JSON.stringify(newMessages.map(msg => ({
+            ...msg,
+            timestamp: msg.timestamp.toISOString()
+          })))
+        })
+        .eq("id", sessionId);
+      
+      if (error) throw error;
+    } catch (error) {
+      console.error("Error updating session:", error);
+    }
+  }, [sessionId]);
 
   const saveSession = useCallback(async () => {
     if (messages.length === 0) return;
@@ -128,5 +174,6 @@ export const useChatSession = (billId?: number | null) => {
     loadSession,
     createNewSession,
     deleteSession,
+    updateSession,
   };
 };
