@@ -1,7 +1,7 @@
+
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Target, Calendar, User, FileText, MapPin } from "lucide-react";
-import { BillStatusBadge } from "@/components/BillStatusBadge";
+import { Target, Calendar, User, FileText, MapPin, Heart, Sparkles } from "lucide-react";
 import { Tables } from "@/integrations/supabase/types";
 import { formatDate } from "@/utils/dateUtils";
 
@@ -16,9 +16,20 @@ type Bill = Tables<"Bills"> & {
 interface BillCardProps {
   bill: Bill;
   onBillSelect: (bill: Bill) => void;
+  onAIAnalysis?: (bill: Bill, e: React.MouseEvent) => void;
+  onFavorite?: (bill: Bill, e: React.MouseEvent) => void;
+  isFavorited?: boolean;
+  hasAIChat?: boolean;
 }
 
-export const BillCard = ({ bill, onBillSelect }: BillCardProps) => {
+export const BillCard = ({ 
+  bill, 
+  onBillSelect, 
+  onAIAnalysis, 
+  onFavorite, 
+  isFavorited = false, 
+  hasAIChat = false 
+}: BillCardProps) => {
   // Get primary sponsor (first one)
   const primarySponsor = bill.sponsors?.[0];
 
@@ -35,8 +46,32 @@ export const BillCard = ({ bill, onBillSelect }: BillCardProps) => {
             </h3>
           </div>
           
-          {bill.status !== null && (
-            <BillStatusBadge status={bill.status} statusDesc={bill.status_desc} />
+          {/* Combined buttons in top right */}
+          {(onFavorite || onAIAnalysis) && (
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {onFavorite && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="px-3"
+                  onClick={(e) => onFavorite(bill, e)}
+                  title="Add to Favorites"
+                >
+                  <Heart className={`h-4 w-4 ${isFavorited ? 'fill-red-500 text-red-500' : ''}`} />
+                </Button>
+              )}
+              {onAIAnalysis && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="px-3"
+                  onClick={(e) => onAIAnalysis(bill, e)}
+                  title="AI Analysis"
+                >
+                  <Sparkles className={`h-4 w-4 ${hasAIChat ? 'fill-yellow-500 text-yellow-500' : ''}`} />
+                </Button>
+              )}
+            </div>
           )}
         </div>
         
