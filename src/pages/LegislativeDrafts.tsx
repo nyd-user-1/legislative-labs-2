@@ -7,9 +7,19 @@ import { MyDraftsTab } from "@/components/drafts/MyDraftsTab";
 import { CollaborativeDraftsTab } from "@/components/drafts/CollaborativeDraftsTab";
 import { DraftGeneratorTab } from "@/components/drafts/DraftGeneratorTab";
 import { PublicGalleryTab } from "@/components/drafts/PublicGalleryTab";
+import { ProblemSolverSection } from "@/components/ProblemSolverSection";
 
 const LegislativeDrafts = () => {
   const [activeTab, setActiveTab] = useState("my-drafts");
+
+  const handleProblemGenerated = (problem: string) => {
+    console.log("Problem generated:", problem);
+  };
+
+  const handleDraftBill = (problem: string) => {
+    console.log("Draft bill requested for problem:", problem);
+    // This could navigate to the draft editor or open a modal
+  };
 
   return (
     <div className="page-container min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
@@ -71,7 +81,10 @@ const LegislativeDrafts = () => {
             </TabsContent>
 
             <TabsContent value="generator" className="space-y-6">
-              <DraftGeneratorTab />
+              <ProblemSolverSection 
+                onProblemGenerated={handleProblemGenerated}
+                onDraftBill={handleDraftBill}
+              />
             </TabsContent>
 
             <TabsContent value="public-gallery" className="space-y-6">
