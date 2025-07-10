@@ -25,7 +25,7 @@ const tabs = [{
 }, {
   id: "policy",
   name: "Policy",
-  title: "Policy",
+  title: "Policy Development",
   subtitle: "Transform problems into policy solutions",
   description: "Convert your problem statement into actionable policy recommendations. This section helps you develop comprehensive legislative frameworks that address the root causes while considering implementation challenges and stakeholder impacts."
 }, {
@@ -113,7 +113,7 @@ Format it as a professional problem statement suitable for legislative drafting.
     setIsExpanded(!isExpanded);
   };
   const currentTab = tabs.find(tab => tab.id === activeTab);
-  return <section className="container mx-auto space-y-16 px-4 py-24 md:px-6 2xl:max-w-[1400px]">
+  return <section className="container mx-auto space-y-16 md:px-6 2xl:max-w-[1400px] px-[19px] py-[25px]">
       
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -190,7 +190,7 @@ Format it as a professional problem statement suitable for legislative drafting.
             {tab.id !== "question" && <div>
                 <div className="mb-6 flex items-center gap-4">
                   <h3 className="text-xl font-semibold whitespace-nowrap">
-                    {tab.title} Ideas
+                    {tab.title} Resources
                   </h3>
                   <Separator className="ml-2 flex-grow" />
                 </div>
