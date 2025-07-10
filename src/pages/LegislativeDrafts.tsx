@@ -1,97 +1,90 @@
 import { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, FileText, Users, Sparkles, Share2 } from "lucide-react";
-import { MyDraftsTab } from "@/components/drafts/MyDraftsTab";
-import { CollaborativeDraftsTab } from "@/components/drafts/CollaborativeDraftsTab";
-import { DraftGeneratorTab } from "@/components/drafts/DraftGeneratorTab";
-import { PublicGalleryTab } from "@/components/drafts/PublicGalleryTab";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { ProblemSolverSection } from "@/components/ProblemSolverSection";
+import { PublicGalleryTab } from "@/components/drafts/PublicGalleryTab";
 
 const LegislativeDrafts = () => {
-  const [activeTab, setActiveTab] = useState("my-drafts");
+  const [generatedProblem, setGeneratedProblem] = useState<string>("");
+  const [showOutput, setShowOutput] = useState(false);
 
   const handleProblemGenerated = (problem: string) => {
-    console.log("Problem generated:", problem);
+    setGeneratedProblem(problem);
+    setShowOutput(true);
   };
 
-  const handleDraftBill = (problem: string) => {
-    console.log("Draft bill requested for problem:", problem);
-    // This could navigate to the draft editor or open a modal
+  const handleSave = () => {
+    console.log("Saving problem:", generatedProblem);
+    // TODO: Implement save functionality
+  };
+
+  const handleSaveAndSubmit = () => {
+    console.log("Saving and submitting problem:", generatedProblem);
+    // TODO: Implement save and submit to public gallery
   };
 
   return (
-    <div className="page-container min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
-      <div className="content-wrapper max-w-7xl mx-auto">
+    <div className="min-h-screen bg-white">
+      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Legislative Drafts</h1>
-            <p className="text-gray-600 mt-2">
-              Create, collaborate, and share legislative proposals
-            </p>
-          </div>
-          <Button className="btn-primary bg-gray-900 hover:bg-gray-800 text-white">
-            <Plus className="w-4 h-4 mr-2" />
-            New Draft
-          </Button>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Problem</h1>
+          <p className="text-gray-600 mt-2">
+            It's not a complaint. It's a problem.
+          </p>
         </div>
 
-        {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 bg-white border border-gray-200 rounded-lg p-1">
-            <TabsTrigger 
-              value="my-drafts" 
-              className="flex items-center gap-2 data-[state=active]:bg-gray-100"
-            >
-              <FileText className="w-4 h-4" />
-              My Drafts
-            </TabsTrigger>
-            <TabsTrigger 
-              value="collaborative" 
-              className="flex items-center gap-2 data-[state=active]:bg-gray-100"
-            >
-              <Users className="w-4 h-4" />
-              Collaborative
-            </TabsTrigger>
-            <TabsTrigger 
-              value="generator" 
-              className="flex items-center gap-2 data-[state=active]:bg-gray-100"
-            >
-              <Sparkles className="w-4 h-4" />
-              AI Generator
-            </TabsTrigger>
-            <TabsTrigger 
-              value="public-gallery" 
-              className="flex items-center gap-2 data-[state=active]:bg-gray-100"
-            >
-              <Share2 className="w-4 h-4" />
-              Public Gallery
-            </TabsTrigger>
-          </TabsList>
+        {/* Problem Solver Section */}
+        <div className="mb-8">
+          <ProblemSolverSection 
+            onProblemGenerated={handleProblemGenerated}
+            onDraftBill={() => {}}
+          />
+        </div>
 
-          <div className="mt-6">
-            <TabsContent value="my-drafts" className="space-y-6">
-              <MyDraftsTab />
-            </TabsContent>
-
-            <TabsContent value="collaborative" className="space-y-6">
-              <CollaborativeDraftsTab />
-            </TabsContent>
-
-            <TabsContent value="generator" className="space-y-6">
-              <ProblemSolverSection 
-                onProblemGenerated={handleProblemGenerated}
-                onDraftBill={handleDraftBill}
-              />
-            </TabsContent>
-
-            <TabsContent value="public-gallery" className="space-y-6">
-              <PublicGalleryTab />
-            </TabsContent>
+        {/* Output Area */}
+        {showOutput && (
+          <div className="mb-8">
+            <div className="bg-white border border-gray-200 rounded-lg">
+              <div className="p-4 border-b border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-900">Generated Problem Statement</h3>
+              </div>
+              <ScrollArea className="h-64 p-4">
+                <div className="text-gray-700 whitespace-pre-wrap">
+                  {generatedProblem}
+                </div>
+              </ScrollArea>
+            </div>
+            
+            {/* Action Buttons */}
+            <div className="flex gap-3 mt-4">
+              <Button 
+                variant="outline" 
+                onClick={handleSave}
+                className="bg-white hover:bg-gray-50"
+              >
+                Save
+              </Button>
+              <Button 
+                onClick={handleSaveAndSubmit}
+                className="bg-gray-900 hover:bg-gray-800 text-white"
+              >
+                Save & Submit
+              </Button>
+            </div>
           </div>
-        </Tabs>
+        )}
+
+        {/* Public Gallery Section */}
+        <div className="mt-12">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">Public Problem Gallery</h2>
+            <p className="text-gray-600 mt-2">
+              Explore problems shared by the community
+            </p>
+          </div>
+          <PublicGalleryTab />
+        </div>
       </div>
     </div>
   );
