@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { generateProblemFromScenario } from "@/utils/problemStatementHelpers";
 import { supabase } from "@/integrations/supabase/client";
 import { useModel } from "@/contexts/ModelContext";
+
 interface ProblemSolverSectionProps {
   onProblemGenerated?: (problem: string) => void;
   onDraftBill?: (problem: string) => void;
@@ -35,21 +36,21 @@ const tabs = [{
   subtitle: "Share and advocate for your legislative ideas",
   description: "Learn how to effectively communicate your policy solutions to stakeholders, build coalitions, and advocate for implementation. Develop strategies for public engagement and legislative advocacy."
 }];
+
 export const ProblemSolverSection = ({
   onProblemGenerated,
   onDraftBill
 }: ProblemSolverSectionProps) => {
   const [activeTab, setActiveTab] = useState("question");
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isQuestionExpanded, setIsQuestionExpanded] = useState(false);
+  const [isPolicyExpanded, setIsPolicyExpanded] = useState(false);
+  const [isPromoteExpanded, setIsPromoteExpanded] = useState(false);
   const [scenarioInput, setScenarioInput] = useState("");
   const [problemStatement, setProblemStatement] = useState("");
   const [isGeneratingProblem, setIsGeneratingProblem] = useState(false);
-  const {
-    toast
-  } = useToast();
-  const {
-    selectedModel
-  } = useModel();
+  const { toast } = useToast();
+  const { selectedModel } = useModel();
+
   const generateProblemStatement = async () => {
     if (!scenarioInput.trim()) {
       toast({
@@ -74,10 +75,7 @@ Please create a comprehensive problem statement that:
 5. Suggests the scope of legislative action needed
 
 Format it as a professional problem statement suitable for legislative drafting.`;
-      const {
-        data,
-        error
-      } = await supabase.functions.invoke('generate-with-openai', {
+      const { data, error } = await supabase.functions.invoke('generate-with-openai', {
         body: {
           prompt,
           type: 'problem',
@@ -109,74 +107,107 @@ Format it as a professional problem statement suitable for legislative drafting.
       setIsGeneratingProblem(false);
     }
   };
-  const handleBeginClick = () => {
-    setIsExpanded(!isExpanded);
-  };
-  const currentTab = tabs.find(tab => tab.id === activeTab);
-  return <section className="container mx-auto space-y-16 md:px-6 2xl:max-w-[1400px] px-[19px] py-[25px]">
-      
 
+  const handleQuestionBeginClick = () => {
+    setIsQuestionExpanded(!isQuestionExpanded);
+  };
+
+  const handlePolicyBeginClick = () => {
+    setIsPolicyExpanded(!isPolicyExpanded);
+  };
+
+  const handlePromoteBeginClick = () => {
+    setIsPromoteExpanded(!isPromoteExpanded);
+  };
+
+  const currentTab = tabs.find(tab => tab.id === activeTab);
+
+  return (
+    <section className="container mx-auto space-y-16 md:px-6 2xl:max-w-[1400px] px-[19px] py-[25px]">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <div className="mb-8 flex justify-center overflow-x-auto">
           <TabsList className="bg-transparent h-fit w-full max-w-2xl justify-normal gap-4 p-0 md:grid-cols-3">
-            {tabs.map(tab => <TabsTrigger 
-              key={tab.id} 
-              value={tab.id} 
-              className="flex h-10 w-full items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground whitespace-nowrap"
-            >
+            {tabs.map(tab => (
+              <TabsTrigger 
+                key={tab.id} 
+                value={tab.id} 
+                className="flex h-10 w-full items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground whitespace-nowrap"
+              >
                 <span className="truncate">{tab.name}</span>
-              </TabsTrigger>)}
+              </TabsTrigger>
+            ))}
           </TabsList>
         </div>
 
-        {tabs.map(tab => <TabsContent key={tab.id} value={tab.id} className="space-y-12">
+        {tabs.map(tab => (
+          <TabsContent key={tab.id} value={tab.id} className="space-y-12">
             {/* Tab Content */}
-            <div className="bg-muted flex flex-col items-center gap-8 rounded-lg p-6 md:flex-row">
+            <div className="bg-white flex flex-col items-center gap-8 rounded-lg p-6 md:flex-row border border-gray-200">
               <div className="flex-1 text-center md:text-left">
                 <h3 className="text-xl font-semibold">{tab.title}</h3>
-                <p className="text-muted-foreground mb-3">{tab.subtitle}</p>
-                <p className="mb-4">{tab.description}</p>
+                <p className="text-gray-600 mb-3">{tab.subtitle}</p>
+                <p className="mb-4 text-gray-700">{tab.description}</p>
 
                 <div className="flex justify-center gap-3 md:justify-start">
-                  {tab.id === "question" && <Button variant="outline" onClick={handleBeginClick} className="flex items-center gap-2">
+                  {tab.id === "question" && (
+                    <Button variant="outline" onClick={handleQuestionBeginClick} className="flex items-center gap-2">
                       Begin
-                      {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                    </Button>}
-                  {tab.id === "policy" && <Button variant="outline" disabled>
-                      Coming Soon
-                    </Button>}
-                  {tab.id === "promote" && <Button variant="outline" disabled>
-                      Coming Soon
-                    </Button>}
+                      {isQuestionExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                    </Button>
+                  )}
+                  {tab.id === "policy" && (
+                    <Button variant="outline" onClick={handlePolicyBeginClick} className="flex items-center gap-2">
+                      Begin
+                      {isPolicyExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                    </Button>
+                  )}
+                  {tab.id === "promote" && (
+                    <Button variant="outline" onClick={handlePromoteBeginClick} className="flex items-center gap-2">
+                      Begin
+                      {isPromoteExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>
 
             {/* Expandable Problem Input Section - Only for Question tab */}
-            {tab.id === "question" && isExpanded && <Card className="p-6 space-y-4 border-2 border-primary/20">
+            {tab.id === "question" && isQuestionExpanded && (
+              <Card className="p-6 space-y-4 border-2 border-primary/20">
                 <div className="space-y-2">
                   <h4 className="text-lg font-semibold">Describe Your Problem</h4>
                   <p className="text-sm text-muted-foreground">
                     Describe a real-life situation or scenario that illustrates the problem you want to address with legislation.
                   </p>
-                  <Textarea placeholder="Example: Small businesses in our community are struggling with outdated zoning laws that prevent them from operating food trucks in commercial districts, limiting entrepreneurship and access to affordable food options..." value={scenarioInput} onChange={e => setScenarioInput(e.target.value)} className="min-h-[120px] resize-none" onKeyDown={e => {
-              if (e.key === 'Enter' && e.ctrlKey) {
-                generateProblemStatement();
-              }
-            }} />
+                  <Textarea 
+                    placeholder="Example: Small businesses in our community are struggling with outdated zoning laws that prevent them from operating food trucks in commercial districts, limiting entrepreneurship and access to affordable food options..." 
+                    value={scenarioInput} 
+                    onChange={e => setScenarioInput(e.target.value)} 
+                    className="min-h-[120px] resize-none" 
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' && e.ctrlKey) {
+                        generateProblemStatement();
+                      }
+                    }} 
+                  />
                 </div>
 
                 <Button onClick={generateProblemStatement} disabled={isGeneratingProblem || !scenarioInput.trim()} className="w-full">
-                  {isGeneratingProblem ? <>
+                  {isGeneratingProblem ? (
+                    <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Generating...
-                    </> : <>
+                    </>
+                  ) : (
+                    <>
                       <Target className="mr-2 h-4 w-4" />
                       Generate Problem Statement
-                    </>}
+                    </>
+                  )}
                 </Button>
 
-                {problemStatement && <div className="space-y-4 mt-6 p-4 bg-background rounded-lg border">
+                {problemStatement && (
+                  <div className="space-y-4 mt-6 p-4 bg-background rounded-lg border">
                     <div className="flex items-center gap-2">
                       <Badge variant="secondary">Generated</Badge>
                       <h5 className="font-medium">Problem Statement</h5>
@@ -187,11 +218,45 @@ Format it as a professional problem statement suitable for legislative drafting.
                     <Button onClick={() => onDraftBill?.(problemStatement)} variant="default" className="w-full">
                       Continue to Draft Generation
                     </Button>
-                  </div>}
-              </Card>}
+                  </div>
+                )}
+              </Card>
+            )}
 
-            {/* Placeholder content for other tabs */}
-            {tab.id !== "question" && <div>
+            {/* Expandable Policy Section */}
+            {tab.id === "policy" && isPolicyExpanded && (
+              <Card className="p-6 space-y-4 border-2 border-primary/20">
+                <div className="space-y-2">
+                  <h4 className="text-lg font-semibold">Policy Development Tools</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Advanced policy development features coming soon. This will include policy analysis, impact assessment, and legislative drafting tools.
+                  </p>
+                </div>
+                <Button disabled className="w-full">
+                  Coming Soon
+                </Button>
+              </Card>
+            )}
+
+            {/* Expandable Promote Section */}
+            {tab.id === "promote" && isPromoteExpanded && (
+              <Card className="p-6 space-y-4 border-2 border-primary/20">
+                <div className="space-y-2">
+                  <h4 className="text-lg font-semibold">Promotion & Advocacy Tools</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Comprehensive advocacy and promotion features coming soon. This will include stakeholder outreach, campaign tools, and public engagement strategies.
+                  </p>
+                </div>
+                <Button disabled className="w-full">
+                  Coming Soon
+                </Button>
+              </Card>
+            )}
+
+            {/* Placeholder content for other tabs when not expanded */}
+            {tab.id !== "question" && 
+             ((tab.id === "policy" && !isPolicyExpanded) || (tab.id === "promote" && !isPromoteExpanded)) && (
+              <div>
                 <div className="mb-6 flex items-center gap-4">
                   <h3 className="text-xl font-semibold whitespace-nowrap">
                     {tab.title} Resources
@@ -226,8 +291,11 @@ Format it as a professional problem statement suitable for legislative drafting.
                     </div>
                   </Card>
                 </div>
-              </div>}
-          </TabsContent>)}
+              </div>
+            )}
+          </TabsContent>
+        ))}
       </Tabs>
-    </section>;
+    </section>
+  );
 };
