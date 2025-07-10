@@ -1,11 +1,14 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { BillCard } from "./BillCard";
-import { Bill, BillsTableProps } from "./types";
 
-interface BillsTableMobileProps extends BillsTableProps {
+import { BillCard } from "./BillCard";
+import { Bill } from "./types";
+
+interface BillsTableMobileProps {
+  bills: Bill[];
+  onBillSelect?: (bill: Bill) => void;
   onAIAnalysis: (bill: Bill, e: React.MouseEvent) => void;
   onFavorite: (bill: Bill, e: React.MouseEvent) => void;
   favoriteBillIds: Set<number>;
+  billsWithAIChat?: Set<number>;
 }
 
 export const BillsTableMobile = ({
@@ -13,10 +16,11 @@ export const BillsTableMobile = ({
   onBillSelect,
   onAIAnalysis,
   onFavorite,
-  favoriteBillIds
+  favoriteBillIds,
+  billsWithAIChat = new Set()
 }: BillsTableMobileProps) => {
   return (
-    <div className="block sm:hidden space-y-3">
+    <div className="md:hidden space-y-4">
       {bills.map((bill) => (
         <BillCard
           key={bill.bill_id}
@@ -25,15 +29,9 @@ export const BillsTableMobile = ({
           onAIAnalysis={onAIAnalysis}
           onFavorite={onFavorite}
           isFavorited={favoriteBillIds.has(bill.bill_id)}
+          hasAIChat={billsWithAIChat.has(bill.bill_id)}
         />
       ))}
-      {bills.length === 0 && (
-        <Card>
-          <CardContent className="p-8 text-center text-muted-foreground">
-            No recent bills found
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 };

@@ -10,6 +10,7 @@ interface BillCardProps {
   onAIAnalysis: (bill: Bill, e: React.MouseEvent) => void;
   onFavorite: (bill: Bill, e: React.MouseEvent) => void;
   isFavorited: boolean;
+  hasAIChat?: boolean;
 }
 
 export const BillCard = ({
@@ -17,7 +18,8 @@ export const BillCard = ({
   onBillSelect,
   onAIAnalysis,
   onFavorite,
-  isFavorited
+  isFavorited,
+  hasAIChat = false
 }: BillCardProps) => {
   return (
     <Card 
@@ -52,7 +54,7 @@ export const BillCard = ({
               onClick={(e) => onAIAnalysis(bill, e)}
               title="AI Analysis"
             >
-              <Sparkles className="h-4 w-4" />
+              <Sparkles className={`h-4 w-4 ${hasAIChat ? 'fill-yellow-500 text-yellow-500' : ''}`} />
             </Button>
           </div>
         </div>
