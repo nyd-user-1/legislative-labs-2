@@ -190,7 +190,7 @@ Format it as a professional problem statement suitable for legislative drafting.
             {tab.id !== "question" && <div>
                 <div className="mb-6 flex items-center gap-4">
                   <h3 className="text-xl font-semibold whitespace-nowrap">
-                    {tab.title} Resources
+                    {tab.title} Ideas
                   </h3>
                   <Separator className="ml-2 flex-grow" />
                 </div>
