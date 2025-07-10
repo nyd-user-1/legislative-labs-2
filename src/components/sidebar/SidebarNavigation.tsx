@@ -1,4 +1,4 @@
-import { Search, Settings, User, FileText, Lightbulb, BarChart3, Users, Building2, TrendingUp, MessageSquare, Heart } from "lucide-react";
+import { Search, Settings, User, FileText, Lightbulb, BarChart3, Users, Building2, TrendingUp, MessageSquare, Heart, PenTool } from "lucide-react";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -18,6 +18,7 @@ const researchNavItems = [
 const workflowNavItems = [
   { title: "Chats", url: "/chats", icon: MessageSquare },
   { title: "Favorites", url: "/favorites", icon: Heart },
+  { title: "Drafts", url: "/drafts", icon: PenTool },
   { title: "Problems", url: "/problems", icon: Search },
   { title: "Ideas", url: "/ideas", icon: Lightbulb },
   { title: "Media Kits", url: "/media-kits", icon: BarChart3 },
