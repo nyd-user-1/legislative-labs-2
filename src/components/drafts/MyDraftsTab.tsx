@@ -123,12 +123,12 @@ export const MyDraftsTab = () => {
             
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700">Status</label>
-              <Select value={filters.status || ''} onValueChange={(value) => setFilters(prev => ({ ...prev, status: value || undefined }))}>
+              <Select value={filters.status || 'all'} onValueChange={(value) => setFilters(prev => ({ ...prev, status: value === 'all' ? undefined : value }))}>
                 <SelectTrigger>
                   <SelectValue placeholder="All statuses" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All statuses</SelectItem>
+                  <SelectItem value="all">All statuses</SelectItem>
                   <SelectItem value="draft">Draft</SelectItem>
                   <SelectItem value="review">Review</SelectItem>
                   <SelectItem value="published">Published</SelectItem>

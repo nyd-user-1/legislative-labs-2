@@ -191,12 +191,12 @@ export const PublicGalleryTab = () => {
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700">Type</label>
-              <Select value={filterType} onValueChange={setFilterType}>
+              <Select value={filterType || 'all'} onValueChange={(value) => setFilterType(value === 'all' ? '' : value)}>
                 <SelectTrigger>
                   <SelectValue placeholder="All types" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All types</SelectItem>
+                  <SelectItem value="all">All types</SelectItem>
                   <SelectItem value="bill">Bill</SelectItem>
                   <SelectItem value="resolution">Resolution</SelectItem>
                   <SelectItem value="amendment">Amendment</SelectItem>
