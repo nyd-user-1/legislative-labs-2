@@ -152,8 +152,8 @@ export const SubscriptionPlans = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-start">
-        <div className="space-y-1">
+      <div className="flex justify-between items-center">
+        <div>
           <h1 className="text-3xl font-bold tracking-tight">Subscription Plans</h1>
           <p className="text-muted-foreground">
             Current tier: <span className="font-medium capitalize">{subscription.subscription_tier}</span>
