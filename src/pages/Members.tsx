@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useMembersData } from "@/hooks/useMembersData";
 import { MembersHeader } from "@/components/members/MembersHeader";
@@ -10,6 +11,8 @@ import { MemberDetail } from "@/components/MemberDetail";
 
 const Members = () => {
   const [selectedMember, setSelectedMember] = useState<any>(null);
+  const [favoriteMembers] = useState<Set<number>>(new Set());
+  const [membersWithAIChat] = useState<Set<number>>(new Set());
 
   const {
     members,
@@ -28,6 +31,18 @@ const Members = () => {
     setDistrictFilter,
     fetchMembers,
   } = useMembersData();
+
+  const handleFavorite = (member: any, e: React.MouseEvent) => {
+    e.stopPropagation();
+    console.log("Toggle favorite for member:", member.name);
+    // TODO: Implement favorite functionality
+  };
+
+  const handleAIAnalysis = (member: any, e: React.MouseEvent) => {
+    e.stopPropagation();
+    console.log("Start AI analysis for member:", member.name);
+    // TODO: Implement AI analysis functionality
+  };
 
   if (loading) {
     return <MembersLoadingSkeleton />;
@@ -77,6 +92,10 @@ const Members = () => {
           <MembersGrid 
             members={members} 
             onMemberSelect={setSelectedMember}
+            onFavorite={handleFavorite}
+            onAIAnalysis={handleAIAnalysis}
+            favoriteMembers={favoriteMembers}
+            membersWithAIChat={membersWithAIChat}
           />
         )}
       </div>

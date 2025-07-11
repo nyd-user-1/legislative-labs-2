@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useCommitteesData } from "@/hooks/useCommitteesData";
 import { CommitteesHeader } from "@/components/committees/CommitteesHeader";
@@ -27,6 +28,8 @@ type Committee = {
 
 const Committees = () => {
   const [selectedCommittee, setSelectedCommittee] = useState<Committee | null>(null);
+  const [favoriteCommittees] = useState<Set<number>>(new Set());
+  const [committeesWithAIChat] = useState<Set<number>>(new Set());
 
   const {
     committees,
@@ -41,6 +44,18 @@ const Committees = () => {
     filteredCount,
     chambers,
   } = useCommitteesData();
+
+  const handleFavorite = (committee: Committee, e: React.MouseEvent) => {
+    e.stopPropagation();
+    console.log("Toggle favorite for committee:", committee.name);
+    // TODO: Implement favorite functionality
+  };
+
+  const handleAIAnalysis = (committee: Committee, e: React.MouseEvent) => {
+    e.stopPropagation();
+    console.log("Start AI analysis for committee:", committee.name);
+    // TODO: Implement AI analysis functionality
+  };
 
   if (loading) {
     return <CommitteesLoadingSkeleton />;
@@ -92,6 +107,10 @@ const Committees = () => {
           <CommitteesGrid 
             committees={committees} 
             onCommitteeSelect={setSelectedCommittee}
+            onFavorite={handleFavorite}
+            onAIAnalysis={handleAIAnalysis}
+            favoriteCommittees={favoriteCommittees}
+            committeesWithAIChat={committeesWithAIChat}
           />
         )}
       </div>

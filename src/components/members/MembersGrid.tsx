@@ -1,5 +1,7 @@
+
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { CardActionButtons } from "@/components/ui/CardActionButtons";
 import { MapPin, Mail, Phone, ExternalLink } from "lucide-react";
 
 interface Member {
@@ -23,9 +25,20 @@ interface Member {
 interface MembersGridProps {
   members: Member[];
   onMemberSelect?: (member: Member) => void;
+  onFavorite?: (member: Member, e: React.MouseEvent) => void;
+  onAIAnalysis?: (member: Member, e: React.MouseEvent) => void;
+  favoriteMembers?: Set<number>;
+  membersWithAIChat?: Set<number>;
 }
 
-export const MembersGrid = ({ members, onMemberSelect }: MembersGridProps) => {
+export const MembersGrid = ({ 
+  members, 
+  onMemberSelect,
+  onFavorite,
+  onAIAnalysis,
+  favoriteMembers = new Set(),
+  membersWithAIChat = new Set()
+}: MembersGridProps) => {
   const getPartyColor = (party: string) => {
     if (!party) return "bg-muted";
     const partyLower = party.toLowerCase();
@@ -64,21 +77,32 @@ export const MembersGrid = ({ members, onMemberSelect }: MembersGridProps) => {
                 <h3 className="font-semibold text-lg leading-tight mb-2">
                   {member.name}
                 </h3>
+                
+                <div className="flex gap-2 flex-wrap">
+                  {member.chamber && (
+                    <Badge variant="outline" className={`${getChamberColor(member.chamber)} w-fit`}>
+                      {member.chamber}
+                    </Badge>
+                  )}
+                  
+                  {member.party && (
+                    <Badge variant="outline" className={`${getPartyColor(member.party)} w-fit`}>
+                      {member.party}
+                    </Badge>
+                  )}
+                </div>
               </div>
-            </div>
-            
-            <div className="flex gap-2 flex-wrap">
-              {member.chamber && (
-                <Badge variant="outline" className={`${getChamberColor(member.chamber)} w-fit`}>
-                  {member.chamber}
-                </Badge>
-              )}
               
-              {member.party && (
-                <Badge variant="outline" className={`${getPartyColor(member.party)} w-fit`}>
-                  {member.party}
-                </Badge>
-              )}
+              <div className="flex items-center gap-2">
+                <CardActionButtons
+                  onFavorite={onFavorite ? (e) => onFavorite(member, e) : undefined}
+                  onAIAnalysis={onAIAnalysis ? (e) => onAIAnalysis(member, e) : undefined}
+                  isFavorited={favoriteMembers.has(member.people_id)}
+                  hasAIChat={membersWithAIChat.has(member.people_id)}
+                  showFavorite={!!onFavorite}
+                  showAIAnalysis={!!onAIAnalysis}
+                />
+              </div>
             </div>
           </CardHeader>
           
