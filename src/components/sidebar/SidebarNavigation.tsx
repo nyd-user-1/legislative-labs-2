@@ -1,4 +1,4 @@
-import { Search, Settings, User, FileText, Lightbulb, BarChart3, Users, Building2, TrendingUp, MessageSquare, Heart, PenTool, Edit3 } from "lucide-react";
+import { Search, Settings, User, FileText, Lightbulb, BarChart3, Users, Building2, TrendingUp, MessageSquare, Heart, PenTool, Edit3, CreditCard } from "lucide-react";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -26,6 +26,7 @@ const workflowNavItems = [
 ];
 
 const bottomNavItems = [
+  { title: "Plans", url: "/plans", icon: CreditCard },
   { title: "Profile", url: "/profile", icon: User },
   { title: "Settings", url: "/settings", icon: Settings },
 ];
