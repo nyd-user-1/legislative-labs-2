@@ -96,21 +96,6 @@ const subscriptionTiers = [
       'SLA guarantee',
       'Custom training sessions'
     ]
-  },
-  {
-    tier: 'government',
-    name: 'Government',
-    monthlyPrice: '$2,499',
-    annualPrice: '$2,082.50',
-    description: 'Specialized for government entities',
-    features: [
-      'All Enterprise features',
-      'Government-grade security',
-      'Compliance reporting',
-      'Custom government workflows',
-      'On-premise deployment options',
-      'Government verification required'
-    ]
   }
 ];
 
@@ -166,11 +151,11 @@ export const SubscriptionPlans = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-semibold">Choose Your Plan</h2>
-          <p className="text-muted-foreground">
+          <h1 className="text-3xl font-bold">Subscription Plans</h1>
+          <p className="text-muted-foreground mt-2">
             Current tier: <span className="font-medium capitalize">{subscription.subscription_tier}</span>
           </p>
         </div>
@@ -180,7 +165,7 @@ export const SubscriptionPlans = () => {
         </Button>
       </div>
 
-      <div className="flex items-center justify-center space-x-4 mb-8">
+      <div className="flex items-center justify-center space-x-4">
         <Label htmlFor="billing-toggle" className={!isAnnual ? "font-semibold" : ""}>
           Monthly
         </Label>
@@ -197,7 +182,7 @@ export const SubscriptionPlans = () => {
         </Label>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {subscriptionTiers.map((tierData) => (
           <SubscriptionTierCard
             key={tierData.tier}
