@@ -1,5 +1,7 @@
+
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { CardActionButtons } from "@/components/ui/CardActionButtons";
 import { User, Users, FileText, ExternalLink } from "lucide-react";
 
 type Committee = {
@@ -22,9 +24,20 @@ type Committee = {
 interface CommitteeCardProps {
   committee: Committee;
   onCommitteeSelect: (committee: Committee) => void;
+  onAIAnalysis?: (committee: Committee, e: React.MouseEvent) => void;
+  onFavorite?: (committee: Committee, e: React.MouseEvent) => void;
+  isFavorited?: boolean;
+  hasAIChat?: boolean;
 }
 
-export const CommitteeCard = ({ committee, onCommitteeSelect }: CommitteeCardProps) => {
+export const CommitteeCard = ({ 
+  committee, 
+  onCommitteeSelect,
+  onAIAnalysis,
+  onFavorite,
+  isFavorited = false,
+  hasAIChat = false
+}: CommitteeCardProps) => {
   const getChamberColor = (chamber: string) => {
     if (!chamber) return "bg-muted text-muted-foreground";
     const chamberLower = chamber.toLowerCase();
@@ -53,11 +66,22 @@ export const CommitteeCard = ({ committee, onCommitteeSelect }: CommitteeCardPro
             </h3>
           </div>
           
-          {committee.chamber && (
-            <Badge variant="outline" className={`${getChamberColor(committee.chamber)} w-fit`}>
-              {committee.chamber}
-            </Badge>
-          )}
+          <div className="flex items-center gap-2">
+            {committee.chamber && (
+              <Badge variant="outline" className={`${getChamberColor(committee.chamber)} w-fit`}>
+                {committee.chamber}
+              </Badge>
+            )}
+            
+            <CardActionButtons
+              onFavorite={onFavorite ? (e) => onFavorite(committee, e) : undefined}
+              onAIAnalysis={onAIAnalysis ? (e) => onAIAnalysis(committee, e) : undefined}
+              isFavorited={isFavorited}
+              hasAIChat={hasAIChat}
+              showFavorite={!!onFavorite}
+              showAIAnalysis={!!onAIAnalysis}
+            />
+          </div>
         </div>
       </CardHeader>
       

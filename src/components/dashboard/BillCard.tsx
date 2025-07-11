@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Heart, Sparkles } from "lucide-react";
+import { CardActionButtons } from "@/components/ui/CardActionButtons";
 import { Bill } from "./types";
 
 interface BillCardProps {
@@ -36,27 +36,12 @@ export const BillCard = ({
             </div>
           </div>
           
-          {/* Combined buttons in top right */}
-          <div className="flex items-center gap-2 flex-shrink-0">
-            <Button
-              variant="outline"
-              size="sm"
-              className="px-3"
-              onClick={(e) => onFavorite(bill, e)}
-              title="Add to Favorites"
-            >
-              <Heart className={`h-4 w-4 ${isFavorited ? 'fill-red-500 text-red-500' : ''}`} />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="px-3"
-              onClick={(e) => onAIAnalysis(bill, e)}
-              title="AI Analysis"
-            >
-              <Sparkles className={`h-4 w-4 ${hasAIChat ? 'fill-yellow-500 text-yellow-500' : ''}`} />
-            </Button>
-          </div>
+          <CardActionButtons
+            onFavorite={(e) => onFavorite(bill, e)}
+            onAIAnalysis={(e) => onAIAnalysis(bill, e)}
+            isFavorited={isFavorited}
+            hasAIChat={hasAIChat}
+          />
         </div>
         
         {/* Description moved to bottom with full width and 3-line limit */}

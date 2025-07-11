@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import {
   Table,
@@ -8,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Heart, Sparkles } from "lucide-react";
+import { CardActionButtons } from "@/components/ui/CardActionButtons";
 import { Tables } from "@/integrations/supabase/types";
 import { formatDate } from "@/utils/dateUtils";
 import { AIChatSheet } from "@/components/AIChatSheet";
@@ -116,24 +117,12 @@ export const MemberVotesTable = ({ member }: MemberVotesTableProps) => {
                     {vote.description}
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-1">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => handleFavorite(vote, e)}
-                        className="h-8 w-8 p-0 hover:bg-muted"
-                      >
-                        <Heart className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => handleAIAnalysis(vote, e)}
-                        className="h-8 w-8 p-0 hover:bg-muted"
-                      >
-                        <Sparkles className="h-4 w-4" />
-                      </Button>
-                    </div>
+                    <CardActionButtons
+                      onFavorite={(e) => handleFavorite(vote, e)}
+                      onAIAnalysis={(e) => handleAIAnalysis(vote, e)}
+                      variant="ghost"
+                      size="sm"
+                    />
                   </TableCell>
                 </TableRow>
               ))}

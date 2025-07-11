@@ -1,7 +1,7 @@
-import { Button } from "@/components/ui/button";
+
 import { Badge } from "@/components/ui/badge";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { Heart, Sparkles } from "lucide-react";
+import { CardActionButtons } from "@/components/ui/CardActionButtons";
 import { Bill } from "./types";
 import { formatLastAction, getStatusBadgeVariant } from "./utils";
 
@@ -42,25 +42,14 @@ export const BillTableRow = ({
         </div>
       </TableCell>
       <TableCell>
-        <div className="flex justify-end gap-2">
-          <Button
+        <div className="flex justify-end">
+          <CardActionButtons
+            onFavorite={(e) => onFavorite(bill, e)}
+            onAIAnalysis={(e) => onAIAnalysis(bill, e)}
+            isFavorited={isFavorited}
             variant="outline"
             size="sm"
-            className="px-2"
-            onClick={(e) => onFavorite(bill, e)}
-            title="Add to Favorites"
-          >
-            <Heart className={`h-4 w-4 ${isFavorited ? 'fill-red-500 text-red-500' : ''}`} />
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="px-2"
-            onClick={(e) => onAIAnalysis(bill, e)}
-            title="AI Analysis"
-          >
-            <Sparkles className="h-4 w-4" />
-          </Button>
+          />
         </div>
       </TableCell>
     </TableRow>

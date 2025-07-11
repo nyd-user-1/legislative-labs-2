@@ -1,8 +1,7 @@
 
-
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Calendar, User, MapPin, Heart, Sparkles } from "lucide-react";
+import { CardActionButtons } from "@/components/ui/CardActionButtons";
+import { Calendar, User, MapPin } from "lucide-react";
 import { Tables } from "@/integrations/supabase/types";
 import { formatDate } from "@/utils/dateUtils";
 
@@ -47,33 +46,14 @@ export const BillCard = ({
             </h3>
           </div>
           
-          {/* Combined buttons in top right */}
-          {(onFavorite || onAIAnalysis) && (
-            <div className="flex items-center gap-2 flex-shrink-0">
-              {onFavorite && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="px-3"
-                  onClick={(e) => onFavorite(bill, e)}
-                  title="Add to Favorites"
-                >
-                  <Heart className={`h-4 w-4 ${isFavorited ? 'fill-red-500 text-red-500' : ''}`} />
-                </Button>
-              )}
-              {onAIAnalysis && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="px-3"
-                  onClick={(e) => onAIAnalysis(bill, e)}
-                  title="AI Analysis"
-                >
-                  <Sparkles className={`h-4 w-4 ${hasAIChat ? 'fill-yellow-500 text-yellow-500' : ''}`} />
-                </Button>
-              )}
-            </div>
-          )}
+          <CardActionButtons
+            onFavorite={onFavorite ? (e) => onFavorite(bill, e) : undefined}
+            onAIAnalysis={onAIAnalysis ? (e) => onAIAnalysis(bill, e) : undefined}
+            isFavorited={isFavorited}
+            hasAIChat={hasAIChat}
+            showFavorite={!!onFavorite}
+            showAIAnalysis={!!onAIAnalysis}
+          />
         </div>
       </CardHeader>
       
@@ -118,4 +98,3 @@ export const BillCard = ({
     </Card>
   );
 };
-
