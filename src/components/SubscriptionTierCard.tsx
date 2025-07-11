@@ -39,7 +39,7 @@ export const SubscriptionTierCard = ({
     ? ` (${monthlyPrice}/month if paid monthly)`
     : '';
   return (
-    <Card className={`relative ${isCurrentTier ? 'ring-2 ring-primary' : ''} ${isPopular ? 'border-primary' : ''}`}>
+    <Card className={`relative h-full min-h-[420px] flex flex-col ${isCurrentTier ? 'ring-2 ring-primary' : ''} ${isPopular ? 'border-primary' : ''}`}>
       {isPopular && (
         <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
           <Badge className="bg-primary text-primary-foreground">
@@ -67,24 +67,28 @@ export const SubscriptionTierCard = ({
         <p className="text-sm text-muted-foreground">{description}</p>
       </CardHeader>
       
-      <CardContent className="space-y-4">
-        <ul className="space-y-2">
-          {features.map((feature, index) => (
-            <li key={index} className="flex items-center gap-2">
-              <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
-              <span className="text-sm">{feature}</span>
-            </li>
-          ))}
-        </ul>
+      <CardContent className="flex-1 flex flex-col justify-between space-y-4">
+        <div className="flex-1">
+          <ul className="space-y-2">
+            {features.map((feature, index) => (
+              <li key={index} className="flex items-center gap-2">
+                <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
+                <span className="text-sm">{feature}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
         
-        <Button 
-          onClick={onSelect} 
-          disabled={disabled || isCurrentTier}
-          className="w-full"
-          variant={isCurrentTier ? "outline" : "default"}
-        >
-          {isCurrentTier ? "Current Plan" : `Upgrade to ${name}`}
-        </Button>
+        <div className="pt-4">
+          <Button 
+            onClick={onSelect} 
+            disabled={disabled || isCurrentTier}
+            className="w-full"
+            variant={isCurrentTier ? "outline" : "default"}
+          >
+            {isCurrentTier ? "Current Plan" : `Upgrade to ${name}`}
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );
