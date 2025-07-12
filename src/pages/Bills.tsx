@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { BillDetail } from "@/components/BillDetail";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
@@ -18,6 +19,7 @@ console.log("Bills.tsx file is loading");
 
 const Bills = () => {
   console.log("Bills page component rendering");
+  const [searchParams] = useSearchParams();
   const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
   const [committees, setCommittees] = useState<Array<{ name: string; chamber: string }>>([]);
   const [sponsors, setSponsors] = useState<Array<{ name: string; chamber: string; party: string }>>([]);
@@ -40,6 +42,17 @@ const Bills = () => {
     totalBills,
     currentPageBills,
   } = useBillsData();
+
+  // Handle URL parameter for selected bill
+  useEffect(() => {
+    const selectedId = searchParams.get('selected');
+    if (selectedId && bills && bills.length > 0) {
+      const bill = bills.find(b => b.bill_id.toString() === selectedId);
+      if (bill) {
+        setSelectedBill(bill);
+      }
+    }
+  }, [searchParams, bills]);
 
   useEffect(() => {
     fetchCommittees();

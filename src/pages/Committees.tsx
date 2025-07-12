@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useCommitteesData } from "@/hooks/useCommitteesData";
 import { useCommitteeFavorites } from "@/hooks/useCommitteeFavorites";
 import { CommitteesHeader } from "@/components/committees/CommitteesHeader";
@@ -30,6 +31,7 @@ type Committee = {
 };
 
 const Committees = () => {
+  const [searchParams] = useSearchParams();
   const [selectedCommittee, setSelectedCommittee] = useState<Committee | null>(null);
   const [chatOpen, setChatOpen] = useState(false);
   const [selectedCommitteeForChat, setSelectedCommitteeForChat] = useState<Committee | null>(null);
@@ -50,6 +52,17 @@ const Committees = () => {
     filteredCount,
     chambers,
   } = useCommitteesData();
+
+  // Handle URL parameter for selected committee
+  useEffect(() => {
+    const selectedId = searchParams.get('selected');
+    if (selectedId && committees && committees.length > 0) {
+      const committee = committees.find(c => c.committee_id.toString() === selectedId);
+      if (committee) {
+        setSelectedCommittee(committee);
+      }
+    }
+  }, [searchParams, committees]);
 
   // Fetch committees that have AI chat sessions
   useEffect(() => {

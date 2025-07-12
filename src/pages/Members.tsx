@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useMembersData } from "@/hooks/useMembersData";
 import { useMemberFavorites } from "@/hooks/useMemberFavorites";
 import { MembersHeader } from "@/components/members/MembersHeader";
@@ -13,6 +14,7 @@ import { AIChatSheet } from "@/components/AIChatSheet";
 import { supabase } from "@/integrations/supabase/client";
 
 const Members = () => {
+  const [searchParams] = useSearchParams();
   const [selectedMember, setSelectedMember] = useState<any>(null);
   const [chatOpen, setChatOpen] = useState(false);
   const [selectedMemberForChat, setSelectedMemberForChat] = useState<any>(null);
@@ -37,6 +39,17 @@ const Members = () => {
     setDistrictFilter,
     fetchMembers,
   } = useMembersData();
+
+  // Handle URL parameter for selected member
+  useEffect(() => {
+    const selectedId = searchParams.get('selected');
+    if (selectedId && members && members.length > 0) {
+      const member = members.find(m => m.people_id.toString() === selectedId);
+      if (member) {
+        setSelectedMember(member);
+      }
+    }
+  }, [searchParams, members]);
 
   // Fetch members that have AI chat sessions
   useEffect(() => {
