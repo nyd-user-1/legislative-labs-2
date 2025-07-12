@@ -79,7 +79,11 @@ export const MemberCard = ({
           {/* Party and District badges */}
           <div className="flex items-center gap-2">
             {member.chamber && (
-              <Badge variant="outline" className="bg-purple-100 text-purple-800 border-purple-200">
+              <Badge variant="outline" className={
+                member.chamber.toLowerCase().includes('assembly') 
+                  ? "bg-green-100 text-green-800 border-green-200"
+                  : "bg-purple-100 text-purple-800 border-purple-200"
+              }>
                 {member.chamber}
               </Badge>
             )}
