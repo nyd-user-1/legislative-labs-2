@@ -64,7 +64,20 @@ export const useSubscription = () => {
     }
 
     if (data?.url) {
-      window.open(data.url, '_blank');
+      // Check if we're on a mobile device or if popup would be blocked
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      
+      if (isMobile) {
+        // On mobile, redirect in the same tab for better compatibility
+        window.location.href = data.url;
+      } else {
+        // On desktop, try to open in new tab, with fallback to same tab
+        const newWindow = window.open(data.url, '_blank');
+        if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+          // Popup blocked, fallback to same tab
+          window.location.href = data.url;
+        }
+      }
     }
   };
 
