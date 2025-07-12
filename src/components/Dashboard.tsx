@@ -20,8 +20,8 @@ type Bill = Tables<"Bills"> & {
 };
 
 export const Dashboard = () => {
-  const [selectedMonth, setSelectedMonth] = useState("01");
-  const [selectedYear, setSelectedYear] = useState("2024");
+  const [selectedMonth, setSelectedMonth] = useState("05");
+  const [selectedYear, setSelectedYear] = useState("2025");
   const { stats, recentBills, chartData, loading, error, refetch } = useDashboardData(selectedMonth, selectedYear);
   const navigate = useNavigate();
 
