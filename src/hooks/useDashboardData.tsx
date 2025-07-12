@@ -24,7 +24,7 @@ interface ChartDataPoint {
   senate: number;
 }
 
-export const useDashboardData = (timePeriod: string = "Month") => {
+export const useDashboardData = (selectedMonth: string = "01", selectedYear: string = "2024") => {
   const [stats, setStats] = useState<DashboardStats>({
     totalBills: 0,
     activeChats: 0,
@@ -106,73 +106,57 @@ export const useDashboardData = (timePeriod: string = "Month") => {
         setRecentBills(billsWithSponsors);
       }
 
-      // Generate chart data based on real Supabase data
+      // Generate chart data based on selected month and year
       const generateChartData = async () => {
         const periods = [];
-        const now = new Date();
-        let periodsToShow = 6;
-        let dateFormat: Intl.DateTimeFormatOptions = { month: 'short' };
-        let intervalDays = 30;
-
-        if (timePeriod === "Week") {
-          periodsToShow = 7;
-          dateFormat = { weekday: 'short' };
-          intervalDays = 1;
-        } else if (timePeriod === "Year") {
-          periodsToShow = 5;
-          dateFormat = { year: 'numeric' };
-          intervalDays = 365;
+        const year = parseInt(selectedYear);
+        const month = parseInt(selectedMonth);
+        
+        // Get days in the selected month
+        const daysInMonth = new Date(year, month, 0).getDate();
+        
+        // Create date ranges for each week of the month
+        const weeks = [];
+        let currentDate = new Date(year, month - 1, 1);
+        
+        while (currentDate.getMonth() === month - 1) {
+          const weekStart = new Date(currentDate);
+          const weekEnd = new Date(currentDate);
+          weekEnd.setDate(weekStart.getDate() + 6);
+          
+          // Ensure we don't go past the end of the month
+          if (weekEnd.getMonth() !== month - 1) {
+            weekEnd.setMonth(month - 1);
+            weekEnd.setDate(daysInMonth);
+          }
+          
+          weeks.push({
+            start: new Date(weekStart),
+            end: new Date(weekEnd),
+            label: `Week ${weeks.length + 1}`
+          });
+          
+          currentDate.setDate(currentDate.getDate() + 7);
         }
 
-        for (let i = periodsToShow - 1; i >= 0; i--) {
-          const date = new Date(now);
-          
-          if (timePeriod === "Week") {
-            date.setDate(date.getDate() - i);
-          } else if (timePeriod === "Month") {
-            date.setMonth(date.getMonth() - i);
-          } else if (timePeriod === "Year") {
-            date.setFullYear(date.getFullYear() - i);
-          }
-
-          // Calculate date range for this period
-          const startDate = new Date(date);
-          const endDate = new Date(date);
-          
-          if (timePeriod === "Week") {
-            startDate.setHours(0, 0, 0, 0);
-            endDate.setHours(23, 59, 59, 999);
-          } else if (timePeriod === "Month") {
-            startDate.setDate(1);
-            startDate.setHours(0, 0, 0, 0);
-            endDate.setMonth(endDate.getMonth() + 1);
-            endDate.setDate(0);
-            endDate.setHours(23, 59, 59, 999);
-          } else if (timePeriod === "Year") {
-            startDate.setMonth(0, 1);
-            startDate.setHours(0, 0, 0, 0);
-            endDate.setMonth(11, 31);
-            endDate.setHours(23, 59, 59, 999);
-          }
-
-          // Query bills in this date range
-          const { data: billsInPeriod } = await supabase
+        // Query bills for each week
+        for (const week of weeks) {
+          const { data: billsInWeek } = await supabase
             .from("Bills")
             .select("bill_number")
-            .gte("last_action_date", startDate.toISOString().split('T')[0])
-            .lte("last_action_date", endDate.toISOString().split('T')[0]);
+            .gte("last_action_date", week.start.toISOString().split('T')[0])
+            .lte("last_action_date", week.end.toISOString().split('T')[0]);
 
-          const totalBills = billsInPeriod?.length || 0;
+          const totalBills = billsInWeek?.length || 0;
           
-          // Approximate split between Assembly and Senate bills
-          // Assembly bills typically start with 'A', Senate bills with 'S'
-          const assemblyBills = billsInPeriod?.filter(bill => 
+          // Split between Assembly and Senate bills
+          const assemblyBills = billsInWeek?.filter(bill => 
             bill.bill_number?.toUpperCase().startsWith('A')
           ).length || 0;
           const senateBills = totalBills - assemblyBills;
 
           periods.push({
-            period: date.toLocaleDateString('en-US', dateFormat),
+            period: week.label,
             assembly: assemblyBills,
             senate: senateBills,
           });
@@ -194,7 +178,7 @@ export const useDashboardData = (timePeriod: string = "Month") => {
 
   useEffect(() => {
     fetchDashboardData();
-  }, [timePeriod]);
+  }, [selectedMonth, selectedYear]);
 
   return {
     stats,

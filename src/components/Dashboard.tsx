@@ -2,7 +2,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Activity, FileText, Users, Building2, TrendingUp, Calendar, Eye, MessageSquare } from "lucide-react";
 import { useDashboardData } from "@/hooks/useDashboardData";
@@ -20,9 +20,31 @@ type Bill = Tables<"Bills"> & {
 };
 
 export const Dashboard = () => {
-  const [timePeriod, setTimePeriod] = useState("Month");
-  const { stats, recentBills, chartData, loading, error, refetch } = useDashboardData(timePeriod);
+  const [selectedMonth, setSelectedMonth] = useState("01");
+  const [selectedYear, setSelectedYear] = useState("2024");
+  const { stats, recentBills, chartData, loading, error, refetch } = useDashboardData(selectedMonth, selectedYear);
   const navigate = useNavigate();
+
+  const months = [
+    { value: "01", label: "Jan" },
+    { value: "02", label: "Feb" },
+    { value: "03", label: "Mar" },
+    { value: "04", label: "Apr" },
+    { value: "05", label: "May" },
+    { value: "06", label: "Jun" },
+    { value: "07", label: "Jul" },
+    { value: "08", label: "Aug" },
+    { value: "09", label: "Sep" },
+    { value: "10", label: "Oct" },
+    { value: "11", label: "Nov" },
+    { value: "12", label: "Dec" },
+  ];
+
+  const years = [
+    { value: "2023", label: "2023" },
+    { value: "2024", label: "2024" },
+    { value: "2025", label: "2025" },
+  ];
 
   const handleBillSelect = (bill: Bill) => {
     navigate('/bills');
@@ -143,23 +165,33 @@ export const Dashboard = () => {
                 <div className="flex items-center gap-2">
                   <CardTitle className="text-base sm:text-lg">Activity</CardTitle>
                 </div>
-                <ToggleGroup 
-                  value={timePeriod} 
-                  onValueChange={(value) => value && setTimePeriod(value)}
-                  type="single"
-                  variant="outline"
-                  size="sm"
-                >
-                  <ToggleGroupItem value="Week" aria-label="Week view">
-                    Week
-                  </ToggleGroupItem>
-                  <ToggleGroupItem value="Month" aria-label="Month view">
-                    Month
-                  </ToggleGroupItem>
-                  <ToggleGroupItem value="Year" aria-label="Year view">
-                    Year
-                  </ToggleGroupItem>
-                </ToggleGroup>
+                <div className="flex items-center gap-3">
+                  <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                    <SelectTrigger className="w-[100px]">
+                      <SelectValue placeholder="Month" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {months.map((month) => (
+                        <SelectItem key={month.value} value={month.value}>
+                          {month.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  
+                  <Select value={selectedYear} onValueChange={setSelectedYear}>
+                    <SelectTrigger className="w-[100px]">
+                      <SelectValue placeholder="Year" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {years.map((year) => (
+                        <SelectItem key={year.value} value={year.value}>
+                          {year.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               <CardDescription className="text-sm">
                 Number of bills introduced over the selected time period
