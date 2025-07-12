@@ -159,10 +159,70 @@ export const useSearch = () => {
     if (!searchTerm.trim()) return [];
 
     const term = searchTerm.toLowerCase();
-    return allContent.filter(item => 
-      item.title.toLowerCase().includes(term) || 
-      item.content.toLowerCase().includes(term)
-    ).slice(0, 10); // Limit to 10 results
+    
+    // Common name variations and nicknames
+    const nameVariations: Record<string, string[]> = {
+      'jose': ['joseph'],
+      'joe': ['joseph'],
+      'jos': ['joseph'],
+      'joey': ['joseph'],
+      'mike': ['michael'],
+      'bill': ['william'],
+      'will': ['william'],
+      'bob': ['robert'],
+      'rob': ['robert'],
+      'rick': ['richard'],
+      'dick': ['richard'],
+      'jim': ['james'],
+      'jimmy': ['james'],
+      'tom': ['thomas'],
+      'tommy': ['thomas'],
+      'dan': ['daniel'],
+      'danny': ['daniel'],
+      'dave': ['david'],
+      'chris': ['christopher'],
+      'matt': ['matthew'],
+      'tony': ['anthony'],
+      'nick': ['nicholas'],
+      'alex': ['alexander']
+    };
+
+    return allContent.filter(item => {
+      const title = item.title.toLowerCase();
+      const content = item.content.toLowerCase();
+      
+      // Direct substring match
+      if (title.includes(term) || content.includes(term)) {
+        return true;
+      }
+      
+      // Check name variations for member searches
+      if (item.type === 'member') {
+        // Check if search term is a nickname
+        if (nameVariations[term]) {
+          for (const variation of nameVariations[term]) {
+            if (title.includes(variation) || content.includes(variation)) {
+              return true;
+            }
+          }
+        }
+        
+        // Check word boundaries for better name matching
+        const searchWords = term.split(' ').filter(word => word.length > 0);
+        const titleWords = title.split(' ').filter(word => word.length > 0);
+        
+        // If any search word matches the beginning of any title word
+        for (const searchWord of searchWords) {
+          for (const titleWord of titleWords) {
+            if (titleWord.startsWith(searchWord) || searchWord.startsWith(titleWord)) {
+              return true;
+            }
+          }
+        }
+      }
+      
+      return false;
+    }).slice(0, 10); // Limit to 10 results
   }, [searchTerm, allContent]);
 
   useEffect(() => {
