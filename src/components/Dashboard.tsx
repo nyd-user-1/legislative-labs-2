@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Activity, FileText, Users, Building2, TrendingUp, Calendar, Eye, MessageSquare } from "lucide-react";
 import { useDashboardData } from "@/hooks/useDashboardData";
-import { BillsTable } from "@/components/dashboard/BillsTable";
+import { RecentLegislativeActivity } from "@/components/dashboard/RecentLegislativeActivity";
 import { Tables } from "@/integrations/supabase/types";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -250,22 +250,8 @@ export const Dashboard = () => {
             </CardContent>
           </Card>
 
-          {/* Recent Bills Table Section */}
-          <Card>
-            <CardHeader className="px-4 sm:px-6">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <div className="flex items-center gap-2">
-                  <CardTitle className="text-base sm:text-lg">Recent Legislative Activity</CardTitle>
-                </div>
-                <Button variant="outline" onClick={handleViewAllBills} size="sm" className="self-start sm:self-auto">
-                  View All Bills
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="px-4 sm:px-6">
-              <BillsTable bills={recentBills} onBillSelect={handleBillSelect} />
-            </CardContent>
-          </Card>
+          {/* Recent Legislative Activity Section */}
+          <RecentLegislativeActivity onViewAllBills={handleViewAllBills} />
         </div>
       </div>
     </div>
