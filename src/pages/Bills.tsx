@@ -35,7 +35,10 @@ const Bills = () => {
     dateRangeFilter,
     setDateRangeFilter,
     fetchBills,
+    loadMoreBills,
+    hasNextPage,
     totalBills,
+    currentPageBills,
   } = useBillsData();
 
   useEffect(() => {
@@ -140,7 +143,26 @@ const Bills = () => {
         {bills.length === 0 ? (
           <BillsEmptyState hasFilters={hasFilters} />
         ) : (
-          <BillsGrid bills={bills} onBillSelect={handleBillSelect} />
+          <div className="space-y-6">
+            <BillsGrid bills={bills} onBillSelect={handleBillSelect} />
+            
+            {/* Pagination Controls */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t">
+              <div className="text-sm text-muted-foreground">
+                Showing {currentPageBills} of {totalBills.toLocaleString()} bills
+              </div>
+              
+              {hasNextPage && (
+                <button
+                  onClick={loadMoreBills}
+                  disabled={loading}
+                  className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {loading ? "Loading..." : "Load More Bills"}
+                </button>
+              )}
+            </div>
+          </div>
         )}
       </div>
     </div>

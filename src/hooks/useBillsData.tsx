@@ -26,24 +26,36 @@ export const useBillsData = () => {
   const [sponsorFilter, setSponsorFilter] = useState("");
   const [committeeFilter, setCommitteeFilter] = useState("");
   const [dateRangeFilter, setDateRangeFilter] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [hasNextPage, setHasNextPage] = useState(true);
   
   // Debounce search to avoid excessive API calls
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
+  
+  const BILLS_PER_PAGE = 50;
 
-  const fetchBills = async () => {
+  const fetchBills = async (loadMore = false) => {
     try {
       setLoading(true);
       setError(null);
-      console.log("Fetching bills with filters:", { searchTerm, sponsorFilter, committeeFilter, dateRangeFilter });
+      console.log("Fetching bills with filters:", { searchTerm, sponsorFilter, committeeFilter, dateRangeFilter, currentPage });
       
-      // Start with basic bills query
+      // Start with basic bills query - get count for pagination
+      let countQuery = supabase
+        .from("Bills")
+        .select("*", { count: 'exact', head: true });
+      
+      // Start with basic bills query for data
       let query = supabase
         .from("Bills")
         .select("*");
 
       // Apply search filter - only search if term is at least 2 characters
       if (debouncedSearchTerm && debouncedSearchTerm.length >= 2) {
-        query = query.or(`title.ilike.%${debouncedSearchTerm}%,bill_number.ilike.%${debouncedSearchTerm}%,description.ilike.%${debouncedSearchTerm}%`);
+        const searchFilter = `title.ilike.%${debouncedSearchTerm}%,bill_number.ilike.%${debouncedSearchTerm}%,description.ilike.%${debouncedSearchTerm}%`;
+        query = query.or(searchFilter);
+        countQuery = countQuery.or(searchFilter);
       }
 
       // Apply sponsor filter
@@ -65,14 +77,19 @@ export const useBillsData = () => {
           if (sponsorBills && sponsorBills.length > 0) {
             const billIds = sponsorBills.map(sb => sb.bill_id);
             query = query.in("bill_id", billIds);
+            countQuery = countQuery.in("bill_id", billIds);
           } else {
             // No bills found for this sponsor, return empty result
             setBills([]);
+            setTotalCount(0);
+            setHasNextPage(false);
             return;
           }
         } else {
           // No people found with this name, return empty result
           setBills([]);
+          setTotalCount(0);
+          setHasNextPage(false);
           return;
         }
       }
@@ -80,6 +97,7 @@ export const useBillsData = () => {
       // Apply committee filter
       if (committeeFilter) {
         query = query.eq("committee", committeeFilter);
+        countQuery = countQuery.eq("committee", committeeFilter);
       }
 
       // Apply date filter
@@ -87,8 +105,14 @@ export const useBillsData = () => {
         const daysAgo = parseInt(dateRangeFilter);
         const cutoffDate = new Date();
         cutoffDate.setDate(cutoffDate.getDate() - daysAgo);
-        query = query.gte("last_action_date", cutoffDate.toISOString().split('T')[0]);
+        const dateFilter = cutoffDate.toISOString().split('T')[0];
+        query = query.gte("last_action_date", dateFilter);
+        countQuery = countQuery.gte("last_action_date", dateFilter);
       }
+
+      // Get total count first
+      const { count: totalCountResult } = await countQuery;
+      setTotalCount(totalCountResult || 0);
 
       // Order by last action date, most recent first
       query = query.order("last_action_date", {
@@ -96,8 +120,11 @@ export const useBillsData = () => {
         nullsFirst: false
       });
 
-      // Limit results for performance
-      query = query.limit(100);
+      // Apply pagination
+      const from = loadMore ? bills.length : (currentPage - 1) * BILLS_PER_PAGE;
+      const to = from + BILLS_PER_PAGE - 1;
+      query = query.range(from, to);
+      
       const { data: billsData, error } = await query;
       
       if (error) {
@@ -145,7 +172,16 @@ export const useBillsData = () => {
       );
 
       console.log("Bills fetched successfully:", billsWithSponsors?.length || 0, "bills");
-      setBills(billsWithSponsors);
+      
+      if (loadMore) {
+        setBills(prevBills => [...prevBills, ...billsWithSponsors]);
+      } else {
+        setBills(billsWithSponsors);
+      }
+      
+      // Check if there are more pages
+      const totalFetched = loadMore ? bills.length + billsWithSponsors.length : billsWithSponsors.length;
+      setHasNextPage(totalFetched < (totalCountResult || 0));
     } catch (err) {
       console.error("Error fetching bills:", err);
       setError("Failed to load bills. Please try again.");
@@ -155,8 +191,16 @@ export const useBillsData = () => {
   };
 
   useEffect(() => {
+    setCurrentPage(1);
     fetchBills();
   }, [debouncedSearchTerm, sponsorFilter, committeeFilter, dateRangeFilter]);
+
+  const loadMoreBills = () => {
+    if (hasNextPage && !loading) {
+      setCurrentPage(prev => prev + 1);
+      fetchBills(true);
+    }
+  };
 
   // No need for client-side filtering since we're doing it server-side now
   const filteredBills = bills;
@@ -174,6 +218,10 @@ export const useBillsData = () => {
     dateRangeFilter,
     setDateRangeFilter,
     fetchBills,
-    totalBills: bills.length,
+    loadMoreBills,
+    hasNextPage,
+    totalBills: totalCount,
+    currentPageBills: bills.length,
+    currentPage,
   };
 };
