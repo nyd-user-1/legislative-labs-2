@@ -5,7 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 export interface SearchResult {
   id: string;
   title: string;
-  type: 'problem' | 'idea' | 'draft' | 'media';
+  type: 'problem' | 'idea' | 'draft' | 'media' | 'bill' | 'member' | 'committee';
   content: string;
   created_at: string;
   url: string;
@@ -26,37 +26,64 @@ export const useSearch = () => {
   const fetchAllContent = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      
+      // Fetch user content (requires auth)
+      let problems, ideas, drafts, media;
+      if (user) {
+        // Fetch problem statements
+        const problemsResult = await supabase
+          .from('problem_statements')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
+        problems = problemsResult.data;
 
-      // Fetch problem statements
-      const { data: problems } = await supabase
-        .from('problem_statements')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+        // Fetch ideas
+        const ideasResult = await supabase
+          .from('legislative_ideas')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
+        ideas = ideasResult.data;
 
-      // Fetch ideas
-      const { data: ideas } = await supabase
-        .from('legislative_ideas')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+        // Fetch drafts
+        const draftsResult = await supabase
+          .from('legislative_drafts')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
+        drafts = draftsResult.data;
 
-      // Fetch drafts
-      const { data: drafts } = await supabase
-        .from('legislative_drafts')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+        // Fetch media outputs
+        const mediaResult = await supabase
+          .from('media_outputs')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
+        media = mediaResult.data;
+      }
 
-      // Fetch media outputs
-      const { data: media } = await supabase
-        .from('media_outputs')
+      // Fetch public legislative data (no auth required)
+      const { data: bills } = await supabase
+        .from('Bills')
         .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+        .limit(100)
+        .order('bill_id', { ascending: false });
+
+      const { data: members } = await supabase
+        .from('People')
+        .select('*')
+        .limit(100)
+        .order('people_id', { ascending: false });
+
+      const { data: committees } = await supabase
+        .from('Committees')
+        .select('*')
+        .limit(100)
+        .order('committee_id', { ascending: false });
 
       const allResults: SearchResult[] = [
+        // User content
         ...(problems?.map(p => ({
           id: p.id,
           title: p.title,
@@ -88,6 +115,31 @@ export const useSearch = () => {
           content: m.content,
           created_at: m.created_at,
           url: `/media-kits?id=${m.id}`
+        })) || []),
+        // Legislative data
+        ...(bills?.map(b => ({
+          id: b.bill_id.toString(),
+          title: b.title || b.bill_number || 'Untitled Bill',
+          type: 'bill' as const,
+          content: b.description || b.last_action || '',
+          created_at: b.status_date || new Date().toISOString(),
+          url: `/bills?selected=${b.bill_id}`
+        })) || []),
+        ...(members?.map(m => ({
+          id: m.people_id.toString(),
+          title: m.name || `${m.first_name} ${m.last_name}`.trim() || 'Unknown Member',
+          type: 'member' as const,
+          content: `${m.party || ''} ${m.chamber || ''} ${m.district || ''}`.trim() || m.bio_short || '',
+          created_at: new Date().toISOString(),
+          url: `/members?selected=${m.people_id}`
+        })) || []),
+        ...(committees?.map(c => ({
+          id: c.committee_id.toString(),
+          title: c.committee_name || 'Untitled Committee',
+          type: 'committee' as const,
+          content: c.description || c.chair_name || '',
+          created_at: new Date().toISOString(),
+          url: `/committees?selected=${c.committee_id}`
         })) || [])
       ];
 

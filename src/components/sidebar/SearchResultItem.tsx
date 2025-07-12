@@ -1,4 +1,4 @@
-import { Search, Lightbulb, FileText, BarChart3 } from "lucide-react";
+import { Search, Lightbulb, FileText, BarChart3, Users, User, Building } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 import { SearchResult } from "@/hooks/useSearch";
@@ -15,6 +15,9 @@ export function SearchResultItem({ result, onClick }: SearchResultItemProps) {
       case 'idea': return Lightbulb;
       case 'draft': return FileText;
       case 'media': return BarChart3;
+      case 'bill': return FileText;
+      case 'member': return User;
+      case 'committee': return Users;
       default: return FileText;
     }
   };
@@ -25,6 +28,9 @@ export function SearchResultItem({ result, onClick }: SearchResultItemProps) {
       case 'idea': return 'outline';
       case 'draft': return 'default';
       case 'media': return 'destructive';
+      case 'bill': return 'secondary';
+      case 'member': return 'outline';
+      case 'committee': return 'default';
       default: return 'secondary';
     }
   };
