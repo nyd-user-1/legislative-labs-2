@@ -39,15 +39,18 @@ serve(async (req) => {
     const isPerplexityModel = model.startsWith('llama-') && model.includes('sonar');
     
     if (isClaudeModel && !anthropicApiKey) {
-      throw new Error('Anthropic API key not configured');
+      console.error('Anthropic API key not configured');
+      throw new Error('Claude model requires Anthropic API key to be configured in Supabase Edge Function Secrets');
     }
     
     if (isPerplexityModel && !perplexityApiKey) {
-      throw new Error('Perplexity API key not configured');
+      console.error('Perplexity API key not configured');
+      throw new Error('Perplexity model requires Perplexity API key to be configured in Supabase Edge Function Secrets');
     }
     
     if (!isClaudeModel && !isPerplexityModel && !openAIApiKey) {
-      throw new Error('OpenAI API key not configured');
+      console.error('OpenAI API key not configured');
+      throw new Error('OpenAI model requires OpenAI API key to be configured in Supabase Edge Function Secrets');
     }
 
     let response;

@@ -290,13 +290,10 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee }: AIC
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-2xl flex flex-col h-full">
         <SheetHeader className="flex-shrink-0">
-          <SheetTitle>AI Legislative Analysis</SheetTitle>
+          <SheetTitle>{getTitle()}</SheetTitle>
           <SheetDescription>
             {getDescription()}
           </SheetDescription>
-          <div className="pt-2">
-            <ModelSelector selectedModel={selectedModel} onModelChange={setSelectedModel} />
-          </div>
         </SheetHeader>
 
         <div className="flex-1 flex flex-col gap-4 min-h-0">

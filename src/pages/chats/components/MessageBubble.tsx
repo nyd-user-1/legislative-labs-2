@@ -18,7 +18,7 @@ export const MessageBubble = ({ message, onCopy, onFeedback }: MessageBubbleProp
         }`}
       >
         <div
-          className={`max-w-[80%] rounded-lg p-3 ${
+          className={`w-full rounded-lg p-3 ${
             message.role === "user"
               ? "bg-primary text-primary-foreground"
               : "bg-muted"
