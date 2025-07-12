@@ -225,11 +225,11 @@ const Favorites = () => {
                             </div>
                           </div>
                           <div className="flex gap-2 flex-shrink-0">
-                            <Button variant="ghost" size="sm" onClick={e => handleBillAIAnalysis(bill, e)} className="hover:bg-primary/10">
-                              <Sparkles className="h-4 w-4" />
-                            </Button>
                             <Button variant="ghost" size="sm" onClick={e => handleRemoveBillFavorite(bill.bill_id, e)} className="hover:bg-destructive hover:text-destructive-foreground">
                               <Trash2 className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm" onClick={e => handleBillAIAnalysis(bill, e)} className="hover:bg-primary/10">
+                              <Sparkles className="h-4 w-4" />
                             </Button>
                           </div>
                         </div>
@@ -240,7 +240,7 @@ const Favorites = () => {
                           <AccordionItem value="bill-content" className="border-none">
                             <AccordionTrigger className="hover:no-underline py-2">
                               <div className="text-left">
-                                <p className="text-sm text-muted-foreground mt-1">
+                                <p className="text-sm text-muted-foreground mt-1 line-clamp-3">
                                   {bill.description || "No description available"}
                                 </p>
                               </div>
@@ -314,11 +314,11 @@ const Favorites = () => {
                             </div>
                           </div>
                           <div className="flex gap-2 flex-shrink-0">
-                            <Button variant="ghost" size="sm" onClick={e => handleMemberAIAnalysis(member, e)} className="hover:bg-primary/10">
-                              <Sparkles className="h-4 w-4" />
-                            </Button>
                             <Button variant="ghost" size="sm" onClick={e => handleRemoveMemberFavorite(member.people_id, e)} className="hover:bg-destructive hover:text-destructive-foreground">
                               <Trash2 className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm" onClick={e => handleMemberAIAnalysis(member, e)} className="hover:bg-primary/10">
+                              <Sparkles className="h-4 w-4" />
                             </Button>
                           </div>
                         </div>
@@ -402,11 +402,11 @@ const Favorites = () => {
                             </div>
                           </div>
                           <div className="flex gap-2 flex-shrink-0">
-                            <Button variant="ghost" size="sm" onClick={e => handleCommitteeAIAnalysis(committee, e)} className="hover:bg-primary/10">
-                              <Sparkles className="h-4 w-4" />
-                            </Button>
                             <Button variant="ghost" size="sm" onClick={e => handleRemoveCommitteeFavorite(committee.committee_id, e)} className="hover:bg-destructive hover:text-destructive-foreground">
                               <Trash2 className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm" onClick={e => handleCommitteeAIAnalysis(committee, e)} className="hover:bg-primary/10">
+                              <Sparkles className="h-4 w-4" />
                             </Button>
                           </div>
                         </div>
