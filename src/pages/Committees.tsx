@@ -1,6 +1,7 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCommitteesData } from "@/hooks/useCommitteesData";
+import { useCommitteeFavorites } from "@/hooks/useCommitteeFavorites";
 import { CommitteesHeader } from "@/components/committees/CommitteesHeader";
 import { CommitteesSearchFilters } from "@/components/committees/CommitteesSearchFilters";
 import { CommitteesGrid } from "@/components/committees/CommitteesGrid";
@@ -8,6 +9,8 @@ import { CommitteesEmptyState } from "@/components/committees/CommitteesEmptySta
 import { CommitteesLoadingSkeleton } from "@/components/committees/CommitteesLoadingSkeleton";
 import { CommitteesErrorState } from "@/components/committees/CommitteesErrorState";
 import { CommitteeDetail } from "@/components/CommitteeDetail";
+import { AIChatSheet } from "@/components/AIChatSheet";
+import { supabase } from "@/integrations/supabase/client";
 
 type Committee = {
   committee_id: number;
@@ -28,8 +31,11 @@ type Committee = {
 
 const Committees = () => {
   const [selectedCommittee, setSelectedCommittee] = useState<Committee | null>(null);
-  const [favoriteCommittees] = useState<Set<number>>(new Set());
-  const [committeesWithAIChat] = useState<Set<number>>(new Set());
+  const [chatOpen, setChatOpen] = useState(false);
+  const [selectedCommitteeForChat, setSelectedCommitteeForChat] = useState<Committee | null>(null);
+  const [committeesWithAIChat, setCommitteesWithAIChat] = useState<Set<number>>(new Set());
+
+  const { favoriteCommitteeIds, toggleFavorite } = useCommitteeFavorites();
 
   const {
     committees,
@@ -45,16 +51,41 @@ const Committees = () => {
     chambers,
   } = useCommitteesData();
 
-  const handleFavorite = (committee: Committee, e: React.MouseEvent) => {
+  // Fetch committees that have AI chat sessions
+  useEffect(() => {
+    const fetchCommitteesWithAIChat = async () => {
+      try {
+        const { data: sessions } = await supabase
+          .from("chat_sessions")
+          .select("committee_id")
+          .not("committee_id", "is", null);
+
+        if (sessions) {
+          const committeeIdsWithChat = new Set(
+            sessions.map(session => session.committee_id).filter(Boolean)
+          );
+          setCommitteesWithAIChat(committeeIdsWithChat);
+        }
+      } catch (error) {
+        console.error("Error fetching AI chat sessions:", error);
+      }
+    };
+
+    fetchCommitteesWithAIChat();
+  }, []);
+
+  const handleFavorite = async (committee: Committee, e: React.MouseEvent) => {
     e.stopPropagation();
-    console.log("Toggle favorite for committee:", committee.name);
-    // TODO: Implement favorite functionality
+    await toggleFavorite(committee.committee_id);
   };
 
   const handleAIAnalysis = (committee: Committee, e: React.MouseEvent) => {
     e.stopPropagation();
-    console.log("Start AI analysis for committee:", committee.name);
-    // TODO: Implement AI analysis functionality
+    setSelectedCommitteeForChat(committee);
+    setChatOpen(true);
+    
+    // Add this committee to the set of committees with AI chat
+    setCommitteesWithAIChat(prev => new Set([...prev, committee.committee_id]));
   };
 
   if (loading) {
@@ -84,37 +115,45 @@ const Committees = () => {
   const hasFilters = searchTerm !== "";
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 py-6">
-      <div className="space-y-6">
-        <CommitteesHeader 
-          filteredCount={filteredCount}
-          totalCount={totalCommittees}
-          chamberFilter={chamberFilter}
-          onChamberFilterChange={setChamberFilter}
-          chambers={chambers}
-        />
-
-        <CommitteesSearchFilters
-          filters={{
-            search: searchTerm,
-          }}
-          onFiltersChange={handleFiltersChange}
-        />
-
-        {committees.length === 0 ? (
-          <CommitteesEmptyState hasFilters={hasFilters} />
-        ) : (
-          <CommitteesGrid 
-            committees={committees} 
-            onCommitteeSelect={setSelectedCommittee}
-            onFavorite={handleFavorite}
-            onAIAnalysis={handleAIAnalysis}
-            favoriteCommittees={favoriteCommittees}
-            committeesWithAIChat={committeesWithAIChat}
+    <>
+      <div className="container mx-auto px-4 sm:px-6 py-6">
+        <div className="space-y-6">
+          <CommitteesHeader 
+            filteredCount={filteredCount}
+            totalCount={totalCommittees}
+            chamberFilter={chamberFilter}
+            onChamberFilterChange={setChamberFilter}
+            chambers={chambers}
           />
-        )}
+
+          <CommitteesSearchFilters
+            filters={{
+              search: searchTerm,
+            }}
+            onFiltersChange={handleFiltersChange}
+          />
+
+          {committees.length === 0 ? (
+            <CommitteesEmptyState hasFilters={hasFilters} />
+          ) : (
+            <CommitteesGrid 
+              committees={committees} 
+              onCommitteeSelect={setSelectedCommittee}
+              onFavorite={handleFavorite}
+              onAIAnalysis={handleAIAnalysis}
+              favoriteCommittees={favoriteCommitteeIds}
+              committeesWithAIChat={committeesWithAIChat}
+            />
+          )}
+        </div>
       </div>
-    </div>
+
+      <AIChatSheet
+        open={chatOpen}
+        onOpenChange={setChatOpen}
+        committee={selectedCommitteeForChat}
+      />
+    </>
   );
 };
 

@@ -33,7 +33,7 @@ export const CardActionButtons = ({
         <Button
           variant={variant}
           size={size}
-          className="px-3"
+          className="px-3 hover:scale-100"
           onClick={onFavorite}
           title="Add to Favorites"
         >
@@ -44,7 +44,7 @@ export const CardActionButtons = ({
         <Button
           variant={variant}
           size={size}
-          className="px-3"
+          className="px-3 hover:scale-100"
           onClick={onAIAnalysis}
           title="AI Analysis"
         >
