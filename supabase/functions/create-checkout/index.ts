@@ -81,7 +81,7 @@ serve(async (req) => {
         },
       ],
       mode: "subscription",
-      success_url: `${req.headers.get("origin")}/profile?success=true`,
+      success_url: `https://policy.newyorkdigital.co/plans`,
       cancel_url: `${req.headers.get("origin")}/profile?canceled=true`,
       metadata: {
         tier: tier,
