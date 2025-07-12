@@ -45,19 +45,26 @@ export const fetchAllSearchContent = async (): Promise<SearchResult[]> => {
     const { data: bills } = await supabase
       .from('Bills')
       .select('*')
-      .limit(100)
+      .limit(500)
       .order('bill_id', { ascending: false });
 
     const { data: members } = await supabase
       .from('People')
       .select('*')
-      .limit(100)
+      .limit(1000) // Increased to include more members like Joseph Addabbo
       .order('people_id', { ascending: false });
+
+    console.log('Raw members data:', members?.length);
+    console.log('First 5 members:', members?.slice(0, 5).map(m => ({ id: m.people_id, name: m.name, first_name: m.first_name, last_name: m.last_name })));
+    console.log('Joseph Addabbo search:', members?.find(m => 
+      m.name?.toLowerCase().includes('addabbo') || 
+      (m.first_name?.toLowerCase().includes('joseph') && m.last_name?.toLowerCase().includes('addabbo'))
+    ));
 
     const { data: committees } = await supabase
       .from('Committees')
       .select('*')
-      .limit(100)
+      .limit(200)
       .order('committee_id', { ascending: false });
 
     const allResults: SearchResult[] = [
