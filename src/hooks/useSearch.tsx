@@ -159,6 +159,17 @@ export const useSearch = () => {
     if (!searchTerm.trim()) return [];
 
     const term = searchTerm.toLowerCase();
+    console.log('Search term:', term);
+    console.log('All content count:', allContent.length);
+    console.log('Members in content:', allContent.filter(item => item.type === 'member').length);
+    
+    // Log some member names to see what we have
+    const members = allContent.filter(item => item.type === 'member');
+    console.log('Sample member names:', members.slice(0, 10).map(m => m.title));
+    
+    // Check if we have Joseph Addabbo specifically
+    const josephAddabbo = members.find(m => m.title.toLowerCase().includes('joseph') && m.title.toLowerCase().includes('addabbo'));
+    console.log('Found Joseph Addabbo:', josephAddabbo?.title);
     
     // Common name variations and nicknames
     const nameVariations: Record<string, string[]> = {
@@ -187,12 +198,13 @@ export const useSearch = () => {
       'alex': ['alexander']
     };
 
-    return allContent.filter(item => {
+    const results = allContent.filter(item => {
       const title = item.title.toLowerCase();
       const content = item.content.toLowerCase();
       
       // Direct substring match
       if (title.includes(term) || content.includes(term)) {
+        console.log('Direct match found:', title);
         return true;
       }
       
@@ -200,8 +212,10 @@ export const useSearch = () => {
       if (item.type === 'member') {
         // Check if search term is a nickname
         if (nameVariations[term]) {
+          console.log('Checking nickname variations for:', term, nameVariations[term]);
           for (const variation of nameVariations[term]) {
             if (title.includes(variation) || content.includes(variation)) {
+              console.log('Nickname match found:', title, 'for variation:', variation);
               return true;
             }
           }
@@ -215,6 +229,7 @@ export const useSearch = () => {
         for (const searchWord of searchWords) {
           for (const titleWord of titleWords) {
             if (titleWord.startsWith(searchWord) || searchWord.startsWith(titleWord)) {
+              console.log('Word boundary match found:', title);
               return true;
             }
           }
@@ -222,7 +237,10 @@ export const useSearch = () => {
       }
       
       return false;
-    }).slice(0, 10); // Limit to 10 results
+    });
+    
+    console.log('Search results:', results.map(r => r.title));
+    return results.slice(0, 10); // Limit to 10 results
   }, [searchTerm, allContent]);
 
   useEffect(() => {
