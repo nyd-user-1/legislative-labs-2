@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Heart, Copy, ThumbsUp, ThumbsDown, Trash2, Sparkles, Mail, Phone, MapPin, ExternalLink } from "lucide-react";
+import { Heart, Copy, ThumbsUp, ThumbsDown, Trash2, Sparkles, Mail, Phone, MapPin, ExternalLink, Users, Calendar } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { useAllFavorites } from "@/hooks/useAllFavorites";
@@ -21,20 +21,29 @@ type Bill = Tables<"Bills"> & {
 };
 
 type Member = Tables<"People">;
+type Committee = Tables<"Committees">;
 
 const Favorites = () => {
   const {
     favoriteBills,
     favoriteMembers,
+    favoriteCommittees,
     loading,
     removeBillFavorite,
-    removeMemberFavorite
+    removeMemberFavorite,
+    removeCommitteeFavorite
   } = useAllFavorites();
   
   const { toast } = useToast();
   const [chatOpen, setChatOpen] = useState(false);
   const [selectedBillForChat, setSelectedBillForChat] = useState<Bill | null>(null);
   const [selectedMemberForChat, setSelectedMemberForChat] = useState<Member | null>(null);
+  const [selectedCommitteeForChat, setSelectedCommitteeForChat] = useState<{
+    committee_id: number;
+    name: string;
+    chamber: string;
+    description?: string;
+  } | null>(null);
 
   const handleBillAIAnalysis = (bill: Bill, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -47,6 +56,22 @@ const Favorites = () => {
     e.stopPropagation();
     setSelectedMemberForChat(member);
     setSelectedBillForChat(null);
+    setSelectedCommitteeForChat(null);
+    setChatOpen(true);
+  };
+
+  const handleCommitteeAIAnalysis = (committee: Committee, e: React.MouseEvent) => {
+    e.stopPropagation();
+    // Convert the committee to the format expected by AIChatSheet
+    const chatCommittee = {
+      committee_id: committee.committee_id,
+      name: committee.committee_name || "",
+      chamber: committee.chamber || "",
+      description: committee.description || ""
+    };
+    setSelectedCommitteeForChat(chatCommittee);
+    setSelectedBillForChat(null);
+    setSelectedMemberForChat(null);
     setChatOpen(true);
   };
 
@@ -58,6 +83,11 @@ const Favorites = () => {
   const handleRemoveMemberFavorite = async (memberId: number, e: React.MouseEvent) => {
     e.stopPropagation();
     await removeMemberFavorite(memberId);
+  };
+
+  const handleRemoveCommitteeFavorite = async (committeeId: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    await removeCommitteeFavorite(committeeId);
   };
 
   const copyToClipboard = async (text: string) => {
@@ -133,7 +163,7 @@ const Favorites = () => {
     );
   }
 
-  const totalFavorites = favoriteBills.length + favoriteMembers.length;
+  const totalFavorites = favoriteBills.length + favoriteMembers.length + favoriteCommittees.length;
 
   return (
     <div className="container mx-auto px-4 sm:px-6 py-6">
@@ -143,7 +173,7 @@ const Favorites = () => {
           <p className="text-muted-foreground">
             {totalFavorites === 0 
               ? "No favorites yet" 
-              : `${favoriteBills.length} favorite bills, ${favoriteMembers.length} favorite members`
+              : `${favoriteBills.length} favorite bills, ${favoriteMembers.length} favorite members, ${favoriteCommittees.length} favorite committees`
             }
           </p>
         </div>
@@ -160,9 +190,10 @@ const Favorites = () => {
           </Card>
         ) : (
           <Tabs defaultValue="bills" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="bills">Bills ({favoriteBills.length})</TabsTrigger>
               <TabsTrigger value="members">Members ({favoriteMembers.length})</TabsTrigger>
+              <TabsTrigger value="committees">Committees ({favoriteCommittees.length})</TabsTrigger>
             </TabsList>
             
             <TabsContent value="bills" className="space-y-4">
@@ -349,6 +380,89 @@ const Favorites = () => {
                 })
               )}
             </TabsContent>
+
+            <TabsContent value="committees" className="space-y-4">
+              {favoriteCommittees.length === 0 ? (
+                <Card>
+                  <CardContent className="flex flex-col items-center justify-center py-8">
+                    <p className="text-muted-foreground">No favorite committees yet</p>
+                  </CardContent>
+                </Card>
+              ) : (
+                favoriteCommittees.map(favorite => {
+                  const committee = favorite.committee;
+                  return (
+                    <Card key={favorite.id} className="w-full">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-start justify-between">
+                          <div className="space-y-1 flex-1">
+                            <CardTitle className="text-lg">{committee.committee_name || "Unknown Committee"}</CardTitle>
+                            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                              <span>Added {format(new Date(favorite.created_at), "MMM d, yyyy 'at' h:mm a")}</span>
+                            </div>
+                          </div>
+                          <div className="flex gap-2 flex-shrink-0">
+                            <Button variant="ghost" size="sm" onClick={e => handleCommitteeAIAnalysis(committee, e)} className="hover:bg-primary/10">
+                              <Sparkles className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm" onClick={e => handleRemoveCommitteeFavorite(committee.committee_id, e)} className="hover:bg-destructive hover:text-destructive-foreground">
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </CardHeader>
+
+                      <CardContent>
+                        <div className="space-y-3">
+                          {/* Chamber badge */}
+                          {committee.chamber && (
+                            <div className="flex items-center gap-2">
+                              <Badge variant="outline" className={
+                                committee.chamber.toLowerCase().includes('assembly') 
+                                  ? "bg-green-100 text-green-800 border-green-200"
+                                  : "bg-purple-100 text-purple-800 border-purple-200"
+                              }>
+                                {committee.chamber}
+                              </Badge>
+                            </div>
+                          )}
+
+                          {/* Chair */}
+                          {committee.chair_name && (
+                            <div className="flex items-center gap-2 text-sm">
+                              <Users className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                              <span className="truncate">Chair: {committee.chair_name}</span>
+                            </div>
+                          )}
+
+                          {/* Meeting Schedule */}
+                          {committee.meeting_schedule && (
+                            <div className="flex items-center gap-2 text-sm">
+                              <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                              <span className="truncate">{committee.meeting_schedule}</span>
+                            </div>
+                          )}
+
+                          {/* Member Count */}
+                          {committee.member_count && (
+                            <div className="flex items-center gap-2 text-sm">
+                              <Users className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                              <span className="truncate">{committee.member_count} members</span>
+                            </div>
+                          )}
+
+                          {/* View Full Details link */}
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
+                            <ExternalLink className="h-4 w-4 flex-shrink-0" />
+                            <span>View Full Details</span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })
+              )}
+            </TabsContent>
           </Tabs>
         )}
       </div>
@@ -359,6 +473,7 @@ const Favorites = () => {
         onOpenChange={setChatOpen} 
         bill={selectedBillForChat} 
         member={selectedMemberForChat}
+        committee={selectedCommitteeForChat}
       />
     </div>
   );

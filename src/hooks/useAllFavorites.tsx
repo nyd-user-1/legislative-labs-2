@@ -5,6 +5,7 @@ import { Tables } from "@/integrations/supabase/types";
 
 type Bill = Tables<"Bills">;
 type Member = Tables<"People">;
+type Committee = Tables<"Committees">;
 
 export interface FavoriteBill {
   id: string;
@@ -24,9 +25,19 @@ export interface FavoriteMember {
   member: Member;
 }
 
+export interface FavoriteCommittee {
+  id: string;
+  committee_id: number;
+  user_id: string;
+  created_at: string;
+  updated_at: string;
+  committee: Committee;
+}
+
 export const useAllFavorites = () => {
   const [favoriteBills, setFavoriteBills] = useState<FavoriteBill[]>([]);
   const [favoriteMembers, setFavoriteMembers] = useState<FavoriteMember[]>([]);
+  const [favoriteCommittees, setFavoriteCommittees] = useState<FavoriteCommittee[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
@@ -86,6 +97,28 @@ export const useAllFavorites = () => {
         membersData = members || [];
       }
 
+      // Fetch favorite committees
+      const { data: committeeFavorites, error: committeeError } = await supabase
+        .from("user_committee_favorites")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (committeeError) throw committeeError;
+
+      // Fetch committees data for favorites
+      const committeeIds = committeeFavorites?.map(fav => fav.committee_id) || [];
+      let committeesData: Committee[] = [];
+      if (committeeIds.length > 0) {
+        const { data: committees, error: committeesError } = await supabase
+          .from("Committees")
+          .select("*")
+          .in("committee_id", committeeIds);
+        
+        if (committeesError) throw committeesError;
+        committeesData = committees || [];
+      }
+
       // Combine favorites with their related data
       const formattedBillFavorites: FavoriteBill[] = billFavorites?.map(fav => ({
         ...fav,
@@ -97,8 +130,14 @@ export const useAllFavorites = () => {
         member: membersData.find(member => member.people_id === fav.member_id)!
       })).filter(fav => fav.member) || [];
 
+      const formattedCommitteeFavorites: FavoriteCommittee[] = committeeFavorites?.map(fav => ({
+        ...fav,
+        committee: committeesData.find(committee => committee.committee_id === fav.committee_id)!
+      })).filter(fav => fav.committee) || [];
+
       setFavoriteBills(formattedBillFavorites);
       setFavoriteMembers(formattedMemberFavorites);
+      setFavoriteCommittees(formattedCommitteeFavorites);
     } catch (error) {
       console.error("Error fetching favorites:", error);
       toast({
@@ -169,12 +208,43 @@ export const useAllFavorites = () => {
     }
   };
 
+  const removeCommitteeFavorite = async (committeeId: number) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { error } = await supabase
+        .from("user_committee_favorites")
+        .delete()
+        .eq("user_id", user.id)
+        .eq("committee_id", committeeId);
+
+      if (error) throw error;
+
+      setFavoriteCommittees(prev => prev.filter(fav => fav.committee.committee_id !== committeeId));
+      
+      toast({
+        title: "Removed from favorites",
+        description: "Committee removed from your favorites",
+      });
+    } catch (error) {
+      console.error("Error removing committee favorite:", error);
+      toast({
+        title: "Error",
+        description: "Failed to remove favorite",
+        variant: "destructive",
+      });
+    }
+  };
+
   return {
     favoriteBills,
     favoriteMembers,
+    favoriteCommittees,
     loading,
     removeBillFavorite,
     removeMemberFavorite,
+    removeCommitteeFavorite,
     refetch: fetchAllFavorites,
   };
 };
