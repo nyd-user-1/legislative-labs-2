@@ -4,7 +4,7 @@
   "description": "Comprehensive platform for New York State legislative research, bill tracking, and analysis",
   "start_url": "/",
   "display": "standalone",
-  "theme_color": "#1f2937",
+  "theme_color": "#ffffff",
   "background_color": "#ffffff",
   "icons": [
     {
