@@ -68,8 +68,10 @@ export type Database = {
       chat_sessions: {
         Row: {
           bill_id: number | null
+          committee_id: number | null
           created_at: string
           id: string
+          member_id: number | null
           messages: Json
           title: string
           updated_at: string
@@ -77,8 +79,10 @@ export type Database = {
         }
         Insert: {
           bill_id?: number | null
+          committee_id?: number | null
           created_at?: string
           id?: string
+          member_id?: number | null
           messages?: Json
           title: string
           updated_at?: string
@@ -86,14 +90,31 @@ export type Database = {
         }
         Update: {
           bill_id?: number | null
+          committee_id?: number | null
           created_at?: string
           id?: string
+          member_id?: number | null
           messages?: Json
           title?: string
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "chat_sessions_committee_id_fkey"
+            columns: ["committee_id"]
+            isOneToOne: false
+            referencedRelation: "Committees"
+            referencedColumns: ["committee_id"]
+          },
+          {
+            foreignKeyName: "chat_sessions_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "People"
+            referencedColumns: ["people_id"]
+          },
+        ]
       }
       co_authors: {
         Row: {
@@ -712,6 +733,38 @@ export type Database = {
         }
         Relationships: []
       }
+      user_committee_favorites: {
+        Row: {
+          committee_id: number
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          committee_id: number
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          committee_id?: number
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_committee_favorites_committee_id_fkey"
+            columns: ["committee_id"]
+            isOneToOne: false
+            referencedRelation: "Committees"
+            referencedColumns: ["committee_id"]
+          },
+        ]
+      }
       user_favorites: {
         Row: {
           bill_id: number
@@ -735,6 +788,38 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_member_favorites: {
+        Row: {
+          created_at: string
+          id: string
+          member_id: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          member_id: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          member_id?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_member_favorites_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "People"
+            referencedColumns: ["people_id"]
+          },
+        ]
       }
       Votes: {
         Row: {

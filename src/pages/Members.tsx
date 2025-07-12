@@ -49,7 +49,7 @@ const Members = () => {
 
         if (sessions) {
           const memberIdsWithChat = new Set(
-            sessions.map(session => session.member_id).filter(Boolean)
+            sessions.map((session: any) => session.member_id).filter(Boolean)
           );
           setMembersWithAIChat(memberIdsWithChat);
         }
@@ -136,7 +136,7 @@ const Members = () => {
       <AIChatSheet
         open={chatOpen}
         onOpenChange={setChatOpen}
-        member={selectedMemberForChat}
+        title={selectedMemberForChat ? `Chat about ${selectedMemberForChat.name}` : "AI Chat"}
       />
     </>
   );

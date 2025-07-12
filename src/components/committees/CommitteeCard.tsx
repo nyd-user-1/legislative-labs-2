@@ -2,7 +2,7 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CardActionButtons } from "@/components/ui/CardActionButtons";
-import { User, Users, FileText, ExternalLink } from "lucide-react";
+import { MapPin, Users, Calendar, Mail } from "lucide-react";
 
 type Committee = {
   committee_id: number;
@@ -38,17 +38,14 @@ export const CommitteeCard = ({
   isFavorited = false,
   hasAIChat = false
 }: CommitteeCardProps) => {
-  const getChamberColor = (chamber: string) => {
+  const getChamberColor = (chamber: string | null) => {
     if (!chamber) return "bg-muted text-muted-foreground";
     const chamberLower = chamber.toLowerCase();
     if (chamberLower.includes("senate")) {
-      return "bg-purple-100 text-purple-800 border-purple-200";
+      return "bg-blue-100 text-blue-800 border-blue-200";
     }
     if (chamberLower.includes("assembly")) {
       return "bg-green-100 text-green-800 border-green-200";
-    }
-    if (chamberLower.includes("joint")) {
-      return "bg-blue-100 text-blue-800 border-blue-200";
     }
     return "bg-muted text-muted-foreground";
   };
@@ -62,7 +59,7 @@ export const CommitteeCard = ({
         <div className="flex justify-between items-start">
           <div className="flex-1">
             <h3 className="font-semibold text-lg leading-tight mb-2">
-              {committee.name}
+              {committee.name || "Unknown Committee"}
             </h3>
           </div>
           
@@ -87,41 +84,37 @@ export const CommitteeCard = ({
       
       <CardContent className="pt-0">
         <div className="space-y-3">
-          {/* Row 1: Chair */}
           {committee.chair_name && (
             <div className="flex items-center gap-2 text-sm">
-              <User className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-              <span className="truncate font-medium">{committee.chair_name}</span>
-              <span className="text-muted-foreground">(Chair)</span>
+              <Users className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+              <span className="truncate font-medium">Chair: {committee.chair_name}</span>
             </div>
           )}
 
-          {/* Row 2: Member Count */}
-          <div className="flex items-center gap-2 text-sm">
-            <Users className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-            <span className="truncate">{committee.memberCount} members</span>
-          </div>
-
-          {/* Row 3: Bill Count */}
-          <div className="flex items-center gap-2 text-sm">
-            <FileText className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-            <span className="truncate">{committee.billCount} active bills</span>
-          </div>
-
-          {/* Row 4: External Link */}
-          <div className="pt-1">
-            <div
-              className="inline-flex items-center gap-1 text-sm text-primary hover:underline cursor-pointer"
-              onClick={(e) => {
-                e.stopPropagation();
-                if (committee.committee_url) {
-                  window.open(committee.committee_url, '_blank');
-                }
-              }}
-            >
-              <ExternalLink className="h-3 w-3" />
-              View Committee Page
+          {committee.chair_email && (
+            <div className="flex items-center gap-2 text-sm">
+              <Mail className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+              <span className="truncate">{committee.chair_email}</span>
             </div>
+          )}
+
+          {committee.meeting_schedule && (
+            <div className="flex items-center gap-2 text-sm">
+              <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+              <span className="truncate">{committee.meeting_schedule}</span>
+            </div>
+          )}
+
+          {committee.address && (
+            <div className="flex items-center gap-2 text-sm">
+              <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+              <span className="truncate">{committee.address}</span>
+            </div>
+          )}
+
+          <div className="flex gap-4 text-sm text-muted-foreground">
+            <span>Members: {committee.memberCount || "N/A"}</span>
+            <span>Bills: {committee.billCount || "N/A"}</span>
           </div>
         </div>
       </CardContent>

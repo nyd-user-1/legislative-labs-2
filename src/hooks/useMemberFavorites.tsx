@@ -21,13 +21,13 @@ export const useMemberFavorites = () => {
       }
 
       const { data, error } = await supabase
-        .from("user_member_favorites")
+        .from("user_member_favorites" as any)
         .select("member_id")
         .eq("user_id", user.id);
 
       if (error) throw error;
 
-      const favoriteIds = new Set(data?.map(fav => fav.member_id) || []);
+      const favoriteIds = new Set(data?.map((fav: any) => fav.member_id) || []);
       setFavoriteMemberIds(favoriteIds);
     } catch (error) {
       console.error("Error fetching member favorites:", error);
@@ -57,7 +57,7 @@ export const useMemberFavorites = () => {
 
       if (isFavorited) {
         const { error } = await supabase
-          .from("user_member_favorites")
+          .from("user_member_favorites" as any)
           .delete()
           .eq("user_id", user.id)
           .eq("member_id", memberId);
@@ -76,7 +76,7 @@ export const useMemberFavorites = () => {
         });
       } else {
         const { error } = await supabase
-          .from("user_member_favorites")
+          .from("user_member_favorites" as any)
           .insert({
             user_id: user.id,
             member_id: memberId,

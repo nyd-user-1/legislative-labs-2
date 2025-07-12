@@ -62,7 +62,7 @@ const Committees = () => {
 
         if (sessions) {
           const committeeIdsWithChat = new Set(
-            sessions.map(session => session.committee_id).filter(Boolean)
+            sessions.map((session: any) => session.committee_id).filter(Boolean)
           );
           setCommitteesWithAIChat(committeeIdsWithChat);
         }
@@ -151,7 +151,7 @@ const Committees = () => {
       <AIChatSheet
         open={chatOpen}
         onOpenChange={setChatOpen}
-        committee={selectedCommitteeForChat}
+        title={selectedCommitteeForChat ? `Chat about ${selectedCommitteeForChat.name}` : "AI Chat"}
       />
     </>
   );

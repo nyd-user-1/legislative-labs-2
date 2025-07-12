@@ -21,13 +21,13 @@ export const useCommitteeFavorites = () => {
       }
 
       const { data, error } = await supabase
-        .from("user_committee_favorites")
+        .from("user_committee_favorites" as any)
         .select("committee_id")
         .eq("user_id", user.id);
 
       if (error) throw error;
 
-      const favoriteIds = new Set(data?.map(fav => fav.committee_id) || []);
+      const favoriteIds = new Set(data?.map((fav: any) => fav.committee_id) || []);
       setFavoriteCommitteeIds(favoriteIds);
     } catch (error) {
       console.error("Error fetching committee favorites:", error);
@@ -57,7 +57,7 @@ export const useCommitteeFavorites = () => {
 
       if (isFavorited) {
         const { error } = await supabase
-          .from("user_committee_favorites")
+          .from("user_committee_favorites" as any)
           .delete()
           .eq("user_id", user.id)
           .eq("committee_id", committeeId);
@@ -76,7 +76,7 @@ export const useCommitteeFavorites = () => {
         });
       } else {
         const { error } = await supabase
-          .from("user_committee_favorites")
+          .from("user_committee_favorites" as any)
           .insert({
             user_id: user.id,
             committee_id: committeeId,
