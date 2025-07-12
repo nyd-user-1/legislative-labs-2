@@ -63,43 +63,42 @@ export const MemberCard = ({
             </h3>
           </div>
           
-          <div className="flex items-center gap-2">
-            {member.party && (
-              <Badge variant="outline" className={`${getPartyColor(member.party)} w-fit`}>
-                {member.party}
-              </Badge>
-            )}
-            
-            <CardActionButtons
-              onFavorite={onFavorite ? (e) => onFavorite(member, e) : undefined}
-              onAIAnalysis={onAIAnalysis ? (e) => onAIAnalysis(member, e) : undefined}
-              isFavorited={isFavorited}
-              hasAIChat={hasAIChat}
-              showFavorite={!!onFavorite}
-              showAIAnalysis={!!onAIAnalysis}
-            />
-          </div>
+          <CardActionButtons
+            onFavorite={onFavorite ? (e) => onFavorite(member, e) : undefined}
+            onAIAnalysis={onAIAnalysis ? (e) => onAIAnalysis(member, e) : undefined}
+            isFavorited={isFavorited}
+            hasAIChat={hasAIChat}
+            showFavorite={!!onFavorite}
+            showAIAnalysis={!!onAIAnalysis}
+          />
         </div>
       </CardHeader>
       
       <CardContent className="pt-0">
         <div className="space-y-3">
-          {member.chamber && (
+          {/* Party and District badges */}
+          <div className="flex items-center gap-2">
+            {member.chamber && (
+              <Badge variant="outline" className="bg-purple-100 text-purple-800 border-purple-200">
+                {member.chamber}
+              </Badge>
+            )}
+            {member.party && (
+              <Badge variant="outline" className={`${getPartyColor(member.party)} w-fit`}>
+                {member.party.charAt(0)}
+              </Badge>
+            )}
+          </div>
+
+          {/* District */}
+          {member.district && (
             <div className="flex items-center gap-2 text-sm">
-              <ExternalLink className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-              <span className="truncate font-medium">{member.chamber}</span>
-              {member.district && (
-                <span className="text-muted-foreground">District {member.district}</span>
-              )}
+              <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+              <span className="truncate">District {member.district}</span>
             </div>
           )}
 
-          {member.role && (
-            <div className="flex items-center gap-2 text-sm">
-              <span className="truncate">{member.role}</span>
-            </div>
-          )}
-
+          {/* Email */}
           {member.email && (
             <div className="flex items-center gap-2 text-sm">
               <Mail className="h-4 w-4 text-muted-foreground flex-shrink-0" />
@@ -107,6 +106,7 @@ export const MemberCard = ({
             </div>
           )}
 
+          {/* Phone */}
           {member.phone_capitol && (
             <div className="flex items-center gap-2 text-sm">
               <Phone className="h-4 w-4 text-muted-foreground flex-shrink-0" />
@@ -114,12 +114,11 @@ export const MemberCard = ({
             </div>
           )}
 
-          {member.address && (
-            <div className="flex items-center gap-2 text-sm">
-              <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-              <span className="truncate">{member.address}</span>
-            </div>
-          )}
+          {/* View Full Bio link */}
+          <div className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
+            <ExternalLink className="h-4 w-4 flex-shrink-0" />
+            <span>View Full Bio</span>
+          </div>
         </div>
       </CardContent>
     </Card>
