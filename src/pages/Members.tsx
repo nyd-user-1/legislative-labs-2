@@ -136,7 +136,7 @@ const Members = () => {
       <AIChatSheet
         open={chatOpen}
         onOpenChange={setChatOpen}
-        title={selectedMemberForChat ? `Chat about ${selectedMemberForChat.name}` : "AI Chat"}
+        member={selectedMemberForChat}
       />
     </>
   );

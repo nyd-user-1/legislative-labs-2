@@ -20,6 +20,19 @@ import { useChatSession } from "@/hooks/useChatSession";
 import { ModelSelector } from "@/components/ModelSelector";
 
 type Bill = Tables<"Bills">;
+type Member = {
+  people_id: number;
+  name: string;
+  party?: string;
+  district?: string;
+  chamber?: string;
+};
+type Committee = {
+  committee_id: number;
+  name: string;
+  chamber: string;
+  description?: string;
+};
 
 interface Message {
   id: string;
@@ -32,14 +45,26 @@ interface AIChatSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   bill?: Bill | null;
+  member?: Member | null;
+  committee?: Committee | null;
 }
 
-const SUGGESTED_PROMPTS = [
-  "Analyze this bill's key provisions and potential impact",
-  "What are the main arguments for and against this legislation?"
-];
+const SUGGESTED_PROMPTS = {
+  bill: [
+    "Analyze this bill's key provisions and potential impact",
+    "What are the main arguments for and against this legislation?"
+  ],
+  member: [
+    "What are this member's key policy positions?",
+    "Analyze this member's voting record and committee assignments"
+  ],
+  committee: [
+    "What types of legislation does this committee typically handle?",
+    "Analyze this committee's recent activity and priorities"
+  ]
+};
 
-export const AIChatSheet = ({ open, onOpenChange, bill }: AIChatSheetProps) => {
+export const AIChatSheet = ({ open, onOpenChange, bill, member, committee }: AIChatSheetProps) => {
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSessionCreated, setIsSessionCreated] = useState(false);
@@ -47,18 +72,44 @@ export const AIChatSheet = ({ open, onOpenChange, bill }: AIChatSheetProps) => {
   const { toast } = useToast();
   const { selectedModel, setSelectedModel } = useModel();
   
+  // Determine the entity ID and type for the chat session
+  const entityId = bill?.bill_id || member?.people_id || committee?.committee_id || null;
+  const entityType = bill ? 'bill' : member ? 'member' : committee ? 'committee' : null;
+  
   const {
     messages,
     sessionId,
     saveMessage,
     createNewSession,
     updateSession
-  } = useChatSession(bill?.bill_id || null);
+  } = useChatSession(entityId);
+
+  // Get the appropriate title and suggested prompts
+  const getTitle = () => {
+    if (bill) return `Analysis: ${bill.bill_number || "Unknown Bill"}`;
+    if (member) return `Chat about ${member.name}`;
+    if (committee) return `Chat about ${committee.name}`;
+    return "AI Legislative Analysis";
+  };
+
+  const getDescription = () => {
+    if (bill) return `Analyzing ${bill.bill_number || "Bill"}`;
+    if (member) return `Discussing ${member.name}`;
+    if (committee) return `Discussing ${committee.name}`;
+    return "Chat with AI about legislation";
+  };
+
+  const getSuggestedPrompts = () => {
+    if (bill) return SUGGESTED_PROMPTS.bill;
+    if (member) return SUGGESTED_PROMPTS.member;
+    if (committee) return SUGGESTED_PROMPTS.committee;
+    return SUGGESTED_PROMPTS.bill;
+  };
 
   useEffect(() => {
-    if (open && bill && !isSessionCreated) {
+    if (open && (bill || member || committee) && !isSessionCreated) {
       // Automatically create session when AI chat is opened
-      const sessionTitle = `Analysis: ${bill.bill_number || "Unknown Bill"}`;
+      const sessionTitle = getTitle();
       createNewSession(sessionTitle).then(() => {
         setIsSessionCreated(true);
       }).catch((error) => {
@@ -75,7 +126,7 @@ export const AIChatSheet = ({ open, onOpenChange, bill }: AIChatSheetProps) => {
     if (!open) {
       setIsSessionCreated(false);
     }
-  }, [open, bill, isSessionCreated, createNewSession, toast]);
+  }, [open, bill, member, committee, isSessionCreated, createNewSession, toast]);
 
   // Update the session whenever messages change
   useEffect(() => {
@@ -107,22 +158,42 @@ export const AIChatSheet = ({ open, onOpenChange, bill }: AIChatSheetProps) => {
       
       saveMessage(userMessage);
 
-      // Prepare context about the bill
-      const billContext = bill ? `
+      // Prepare context based on the entity type
+      let contextInfo = "";
+      if (bill) {
+        contextInfo = `
         Bill Information:
         - Number: ${bill.bill_number || "Unknown"}
         - Title: ${bill.title || "No title"}
         - Status: ${bill.status_desc || "Unknown"}
         - Last Action: ${bill.last_action || "None"}
         - Committee: ${bill.committee || "Unknown"}
+        `;
+      } else if (member) {
+        contextInfo = `
+        Member Information:
+        - Name: ${member.name}
+        - Party: ${member.party || "Unknown"}
+        - District: ${member.district || "Unknown"}
+        - Chamber: ${member.chamber || "Unknown"}
+        `;
+      } else if (committee) {
+        contextInfo = `
+        Committee Information:
+        - Name: ${committee.name}
+        - Chamber: ${committee.chamber}
+        - Description: ${committee.description || "No description available"}
+        `;
+      }
+
+      const fullPrompt = `${contextInfo}
         
-        User Question: ${content}
-      ` : content;
+        User Question: ${content}`;
 
       // Call OpenAI edge function using Supabase client
       const { data: responseData, error: functionError } = await supabase.functions.invoke('generate-with-openai', {
         body: {
-          prompt: billContext,
+          prompt: fullPrompt,
           model: selectedModel,
           type: 'default'
         }
@@ -184,7 +255,7 @@ export const AIChatSheet = ({ open, onOpenChange, bill }: AIChatSheetProps) => {
       ).join('\n\n');
       
       const shareData = {
-        title: `AI Chat Analysis - ${bill?.bill_number || 'Legislative Discussion'}`,
+        title: getTitle(),
         text: chatText,
       };
 
@@ -221,7 +292,7 @@ export const AIChatSheet = ({ open, onOpenChange, bill }: AIChatSheetProps) => {
         <SheetHeader className="flex-shrink-0">
           <SheetTitle>AI Legislative Analysis</SheetTitle>
           <SheetDescription>
-            {bill ? `Analyzing ${bill.bill_number || "Bill"}` : "Chat with AI about legislation"}
+            {getDescription()}
           </SheetDescription>
           <div className="pt-2">
             <ModelSelector selectedModel={selectedModel} onModelChange={setSelectedModel} />
@@ -234,7 +305,7 @@ export const AIChatSheet = ({ open, onOpenChange, bill }: AIChatSheetProps) => {
             <div className="space-y-2">
               <h4 className="text-sm font-medium">Suggested prompts:</h4>
               <div className="grid gap-2">
-                {SUGGESTED_PROMPTS.map((prompt, index) => (
+                {getSuggestedPrompts().map((prompt, index) => (
                   <Button
                     key={index}
                     variant="outline"

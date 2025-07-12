@@ -151,7 +151,7 @@ const Committees = () => {
       <AIChatSheet
         open={chatOpen}
         onOpenChange={setChatOpen}
-        title={selectedCommitteeForChat ? `Chat about ${selectedCommitteeForChat.name}` : "AI Chat"}
+        committee={selectedCommitteeForChat}
       />
     </>
   );
