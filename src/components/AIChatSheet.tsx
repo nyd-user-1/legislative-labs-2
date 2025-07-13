@@ -19,6 +19,7 @@ import { useChatSession } from "@/hooks/useChatSession";
 import { MessageBubble } from "@/pages/chats/components/MessageBubble";
 import { Message as ChatMessage } from "@/pages/chats/types";
 import { CitationsDrawer } from "./CitationsDrawer";
+import { ContextBuilder, EntityContext } from "@/utils/contextBuilder";
 
 type Bill = Tables<"Bills">;
 type Member = {
@@ -76,6 +77,7 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee }: AIC
   const [isLoading, setIsLoading] = useState(false);
   const [isSessionCreated, setIsSessionCreated] = useState(false);
   const [citationsOpen, setCitationsOpen] = useState(false);
+  const [citations, setCitations] = useState<any[]>([]);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const { selectedModel, setSelectedModel } = useModel();
@@ -83,6 +85,7 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee }: AIC
   // Determine the entity ID and type for the chat session
   const entityId = bill?.bill_id || member?.people_id || committee?.committee_id || null;
   const entityType = bill ? 'bill' : member ? 'member' : committee ? 'committee' : null;
+  const entity = bill || member || committee || null;
   
   const {
     messages,
@@ -166,44 +169,18 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee }: AIC
       
       saveMessage(userMessage);
 
-      // Prepare context based on the entity type
-      let contextInfo = "";
-      if (bill) {
-        contextInfo = `
-        Bill Information:
-        - Number: ${bill.bill_number || "Unknown"}
-        - Title: ${bill.title || "No title"}
-        - Status: ${bill.status_desc || "Unknown"}
-        - Last Action: ${bill.last_action || "None"}
-        - Committee: ${bill.committee || "Unknown"}
-        `;
-      } else if (member) {
-        contextInfo = `
-        Member Information:
-        - Name: ${member.name}
-        - Party: ${member.party || "Unknown"}
-        - District: ${member.district || "Unknown"}
-        - Chamber: ${member.chamber || "Unknown"}
-        `;
-      } else if (committee) {
-        contextInfo = `
-        Committee Information:
-        - Name: ${committee.name}
-        - Chamber: ${committee.chamber}
-        - Description: ${committee.description || "No description available"}
-        `;
-      }
+      // Build enhanced context using ContextBuilder
+      const enhancedPrompt = ContextBuilder.buildPromptContext(entity, entityType, content);
+      const entityContext = ContextBuilder.getEntityContext(entity, entityType);
 
-      const fullPrompt = `${contextInfo}
-        
-        User Question: ${content}`;
-
-      // Call OpenAI edge function using Supabase client
+      // Call enhanced OpenAI edge function
       const { data: responseData, error: functionError } = await supabase.functions.invoke('generate-with-openai', {
         body: {
-          prompt: fullPrompt,
+          prompt: enhancedPrompt,
           model: selectedModel,
-          type: 'default'
+          type: 'default',
+          entityContext: entityContext,
+          enhanceWithNYSData: true
         }
       });
 
@@ -213,6 +190,36 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee }: AIC
 
       if (!responseData?.generatedText) {
         throw new Error("No response received from AI");
+      }
+
+      // Handle citations if NYS data was used
+      if (responseData.nysDataUsed && responseData.searchResults) {
+        const newCitations = [];
+        
+        if (responseData.searchResults.bills) {
+          responseData.searchResults.bills.forEach((bill: any) => {
+            newCitations.push({
+              id: `bill-${bill.printNo || bill.basePrintNo}`,
+              title: `${bill.printNo || bill.basePrintNo} - ${bill.title || 'NYS Bill'}`,
+              source: "New York State Senate",
+              url: `https://www.nysenate.gov/legislation/bills/${bill.session}/${bill.printNo || bill.basePrintNo}`,
+              excerpt: `Status: ${bill.status?.statusDesc || 'Unknown'} | Sponsor: ${bill.sponsor?.member?.shortName || 'Unknown'}`
+            });
+          });
+        }
+        
+        if (responseData.searchResults.members) {
+          responseData.searchResults.members.forEach((member: any) => {
+            newCitations.push({
+              id: `member-${member.memberId}`,
+              title: `${member.shortName} - NYS ${member.chamber}`,
+              source: "New York State Legislature",
+              excerpt: `District: ${member.districtCode || 'N/A'}`
+            });
+          });
+        }
+        
+        setCitations(newCitations);
       }
       
       // Add AI response
@@ -294,6 +301,13 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee }: AIC
     }
   };
 
+  // Generate dynamic suggested prompts
+  const getSuggestedPrompts = () => {
+    if (messages.length > 0) return []; // Hide after first message
+    
+    return ContextBuilder.generateDynamicPrompts(entity, entityType);
+  };
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-2xl flex flex-col h-full">
@@ -302,7 +316,7 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee }: AIC
         </SheetHeader>
 
         <div className="flex-1 flex flex-col gap-4 min-h-0">
-          {/* Suggested Prompts */}
+          {/* Dynamic Suggested Prompts */}
           {messages.length === 0 && (
             <div className="space-y-3">
               <h4 className="text-sm font-medium">Suggested prompts:</h4>
@@ -355,6 +369,8 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee }: AIC
                     }}
                     onShare={handleShareChat}
                     onSendPrompt={(prompt) => sendMessage(prompt)}
+                    entity={entity}
+                    entityType={entityType}
                   />
                 );
               })}
@@ -393,7 +409,6 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee }: AIC
                 <Send className="w-4 h-4" />
               </Button>
             </div>
-
           </div>
         </div>
       </SheetContent>
@@ -401,21 +416,7 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee }: AIC
       <CitationsDrawer 
         open={citationsOpen}
         onOpenChange={setCitationsOpen}
-        citations={[
-          {
-            id: "1",
-            title: "NYS Legislative Database",
-            source: "New York State Senate",
-            url: "https://www.nysenate.gov",
-            excerpt: "Official legislative records and bill tracking system"
-          },
-          {
-            id: "2", 
-            title: "Committee Reports",
-            source: "Assembly Committee Records",
-            excerpt: "Analysis based on committee hearing transcripts and reports"
-          }
-        ]}
+        citations={citations}
       />
     </Sheet>
   );

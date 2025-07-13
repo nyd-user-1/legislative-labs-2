@@ -1,8 +1,10 @@
+
 import { Button } from "@/components/ui/button";
 import { Copy, ExternalLink, BookOpen } from "lucide-react";
 import { format } from "date-fns";
 import ReactMarkdown from "react-markdown";
 import { Message } from "../types";
+import { ContextBuilder } from "@/utils/contextBuilder";
 
 interface MessageBubbleProps {
   message: Message;
@@ -10,38 +12,25 @@ interface MessageBubbleProps {
   onFeedback: (type: "thumbs-up" | "thumbs-down" | "citations") => void;
   onShare?: () => void;
   onSendPrompt?: (prompt: string) => void;
+  entity?: any;
+  entityType?: 'bill' | 'member' | 'committee' | null;
 }
 
-export const MessageBubble = ({ message, onCopy, onFeedback, onShare, onSendPrompt }: MessageBubbleProps) => {
-  // Generate dynamic prompts based on message content
-  const generateDynamicPrompts = (content: string) => {
-    const prompts = [];
-    const lowerContent = content.toLowerCase();
-    
-    // Base prompts that always appear
-    if (lowerContent.includes('bill') || lowerContent.includes('legislation')) {
-      prompts.push('Fiscal Impact', 'Similar Bills');
-    } else if (lowerContent.includes('member') || lowerContent.includes('legislator')) {
-      prompts.push('Voting Record', 'Committee Work');
-    } else if (lowerContent.includes('committee')) {
-      prompts.push('Meeting Schedule', 'Active Bills');
-    } else {
-      // Default prompts
-      prompts.push('More Details', 'Related Topics');
-    }
-    
-    // Add a third contextual prompt if space allows
-    if (lowerContent.includes('vote') || lowerContent.includes('voting')) {
-      prompts.push('Vote Analysis');
-    } else if (lowerContent.includes('sponsor') || lowerContent.includes('author')) {
-      prompts.push('Sponsor History');
-    } else if (lowerContent.includes('impact') || lowerContent.includes('effect')) {
-      prompts.push('Stakeholder Views');
-    }
-    
-    // Return only first 2-3 prompts that fit in one line
-    return prompts.slice(0, 3);
+export const MessageBubble = ({ 
+  message, 
+  onCopy, 
+  onFeedback, 
+  onShare, 
+  onSendPrompt,
+  entity,
+  entityType 
+}: MessageBubbleProps) => {
+  
+  // Generate dynamic prompts using ContextBuilder
+  const getDynamicPrompts = () => {
+    return ContextBuilder.generateDynamicPrompts(entity, entityType, message.content);
   };
+
   return (
     <div className="space-y-2">
       <div
@@ -73,9 +62,9 @@ export const MessageBubble = ({ message, onCopy, onFeedback, onShare, onSendProm
       
       {message.role === "assistant" && (
         <div className="space-y-2">
-          {/* Suggested prompts */}
+          {/* Dynamic suggested prompts */}
           <div className="flex flex-wrap gap-2">
-            {generateDynamicPrompts(message.content).map((prompt, index) => (
+            {getDynamicPrompts().map((prompt, index) => (
               <Button
                 key={index}
                 variant="outline"
