@@ -67,12 +67,13 @@ export const useBillsData = () => {
           .eq("name", sponsorFilter);
         
         if (people && people.length > 0) {
-          // Then find bills sponsored by these people
+          // Then find bills where these people are PRIMARY sponsors (position = 1)
           const peopleIds = people.map(p => p.people_id);
           const { data: sponsorBills } = await supabase
             .from("Sponsors")
             .select("bill_id")
-            .in("people_id", peopleIds);
+            .in("people_id", peopleIds)
+            .eq("position", 1);
           
           if (sponsorBills && sponsorBills.length > 0) {
             const billIds = sponsorBills.map(sb => sb.bill_id);
