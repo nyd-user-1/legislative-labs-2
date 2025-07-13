@@ -13,15 +13,12 @@ import {
   FileText, 
   History,
   Users,
-  Vote,
-  Sparkles
+  Vote
 } from "lucide-react";
 import { BillStatusBadge } from "./BillStatusBadge";
 import { BillJourney } from "./BillJourney";
-import { EnhancedBillOverview } from "./bills/EnhancedBillOverview";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
-import { useEnhancedBillDetails } from "@/hooks/useEnhancedBillDetails";
 
 type Bill = Tables<"Bills">;
 type Document = Tables<"Documents">;
@@ -42,45 +39,37 @@ export const BillDetail = ({ bill, onBack }: BillDetailProps) => {
   const [sponsors, setSponsors] = useState<(Sponsor & { person?: Person })[]>([]);
   const [rollCalls, setRollCalls] = useState<(RollCall & { votes?: (Vote & { person?: Person })[] })[]>([]);
   const [loading, setLoading] = useState(true);
-  
-  // Enhanced details from NYS API
-  const { 
-    loading: enhancedLoading, 
-    enhancedDetails, 
-    error: enhancedError,
-    fetchEnhancedDetails 
-  } = useEnhancedBillDetails();
 
   useEffect(() => {
     fetchBillDetails();
-    // Fetch enhanced details if bill number is available
-    if (bill.bill_number) {
-      fetchEnhancedDetails(bill.bill_number, bill.session_id || undefined);
-    }
   }, [bill.bill_id]);
 
   const fetchBillDetails = async () => {
     try {
       setLoading(true);
 
+      // Fetch documents
       const { data: documentsData } = await supabase
         .from("Documents")
         .select("*")
         .eq("bill_id", bill.bill_id)
         .order("document_id");
 
+      // Fetch history
       const { data: historyData } = await supabase
         .from("History Table")
         .select("*")
         .eq("bill_id", bill.bill_id)
         .order("date", { ascending: false });
 
+      // Fetch sponsors and people data separately
       const { data: sponsorsData } = await supabase
         .from("Sponsors")
         .select("*")
         .eq("bill_id", bill.bill_id)
         .order("position");
 
+      // Fetch people data for sponsors
       let sponsorsWithPeople: (Sponsor & { person?: Person })[] = [];
       if (sponsorsData && sponsorsData.length > 0) {
         const peopleIds = sponsorsData.map(s => s.people_id).filter(Boolean);
@@ -100,21 +89,25 @@ export const BillDetail = ({ bill, onBack }: BillDetailProps) => {
         }
       }
 
+      // Fetch roll call votes for this bill
       const { data: rollCallData } = await supabase
         .from("Roll Call")
         .select("*")
         .eq("bill_id", bill.bill_id)
         .order("date", { ascending: false });
 
+      // Fetch detailed vote records for each roll call
       let rollCallsWithVotes: (RollCall & { votes?: (Vote & { person?: Person })[] })[] = [];
       if (rollCallData && rollCallData.length > 0) {
         rollCallsWithVotes = await Promise.all(
           rollCallData.map(async (rollCall) => {
+            // Get votes for this roll call
             const { data: votesData } = await supabase
               .from("Votes")
               .select("*")
               .eq("roll_call_id", rollCall.roll_call_id);
 
+            // Get person data for the votes
             let votesWithPeople: (Vote & { person?: Person })[] = [];
             if (votesData && votesData.length > 0) {
               const voterIds = votesData.map(v => v.people_id);
@@ -183,17 +176,14 @@ export const BillDetail = ({ bill, onBack }: BillDetailProps) => {
             Back to Bills
           </Button>
 
+
           {/* Bill Tabs Section */}
           <section>
             <Tabs defaultValue="overview" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-5 h-12 p-1 bg-muted rounded-lg">
+              <TabsList className="grid w-full grid-cols-4 h-12 p-1 bg-muted rounded-lg">
                 <TabsTrigger value="overview" className="flex items-center gap-2 h-10 rounded-md text-sm font-medium">
                   <FileText className="h-4 w-4" />
                   Overview
-                </TabsTrigger>
-                <TabsTrigger value="enhanced" className="flex items-center gap-2 h-10 rounded-md text-sm font-medium">
-                  <Sparkles className="h-4 w-4" />
-                  Enhanced
                 </TabsTrigger>
                 <TabsTrigger value="sponsors" className="flex items-center gap-2 h-10 rounded-md text-sm font-medium">
                   <Users className="h-4 w-4" />
@@ -273,35 +263,7 @@ export const BillDetail = ({ bill, onBack }: BillDetailProps) => {
                     </CardContent>
                   </Card>
                 </div>
-              </TabsContent>
 
-              <TabsContent value="enhanced" className="mt-6">
-                {enhancedLoading ? (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {[...Array(4)].map((_, i) => (
-                      <Skeleton key={i} className="h-80 w-full" />
-                    ))}
-                  </div>
-                ) : enhancedError ? (
-                  <div className="text-center py-12">
-                    <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                    <h3 className="text-lg font-medium mb-2">Enhanced Details Unavailable</h3>
-                    <p className="text-muted-foreground text-sm max-w-md mx-auto">
-                      Unable to load enhanced bill details from the NYS Legislature API. 
-                      This may be due to the bill not being found in the NYS system or API limitations.
-                    </p>
-                  </div>
-                ) : enhancedDetails ? (
-                  <EnhancedBillOverview enhancedDetails={enhancedDetails} />
-                ) : (
-                  <div className="text-center py-12">
-                    <Sparkles className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                    <h3 className="text-lg font-medium mb-2">No Enhanced Details</h3>
-                    <p className="text-muted-foreground text-sm max-w-md mx-auto">
-                      Enhanced details are not available for this bill.
-                    </p>
-                  </div>
-                )}
               </TabsContent>
 
               <TabsContent value="sponsors" className="mt-6">
@@ -402,11 +364,13 @@ export const BillDetail = ({ bill, onBack }: BillDetailProps) => {
                     ) : (
                       <ScrollArea className="h-[500px] pr-4">
                         <div className="relative">
+                          {/* Timeline line */}
                           <div className="absolute left-6 top-6 bottom-6 w-px bg-border"></div>
                           
                           <div className="space-y-6">
                             {history.map((entry, index) => (
                               <div key={`${entry.date}-${entry.sequence}`} className="relative flex gap-6">
+                                {/* Timeline dot */}
                                 <div className="flex-shrink-0 w-3 h-3 bg-primary rounded-full mt-2 relative z-10"></div>
                                 
                                 <div className="flex-1 pb-6">
