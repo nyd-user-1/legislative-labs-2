@@ -51,22 +51,22 @@ interface AIChatSheetProps {
 
 const SUGGESTED_PROMPTS = {
   bill: [
-    "Analyze this bill's key provisions and potential impact",
-    "What are the main arguments for and against this legislation?",
-    "How does this bill compare to similar legislation in other states?",
-    "What are the potential fiscal implications of this bill?"
+    "Analyze key provisions & impact",
+    "Arguments for & against?",
+    "Compare to similar state bills",
+    "What are fiscal implications?"
   ],
   member: [
-    "What are this member's key policy positions?",
-    "Analyze this member's voting record and committee assignments",
-    "What legislation has this member sponsored recently?",
-    "How does this member's voting align with their party?"
+    "Key policy positions?",
+    "Voting record & committees",
+    "Recent sponsored legislation",
+    "Party alignment analysis"
   ],
   committee: [
-    "What types of legislation does this committee typically handle?",
-    "Analyze this committee's recent activity and priorities",
-    "Who are the key members of this committee?",
-    "What major bills has this committee reviewed recently?"
+    "What legislation do they handle?",
+    "Recent activity & priorities",
+    "Who are key members?",
+    "Major bills reviewed recently?"
   ]
 };
 
@@ -309,7 +309,7 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee }: AIC
                   <Button
                     key={index}
                     variant="outline"
-                    className="h-auto p-3 text-left whitespace-nowrap min-w-[280px] flex-shrink-0"
+                    className="h-auto py-3 px-4 text-left whitespace-normal min-w-[160px] max-w-[180px] flex-shrink-0 leading-tight text-sm"
                     onClick={() => handlePromptClick(prompt)}
                     disabled={isLoading}
                   >
