@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -23,6 +24,7 @@ import Favorites from "./pages/Favorites";
 import LegislativeDrafts from "./pages/LegislativeDrafts";
 import LegislativeDrafts2 from "./pages/LegislativeDrafts2";
 import Plans from "./pages/Plans";
+import ChangeLog from "./pages/ChangeLog";
 
 const queryClient = new QueryClient();
 
@@ -60,6 +62,7 @@ const AppLayout = () => {
                 <Route path="/drafts2" element={<LegislativeDrafts2 />} />
                 <Route path="/plans" element={<Plans />} />
                 <Route path="/profile" element={<Profile />} />
+                <Route path="/changelog" element={<ChangeLog />} />
                 <Route path="/" element={<Index />} />
               </Routes>
             </main>
