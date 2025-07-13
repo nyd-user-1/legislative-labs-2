@@ -118,14 +118,9 @@ const ChangeLog = () => {
       <div className="content-wrapper max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <Sparkles className="h-6 w-6 text-primary" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Change Log</h1>
-              <p className="text-gray-600">Continuous innovation since July 2025</p>
-            </div>
+          <div className="mb-4">
+            <h1 className="text-3xl font-bold text-gray-900">Change Log</h1>
+            <p className="text-gray-600">Continuous innovation since July 2025</p>
           </div>
           
           <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
@@ -204,10 +199,10 @@ const ChangeLog = () => {
         <div className="mt-8 p-4 bg-gradient-to-r from-primary/5 to-primary/10 rounded-lg border border-primary/20">
           <div className="text-center">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              Platform Impact Summary
+              Impact Summary
             </h3>
             <p className="text-sm text-gray-600 mb-4">
-              Empowering legislative research and policy analysis through cutting-edge technology
+              Empowering legislative research, policy analysis, and problem solving through cutting-edge innovation
             </p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
               <div className="text-center">
