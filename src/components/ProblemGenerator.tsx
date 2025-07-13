@@ -8,6 +8,7 @@ import { Loader2, Lightbulb, Copy, FileText, Target } from "lucide-react";
 import { generateProblemFromScenario } from "@/utils/problemStatementHelpers";
 import { supabase } from "@/integrations/supabase/client";
 import { useModel } from "@/contexts/ModelContext";
+import ReactMarkdown from "react-markdown";
 
 interface ProblemGeneratorProps {
   onProblemGenerated?: (problem: string) => void;
@@ -97,75 +98,74 @@ Format it as a professional problem statement suitable for legislative drafting.
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Lightbulb className="h-5 w-5" />
-          Problem Statement
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Textarea
-            id="scenario"
-            placeholder="Describe a real-life situation or scenario that illustrates the problem you want to address with legislation..."
-            value={scenarioInput}
-            onChange={(e) => setScenarioInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && e.ctrlKey) {
-                generateProblemStatement();
-              }
-            }}
-            className="min-h-[100px] resize-none form-input"
-          />
-        </div>
-
-        <Button
-          onClick={generateProblemStatement}
-          disabled={isGeneratingProblem}
-          className="button-generate touch-manipulation"
-        >
-          {isGeneratingProblem ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Generating...
-            </>
-          ) : (
-            <>
-              <Target className="mr-2 h-4 w-4" />
-              Generate
-            </>
-          )}
-        </Button>
-
-        {problemStatement && (
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Generated Problem Statement</Label>
-              <div className="bg-muted/50 p-4 rounded-lg border output-container relative">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={copyProblemStatement}
-                  className="absolute top-2 right-2 h-8 w-8 p-0 opacity-70 hover:opacity-100"
-                >
-                  <Copy className="h-4 w-4" />
-                </Button>
-                <p className="text-sm leading-relaxed whitespace-pre-wrap pr-10">{problemStatement}</p>
+    <div className="space-y-6">
+      {/* Problem Statement Section */}
+      <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-xl">
+            <Lightbulb className="h-6 w-6 text-blue-600" />
+            Problem Statement
+          </CardTitle>
+          <p className="text-gray-600 text-sm">
+            Based on your problem statement, develop a comprehensive legislative idea.
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Problem Statement Display */}
+          <div className="space-y-3">
+            <Label className="text-sm font-semibold text-gray-700">Problem Statement</Label>
+            <div className="bg-gray-900 text-white p-6 rounded-lg min-h-[200px] relative">
+              <div className="prose prose-sm prose-invert max-w-none">
+                <ReactMarkdown>
+                  {problemStatement || "**Problem Statement:** The escalating cost of higher education in the United States has resulted in a significant increase in student loan debt, with over 45 million borrowers collectively owing more than $1.7 trillion. This debt burden is disproportionately affecting low- and middle-income families, leading to long-term financial instability, delayed homeownership, and reduced economic mobility for graduates. The current reliance on student loans as a primary means of financing higher education is creating a cycle of debt that impacts not only individual borrowers but also the broader economy, which suffers from decreased consumer spending and increased reliance on social services. Existing federal and state regulations have proven insufficient in addressing the root causes of the student debt crisis. Current legislation primarily focuses on loan availability and repayment plans, rather than tackling the underlying issues of rising tuition costs and inadequate institutional accountability. Furthermore, the complexities of existing student loan programs create barriers for borrowers seeking relief, leaving many without adequate options to manage or reduce their debt. There is a pressing need for comprehensive legislative action that addresses both the affordability of higher education and the mechanisms of student loan financing to ensure equitable access to education without the crippling burden of debt. Such reforms would not only alleviate the financial strain on families but also foster a more sustainable and equitable economic environment."}
+                </ReactMarkdown>
               </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={copyProblemStatement}
+                className="absolute bottom-4 right-4 h-8 w-8 p-0 text-white/70 hover:text-white hover:bg-white/10"
+              >
+                <Copy className="h-4 w-4" />
+              </Button>
             </div>
-            
-            <Button
-              onClick={() => onDraftBill?.(problemStatement)}
-              variant="secondary"
-              className="w-full"
-            >
-              <FileText className="mr-2 h-4 w-4" />
-              Draft Bill from Problem Statement
-            </Button>
           </div>
-        )}
-      </CardContent>
-    </Card>
+
+          {/* Ideation Section */}
+          <div className="space-y-3">
+            <Label className="text-sm font-semibold text-gray-700">Ideation</Label>
+            <Textarea
+              placeholder="Enter your idea for legislation or policy here. Be as detailed as possible and include a problem statement."
+              value={scenarioInput}
+              onChange={(e) => setScenarioInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && e.ctrlKey) {
+                  generateProblemStatement();
+                }
+              }}
+              className="min-h-[120px] resize-none border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+            />
+          </div>
+
+          <Button
+            onClick={generateProblemStatement}
+            disabled={isGeneratingProblem}
+            className="w-full bg-gray-900 hover:bg-gray-800 text-white"
+          >
+            {isGeneratingProblem ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Generating...
+              </>
+            ) : (
+              <>
+                <Lightbulb className="mr-2 h-4 w-4" />
+                Generate
+              </>
+            )}
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
   );
 };

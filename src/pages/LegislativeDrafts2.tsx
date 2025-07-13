@@ -13,7 +13,7 @@ const LegislativeDrafts2 = () => {
       <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Legislative Drafts</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Process</h1>
           <p className="text-gray-600 mt-2">
             Create, manage, and collaborate on legislative proposals with AI assistance.
           </p>
@@ -22,10 +22,10 @@ const LegislativeDrafts2 = () => {
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-4 mb-8">
-            <TabsTrigger value="generator">Draft Generator</TabsTrigger>
-            <TabsTrigger value="my-drafts">My Drafts</TabsTrigger>
-            <TabsTrigger value="collaborative">Collaborative</TabsTrigger>
-            <TabsTrigger value="gallery">Public Gallery</TabsTrigger>
+            <TabsTrigger value="generator">Problem</TabsTrigger>
+            <TabsTrigger value="my-drafts">Policy</TabsTrigger>
+            <TabsTrigger value="collaborative">Partner</TabsTrigger>
+            <TabsTrigger value="gallery">Project</TabsTrigger>
           </TabsList>
 
           <TabsContent value="generator">
