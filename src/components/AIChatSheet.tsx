@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Tables } from "@/integrations/supabase/types";
 import {
   Sheet,
@@ -58,16 +58,23 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee }: AIC
     initializeSession
   } = useChatLogic(entity, entityType);
 
-  // Initialize session when sheet opens/closes
-  React.useEffect(() => {
-    initializeSession(open);
-  }, [open, entity, initializeSession]);
+  // Initialize session when sheet opens (only once)
+  useEffect(() => {
+    if (open) {
+      console.log("Chat sheet opened, initializing session");
+      initializeSession(true);
+    }
+  }, [open, initializeSession]);
 
   const handleSendMessage = () => {
-    sendMessage(inputValue);
+    if (inputValue.trim()) {
+      console.log("Handling send message:", inputValue);
+      sendMessage(inputValue);
+    }
   };
 
   const handlePromptClick = (prompt: string) => {
+    console.log("Handling prompt click:", prompt);
     sendMessage(prompt);
   };
 

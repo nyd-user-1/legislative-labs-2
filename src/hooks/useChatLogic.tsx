@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useModel } from "@/contexts/ModelContext";
 import { useToast } from "@/hooks/use-toast";
@@ -19,7 +19,6 @@ type EntityType = 'bill' | 'member' | 'committee' | null;
 export const useChatLogic = (entity: Entity, entityType: EntityType) => {
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isSessionCreated, setIsSessionCreated] = useState(false);
   const [citations, setCitations] = useState<any[]>([]);
   const { toast } = useToast();
   const { selectedModel } = useModel();
@@ -43,13 +42,13 @@ export const useChatLogic = (entity: Entity, entityType: EntityType) => {
     return "AI Legislative Analysis";
   };
 
-  // Auto-create session when chat is opened
-  const initializeSession = async (isOpen: boolean) => {
-    if (isOpen && entity && !isSessionCreated) {
+  // Initialize session only once when chat opens
+  const initializeSession = useCallback(async (isOpen: boolean) => {
+    if (isOpen && entity && !sessionId) {
       try {
+        console.log("Initializing new chat session for:", getTitle());
         const sessionTitle = getTitle();
         await createNewSession(sessionTitle);
-        setIsSessionCreated(true);
       } catch (error) {
         console.error("Failed to create session:", error);
         toast({
@@ -59,27 +58,27 @@ export const useChatLogic = (entity: Entity, entityType: EntityType) => {
         });
       }
     }
-    
-    // Reset session created flag when sheet closes
-    if (!isOpen) {
-      setIsSessionCreated(false);
-    }
-  };
+  }, [entity, sessionId, createNewSession, getTitle, toast]);
 
-  // Update the session whenever messages change
+  // Update the session when messages change (but avoid infinite loops)
   useEffect(() => {
     if (sessionId && messages.length > 0) {
+      console.log("Updating session with", messages.length, "messages");
       updateSession(messages);
     }
-  }, [messages, sessionId, updateSession]);
+  }, [messages.length, sessionId]); // Only trigger when message count changes
 
   const sendMessage = async (content: string) => {
-    if (!content.trim() || isLoading) return;
+    if (!content.trim() || isLoading) {
+      console.log("Message sending blocked - empty content or already loading");
+      return;
+    }
 
+    console.log("Sending message:", content);
     setIsLoading(true);
     
     try {
-      // Add user message
+      // Add user message immediately
       const userMessage: Message = {
         id: crypto.randomUUID(),
         role: "user",
@@ -93,6 +92,8 @@ export const useChatLogic = (entity: Entity, entityType: EntityType) => {
       const enhancedPrompt = ContextBuilder.buildPromptContext(entity, entityType, content);
       const entityContext = ContextBuilder.getEntityContext(entity, entityType);
 
+      console.log("Calling AI function with enhanced prompt");
+      
       // Call enhanced OpenAI edge function
       const { data: responseData, error: functionError } = await supabase.functions.invoke('generate-with-openai', {
         body: {
@@ -105,12 +106,16 @@ export const useChatLogic = (entity: Entity, entityType: EntityType) => {
       });
 
       if (functionError) {
+        console.error("Function error:", functionError);
         throw new Error(functionError.message || "Failed to get AI response");
       }
 
       if (!responseData?.generatedText) {
+        console.error("No generated text in response:", responseData);
         throw new Error("No response received from AI");
       }
+
+      console.log("AI response received, length:", responseData.generatedText.length);
 
       // Handle citations if NYS data was used
       if (responseData.nysDataUsed && responseData.searchResults) {
@@ -150,6 +155,7 @@ export const useChatLogic = (entity: Entity, entityType: EntityType) => {
         timestamp: new Date()
       };
       
+      console.log("Saving assistant message");
       saveMessage(assistantMessage);
       
     } catch (error) {
