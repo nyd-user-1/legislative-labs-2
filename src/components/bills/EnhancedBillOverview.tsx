@@ -63,7 +63,7 @@ export const EnhancedBillOverview = ({ enhancedDetails }: EnhancedBillOverviewPr
     }
   };
 
-  // Helper function to safely get vote counts with proper type handling
+  // Helper function to safely get vote counts - ensures we always return a number
   const getVoteCount = (votes: Array<any>, voteType: string): number => {
     if (!Array.isArray(votes) || votes.length === 0) {
       return 0;
@@ -78,9 +78,12 @@ export const EnhancedBillOverview = ({ enhancedDetails }: EnhancedBillOverviewPr
       
       const count = vote[voteType];
       
+      // Handle numeric values
       if (typeof count === 'number' && !isNaN(count)) {
         total += count;
-      } else if (typeof count === 'string') {
+      } 
+      // Handle string values that can be parsed to numbers
+      else if (typeof count === 'string' && count.trim() !== '') {
         const parsed = parseInt(count, 10);
         if (!isNaN(parsed)) {
           total += parsed;
@@ -91,10 +94,10 @@ export const EnhancedBillOverview = ({ enhancedDetails }: EnhancedBillOverviewPr
     return total;
   };
 
-  // Calculate vote totals with explicit number typing
-  const yesVotes = getVoteCount(enhancedDetails.votes, 'aye');
-  const noVotes = getVoteCount(enhancedDetails.votes, 'nay');
-  const absentVotes = getVoteCount(enhancedDetails.votes, 'absent');
+  // Calculate vote totals - explicitly ensure these are numbers
+  const yesVotes: number = getVoteCount(enhancedDetails.votes, 'aye');
+  const noVotes: number = getVoteCount(enhancedDetails.votes, 'nay');
+  const absentVotes: number = getVoteCount(enhancedDetails.votes, 'absent');
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
