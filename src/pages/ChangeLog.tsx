@@ -122,18 +122,6 @@ const ChangeLog = () => {
             <h1 className="text-3xl font-bold text-gray-900">Change Log</h1>
             <p className="text-gray-600">Continuous innovation since July 2025</p>
           </div>
-          
-          <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
-            <div className="flex-1">
-              <p className="text-sm font-medium text-blue-900">
-                Platform Evolution
-              </p>
-              <p className="text-xs text-blue-700">
-                {releases.reduce((acc, release) => acc + release.features.length, 0)} features delivered • 
-                {releases.length} major releases
-              </p>
-            </div>
-          </div>
         </div>
 
         {/* Release Timeline */}
