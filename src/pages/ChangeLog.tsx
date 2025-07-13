@@ -3,23 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { 
-  Sparkles, 
-  Users, 
-  FileText, 
-  Building2, 
-  MessageSquare, 
-  Heart, 
-  Search, 
-  Shield, 
-  Zap, 
-  Database,
-  Palette,
-  Globe,
-  TrendingUp,
-  Bot,
-  BarChart3,
-  Settings,
-  Lock
+  Sparkles
 } from "lucide-react";
 
 const ChangeLog = () => {
@@ -27,31 +11,27 @@ const ChangeLog = () => {
     {
       version: "2.0.0",
       date: "July 20, 2025",
-      title: "Advanced Legislative Intelligence & Analytics",
+      title: "Advanced Legislative Intelligence",
       description: "Transforming how policy professionals research and engage with legislative data through AI-powered insights.",
       isLatest: true,
       features: [
         {
-          icon: <Bot className="h-5 w-5" />,
-          title: "AI-Powered Legislative Analysis",
+          title: "AI-Powered Analysis",
           description: "Revolutionary AI chat system that provides instant, contextual insights on bills, members, and committees with natural language processing.",
           category: "AI"
         },
         {
-          icon: <BarChart3 className="h-5 w-5" />,
-          title: "Dynamic Dashboard Analytics",
+          title: "Dynamic Dashboard",
           description: "Comprehensive dashboard with real-time legislative metrics, trending bills, committee activity, and member performance indicators.",
           category: "Analytics"
         },
         {
-          icon: <Search className="h-5 w-5" />,
-          title: "Advanced Search & Filtering",
+          title: "Advanced Search",
           description: "Sophisticated search capabilities across all legislative data with intelligent filters, keyword highlighting, and contextual suggestions.",
           category: "Search"
         },
         {
-          icon: <Heart className="h-5 w-5" />,
-          title: "Personalized Favorites System",
+          title: "Personalized Favorites",
           description: "Smart favorites management allowing users to track bills, members, and committees with priority notifications and updates.",
           category: "Personalization"
         }
@@ -64,26 +44,22 @@ const ChangeLog = () => {
       description: "Complete platform overhaul delivering enterprise-grade legislative research capabilities with modern UI/UX.",
       features: [
         {
-          icon: <FileText className="h-5 w-5" />,
-          title: "Comprehensive Bills Database",
+          title: "Bills Database",
           description: "Full access to New York State legislative database with detailed bill information, sponsor data, committee assignments, and voting records.",
           category: "Data"
         },
         {
-          icon: <Users className="h-5 w-5" />,
-          title: "Legislative Member Profiles",
+          title: "Member Profiles",
           description: "Detailed member profiles with biographical information, committee memberships, sponsored legislation, and voting patterns.",
           category: "Members"
         },
         {
-          icon: <Building2 className="h-5 w-5" />,
-          title: "Committee Management System",
+          title: "Committee Management",
           description: "Complete committee information including membership, meeting schedules, active legislation, and jurisdictional details.",
           category: "Committees"
         },
         {
-          icon: <MessageSquare className="h-5 w-5" />,
-          title: "Interactive Chat Sessions",
+          title: "Interactive Chat",
           description: "Persistent chat sessions with AI assistant specialized in legislative research, policy analysis, and strategic planning.",
           category: "Intelligence"
         }
@@ -96,26 +72,22 @@ const ChangeLog = () => {
       description: "Initial platform release establishing the core architecture for legislative research and policy analysis.",
       features: [
         {
-          icon: <Palette className="h-5 w-5" />,
-          title: "Modern Design System",
+          title: "Modern Design",
           description: "Comprehensive design system built with Tailwind CSS and Shadcn UI components for consistent, accessible user experience.",
           category: "Design"
         },
         {
-          icon: <Zap className="h-5 w-5" />,
-          title: "High-Performance Architecture",
+          title: "High-Performance",
           description: "React-based architecture with optimized data loading, caching strategies, and responsive design for all devices.",
           category: "Performance"
         },
         {
-          icon: <Globe className="h-5 w-5" />,
-          title: "NYS OpenLegislation API Integration",
+          title: "NYS API Integration",
           description: "Complete integration with New York State's official legislative API providing comprehensive access to all public legislative data.",
           category: "Integration"
         },
         {
-          icon: <Settings className="h-5 w-5" />,
-          title: "Responsive Navigation System",
+          title: "Responsive Navigation",
           description: "Intuitive sidebar navigation with collapsible design, search integration, and contextual menu organization.",
           category: "Navigation"
         }
@@ -152,20 +124,18 @@ const ChangeLog = () => {
             </div>
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Change Log</h1>
-              <p className="text-gray-600">Track our journey of continuous innovation and feature development</p>
+              <p className="text-gray-600">Continuous innovation since July 2025</p>
             </div>
           </div>
           
           <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
-            <TrendingUp className="h-5 w-5 text-blue-600" />
             <div className="flex-1">
               <p className="text-sm font-medium text-blue-900">
-                Platform Evolution Metrics
+                Platform Evolution
               </p>
               <p className="text-xs text-blue-700">
                 {releases.reduce((acc, release) => acc + release.features.length, 0)} features delivered • 
-                {releases.length} major releases • 
-                Continuous innovation since July 2025
+                {releases.length} major releases
               </p>
             </div>
           </div>
@@ -205,11 +175,8 @@ const ChangeLog = () => {
                   <div className="space-y-3">
                     {release.features.map((feature, featureIndex) => (
                       <div key={featureIndex} className="flex items-start gap-3">
-                        <div className="flex-shrink-0 p-1.5 bg-gray-50 rounded-md mt-0.5">
-                          {feature.icon}
-                        </div>
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
+                          <div className="flex items-center justify-between mb-1">
                             <h4 className="font-medium text-gray-900 text-sm">
                               {feature.title}
                             </h4>
