@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Copy, ThumbsUp, ThumbsDown, Share } from "lucide-react";
+import { Copy, ThumbsUp, ThumbsDown, ExternalLink } from "lucide-react";
 import { format } from "date-fns";
 import ReactMarkdown from "react-markdown";
 import { Message } from "../types";
@@ -58,7 +58,7 @@ export const MessageBubble = ({ message, onCopy, onFeedback, onShare }: MessageB
               onClick={onShare}
               className="h-8 px-2"
             >
-              <Share className="h-3 w-3" />
+              <ExternalLink className="h-3 w-3" />
             </Button>
           )}
           <Button
