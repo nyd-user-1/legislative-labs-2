@@ -47,23 +47,29 @@ export const BillsSearchFilters = ({
     filters.committee !== "" ||
     filters.dateRange !== "";
 
+  const months = [
+    { value: "all", label: "Month" },
+    { value: "01", label: "January" },
+    { value: "02", label: "February" },
+    { value: "03", label: "March" },
+    { value: "04", label: "April" },
+    { value: "05", label: "May" },
+    { value: "06", label: "June" },
+    { value: "07", label: "July" },
+    { value: "08", label: "August" },
+    { value: "09", label: "September" },
+    { value: "10", label: "October" },
+    { value: "11", label: "November" },
+    { value: "12", label: "December" },
+  ];
+
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <Input
-            placeholder="Search bills (min 2 chars)..."
-            value={filters.search}
-            onChange={(e) => handleFilterChange("search", e.target.value)}
-            className="pl-10"
-          />
-        </div>
-
+      <div className="grid grid-cols-3 gap-4">
         <div>
           <Select value={filters.sponsor || "all"} onValueChange={(value) => handleFilterChange("sponsor", value === "all" ? "" : value)}>
             <SelectTrigger>
-              <SelectValue placeholder="All Sponsors" />
+              <SelectValue placeholder="Sponsors" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Sponsors</SelectItem>
@@ -91,7 +97,7 @@ export const BillsSearchFilters = ({
         <div>
           <Select value={filters.committee || "all"} onValueChange={(value) => handleFilterChange("committee", value === "all" ? "" : value)}>
             <SelectTrigger>
-              <SelectValue placeholder="All Committees" />
+              <SelectValue placeholder="Committees" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Committees</SelectItem>
@@ -114,17 +120,27 @@ export const BillsSearchFilters = ({
         <div>
           <Select value={filters.dateRange || "all"} onValueChange={(value) => handleFilterChange("dateRange", value === "all" ? "" : value)}>
             <SelectTrigger>
-              <SelectValue placeholder="All Time" />
+              <SelectValue placeholder="Month" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Time</SelectItem>
-              <SelectItem value="7">Last 7 days</SelectItem>
-              <SelectItem value="30">Last 30 days</SelectItem>
-              <SelectItem value="90">Last 3 months</SelectItem>
-              <SelectItem value="365">Last year</SelectItem>
+              {months.map((month) => (
+                <SelectItem key={month.value} value={month.value}>
+                  {month.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
+      </div>
+
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+        <Input
+          placeholder="Search bills (min 2 chars)..."
+          value={filters.search}
+          onChange={(e) => handleFilterChange("search", e.target.value)}
+          className="pl-10"
+        />
       </div>
 
       {hasActiveFilters && (

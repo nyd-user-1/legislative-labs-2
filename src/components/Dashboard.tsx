@@ -121,12 +121,12 @@ export const Dashboard = () => {
 
           {/* Statistics Cards Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
-            <Card className="hover:shadow-md transition-shadow cursor-pointer max-w-[48dvw] sm:max-w-none" onClick={handleViewAllBills}>
+            <Card className="hover:shadow-md transition-shadow cursor-pointer max-w-[48dvw] sm:max-w-none" onClick={handleViewAllMembers}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
-                <CardTitle className="text-xs sm:text-sm font-medium truncate">Total Bills</CardTitle>
+                <CardTitle className="text-xs sm:text-sm font-medium truncate">Members</CardTitle>
               </CardHeader>
               <CardContent className="px-4 pb-4">
-                <div className="text-3xl sm:text-4xl font-bold">{stats.totalBills.toLocaleString()}</div>
+                <div className="text-3xl sm:text-4xl font-bold">{stats.totalMembers.toLocaleString()}</div>
               </CardContent>
             </Card>
 
@@ -148,12 +148,12 @@ export const Dashboard = () => {
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-md transition-shadow cursor-pointer max-w-[48dvw] sm:max-w-none" onClick={handleViewAllMembers}>
+            <Card className="hover:shadow-md transition-shadow cursor-pointer max-w-[48dvw] sm:max-w-none" onClick={handleViewAllBills}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
-                <CardTitle className="text-xs sm:text-sm font-medium truncate">Legislators</CardTitle>
+                <CardTitle className="text-xs sm:text-sm font-medium truncate">Total Bills</CardTitle>
               </CardHeader>
               <CardContent className="px-4 pb-4">
-                <div className="text-3xl sm:text-4xl font-bold">{stats.totalMembers.toLocaleString()}</div>
+                <div className="text-3xl sm:text-4xl font-bold">{stats.totalBills.toLocaleString()}</div>
               </CardContent>
             </Card>
           </div>
