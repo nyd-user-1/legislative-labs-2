@@ -13,11 +13,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Card, CardContent } from "@/components/ui/card";
 import { Send, Share } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useChatSession } from "@/hooks/useChatSession";
-import { ModelSelector } from "@/components/ModelSelector";
+import { MessageBubble } from "@/pages/chats/components/MessageBubble";
+import { Message as ChatMessage } from "@/pages/chats/types";
 
 type Bill = Tables<"Bills">;
 type Member = {
@@ -323,34 +323,44 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee }: AIC
           {/* Chat Messages */}
           <ScrollArea ref={scrollAreaRef} className="flex-1 pr-4">
             <div className="space-y-4">
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`px-4 ${
-                    message.role === "user" ? "flex justify-end" : "flex justify-start"
-                  }`}
-                >
-                  <Card className={`w-full ${message.role === "user" ? "bg-primary text-primary-foreground" : ""}`}>
-                    <CardContent className="p-3">
-                      <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                      <p className="text-xs opacity-70 mt-2">
-                        {message.timestamp.toLocaleTimeString()}
-                      </p>
-                    </CardContent>
-                  </Card>
-                </div>
-              ))}
+              {messages.map((message) => {
+                // Convert Date to string for MessageBubble compatibility
+                const chatMessage: ChatMessage = {
+                  ...message,
+                  timestamp: message.timestamp.toISOString()
+                };
+                
+                return (
+                  <MessageBubble 
+                    key={message.id}
+                    message={chatMessage}
+                    onCopy={(text) => {
+                      navigator.clipboard.writeText(text);
+                      toast({
+                        title: "Copied to clipboard",
+                        description: "Message content copied to clipboard.",
+                      });
+                    }}
+                    onFeedback={(type) => {
+                      toast({
+                        title: "Feedback received",
+                        description: `Thank you for your ${type} feedback!`,
+                      });
+                    }}
+                  />
+                );
+              })}
               {isLoading && (
-                <div className="px-4 flex justify-start">
-                  <Card className="w-full">
-                    <CardContent className="p-3">
+                <div className="space-y-2">
+                  <div className="flex justify-start">
+                    <div className="w-full rounded-lg p-3 bg-muted">
                       <div className="flex gap-1">
                         <div className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce"></div>
                         <div className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: "0.1s" }}></div>
                         <div className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: "0.2s" }}></div>
                       </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
