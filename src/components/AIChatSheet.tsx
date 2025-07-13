@@ -52,15 +52,21 @@ interface AIChatSheetProps {
 const SUGGESTED_PROMPTS = {
   bill: [
     "Analyze this bill's key provisions and potential impact",
-    "What are the main arguments for and against this legislation?"
+    "What are the main arguments for and against this legislation?",
+    "How does this bill compare to similar legislation in other states?",
+    "What are the potential fiscal implications of this bill?"
   ],
   member: [
     "What are this member's key policy positions?",
-    "Analyze this member's voting record and committee assignments"
+    "Analyze this member's voting record and committee assignments",
+    "What legislation has this member sponsored recently?",
+    "How does this member's voting align with their party?"
   ],
   committee: [
     "What types of legislation does this committee typically handle?",
-    "Analyze this committee's recent activity and priorities"
+    "Analyze this committee's recent activity and priorities",
+    "Who are the key members of this committee?",
+    "What major bills has this committee reviewed recently?"
   ]
 };
 
@@ -291,22 +297,19 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee }: AIC
       <SheetContent className="w-full sm:max-w-2xl flex flex-col h-full">
         <SheetHeader className="flex-shrink-0">
           <SheetTitle>{getTitle()}</SheetTitle>
-          <SheetDescription>
-            {getDescription()}
-          </SheetDescription>
         </SheetHeader>
 
         <div className="flex-1 flex flex-col gap-4 min-h-0">
           {/* Suggested Prompts */}
           {messages.length === 0 && (
-            <div className="space-y-2">
+            <div className="space-y-3">
               <h4 className="text-sm font-medium">Suggested prompts:</h4>
-              <div className="grid gap-2">
+              <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                 {getSuggestedPrompts().map((prompt, index) => (
                   <Button
                     key={index}
                     variant="outline"
-                    className="h-auto p-3 text-left whitespace-normal"
+                    className="h-auto p-3 text-left whitespace-nowrap min-w-[280px] flex-shrink-0"
                     onClick={() => handlePromptClick(prompt)}
                     disabled={isLoading}
                   >

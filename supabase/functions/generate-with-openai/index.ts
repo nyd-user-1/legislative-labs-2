@@ -36,7 +36,7 @@ serve(async (req) => {
 
     // Determine model provider
     const isClaudeModel = model.startsWith('claude-');
-    const isPerplexityModel = model.startsWith('llama-') && model.includes('sonar');
+    const isPerplexityModel = model.startsWith('llama-') || model.startsWith('perplexity-');
     
     if (isClaudeModel && !anthropicApiKey) {
       console.error('Anthropic API key not configured');
@@ -62,7 +62,7 @@ serve(async (req) => {
         headers: {
           'Authorization': `Bearer ${anthropicApiKey}`,
           'Content-Type': 'application/json',
-          'x-api-version': '2023-06-01',
+          'anthropic-version': '2023-06-01',
         },
         body: JSON.stringify({
           model: model,
@@ -72,7 +72,6 @@ serve(async (req) => {
             content: `${getSystemPrompt(type)}\n\n${prompt}`
           }],
           temperature: 0.7,
-          stream: stream,
         }),
       });
     } else if (isPerplexityModel) {
@@ -100,7 +99,6 @@ serve(async (req) => {
           search_recency_filter: 'month',
           frequency_penalty: 1,
           presence_penalty: 0,
-          stream: stream,
         }),
       });
     } else {
