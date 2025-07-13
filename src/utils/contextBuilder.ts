@@ -36,7 +36,34 @@ export class ContextBuilder {
     switch (entityType) {
       case 'bill':
         const bill = entity as Bill;
-        contextInfo = `
+        
+        // Special handling for "Summary" prompt
+        if (userPrompt === "Summary") {
+          contextInfo = `
+BILL CONTEXT FOR SUMMARY:
+- Number: ${bill.bill_number || "Unknown"}
+- Title: ${bill.title || "No title"}
+- Status: ${bill.status_desc || "Unknown"}
+- Last Action: ${bill.last_action || "None"}
+- Committee: ${bill.committee || "Unknown"}
+- Description: ${bill.description || "No description"}
+
+Please provide a comprehensive summary of this bill in the following format:
+
+${bill.bill_number || "This bill"} is a New York State ${bill.bill_number?.startsWith('S') ? 'Senate' : 'Assembly'} bill number. In the 2025-2026 session, [describe what it proposes based on the title and description].
+
+Here's a more detailed breakdown:
+
+• Bill Title: [Provide the title]
+• Sponsors: [List sponsors if available]
+• Status: [Current status and committee assignment]
+• Key Provisions: [Main provisions of the bill]
+• Legislative Context: [Context about this legislation]
+
+Focus specifically on THIS bill: ${bill.bill_number || "the current bill"}.
+          `;
+        } else {
+          contextInfo = `
 BILL CONTEXT:
 - Number: ${bill.bill_number || "Unknown"}
 - Title: ${bill.title || "No title"}
@@ -44,7 +71,10 @@ BILL CONTEXT:
 - Last Action: ${bill.last_action || "None"}
 - Committee: ${bill.committee || "Unknown"}
 - Description: ${bill.description || "No description"}
-        `;
+
+IMPORTANT: Focus your response specifically on ${bill.bill_number || "this bill"} only.
+          `;
+        }
         break;
         
       case 'member':
@@ -110,15 +140,13 @@ USER QUESTION: ${userPrompt}`;
 
     switch (entityType) {
       case 'bill':
-        const bill = entity as Bill;
         prompts.push(
-          `Analyze fiscal impact of ${bill.bill_number}`,
-          `Find similar bills to ${bill.bill_number}`,
-          `Explain voting record on ${bill.bill_number}`
+          'Summary',
+          'Similar Bills',
+          'Fiscal Analysis',
+          'Key Provisions',
+          'Sponsors'
         );
-        if (bill.committee) {
-          prompts.push(`Committee analysis for ${bill.committee}`);
-        }
         break;
         
       case 'member':
@@ -157,6 +185,6 @@ USER QUESTION: ${userPrompt}`;
       }
     }
 
-    return prompts.slice(0, 3); // Return top 3 most relevant
+    return prompts.slice(0, 5); // Return top 5 prompts
   }
 }

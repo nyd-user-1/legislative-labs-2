@@ -50,11 +50,11 @@ export const useChatLogic = (entity: Entity, entityType: EntityType) => {
     // Only initialize if chat is open, we have an entity, no existing session, and we're not already creating one
     if (isOpen && entity && !sessionId && !isCreatingSession.current) {
       try {
-        console.log("Initializing new chat session for:", getTitle());
+        console.log("Initializing new chat session for:", getTitle(), "Entity ID:", entityId);
         isCreatingSession.current = true;
         const sessionTitle = getTitle();
         await createNewSession(sessionTitle);
-        console.log("Session created successfully");
+        console.log("Session created successfully for entity:", entityId);
       } catch (error) {
         console.error("Failed to create session:", error);
         toast({
@@ -66,7 +66,7 @@ export const useChatLogic = (entity: Entity, entityType: EntityType) => {
         isCreatingSession.current = false;
       }
     }
-  }, [entity, sessionId, createNewSession, toast]);
+  }, [entity, entityId, sessionId, createNewSession, toast, getTitle]);
 
   // Update the session when messages change (but avoid infinite loops)
   useEffect(() => {
