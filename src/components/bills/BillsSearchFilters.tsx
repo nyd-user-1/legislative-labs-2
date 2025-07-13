@@ -94,6 +94,9 @@ export const BillsSearchFilters = ({
   // Get the selected sponsor's display name
   const selectedSponsor = uniqueSponsors.find(s => s.name === filters.sponsor);
 
+  // Get the selected committee's display name
+  const selectedCommittee = uniqueCommittees.find(c => c.name === filters.committee);
+
   return (
     <div className="space-y-4">
       {/* Search Input */}
@@ -160,13 +163,17 @@ export const BillsSearchFilters = ({
         <div>
           <Select value={filters.committee || "all"} onValueChange={(value) => handleFilterChange("committee", value === "all" ? "" : value)}>
             <SelectTrigger>
-              <SelectValue placeholder="Committees" />
+              <SelectValue 
+                placeholder="Committees"
+              >
+                {selectedCommittee ? selectedCommittee.name : "Committees"}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Committees</SelectItem>
               {uniqueCommittees.map((committee, index) => (
                 <SelectItem key={`${committee.name}-${index}`} value={committee.name}>
-                  <span className="truncate">{committee.name}</span>
+                  <span className="text-sm font-medium">{committee.name}</span>
                 </SelectItem>
               ))}
             </SelectContent>
