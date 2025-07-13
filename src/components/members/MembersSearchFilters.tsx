@@ -45,7 +45,7 @@ export const MembersSearchFilters = ({
   return (
     <div className="mb-8 space-y-4">
       {/* Search and Dropdowns Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
+      <div className="grid grid-cols-1 gap-4 items-end">
         {/* Search Bar */}
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -57,55 +57,58 @@ export const MembersSearchFilters = ({
           />
         </div>
 
-        {/* Party Filter Dropdown */}
-        <div>
-          <Select value={partyFilter} onValueChange={setPartyFilter}>
-            <SelectTrigger>
-              <SelectValue placeholder="All Parties" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Parties</SelectItem>
-              {parties.map((party) => (
-                <SelectItem key={party} value={party}>
-                  {party}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        {/* Filters - Hidden on mobile, visible on desktop */}
+        <div className="hidden md:grid md:grid-cols-3 gap-4">
+          {/* Party Filter Dropdown */}
+          <div>
+            <Select value={partyFilter} onValueChange={setPartyFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="All Parties" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Parties</SelectItem>
+                {parties.map((party) => (
+                  <SelectItem key={party} value={party}>
+                    {party}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-        {/* District Filter Dropdown */}
-        <div>
-          <Select value={districtFilter} onValueChange={setDistrictFilter}>
-            <SelectTrigger>
-              <SelectValue placeholder="All Districts" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Districts</SelectItem>
-              {districts.map((district) => (
-                <SelectItem key={district} value={district}>
-                  District {district}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+          {/* District Filter Dropdown */}
+          <div>
+            <Select value={districtFilter} onValueChange={setDistrictFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="All Districts" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Districts</SelectItem>
+                {districts.map((district) => (
+                  <SelectItem key={district} value={district}>
+                    District {district}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-        {/* Chamber Filter Dropdown */}
-        <div>
-          <Select value={chamberFilter} onValueChange={setChamberFilter}>
-            <SelectTrigger>
-              <SelectValue placeholder="All Chambers" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Chambers</SelectItem>
-              {chambers.map((chamber) => (
-                <SelectItem key={chamber} value={chamber}>
-                  {chamber}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {/* Chamber Filter Dropdown */}
+          <div>
+            <Select value={chamberFilter} onValueChange={setChamberFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="All Chambers" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Chambers</SelectItem>
+                {chambers.map((chamber) => (
+                  <SelectItem key={chamber} value={chamber}>
+                    {chamber}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
 

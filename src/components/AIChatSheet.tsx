@@ -18,6 +18,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useChatSession } from "@/hooks/useChatSession";
 import { MessageBubble } from "@/pages/chats/components/MessageBubble";
 import { Message as ChatMessage } from "@/pages/chats/types";
+import { CitationsDrawer } from "./CitationsDrawer";
 
 type Bill = Tables<"Bills">;
 type Member = {
@@ -74,6 +75,7 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee }: AIC
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSessionCreated, setIsSessionCreated] = useState(false);
+  const [citationsOpen, setCitationsOpen] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const { selectedModel, setSelectedModel } = useModel();
@@ -342,10 +344,14 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee }: AIC
                       });
                     }}
                     onFeedback={(type) => {
-                      toast({
-                        title: "Feedback received",
-                        description: `Thank you for your ${type} feedback!`,
-                      });
+                      if (type === "citations") {
+                        setCitationsOpen(true);
+                      } else {
+                        toast({
+                          title: "Feedback received",
+                          description: `Thank you for your ${type} feedback!`,
+                        });
+                      }
                     }}
                     onShare={handleShareChat}
                   />
@@ -390,6 +396,26 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee }: AIC
           </div>
         </div>
       </SheetContent>
+      
+      <CitationsDrawer 
+        open={citationsOpen}
+        onOpenChange={setCitationsOpen}
+        citations={[
+          {
+            id: "1",
+            title: "NYS Legislative Database",
+            source: "New York State Senate",
+            url: "https://www.nysenate.gov",
+            excerpt: "Official legislative records and bill tracking system"
+          },
+          {
+            id: "2", 
+            title: "Committee Reports",
+            source: "Assembly Committee Records",
+            excerpt: "Analysis based on committee hearing transcripts and reports"
+          }
+        ]}
+      />
     </Sheet>
   );
 };

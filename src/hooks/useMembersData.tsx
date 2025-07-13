@@ -152,14 +152,22 @@ export const useMembersData = () => {
 
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
-      filtered = filtered.filter(member =>
-        member.name?.toLowerCase().includes(term) ||
-        member.first_name?.toLowerCase().includes(term) ||
-        member.last_name?.toLowerCase().includes(term) ||
-        member.party?.toLowerCase().includes(term) ||
-        member.district?.toLowerCase().includes(term) ||
-        member.role?.toLowerCase().includes(term)
-      );
+      filtered = filtered.filter(member => {
+        // Create full name combinations for better search
+        const fullName = `${member.first_name || ''} ${member.last_name || ''}`.trim();
+        const reverseName = `${member.last_name || ''} ${member.first_name || ''}`.trim();
+        
+        return (
+          member.name?.toLowerCase().includes(term) ||
+          member.first_name?.toLowerCase().includes(term) ||
+          member.last_name?.toLowerCase().includes(term) ||
+          fullName.toLowerCase().includes(term) ||
+          reverseName.toLowerCase().includes(term) ||
+          member.party?.toLowerCase().includes(term) ||
+          member.district?.toLowerCase().includes(term) ||
+          member.role?.toLowerCase().includes(term)
+        );
+      });
     }
 
     if (chamberFilter !== "all") {

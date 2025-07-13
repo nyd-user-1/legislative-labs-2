@@ -27,16 +27,16 @@ export const MemberTabs = ({ member }: MemberTabsProps) => {
   return (
     <Tabs defaultValue="history" className="space-y-6">
       <TabsList className="grid w-full grid-cols-4 h-12 p-1 bg-muted rounded-lg">
-        <TabsTrigger value="history" className="flex items-center gap-2 h-10 rounded-md text-sm font-medium">
+        <TabsTrigger value="history" className="h-10 rounded-md text-sm font-medium">
           History
         </TabsTrigger>
-        <TabsTrigger value="documents" className="flex items-center gap-2 h-10 rounded-md text-sm font-medium">
+        <TabsTrigger value="documents" className="h-10 rounded-md text-sm font-medium">
           Documents
         </TabsTrigger>
-        <TabsTrigger value="committees" className="flex items-center gap-2 h-10 rounded-md text-sm font-medium">
+        <TabsTrigger value="committees" className="h-10 rounded-md text-sm font-medium">
           Committees
         </TabsTrigger>
-        <TabsTrigger value="votes" className="flex items-center gap-2 h-10 rounded-md text-sm font-medium">
+        <TabsTrigger value="votes" className="h-10 rounded-md text-sm font-medium">
           Votes
         </TabsTrigger>
       </TabsList>

@@ -33,36 +33,6 @@ export const MemberDetail = ({ member, onBack }: MemberDetailProps) => {
           </Button>
         </div>
 
-        {/* Combined Member Header and Information Section */}
-        <section className="bg-white rounded-xl border shadow-sm p-6">
-          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
-            <div className="flex-1 min-w-0">
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight break-words mb-2">
-                {member.name || `${member.first_name || ''} ${member.last_name || ''}`.trim() || `Member #${member.people_id}`}
-              </h1>
-              {member.bio_short && (
-                <p className="text-gray-600 text-base sm:text-lg break-words">{member.bio_short}</p>
-              )}
-            </div>
-            <div className="flex-shrink-0 self-start">
-              <Badge 
-                variant="secondary" 
-                className={member.chamber?.toLowerCase() === 'senate' 
-                  ? "bg-purple-100 text-purple-700 border-purple-200" 
-                  : "bg-green-100 text-green-700 border-green-200"
-                }
-              >
-                {member.chamber || "Active"}
-              </Badge>
-            </div>
-          </div>
-
-          {/* Member Information */}
-          <div className="max-w-2xl">
-            <MemberInformation member={member} />
-          </div>
-        </section>
-
         {/* Member Tabs Section */}
         <section>
           <MemberTabs member={member} />
