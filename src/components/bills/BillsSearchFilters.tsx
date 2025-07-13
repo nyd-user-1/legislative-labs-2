@@ -141,18 +141,11 @@ export const BillsSearchFilters = ({
               <SelectItem value="all">All Sponsors</SelectItem>
               {uniqueSponsors.map((sponsor, index) => (
                 <SelectItem key={`${sponsor.name}-${index}`} value={sponsor.name}>
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center">
-                      <span className="text-xs font-medium">
-                        {sponsor.name?.split(' ').map(n => n[0]).join('').toUpperCase()}
-                      </span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium">{sponsor.name}</span>
-                      <span className="text-xs text-muted-foreground">
-                        {sponsor.chamber} • {sponsor.party}
-                      </span>
-                    </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium">{sponsor.name}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {sponsor.chamber} • {sponsor.party}
+                    </span>
                   </div>
                 </SelectItem>
               ))}
@@ -173,18 +166,11 @@ export const BillsSearchFilters = ({
               <SelectItem value="all">All Committees</SelectItem>
               {uniqueCommittees.map((committee, index) => (
                 <SelectItem key={`${committee.name}-${index}`} value={committee.name}>
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center">
-                      <span className="text-xs font-medium">
-                        {committee.name?.split(' ').map(n => n[0]).join('').toUpperCase()}
-                      </span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium">{committee.name}</span>
-                      <span className="text-xs text-muted-foreground">
-                        {committee.chamber}{committee.chair_name ? ` • Chair ${committee.chair_name}` : ''}
-                      </span>
-                    </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium">{committee.name}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {committee.chamber}{committee.chair_name ? ` • Chair ${committee.chair_name}` : ''}
+                    </span>
                   </div>
                 </SelectItem>
               ))}
