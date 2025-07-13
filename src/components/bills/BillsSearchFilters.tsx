@@ -44,35 +44,40 @@ export const BillsSearchFilters = ({
 
   const hasActiveFilters = filters.search !== "" || 
     filters.sponsor !== "" ||
-    filters.committee !== "" ||
-    filters.dateRange !== "";
-
-  const months = [
-    { value: "all", label: "Month" },
-    { value: "01", label: "January" },
-    { value: "02", label: "February" },
-    { value: "03", label: "March" },
-    { value: "04", label: "April" },
-    { value: "05", label: "May" },
-    { value: "06", label: "June" },
-    { value: "07", label: "July" },
-    { value: "08", label: "August" },
-    { value: "09", label: "September" },
-    { value: "10", label: "October" },
-    { value: "11", label: "November" },
-    { value: "12", label: "December" },
-  ];
+    filters.committee !== "";
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-3 gap-4">
+      {/* Search Input */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Search bills..."
+          value={filters.search}
+          onChange={(e) => handleFilterChange("search", e.target.value)}
+          className="pl-10"
+        />
+        {filters.search && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => handleFilterChange("search", "")}
+            className="absolute right-2 top-2 h-5 w-5 p-0"
+          >
+            <X className="h-3 w-3" />
+          </Button>
+        )}
+      </div>
+
+      {/* Filter Controls */}
+      <div className="grid grid-cols-2 gap-4">
         <div>
           <Select value={filters.sponsor || "all"} onValueChange={(value) => handleFilterChange("sponsor", value === "all" ? "" : value)}>
             <SelectTrigger>
               <SelectValue placeholder="Sponsors" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Sponsors</SelectItem>
+              <SelectItem value="all">Sponsors</SelectItem>
               {sponsors.map((sponsor) => (
                 <SelectItem key={sponsor.name} value={sponsor.name}>
                   <div className="flex items-center gap-2">
@@ -100,7 +105,7 @@ export const BillsSearchFilters = ({
               <SelectValue placeholder="Committees" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Committees</SelectItem>
+              <SelectItem value="all">Committees</SelectItem>
               {committees.map((committee) => (
                 <SelectItem key={committee.name} value={committee.name}>
                   <div className="flex items-center gap-2">
@@ -116,31 +121,6 @@ export const BillsSearchFilters = ({
             </SelectContent>
           </Select>
         </div>
-
-        <div>
-          <Select value={filters.dateRange || "all"} onValueChange={(value) => handleFilterChange("dateRange", value === "all" ? "" : value)}>
-            <SelectTrigger>
-              <SelectValue placeholder="Month" />
-            </SelectTrigger>
-            <SelectContent>
-              {months.map((month) => (
-                <SelectItem key={month.value} value={month.value}>
-                  {month.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-        <Input
-          placeholder="Search bills (min 2 chars)..."
-          value={filters.search}
-          onChange={(e) => handleFilterChange("search", e.target.value)}
-          className="pl-10"
-        />
       </div>
 
       {hasActiveFilters && (
