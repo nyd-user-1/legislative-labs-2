@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, User, FileText, Users, Vote, Clock } from "lucide-react";
@@ -63,7 +64,24 @@ export const EnhancedBillOverview = ({ enhancedDetails }: EnhancedBillOverviewPr
     }
   };
 
-  // Helper function to safely get vote counts - ensures we always return a number
+  // Helper function to safely convert any value to a number
+  const safeNumberConvert = (value: any): number => {
+    // If it's already a number and not NaN, return it
+    if (typeof value === 'number' && !isNaN(value)) {
+      return value;
+    }
+    
+    // If it's a string, try to parse it
+    if (typeof value === 'string' && value.trim() !== '') {
+      const parsed = parseInt(value.trim(), 10);
+      return isNaN(parsed) ? 0 : parsed;
+    }
+    
+    // Default to 0 for any other type or invalid value
+    return 0;
+  };
+
+  // Helper function to safely get vote counts from the votes array
   const getVoteCount = (votes: Array<any>, voteType: string): number => {
     if (!Array.isArray(votes) || votes.length === 0) {
       return 0;
@@ -77,27 +95,16 @@ export const EnhancedBillOverview = ({ enhancedDetails }: EnhancedBillOverviewPr
       }
       
       const count = vote[voteType];
-      
-      // Handle numeric values
-      if (typeof count === 'number' && !isNaN(count)) {
-        total += count;
-      } 
-      // Handle string values that can be parsed to numbers
-      else if (typeof count === 'string' && count.trim() !== '') {
-        const parsed = parseInt(count, 10);
-        if (!isNaN(parsed)) {
-          total += parsed;
-        }
-      }
+      total += safeNumberConvert(count);
     }
     
     return total;
   };
 
-  // Calculate vote totals - explicitly ensure these are numbers
-  const yesVotes: number = getVoteCount(enhancedDetails.votes, 'aye');
-  const noVotes: number = getVoteCount(enhancedDetails.votes, 'nay');
-  const absentVotes: number = getVoteCount(enhancedDetails.votes, 'absent');
+  // Calculate vote totals - using the safe conversion function
+  const yesVotes = getVoteCount(enhancedDetails.votes, 'aye');
+  const noVotes = getVoteCount(enhancedDetails.votes, 'nay');
+  const absentVotes = getVoteCount(enhancedDetails.votes, 'absent');
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
