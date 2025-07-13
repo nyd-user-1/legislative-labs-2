@@ -32,6 +32,10 @@ export const useMembersData = () => {
   const [chamberFilter, setChamberFilter] = useState("all");
   const [partyFilter, setPartyFilter] = useState("all");
   const [districtFilter, setDistrictFilter] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalMembers, setTotalMembers] = useState(0);
+  const [fullFilteredCount, setFullFilteredCount] = useState(0);
+  const ITEMS_PER_PAGE = 50;
   const { toast } = useToast();
 
   useEffect(() => {
@@ -42,14 +46,29 @@ export const useMembersData = () => {
   }, []);
 
   useEffect(() => {
+    setCurrentPage(1); // Reset to first page when filters change
     filterMembers();
   }, [members, searchTerm, chamberFilter, partyFilter, districtFilter]);
+
+  useEffect(() => {
+    filterMembers();
+  }, [currentPage]);
 
   const fetchMembers = async () => {
     try {
       setLoading(true);
       setError(null);
 
+      // First get the total count
+      const { count } = await supabase
+        .from("People")
+        .select("*", { count: 'exact', head: true })
+        .not("chamber", "is", null)
+        .not("name", "is", null);
+
+      setTotalMembers(count || 0);
+
+      // Then fetch the actual data with increased limit
       const { data, error } = await supabase
         .from("People")
         .select(`
@@ -72,10 +91,11 @@ export const useMembersData = () => {
         .not("chamber", "is", null)
         .not("name", "is", null)
         .order("last_name", { ascending: true })
-        .limit(100);
+        .limit(200);
 
       if (error) throw error;
 
+      console.log(`Fetched ${data?.length || 0} members from database`);
       setMembers(data || []);
     } catch (err) {
       console.error("Error fetching members:", err);
@@ -151,23 +171,31 @@ export const useMembersData = () => {
     let filtered = members;
 
     if (searchTerm) {
-      const term = searchTerm.toLowerCase();
+      const term = searchTerm.toLowerCase().trim();
+      console.log(`Searching for: "${term}" in ${members.length} members`);
+      
       filtered = filtered.filter(member => {
         // Create full name combinations for better search
         const fullName = `${member.first_name || ''} ${member.last_name || ''}`.trim();
         const reverseName = `${member.last_name || ''} ${member.first_name || ''}`.trim();
+        const middleReverseName = `${member.last_name || ''}, ${member.first_name || ''}`.trim();
         
-        return (
+        const matches = (
           member.name?.toLowerCase().includes(term) ||
           member.first_name?.toLowerCase().includes(term) ||
           member.last_name?.toLowerCase().includes(term) ||
           fullName.toLowerCase().includes(term) ||
           reverseName.toLowerCase().includes(term) ||
+          middleReverseName.toLowerCase().includes(term) ||
           member.party?.toLowerCase().includes(term) ||
           member.district?.toLowerCase().includes(term) ||
           member.role?.toLowerCase().includes(term)
         );
+        
+        return matches;
       });
+      
+      console.log(`Search results: ${filtered.length} members found`);
     }
 
     if (chamberFilter !== "all") {
@@ -182,7 +210,16 @@ export const useMembersData = () => {
       filtered = filtered.filter(member => member.district === districtFilter);
     }
 
-    setFilteredMembers(filtered);
+    // Store full filtered results for pagination calculation
+    const fullFilteredResults = filtered;
+    setFullFilteredCount(fullFilteredResults.length);
+    
+    // Apply pagination
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    const paginatedResults = filtered.slice(startIndex, endIndex);
+
+    setFilteredMembers(paginatedResults);
   };
 
   return {
@@ -200,6 +237,10 @@ export const useMembersData = () => {
     setPartyFilter,
     districtFilter,
     setDistrictFilter,
+    currentPage,
+    setCurrentPage,
+    totalMembers,
+    totalPages: Math.ceil((fullFilteredCount || totalMembers) / ITEMS_PER_PAGE),
     fetchMembers,
   };
 };

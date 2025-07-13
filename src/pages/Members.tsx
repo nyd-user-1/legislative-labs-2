@@ -11,6 +11,8 @@ import { MembersLoadingSkeleton } from "@/components/members/MembersLoadingSkele
 import { MembersErrorState } from "@/components/members/MembersErrorState";
 import { MemberDetail } from "@/components/MemberDetail";
 import { AIChatSheet } from "@/components/AIChatSheet";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 const Members = () => {
@@ -37,6 +39,9 @@ const Members = () => {
     setPartyFilter,
     districtFilter,
     setDistrictFilter,
+    currentPage,
+    setCurrentPage,
+    totalPages,
     fetchMembers,
   } = useMembersData();
 
@@ -134,14 +139,45 @@ const Members = () => {
           {members.length === 0 ? (
             <MembersEmptyState hasFilters={hasFilters} />
           ) : (
-            <MembersGrid 
-              members={members} 
-              onMemberSelect={setSelectedMember}
-              onFavorite={handleFavorite}
-              onAIAnalysis={handleAIAnalysis}
-              favoriteMembers={favoriteMemberIds}
-              membersWithAIChat={membersWithAIChat}
-            />
+            <>
+              <MembersGrid 
+                members={members} 
+                onMemberSelect={setSelectedMember}
+                onFavorite={handleFavorite}
+                onAIAnalysis={handleAIAnalysis}
+                favoriteMembers={favoriteMemberIds}
+                membersWithAIChat={membersWithAIChat}
+              />
+              
+              {/* Pagination Controls */}
+              {totalPages > 1 && (
+                <div className="flex justify-center items-center gap-4 mt-8">
+                  <Button
+                    variant="outline"
+                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                    disabled={currentPage === 1}
+                    className="flex items-center gap-2"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                    Previous
+                  </Button>
+                  
+                  <span className="text-sm text-muted-foreground">
+                    Page {currentPage} of {totalPages}
+                  </span>
+                  
+                  <Button
+                    variant="outline"
+                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                    disabled={currentPage === totalPages}
+                    className="flex items-center gap-2"
+                  >
+                    Next
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
