@@ -64,20 +64,36 @@ export const EnhancedBillOverview = ({ enhancedDetails }: EnhancedBillOverviewPr
     }
   };
 
-  // Helper function to safely convert vote counts to numbers
+  // Helper function to safely get vote counts with proper type handling
   const getVoteCount = (votes: Array<any>, voteType: string): number => {
-    return votes.reduce((sum, vote) => {
+    if (!Array.isArray(votes) || votes.length === 0) {
+      return 0;
+    }
+    
+    return votes.reduce((sum: number, vote: any) => {
+      if (!vote || typeof vote !== 'object') {
+        return sum;
+      }
+      
       const count = vote[voteType];
-      if (typeof count === 'number') {
+      
+      if (typeof count === 'number' && !isNaN(count)) {
         return sum + count;
       }
+      
       if (typeof count === 'string') {
         const parsed = parseInt(count, 10);
         return sum + (isNaN(parsed) ? 0 : parsed);
       }
+      
       return sum;
     }, 0);
   };
+
+  // Calculate vote totals with explicit number typing
+  const yesVotes: number = getVoteCount(enhancedDetails.votes, 'aye');
+  const noVotes: number = getVoteCount(enhancedDetails.votes, 'nay');
+  const absentVotes: number = getVoteCount(enhancedDetails.votes, 'absent');
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -255,19 +271,19 @@ export const EnhancedBillOverview = ({ enhancedDetails }: EnhancedBillOverviewPr
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div className="p-3 bg-green-50 rounded-lg border border-green-200">
                   <p className="text-2xl font-bold text-green-700">
-                    {getVoteCount(enhancedDetails.votes, 'aye')}
+                    {yesVotes}
                   </p>
                   <p className="text-sm text-green-600">Yes Votes</p>
                 </div>
                 <div className="p-3 bg-red-50 rounded-lg border border-red-200">
                   <p className="text-2xl font-bold text-red-700">
-                    {getVoteCount(enhancedDetails.votes, 'nay')}
+                    {noVotes}
                   </p>
                   <p className="text-sm text-red-600">No Votes</p>
                 </div>
                 <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
                   <p className="text-2xl font-bold text-gray-700">
-                    {getVoteCount(enhancedDetails.votes, 'absent')}
+                    {absentVotes}
                   </p>
                   <p className="text-sm text-gray-600">Absent</p>
                 </div>
