@@ -33,6 +33,11 @@ export const MemberDetail = ({ member, onBack }: MemberDetailProps) => {
           </Button>
         </div>
 
+        {/* Member Header Card */}
+        <Card className="overflow-hidden">
+          <MemberInformation member={member} />
+        </Card>
+
         {/* Member Tabs Section */}
         <section>
           <MemberTabs member={member} />

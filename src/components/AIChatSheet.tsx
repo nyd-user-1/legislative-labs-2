@@ -354,6 +354,7 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee }: AIC
                       }
                     }}
                     onShare={handleShareChat}
+                    onSendPrompt={(prompt) => sendMessage(prompt)}
                   />
                 );
               })}

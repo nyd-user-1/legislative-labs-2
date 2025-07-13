@@ -6,9 +6,10 @@ interface ConversationViewProps {
   messages: Message[];
   onCopy: (text: string) => void;
   onFeedback: (type: "thumbs-up" | "thumbs-down") => void;
+  onSendPrompt?: (prompt: string) => void;
 }
 
-export const ConversationView = ({ messages, onCopy, onFeedback }: ConversationViewProps) => {
+export const ConversationView = ({ messages, onCopy, onFeedback, onSendPrompt }: ConversationViewProps) => {
   return (
     <ScrollArea className="h-[400px] w-full rounded-md border p-4">
       <div className="space-y-4">
@@ -18,6 +19,7 @@ export const ConversationView = ({ messages, onCopy, onFeedback }: ConversationV
             message={message}
             onCopy={onCopy}
             onFeedback={onFeedback}
+            onSendPrompt={onSendPrompt}
           />
         ))}
       </div>
