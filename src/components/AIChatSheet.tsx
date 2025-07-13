@@ -12,6 +12,7 @@ import { CitationsDrawer } from "./CitationsDrawer";
 import { SuggestedPrompts } from "./chat/SuggestedPrompts";
 import { ChatMessages } from "./chat/ChatMessages";
 import { ChatInput } from "./chat/ChatInput";
+import { ChatContainer } from "./chat/ChatContainer";
 import { useChatLogic } from "@/hooks/useChatLogic";
 
 type Bill = Tables<"Bills">;
@@ -96,7 +97,7 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee }: AIC
           <SheetTitle>{getTitle()}</SheetTitle>
         </SheetHeader>
 
-        <div className="flex-1 flex flex-col gap-4 min-h-0">
+        <ChatContainer>
           {/* Dynamic Suggested Prompts */}
           <SuggestedPrompts
             entity={entity}
@@ -125,7 +126,7 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee }: AIC
             onSendMessage={handleSendMessage}
             isLoading={isLoading}
           />
-        </div>
+        </ChatContainer>
       </SheetContent>
       
       <CitationsDrawer 
