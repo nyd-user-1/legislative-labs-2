@@ -17,7 +17,7 @@ interface BillsSearchFiltersProps {
     committee: string;
     dateRange: string;
   }) => void;
-  committees: Array<{ name: string; chamber: string }>;
+  committees: Array<{ name: string; chamber: string; chair_name?: string }>;
   sponsors: Array<{ name: string; chamber: string; party: string }>;
 }
 
@@ -173,7 +173,19 @@ export const BillsSearchFilters = ({
               <SelectItem value="all">All Committees</SelectItem>
               {uniqueCommittees.map((committee, index) => (
                 <SelectItem key={`${committee.name}-${index}`} value={committee.name}>
-                  <span className="text-sm font-medium">{committee.name}</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center">
+                      <span className="text-xs font-medium">
+                        {committee.name?.split(' ').map(n => n[0]).join('').toUpperCase()}
+                      </span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium">{committee.name}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {committee.chamber}{committee.chair_name ? ` • Chair ${committee.chair_name}` : ''}
+                      </span>
+                    </div>
+                  </div>
                 </SelectItem>
               ))}
             </SelectContent>
