@@ -125,14 +125,59 @@ export const useChatLogic = (entity: Entity, entityType: EntityType) => {
 
       console.log("AI response received, length:", responseData.generatedText.length);
 
-      // Handle citations if NYS data was used
+      // Always include baseline citations plus any NYS data
+      const newCitations = [];
+      
+      // Add baseline citation for current entity
+      if (entity && entityType) {
+        if (entityType === 'bill') {
+          // Add link to bill detail page on our website
+          newCitations.push({
+            id: `our-bill-${entity.bill_id}`,
+            title: `${entity.bill_number || 'Bill'} - Legislative Analysis`,
+            source: "NYS Legislative Tracker",
+            url: `${window.location.origin}/bills/${entity.bill_id}`,
+            excerpt: `${entity.title || 'New York State bill analysis and tracking'}`
+          });
+          
+          // Add link to official NYS bill page if bill number exists
+          if (entity.bill_number) {
+            const billNumber = entity.bill_number.replace(/\s+/g, '');
+            newCitations.push({
+              id: `nys-bill-${entity.bill_number}`,
+              title: `${entity.bill_number} - Official NYS Page`,
+              source: entity.bill_number.startsWith('S') ? "New York State Senate" : "New York State Assembly",
+              url: entity.bill_number.startsWith('S') 
+                ? `https://www.nysenate.gov/legislation/bills/2023/${billNumber}`
+                : `https://nyassembly.gov/leg/?default_fld=&leg_video=&bn=${billNumber}&term=2023`,
+              excerpt: `Official legislative page for ${entity.bill_number}`
+            });
+          }
+        } else if (entityType === 'member') {
+          newCitations.push({
+            id: `our-member-${entity.people_id}`,
+            title: `${entity.name} - Member Profile`,
+            source: "NYS Legislative Tracker",
+            url: `${window.location.origin}/members/${entity.people_id}`,
+            excerpt: `Profile and legislative activity for ${entity.name}`
+          });
+        } else if (entityType === 'committee') {
+          newCitations.push({
+            id: `our-committee-${entity.committee_id}`,
+            title: `${entity.name} - Committee Profile`,
+            source: "NYS Legislative Tracker", 
+            url: `${window.location.origin}/committees/${entity.committee_id}`,
+            excerpt: `Committee information and current agenda`
+          });
+        }
+      }
+      
+      // Add citations from NYS search results if available
       if (responseData.nysDataUsed && responseData.searchResults) {
-        const newCitations = [];
-        
         if (responseData.searchResults.bills) {
           responseData.searchResults.bills.forEach((bill: any) => {
             newCitations.push({
-              id: `bill-${bill.printNo || bill.basePrintNo}`,
+              id: `nys-search-bill-${bill.printNo || bill.basePrintNo}`,
               title: `${bill.printNo || bill.basePrintNo} - ${bill.title || 'NYS Bill'}`,
               source: "New York State Senate",
               url: `https://www.nysenate.gov/legislation/bills/${bill.session}/${bill.printNo || bill.basePrintNo}`,
@@ -144,16 +189,16 @@ export const useChatLogic = (entity: Entity, entityType: EntityType) => {
         if (responseData.searchResults.members) {
           responseData.searchResults.members.forEach((member: any) => {
             newCitations.push({
-              id: `member-${member.memberId}`,
+              id: `nys-search-member-${member.memberId}`,
               title: `${member.shortName} - NYS ${member.chamber}`,
               source: "New York State Legislature",
               excerpt: `District: ${member.districtCode || 'N/A'}`
             });
           });
         }
-        
-        setCitations(newCitations);
       }
+      
+      setCitations(newCitations);
       
       // Add AI response
       const assistantMessage: Message = {
