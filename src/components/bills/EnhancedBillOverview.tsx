@@ -64,6 +64,14 @@ export const EnhancedBillOverview = ({ enhancedDetails }: EnhancedBillOverviewPr
     }
   };
 
+  // Helper function to safely convert vote counts to numbers
+  const getVoteCount = (votes: Array<any>, voteType: string): number => {
+    return votes.reduce((sum, vote) => {
+      const count = vote[voteType];
+      return sum + (typeof count === 'number' ? count : parseInt(count) || 0);
+    }, 0);
+  };
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Enhanced Bill Summary */}
@@ -240,19 +248,19 @@ export const EnhancedBillOverview = ({ enhancedDetails }: EnhancedBillOverviewPr
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div className="p-3 bg-green-50 rounded-lg border border-green-200">
                   <p className="text-2xl font-bold text-green-700">
-                    {enhancedDetails.votes.reduce((sum, vote) => sum + (vote.aye || 0), 0)}
+                    {getVoteCount(enhancedDetails.votes, 'aye')}
                   </p>
                   <p className="text-sm text-green-600">Yes Votes</p>
                 </div>
                 <div className="p-3 bg-red-50 rounded-lg border border-red-200">
                   <p className="text-2xl font-bold text-red-700">
-                    {enhancedDetails.votes.reduce((sum, vote) => sum + (vote.nay || 0), 0)}
+                    {getVoteCount(enhancedDetails.votes, 'nay')}
                   </p>
                   <p className="text-sm text-red-600">No Votes</p>
                 </div>
                 <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
                   <p className="text-2xl font-bold text-gray-700">
-                    {enhancedDetails.votes.reduce((sum, vote) => sum + (vote.absent || 0), 0)}
+                    {getVoteCount(enhancedDetails.votes, 'absent')}
                   </p>
                   <p className="text-sm text-gray-600">Absent</p>
                 </div>
