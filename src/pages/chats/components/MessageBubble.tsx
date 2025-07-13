@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Copy, ThumbsUp, ThumbsDown } from "lucide-react";
+import { Copy, ThumbsUp, ThumbsDown, Share } from "lucide-react";
 import { format } from "date-fns";
 import ReactMarkdown from "react-markdown";
 import { Message } from "../types";
@@ -8,9 +8,10 @@ interface MessageBubbleProps {
   message: Message;
   onCopy: (text: string) => void;
   onFeedback: (type: "thumbs-up" | "thumbs-down") => void;
+  onShare?: () => void;
 }
 
-export const MessageBubble = ({ message, onCopy, onFeedback }: MessageBubbleProps) => {
+export const MessageBubble = ({ message, onCopy, onFeedback, onShare }: MessageBubbleProps) => {
   return (
     <div className="space-y-2">
       <div
@@ -50,6 +51,16 @@ export const MessageBubble = ({ message, onCopy, onFeedback }: MessageBubbleProp
           >
             <Copy className="h-3 w-3" />
           </Button>
+          {onShare && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onShare}
+              className="h-8 px-2"
+            >
+              <Share className="h-3 w-3" />
+            </Button>
+          )}
           <Button
             variant="ghost"
             size="sm"

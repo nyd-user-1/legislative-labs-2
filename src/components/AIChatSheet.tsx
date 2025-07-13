@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, Share } from "lucide-react";
+import { Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useChatSession } from "@/hooks/useChatSession";
 import { MessageBubble } from "@/pages/chats/components/MessageBubble";
@@ -347,6 +347,7 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee }: AIC
                         description: `Thank you for your ${type} feedback!`,
                       });
                     }}
+                    onShare={handleShareChat}
                   />
                 );
               })}
@@ -386,21 +387,6 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee }: AIC
               </Button>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex gap-2 justify-between">
-              <Button
-                variant="outline"
-                onClick={handleShareChat}
-                disabled={messages.length === 0}
-                className="flex items-center gap-2"
-              >
-                <Share className="w-4 h-4" />
-                Share Chat
-              </Button>
-              <Button variant="outline" onClick={() => onOpenChange(false)}>
-                Close
-              </Button>
-            </div>
           </div>
         </div>
       </SheetContent>
