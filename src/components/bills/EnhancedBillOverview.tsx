@@ -68,7 +68,14 @@ export const EnhancedBillOverview = ({ enhancedDetails }: EnhancedBillOverviewPr
   const getVoteCount = (votes: Array<any>, voteType: string): number => {
     return votes.reduce((sum, vote) => {
       const count = vote[voteType];
-      return sum + (typeof count === 'number' ? count : parseInt(count) || 0);
+      if (typeof count === 'number') {
+        return sum + count;
+      }
+      if (typeof count === 'string') {
+        const parsed = parseInt(count, 10);
+        return sum + (isNaN(parsed) ? 0 : parsed);
+      }
+      return sum;
     }, 0);
   };
 
