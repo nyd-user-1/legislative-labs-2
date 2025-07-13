@@ -176,90 +176,96 @@ export const BillDetail = ({ bill, onBack }: BillDetailProps) => {
             Back to Bills
           </Button>
 
+          {/* Combined Bill Header and Metadata Section */}
+          <section className="section-container bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-start justify-between gap-4 mb-6">
+              <div className="flex-1">
+                <CardTitle className="text-2xl leading-tight">
+                  {bill.bill_number || "No Bill Number"}
+                </CardTitle>
+                {bill.title && (
+                  <p className="text-muted-foreground mt-2 text-lg">{bill.title}</p>
+                )}
+              </div>
+              <div className="flex-shrink-0">
+                {bill.status !== null && (
+                  <BillStatusBadge status={bill.status} statusDesc={bill.status_desc} />
+                )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <h4 className="font-medium flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    Committee
+                  </h4>
+                  <p className="text-muted-foreground">
+                    {bill.committee || "Not assigned"}
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <h4 className="font-medium flex items-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    Last Action Date
+                  </h4>
+                  <p className="text-muted-foreground">
+                    {formatDate(bill.last_action_date)}
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <h4 className="font-medium">Session ID</h4>
+                  <p className="text-muted-foreground">
+                    {bill.session_id || "Not specified"}
+                  </p>
+                </div>
+
+                {bill.url && (
+                  <div className="space-y-2">
+                    <h4 className="font-medium">External Link</h4>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => window.open(bill.url!, '_blank')}
+                      className="btn-secondary border border-gray-300 hover:border-gray-400 bg-white hover:bg-gray-50 text-gray-700 font-medium py-3 px-6 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 flex items-center gap-2"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      View on Official Site
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
 
           {/* Bill Tabs Section */}
           <section>
             <Tabs defaultValue="overview" className="space-y-6">
               <TabsList className="grid w-full grid-cols-4 h-12 p-1 bg-muted rounded-lg">
-                <TabsTrigger value="overview" className="h-10 rounded-md text-sm font-medium">
+                <TabsTrigger value="overview" className="flex items-center gap-2 h-10 rounded-md text-sm font-medium">
+                  <FileText className="h-4 w-4" />
                   Overview
                 </TabsTrigger>
-                <TabsTrigger value="sponsors" className="h-10 rounded-md text-sm font-medium">
+                <TabsTrigger value="sponsors" className="flex items-center gap-2 h-10 rounded-md text-sm font-medium">
+                  <Users className="h-4 w-4" />
                   Sponsors
                 </TabsTrigger>
-                <TabsTrigger value="history" className="h-10 rounded-md text-sm font-medium">
+                <TabsTrigger value="history" className="flex items-center gap-2 h-10 rounded-md text-sm font-medium">
+                  <History className="h-4 w-4" />
                   History
                 </TabsTrigger>
-                <TabsTrigger value="votes" className="h-10 rounded-md text-sm font-medium">
+                <TabsTrigger value="votes" className="flex items-center gap-2 h-10 rounded-md text-sm font-medium">
+                  <Vote className="h-4 w-4" />
                   Votes
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="overview" className="mt-0">
-                <div className="flex items-start justify-between gap-4 mb-6">
-                  <div className="flex-1">
-                    <CardTitle className="text-2xl leading-tight">
-                      {bill.bill_number || "No Bill Number"}
-                    </CardTitle>
-                    {bill.title && (
-                      <p className="text-muted-foreground mt-2 text-lg">{bill.title}</p>
-                    )}
-                  </div>
-                  <div className="flex-shrink-0">
-                    {bill.status !== null && (
-                      <BillStatusBadge status={bill.status} statusDesc={bill.status_desc} />
-                    )}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <h4 className="font-medium flex items-center gap-2">
-                        <User className="h-4 w-4" />
-                        Committee
-                      </h4>
-                      <p className="text-muted-foreground">
-                        {bill.committee || "Not assigned"}
-                      </p>
-                    </div>
-
-                    <div className="space-y-2">
-                      <h4 className="font-medium flex items-center gap-2">
-                        <Calendar className="h-4 w-4" />
-                        Last Action Date
-                      </h4>
-                      <p className="text-muted-foreground">
-                        {formatDate(bill.last_action_date)}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <h4 className="font-medium">Session ID</h4>
-                      <p className="text-muted-foreground">
-                        {bill.session_id || "Not specified"}
-                      </p>
-                    </div>
-
-                    {bill.url && (
-                      <div className="space-y-2">
-                        <h4 className="font-medium">External Link</h4>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => window.open(bill.url!, '_blank')}
-                          className="btn-secondary border border-gray-300 hover:border-gray-400 bg-white hover:bg-gray-50 text-gray-700 font-medium py-3 px-6 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 flex items-center gap-2"
-                        >
-                          <ExternalLink className="h-4 w-4" />
-                          View on Official Site
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
+              <TabsContent value="overview" className="mt-6">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Bill Summary Card */}
                   <Card className="min-h-[320px] flex flex-col">
