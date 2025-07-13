@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Tables } from "@/integrations/supabase/types";
 import {
   Sheet,
@@ -42,6 +42,9 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee }: AIC
   const [citationsOpen, setCitationsOpen] = useState(false);
   const { toast } = useToast();
   
+  // Use ref to track if we've already initialized this session
+  const hasInitialized = useRef(false);
+  
   // Determine the entity and type for the chat session
   const entity = bill || member || committee || null;
   const entityType = bill ? 'bill' : member ? 'member' : committee ? 'committee' : null;
@@ -58,13 +61,19 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee }: AIC
     initializeSession
   } = useChatLogic(entity, entityType);
 
-  // Initialize session when sheet opens (only once)
+  // Initialize session when sheet opens (only once per entity)
   useEffect(() => {
-    if (open) {
+    if (open && entity && !hasInitialized.current) {
       console.log("Chat sheet opened, initializing session");
+      hasInitialized.current = true;
       initializeSession(true);
     }
-  }, [open, initializeSession]);
+    
+    // Reset when sheet closes
+    if (!open) {
+      hasInitialized.current = false;
+    }
+  }, [open, entity, initializeSession]);
 
   const handleSendMessage = () => {
     if (inputValue.trim()) {

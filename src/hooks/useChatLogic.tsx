@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useModel } from "@/contexts/ModelContext";
 import { useToast } from "@/hooks/use-toast";
@@ -23,6 +23,9 @@ export const useChatLogic = (entity: Entity, entityType: EntityType) => {
   const { toast } = useToast();
   const { selectedModel } = useModel();
   
+  // Use ref to track if we're already creating a session
+  const isCreatingSession = useRef(false);
+  
   // Determine the entity ID for the chat session
   const entityId = entity?.bill_id || entity?.people_id || entity?.committee_id || null;
   
@@ -44,11 +47,14 @@ export const useChatLogic = (entity: Entity, entityType: EntityType) => {
 
   // Initialize session only once when chat opens
   const initializeSession = useCallback(async (isOpen: boolean) => {
-    if (isOpen && entity && !sessionId) {
+    // Only initialize if chat is open, we have an entity, no existing session, and we're not already creating one
+    if (isOpen && entity && !sessionId && !isCreatingSession.current) {
       try {
         console.log("Initializing new chat session for:", getTitle());
+        isCreatingSession.current = true;
         const sessionTitle = getTitle();
         await createNewSession(sessionTitle);
+        console.log("Session created successfully");
       } catch (error) {
         console.error("Failed to create session:", error);
         toast({
@@ -56,9 +62,11 @@ export const useChatLogic = (entity: Entity, entityType: EntityType) => {
           description: "Failed to create chat session",
           variant: "destructive",
         });
+      } finally {
+        isCreatingSession.current = false;
       }
     }
-  }, [entity, sessionId, createNewSession, getTitle, toast]);
+  }, [entity, sessionId, createNewSession, toast]);
 
   // Update the session when messages change (but avoid infinite loops)
   useEffect(() => {
