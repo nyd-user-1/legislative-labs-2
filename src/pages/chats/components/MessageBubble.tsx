@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Copy, ThumbsUp, ThumbsDown } from "lucide-react";
 import { format } from "date-fns";
+import ReactMarkdown from "react-markdown";
 import { Message } from "../types";
 
 interface MessageBubbleProps {
@@ -24,7 +25,13 @@ export const MessageBubble = ({ message, onCopy, onFeedback }: MessageBubbleProp
               : "bg-muted"
           }`}
         >
-          <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+          {message.role === "assistant" ? (
+            <div className="text-sm prose prose-sm max-w-none dark:prose-invert">
+              <ReactMarkdown>{message.content}</ReactMarkdown>
+            </div>
+          ) : (
+            <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+          )}
           {message.timestamp && (
             <p className="text-xs opacity-70 mt-1">
               {format(new Date(message.timestamp), "h:mm a")}
