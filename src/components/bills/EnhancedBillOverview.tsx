@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, User, FileText, Users, Vote, Clock } from "lucide-react";
@@ -70,30 +69,32 @@ export const EnhancedBillOverview = ({ enhancedDetails }: EnhancedBillOverviewPr
       return 0;
     }
     
-    return votes.reduce((sum: number, vote: any) => {
+    let total = 0;
+    
+    for (const vote of votes) {
       if (!vote || typeof vote !== 'object') {
-        return sum;
+        continue;
       }
       
       const count = vote[voteType];
       
       if (typeof count === 'number' && !isNaN(count)) {
-        return sum + count;
-      }
-      
-      if (typeof count === 'string') {
+        total += count;
+      } else if (typeof count === 'string') {
         const parsed = parseInt(count, 10);
-        return sum + (isNaN(parsed) ? 0 : parsed);
+        if (!isNaN(parsed)) {
+          total += parsed;
+        }
       }
-      
-      return sum;
-    }, 0);
+    }
+    
+    return total;
   };
 
   // Calculate vote totals with explicit number typing
-  const yesVotes: number = getVoteCount(enhancedDetails.votes, 'aye');
-  const noVotes: number = getVoteCount(enhancedDetails.votes, 'nay');
-  const absentVotes: number = getVoteCount(enhancedDetails.votes, 'absent');
+  const yesVotes = getVoteCount(enhancedDetails.votes, 'aye');
+  const noVotes = getVoteCount(enhancedDetails.votes, 'nay');
+  const absentVotes = getVoteCount(enhancedDetails.votes, 'absent');
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
