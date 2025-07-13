@@ -144,7 +144,10 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee }: AIC
   useEffect(() => {
     // Scroll to bottom when new messages are added
     if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
+      const scrollElement = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+      if (scrollElement) {
+        scrollElement.scrollTop = scrollElement.scrollHeight;
+      }
     }
   }, [messages]);
 
@@ -163,6 +166,16 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee }: AIC
       };
       
       saveMessage(userMessage);
+
+      // Scroll to bottom after user message
+      setTimeout(() => {
+        if (scrollAreaRef.current) {
+          const scrollElement = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+          if (scrollElement) {
+            scrollElement.scrollTop = scrollElement.scrollHeight;
+          }
+        }
+      }, 100);
 
       // Prepare context based on the entity type
       let contextInfo = "";
@@ -196,32 +209,80 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee }: AIC
         
         User Question: ${content}`;
 
-      // Call OpenAI edge function using Supabase client
-      const { data: responseData, error: functionError } = await supabase.functions.invoke('generate-with-openai', {
-        body: {
-          prompt: fullPrompt,
-          model: selectedModel,
-          type: 'default'
-        }
-      });
-
-      if (functionError) {
-        throw new Error(functionError.message || "Failed to get AI response");
-      }
-
-      if (!responseData?.generatedText) {
-        throw new Error("No response received from AI");
-      }
-      
-      // Add AI response
+      // Create assistant message placeholder for streaming
+      const assistantMessageId = crypto.randomUUID();
       const assistantMessage: Message = {
-        id: crypto.randomUUID(),
+        id: assistantMessageId,
         role: "assistant",
-        content: responseData.generatedText,
+        content: "",
         timestamp: new Date()
       };
       
       saveMessage(assistantMessage);
+
+      try {
+        // Call OpenAI edge function with streaming
+        const { data: responseData, error: functionError } = await supabase.functions.invoke('generate-with-openai', {
+          body: {
+            prompt: fullPrompt,
+            model: selectedModel,
+            type: 'default',
+            stream: true
+          }
+        });
+
+        if (functionError) {
+          throw new Error(functionError.message || "Failed to get AI response");
+        }
+
+        // If we get a complete response (fallback for non-streaming)
+        if (responseData?.generatedText) {
+          const updatedMessage: Message = {
+            ...assistantMessage,
+            content: responseData.generatedText
+          };
+          saveMessage(updatedMessage);
+        }
+        
+      } catch (streamError) {
+        console.warn("Streaming failed, falling back to non-streaming:", streamError);
+        
+        // Fallback to non-streaming
+        const { data: responseData, error: functionError } = await supabase.functions.invoke('generate-with-openai', {
+          body: {
+            prompt: fullPrompt,
+            model: selectedModel,
+            type: 'default',
+            stream: false
+          }
+        });
+
+        if (functionError) {
+          throw new Error(functionError.message || "Failed to get AI response");
+        }
+
+        if (!responseData?.generatedText) {
+          throw new Error("No response received from AI");
+        }
+        
+        // Update the assistant message with complete response
+        const updatedMessage: Message = {
+          ...assistantMessage,
+          content: responseData.generatedText
+        };
+        
+        saveMessage(updatedMessage);
+      }
+      
+      // Scroll to bottom after AI response
+      setTimeout(() => {
+        if (scrollAreaRef.current) {
+          const scrollElement = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+          if (scrollElement) {
+            scrollElement.scrollTop = scrollElement.scrollHeight;
+          }
+        }
+      }, 100);
       
     } catch (error) {
       console.error("Error sending message:", error);
@@ -321,51 +382,86 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee }: AIC
           )}
 
           {/* Chat Messages */}
-          <ScrollArea ref={scrollAreaRef} className="flex-1 pr-4">
-            <div className="space-y-4">
-              {messages.map((message) => {
-                // Convert Date to string for MessageBubble compatibility
-                const chatMessage: ChatMessage = {
-                  ...message,
-                  timestamp: message.timestamp.toISOString()
-                };
-                
-                return (
-                  <MessageBubble 
-                    key={message.id}
-                    message={chatMessage}
-                    onCopy={(text) => {
-                      navigator.clipboard.writeText(text);
-                      toast({
-                        title: "Copied to clipboard",
-                        description: "Message content copied to clipboard.",
-                      });
-                    }}
-                    onFeedback={(type) => {
-                      toast({
-                        title: "Feedback received",
-                        description: `Thank you for your ${type} feedback!`,
-                      });
-                    }}
-                    onShare={handleShareChat}
-                  />
-                );
-              })}
-              {isLoading && (
-                <div className="space-y-2">
-                  <div className="flex justify-start">
-                    <div className="w-full rounded-lg p-3 bg-muted">
-                      <div className="flex gap-1">
-                        <div className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce"></div>
-                        <div className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: "0.1s" }}></div>
-                        <div className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+          <div className="flex-1 relative">
+            {/* Top blur gradient */}
+            <div className="absolute top-0 left-0 right-0 h-4 bg-gradient-to-b from-white/80 to-transparent z-10 pointer-events-none" />
+            
+            <ScrollArea ref={scrollAreaRef} className="h-full pr-4">
+              <div className="space-y-4 py-2">
+                {messages.map((message, index) => {
+                  // Convert Date to string for MessageBubble compatibility
+                  const chatMessage: ChatMessage = {
+                    ...message,
+                    timestamp: message.timestamp.toISOString()
+                  };
+                  
+                  // Generate suggested prompts for assistant messages
+                  const suggestedPrompts = getSuggestedPrompts();
+                  const suggestedPrompt = message.role === "assistant" && index === messages.length - 1 
+                    ? suggestedPrompts[Math.floor(Math.random() * suggestedPrompts.length)]
+                    : undefined;
+                  
+                  // Mock citations for demonstration
+                  const mockCitations = message.role === "assistant" ? [
+                    {
+                      id: "1",
+                      title: "New York State Legislature",
+                      url: "https://www.nysenate.gov",
+                      source: "NY Senate",
+                      excerpt: "Official legislative information and bill tracking"
+                    },
+                    {
+                      id: "2", 
+                      title: "Legislative Database",
+                      url: "https://legislation.nysenate.gov",
+                      source: "OpenLegislation",
+                      excerpt: "Comprehensive database of NY legislative actions"
+                    }
+                  ] : [];
+                  
+                  return (
+                    <MessageBubble 
+                      key={message.id}
+                      message={chatMessage}
+                      citations={mockCitations}
+                      suggestedPrompt={suggestedPrompt}
+                      onPromptClick={handlePromptClick}
+                      onCopy={(text) => {
+                        navigator.clipboard.writeText(text);
+                        toast({
+                          title: "Copied to clipboard",
+                          description: "Message content copied to clipboard.",
+                        });
+                      }}
+                      onFeedback={(type) => {
+                        toast({
+                          title: "Feedback received",
+                          description: `Thank you for your ${type} feedback!`,
+                        });
+                      }}
+                      onShare={handleShareChat}
+                    />
+                  );
+                })}
+                {isLoading && (
+                  <div className="space-y-2">
+                    <div className="flex justify-start">
+                      <div className="w-full rounded-lg p-3 bg-muted">
+                        <div className="flex gap-1">
+                          <div className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce"></div>
+                          <div className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: "0.1s" }}></div>
+                          <div className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              )}
-            </div>
-          </ScrollArea>
+                )}
+              </div>
+            </ScrollArea>
+            
+            {/* Bottom blur gradient */}
+            <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-white/80 to-transparent z-10 pointer-events-none" />
+          </div>
 
           {/* Input Area */}
           <div className="flex-shrink-0 space-y-3">
