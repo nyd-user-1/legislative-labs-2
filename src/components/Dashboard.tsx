@@ -65,9 +65,9 @@ export const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="w-screen min-h-screen bg-white overflow-x-hidden">
-        <div className="container mx-auto px-[27px] py-4 sm:py-6 max-w-full">
-          <div className="space-y-4 sm:space-y-6 max-w-full overflow-hidden">
+      <div className="w-full min-h-screen bg-white overflow-x-hidden">
+        <div className="container mx-auto px-[27px] py-4 sm:py-6 max-w-7xl">
+          <div className="space-y-4 sm:space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="space-y-1">
                 <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Overview</h1>
@@ -94,8 +94,8 @@ export const Dashboard = () => {
 
   if (error) {
     return (
-      <div className="w-screen min-h-screen bg-white overflow-x-hidden">
-        <div className="container mx-auto px-[27px] py-4 sm:py-6 max-w-full">
+      <div className="w-full min-h-screen bg-white overflow-x-hidden">
+        <div className="container mx-auto px-[27px] py-4 sm:py-6 max-w-7xl">
           <div className="text-center py-12">
             <h2 className="text-xl font-semibold text-destructive mb-2">Error Loading Dashboard</h2>
             <p className="text-muted-foreground mb-4">{error}</p>
@@ -107,9 +107,9 @@ export const Dashboard = () => {
   }
 
   return (
-    <div className="w-screen min-h-screen bg-white overflow-x-hidden">
-      <div className="container mx-auto px-[27px] py-4 sm:py-6 max-w-full">
-        <div className="space-y-4 sm:space-y-6 max-w-full overflow-hidden">
+    <div className="w-full min-h-screen bg-white overflow-x-hidden">
+      <div className="container mx-auto px-[27px] py-4 sm:py-6 max-w-7xl">
+        <div className="space-y-4 sm:space-y-6">
           {/* Header Section */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="space-y-1">
@@ -157,7 +157,7 @@ export const Dashboard = () => {
           </div>
 
           {/* Chart Section */}
-          <Card className="overflow-hidden">
+          <Card>
             <CardHeader className="px-4 sm:px-6">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div className="flex items-center gap-2">
@@ -196,7 +196,7 @@ export const Dashboard = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="px-4 sm:px-6">
-              <div className="h-[250px] sm:h-[300px] lg:h-[350px] w-full overflow-hidden">
+              <div className="h-[250px] sm:h-[300px] lg:h-[350px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
@@ -249,9 +249,7 @@ export const Dashboard = () => {
           </Card>
 
           {/* Dashboard Tabs Section */}
-          <div className="overflow-hidden">
-            <DashboardTabsSection bills={recentBills} />
-          </div>
+          <DashboardTabsSection bills={recentBills} />
         </div>
       </div>
     </div>
