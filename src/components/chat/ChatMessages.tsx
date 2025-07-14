@@ -18,7 +18,7 @@ interface ChatMessagesProps {
   onShare: () => void;
   onSendPrompt: (prompt: string) => void;
   entity: any;
-  entityType: 'bill' | 'member' | 'committee' | null;
+  entityType: 'bill' | 'member' | 'committee' | 'problem' | null;
   onFeedback: (type: "thumbs-up" | "thumbs-down" | "citations") => void;
 }
 

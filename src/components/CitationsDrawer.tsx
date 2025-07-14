@@ -1,3 +1,4 @@
+
 import {
   Drawer,
   DrawerContent,
@@ -11,8 +12,7 @@ import { ExternalLink } from "lucide-react";
 interface Citation {
   id: string;
   title: string;
-  source: string;
-  url?: string;
+  url: string;
   excerpt: string;
 }
 
@@ -55,7 +55,6 @@ export const CitationsDrawer = ({ open, onOpenChange, citations }: CitationsDraw
                         </Button>
                       )}
                     </div>
-                    <p className="text-xs text-muted-foreground">{citation.source}</p>
                     <p className="text-sm">{citation.excerpt}</p>
                   </div>
                 ))

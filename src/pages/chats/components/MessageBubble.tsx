@@ -13,7 +13,7 @@ interface MessageBubbleProps {
   onShare?: () => void;
   onSendPrompt?: (prompt: string) => void;
   entity?: any;
-  entityType?: 'bill' | 'member' | 'committee' | null;
+  entityType?: 'bill' | 'member' | 'committee' | 'problem' | null;
 }
 
 export const MessageBubble = ({ 
@@ -28,7 +28,7 @@ export const MessageBubble = ({
   
   // Generate dynamic prompts using ContextBuilder
   const getDynamicPrompts = () => {
-    return ContextBuilder.generateDynamicPrompts(entity, entityType, message.content);
+    return ContextBuilder.generateDynamicPrompts(entity, entityType);
   };
 
   return (
