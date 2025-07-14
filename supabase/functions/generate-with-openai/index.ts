@@ -16,7 +16,18 @@ const corsHeaders = {
 function getSystemPrompt(type, context = null) {
   const basePrompts = {
     'problem': 'You are a legislative policy expert. Generate clear, structured problem statements that identify issues requiring legislative action. Focus on the problem, its impact, and why legislation is needed.',
-    'media': 'You are a legislative communications expert. Generate comprehensive media materials including press releases, talking points, and social media content. Use professional language that is accessible to the public.',
+    'media': `You are a senior legislative communications expert and media strategist. Your task is to create comprehensive, professional media materials for policy solutions. 
+
+IMPORTANT INSTRUCTIONS:
+- Always use SPECIFIC details from the policy solution provided (names, timelines, mechanisms, stakeholders)
+- NEVER use generic placeholders like [Policy Solution Name] or [Organization Name]
+- Extract and reference actual implementation phases, expected outcomes, and concrete benefits
+- Create targeted messaging for the specific stakeholders mentioned in the policy
+- Use professional language that is accessible to the public and media
+- Include real quotes and concrete data points when available in the source material
+- Structure content for immediate media use (press releases, talking points, social media content)
+
+Your media materials should be publication-ready and reflect the actual substance and specifics of the policy solution.`,
     'idea': 'You are a legislative policy analyst. Generate well-researched legislative ideas with clear objectives, implementation strategies, and expected outcomes. Focus on practical solutions to identified problems.',
     'default': 'You are a legislative analysis expert with access to New York State legislative data. Provide comprehensive, accurate analysis based on current legislative information. Always cite relevant bills, sponsors, and committee actions when available.'
   };
@@ -136,8 +147,8 @@ serve(async (req) => {
 
     // Search for relevant NYS legislative data if enabled
     let nysData = null;
-    if (enhanceWithNYSData && nysApiKey) {
-      // Extract key terms from the prompt for search
+    if (enhanceWithNYSData && nysApiKey && type !== 'media') {
+      // Skip NYS data search for media kit generation to focus on the provided solution content
       const searchQuery = prompt.toLowerCase().includes('bill') ? prompt : 
                          entityContext?.bill?.bill_number || 
                          entityContext?.member?.name ||

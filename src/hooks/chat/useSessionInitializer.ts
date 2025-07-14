@@ -1,246 +1,85 @@
 
 import { useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
 import { Message, EntityType } from './types';
-import { generateId, getTitle } from './utils';
+import { generateId } from './utils';
 
 export const useSessionInitializer = (entity: any, entityType: EntityType) => {
-  const { toast } = useToast();
-
   const initializeSession = useCallback(async (
     withInitialMessage: boolean,
     setMessages: (messages: Message[]) => void,
     setIsLoading: (loading: boolean) => void,
-    saveChatSession: (messages: Message[], title: string) => void
+    saveChatSession: (messages: Message[]) => void
   ) => {
     if (!withInitialMessage || !entity) return;
 
     setIsLoading(true);
+
     try {
-      let prompt = "";
+      let initialPrompt = '';
 
       if (entityType === 'problem') {
-        // Create the user message first
-        const userMessage: Message = {
-          id: generateId(),
-          role: "user",
-          content: entity.originalStatement || entity.description,
-          timestamp: new Date()
-        };
-
-        setMessages([userMessage]);
-
-        // Then generate the refined analysis
-        prompt = `Please provide a refined problem statement for the following problem description:
-
-"${entity.originalStatement || entity.description}"
-
-Provide a clear, structured analysis that includes:
-1. A clear problem identification
-2. Impact analysis on affected parties  
-3. Assessment of current legal/regulatory gaps
-4. Justification for legislative action needed
-5. Professional policy language
-
-Keep it structured and comprehensive but concise. Do not include memorandum formatting, headers, or formal document structure.`;
+        initialPrompt = `Please analyze this problem statement and provide insights on potential legislative solutions: "${entity.originalStatement || entity.description}"`;
       } else if (entityType === 'solution') {
-        // Create the user message first
-        const userMessage: Message = {
-          id: generateId(),
-          role: "user",
-          content: entity.originalStatement || entity.description,
-          timestamp: new Date()
-        };
-
-        setMessages([userMessage]);
-
-        // Then generate the solution
-        prompt = `Based on this problem statement, please develop a comprehensive policy solution:
-
-"${entity.originalStatement || entity.description}"
-
-Provide a detailed policy proposal that includes:
-1. Executive summary of the proposed solution
-2. Specific policy mechanisms and tools
-3. Implementation strategy and timeline
-4. Stakeholder analysis and engagement plan
-5. Expected outcomes and success metrics
-6. Potential challenges and mitigation strategies
-
-Keep it practical, actionable, and focused on real-world implementation.`;
+        initialPrompt = `Please analyze this policy solution and provide detailed implementation guidance: "${entity.originalStatement || entity.description}"`;
       } else if (entityType === 'mediaKit') {
-        // Create the user message first
-        const userMessage: Message = {
+        // Create comprehensive initial media kit prompt with actual solution content
+        const solutionContent = entity.solutionContent || entity.originalStatement || entity.description;
+        
+        initialPrompt = `Please create a comprehensive media kit for the following policy solution:
+
+POLICY SOLUTION:
+${solutionContent}
+
+Generate a complete media kit that includes:
+
+1. **PROFESSIONAL PRESS RELEASE** - Using the actual policy name, specific mechanisms, timeline, and outcomes mentioned in the solution
+2. **STRATEGIC TALKING POINTS** - Key messages for stakeholders based on the actual benefits and implementation strategy
+3. **STAKEHOLDER-SPECIFIC MESSAGING** - Targeted communications for the specific audiences identified in the policy
+4. **CONCRETE ACTION STEPS** - Specific actions supporters can take based on the implementation and engagement plans
+
+Use the real details, names, timelines, and specifics from the policy solution. Do not use generic placeholders.`;
+      }
+
+      if (initialPrompt) {
+        const { data, error } = await supabase.functions.invoke('generate-with-openai', {
+          body: { 
+            prompt: initialPrompt,
+            type: entityType === 'mediaKit' ? 'media' : 'chat',
+            entityContext: { type: entityType, [entityType]: entity }
+          }
+        });
+
+        if (error) {
+          console.error('Error initializing session:', error);
+          throw new Error('Failed to initialize session');
+        }
+
+        const assistantMessage: Message = {
           id: generateId(),
-          role: "user",
-          content: entity.originalStatement || entity.description,
+          role: "assistant",
+          content: data.generatedText || 'Hello! How can I help you today?',
           timestamp: new Date()
         };
 
-        setMessages([userMessage]);
-
-        // Then generate the media kit
-        prompt = `Based on this policy solution, please create comprehensive media kit materials:
-
-"${entity.originalStatement || entity.description}"
-
-Please provide:
-
-1. **DRAFT PRESS RELEASE**
-   - Compelling headline
-   - Executive summary
-   - Key benefits and impact
-   - Call to action
-
-2. **TALKING POINTS**
-   - 5-7 key messages for stakeholders
-   - Supporting facts and statistics
-   - Responses to common objections
-
-3. **PERSUASION TECHNIQUES**
-   - Conversational approaches for friends and family
-   - Emotional appeals and logical arguments
-   - Simple explanations of complex policy
-
-4. **ACTIONABLE STEPS**
-   - How supporters can help advance the solution
-   - Contact information for representatives
-   - Social media strategies
-
-Keep all content professional yet accessible, compelling, and focused on building broad support for this policy solution.`;
-      } else if (entityType === 'bill') {
-        prompt = `Please provide a comprehensive analysis of this bill: ${entity.bill_number}. Include summary, key provisions, and potential impact.`;
-      } else {
-        return;
+        const initialMessages = [assistantMessage];
+        setMessages(initialMessages);
+        await saveChatSession(initialMessages);
       }
-
-      const { data, error } = await supabase.functions.invoke('generate-with-openai', {
-        body: { 
-          prompt, 
-          type: entityType === 'problem' ? 'problem-refinement' : entityType === 'solution' ? 'solution-generation' : entityType === 'mediaKit' ? 'media-kit-generation' : 'analysis',
-          entityContext: { type: entityType, [entityType]: entity }
-        }
-      });
-
-      if (error) {
-        console.error('Error calling OpenAI function:', error);
-        toast({
-          title: "Error",
-          description: "Failed to generate initial analysis. Please try again.",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      // Add the AI response to the existing user message
-      const analysisMessage: Message = {
+    } catch (error) {
+      console.error('Error initializing session:', error);
+      // Set a fallback message if initialization fails
+      const fallbackMessage: Message = {
         id: generateId(),
-        role: "assistant", 
-        content: data.generatedText || 'Unable to generate analysis. Please try again.',
+        role: "assistant",
+        content: "Hello! I'm ready to help you with your legislative analysis. How can I assist you today?",
         timestamp: new Date()
       };
-
-      const newMessages = (entityType === 'problem' || entityType === 'solution' || entityType === 'mediaKit')
-        ? [
-            {
-              id: generateId(),
-              role: "user" as const,
-              content: entity.originalStatement || entity.description,
-              timestamp: new Date()
-            },
-            analysisMessage
-          ]
-        : [analysisMessage];
-
-      setMessages(newMessages);
-
-      // For problem type, create a problem chat entry FIRST
-      if (entityType === 'problem') {
-        const problemChatId = await createProblemChatEntry(entity);
-        console.log('Created problem chat entry with ID:', problemChatId);
-      }
-
-      // Save the session after creating the problem chat entry
-      await saveChatSession(newMessages, '');
-
-    } catch (error) {
-      console.error('Error in initializeSession:', error);
-      toast({
-        title: "Error",
-        description: "Failed to initialize chat session. Please try again.",
-        variant: "destructive"
-      });
+      setMessages([fallbackMessage]);
     } finally {
       setIsLoading(false);
     }
-  }, [entity, entityType, toast]);
-
-  const createProblemChatEntry = async (entity: any): Promise<string | null> => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        console.error('No authenticated user found');
-        return null;
-      }
-
-      console.log('Creating problem chat entry for user:', user.id);
-
-      // Get the next problem number using the fixed database function
-      const { data: problemNumber, error: numberError } = await supabase.rpc('generate_problem_number');
-      
-      if (numberError) {
-        console.error('Failed to generate problem number:', numberError);
-        toast({
-          title: "Error",
-          description: "Failed to generate problem number. Please try again.",
-          variant: "destructive"
-        });
-        return null;
-      }
-
-      if (!problemNumber) {
-        console.error('No problem number returned from function');
-        return null;
-      }
-
-      console.log('Generated problem number:', problemNumber);
-
-      // Create problem chat entry
-      const { data, error } = await supabase
-        .from('problem_chats')
-        .insert({
-          user_id: user.id,
-          problem_number: problemNumber,
-          title: entity.title || 'Problem Statement',
-          problem_statement: entity.originalStatement || entity.description,
-          current_state: 'Problem Identified'
-        })
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Error creating problem chat entry:', error);
-        toast({
-          title: "Error",
-          description: "Failed to save problem statement. Please try again.",
-          variant: "destructive"
-        });
-        return null;
-      }
-
-      console.log('Successfully created problem chat entry:', data);
-      return data.id;
-    } catch (error) {
-      console.error('Error in createProblemChatEntry:', error);
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
-        variant: "destructive"
-      });
-      return null;
-    }
-  };
+  }, [entity, entityType]);
 
   return { initializeSession };
 };

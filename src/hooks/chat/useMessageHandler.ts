@@ -48,18 +48,35 @@ User question: ${message}
 Please provide a detailed response addressing the user's question in the context of developing effective policy solutions for this problem.`;
         contextualPrompt = solutionContext;
       } else if (entityType === 'mediaKit' && entity) {
-        // Add context for media kit-specific prompts
-        const mediaKitContext = `Context: We are creating media kit materials (press releases, talking points, persuasion techniques) for this policy solution: "${entity.originalStatement || entity.description}"
+        // Enhanced context for media kit-specific prompts with actual solution content
+        const solutionContent = entity.solutionContent || entity.originalStatement || entity.description;
+        
+        const mediaKitContext = `Context: You are creating comprehensive media kit materials for the following policy solution:
 
-User question: ${message}
+POLICY SOLUTION CONTENT:
+${solutionContent}
 
-Please provide a detailed response that includes:
-1. Draft press release content
-2. Key talking points for stakeholders
-3. Conversational techniques to persuade friends and family
-4. Actionable steps to advance the solution
+User request: ${message}
 
-Keep the tone professional yet accessible, and focus on compelling messaging that effectively communicates the benefits of this policy solution.`;
+Based on the specific policy solution provided above, create detailed and tailored media materials that include:
+
+1. **DRAFT PRESS RELEASE**: Create a professional press release using the actual policy name, specific mechanisms, implementation timeline, and expected outcomes from the solution. Include real quotes and concrete details from the policy.
+
+2. **KEY TALKING POINTS**: Extract and organize the main benefits, implementation strategies, and expected outcomes from the actual policy solution. Include specific statistics, timelines, and stakeholder information mentioned in the solution.
+
+3. **STAKEHOLDER MESSAGING**: Create targeted messaging for the specific stakeholders mentioned in the policy solution (government agencies, non-profits, community members, etc.).
+
+4. **ACTIONABLE STEPS**: Provide concrete actions based on the implementation strategy and stakeholder engagement plan outlined in the policy solution.
+
+Make sure to:
+- Use the actual policy name and specific details from the solution
+- Reference real implementation phases, timelines, and metrics mentioned
+- Include specific benefits and outcomes outlined in the policy
+- Address the actual target population and geographic scope mentioned
+- Incorporate the real stakeholder analysis and engagement strategies
+
+DO NOT use generic placeholders like [Policy Solution Name] or [Organization Name]. Use the specific details and names from the actual policy solution provided.`;
+        
         contextualPrompt = mediaKitContext;
       }
 

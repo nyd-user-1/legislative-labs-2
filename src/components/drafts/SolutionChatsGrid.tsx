@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -25,6 +24,8 @@ export const SolutionChatsGrid = () => {
   const queryClient = useQueryClient();
   const [selectedSolution, setSelectedSolution] = useState<SolutionChat | null>(null);
   const [chatSheetOpen, setChatSheetOpen] = useState(false);
+  const [mediaKitSheetOpen, setMediaKitSheetOpen] = useState(false);
+  const [mediaKitContent, setMediaKitContent] = useState<any>(null);
 
   // For now, we'll use the same problem_chats table but filter for solutions
   // In a real implementation, you might want a separate solutions table
@@ -121,13 +122,52 @@ export const SolutionChatsGrid = () => {
     setChatSheetOpen(true);
   };
 
-  const handleMediaKit = (solutionChat: SolutionChat, e: React.MouseEvent) => {
+  const handleMediaKit = async (solutionChat: SolutionChat, e: React.MouseEvent) => {
     e.stopPropagation();
+    
+    // Fetch the full solution content from the chat session
+    let solutionContent = solutionChat.problem_statement;
+    
+    if (solutionChat.chat_session_id) {
+      try {
+        const { data, error } = await supabase
+          .from('chat_sessions')
+          .select('messages')
+          .eq('id', solutionChat.chat_session_id)
+          .single();
+          
+        if (data && !error) {
+          const messages = JSON.parse(String(data.messages) || '[]');
+          // Get the last assistant message which should contain the full solution
+          const lastAssistantMessage = messages
+            .filter((msg: any) => msg.role === 'assistant')
+            .pop();
+          
+          if (lastAssistantMessage && lastAssistantMessage.content) {
+            solutionContent = lastAssistantMessage.content;
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching solution content:', error);
+      }
+    }
+    
+    const mediaKitObject = {
+      id: `media-kit-${solutionChat.id}`,
+      title: `Media Kit for ${solutionChat.problem_number}`,
+      description: `Media kit for solution: ${solutionChat.title}`,
+      originalStatement: solutionContent, // Pass the full solution content
+      mediaKitNumber: `MK-${solutionChat.problem_number}`,
+      solutionContent: solutionContent // Additional field for clarity
+    };
+    
+    setMediaKitContent(mediaKitObject);
+    setMediaKitSheetOpen(true);
+    
     toast({
       title: "Generating Media Kit",
-      description: `Creating talking points and media kit for ${solutionChat.problem_number}`,
+      description: `Creating comprehensive media materials for ${solutionChat.problem_number}`,
     });
-    // TODO: Implement media kit generation
   };
 
   const handleSolutionClick = (solutionChat: SolutionChat) => {
@@ -287,19 +327,25 @@ export const SolutionChatsGrid = () => {
         ))}
       </div>
 
-      {selectedSolution && (
-        <AIChatSheet
-          open={chatSheetOpen}
-          onOpenChange={setChatSheetOpen}
-          solution={{
-            id: selectedSolution.id,
-            title: selectedSolution.title,
-            description: selectedSolution.problem_statement,
-            originalStatement: selectedSolution.problem_statement,
-            problemNumber: selectedSolution.problem_number
-          }}
-        />
-      )}
+      {/* AI Chat Sheet for viewing existing solutions */}
+      <AIChatSheet
+        open={chatSheetOpen}
+        onOpenChange={setChatSheetOpen}
+        solution={selectedSolution ? {
+          id: selectedSolution.id,
+          title: selectedSolution.title,
+          description: selectedSolution.problem_statement,
+          originalStatement: selectedSolution.problem_statement,
+          problemNumber: selectedSolution.problem_number
+        } : null}
+      />
+
+      {/* AI Chat Sheet for media kit generation */}
+      <AIChatSheet
+        open={mediaKitSheetOpen}
+        onOpenChange={setMediaKitSheetOpen}
+        mediaKit={mediaKitContent}
+      />
     </>
   );
 };
