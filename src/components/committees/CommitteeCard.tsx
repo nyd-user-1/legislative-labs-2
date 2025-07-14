@@ -38,38 +38,20 @@ export const CommitteeCard = ({
   isFavorited = false,
   hasAIChat = false
 }: CommitteeCardProps) => {
-  const getChamberColor = (chamber: string | null) => {
-    if (!chamber) return "bg-muted text-muted-foreground";
-    const chamberLower = chamber.toLowerCase();
-    if (chamberLower.includes("senate")) {
-      return "bg-blue-100 text-blue-800 border-blue-200";
-    }
-    if (chamberLower.includes("assembly")) {
-      return "bg-green-100 text-green-800 border-green-200";
-    }
-    return "bg-muted text-muted-foreground";
-  };
-
   return (
     <Card 
-      className="card hover:shadow-md transition-shadow cursor-pointer"
+      className="cursor-pointer hover:bg-muted/50 transition-colors"
       onClick={() => onCommitteeSelect(committee)}
     >
       <CardHeader className="pb-3">
         <div className="flex justify-between items-start">
-          <div className="flex-1">
-            <h3 className="font-semibold text-lg leading-tight mb-2">
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-lg leading-tight mb-2 pr-2">
               {committee.name || "Unknown Committee"}
             </h3>
           </div>
           
-          <div className="flex items-center gap-2">
-            {committee.chamber && (
-              <Badge variant="outline" className={`${getChamberColor(committee.chamber)} w-fit`}>
-                {committee.chamber}
-              </Badge>
-            )}
-            
+          <div className="flex-shrink-0">
             <CardActionButtons
               onFavorite={onFavorite ? (e) => onFavorite(committee, e) : undefined}
               onAIAnalysis={onAIAnalysis ? (e) => onAIAnalysis(committee, e) : undefined}
@@ -83,38 +65,57 @@ export const CommitteeCard = ({
       </CardHeader>
       
       <CardContent className="pt-0">
-        <div className="space-y-3">
-          {committee.chair_name && (
-            <div className="flex items-center gap-2 text-sm">
-              <Users className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-              <span className="truncate font-medium">Chair: {committee.chair_name}</span>
-            </div>
-          )}
+        <div className="space-y-6">
+          <div className="space-y-2 pt-2 border-t">
+            {committee.chair_name && (
+              <div className="flex items-center gap-2 text-sm">
+                <Users className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                <span className="truncate font-medium">Chair: {committee.chair_name}</span>
+              </div>
+            )}
 
-          {committee.chair_email && (
-            <div className="flex items-center gap-2 text-sm">
-              <Mail className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-              <span className="truncate">{committee.chair_email}</span>
-            </div>
-          )}
+            {committee.chair_email && (
+              <div className="flex items-center gap-2 text-sm">
+                <Mail className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                <span className="truncate">{committee.chair_email}</span>
+              </div>
+            )}
 
-          {committee.meeting_schedule && (
-            <div className="flex items-center gap-2 text-sm">
-              <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-              <span className="truncate">{committee.meeting_schedule}</span>
-            </div>
-          )}
+            {committee.meeting_schedule && (
+              <div className="flex items-center gap-2 text-sm">
+                <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                <span className="truncate">{committee.meeting_schedule}</span>
+              </div>
+            )}
 
-          {committee.address && (
-            <div className="flex items-center gap-2 text-sm">
-              <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-              <span className="truncate">{committee.address}</span>
-            </div>
-          )}
+            {committee.address && (
+              <div className="flex items-center gap-2 text-sm">
+                <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                <span className="truncate">{committee.address}</span>
+              </div>
+            )}
+          </div>
 
-          <div className="flex gap-4 text-sm text-muted-foreground">
-            <span>Members: {committee.memberCount || "N/A"}</span>
-            <span>Bills: {committee.billCount || "N/A"}</span>
+          {/* Badges and member/bill counts section with spacing */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {committee.chamber && (
+                <Badge variant="outline" className={
+                  committee.chamber.toLowerCase().includes("senate")
+                    ? "bg-blue-100 text-blue-800 border-blue-200"
+                    : committee.chamber.toLowerCase().includes("assembly")
+                    ? "bg-green-100 text-green-800 border-green-200"
+                    : "bg-muted text-muted-foreground"
+                }>
+                  {committee.chamber}
+                </Badge>
+              )}
+            </div>
+            
+            <div className="flex gap-4 text-sm text-muted-foreground">
+              <span>Members: {committee.memberCount || "N/A"}</span>
+              <span>Bills: {committee.billCount || "N/A"}</span>
+            </div>
           </div>
         </div>
       </CardContent>

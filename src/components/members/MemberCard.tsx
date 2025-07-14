@@ -2,7 +2,7 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CardActionButtons } from "@/components/ui/CardActionButtons";
-import { MapPin, Phone, Mail, ExternalLink } from "lucide-react";
+import { MapPin, Phone, Mail } from "lucide-react";
 
 type Member = {
   people_id: number;
@@ -35,24 +35,9 @@ export const MemberCard = ({
   isFavorited = false,
   hasAIChat = false
 }: MemberCardProps) => {
-  const getPartyColor = (party: string | null) => {
-    if (!party) return "bg-muted text-muted-foreground";
-    const partyLower = party.toLowerCase();
-    if (partyLower.includes("democrat") || partyLower.includes("democratic")) {
-      return "bg-blue-100 text-blue-800 border-blue-200";
-    }
-    if (partyLower.includes("republican")) {
-      return "bg-red-100 text-red-800 border-red-200";
-    }
-    if (partyLower.includes("independent")) {
-      return "bg-purple-100 text-purple-800 border-purple-200";
-    }
-    return "bg-muted text-muted-foreground";
-  };
-
   return (
     <Card 
-      className="card hover:shadow-md transition-shadow cursor-pointer"
+      className="cursor-pointer hover:bg-muted/50 transition-colors"
       onClick={() => onMemberSelect(member)}
     >
       <CardHeader className="pb-3">
@@ -75,8 +60,34 @@ export const MemberCard = ({
       </CardHeader>
       
       <CardContent className="pt-0">
-        <div className="space-y-3">
-          {/* Party and District badges */}
+        <div className="space-y-6">
+          <div className="space-y-2 pt-2 border-t">
+            {/* District */}
+            {member.district && (
+              <div className="flex items-center gap-2 text-sm">
+                <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                <span className="truncate">District {member.district}</span>
+              </div>
+            )}
+
+            {/* Email */}
+            {member.email && (
+              <div className="flex items-center gap-2 text-sm">
+                <Mail className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                <span className="truncate">{member.email}</span>
+              </div>
+            )}
+
+            {/* Phone */}
+            {member.phone_capitol && (
+              <div className="flex items-center gap-2 text-sm">
+                <Phone className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                <span className="truncate">{member.phone_capitol}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Badges section with spacing */}
           <div className="flex items-center gap-2">
             {member.chamber && (
               <Badge variant="outline" className={
@@ -88,40 +99,18 @@ export const MemberCard = ({
               </Badge>
             )}
             {member.party && (
-              <Badge variant="outline" className={`${getPartyColor(member.party)} w-fit`}>
+              <Badge variant="outline" className={`w-fit ${
+                member.party.toLowerCase().includes("democrat") || member.party.toLowerCase().includes("democratic")
+                  ? "bg-blue-100 text-blue-800 border-blue-200"
+                  : member.party.toLowerCase().includes("republican")
+                  ? "bg-red-100 text-red-800 border-red-200"
+                  : member.party.toLowerCase().includes("independent")
+                  ? "bg-purple-100 text-purple-800 border-purple-200"
+                  : "bg-muted text-muted-foreground"
+              }`}>
                 {member.party.charAt(0)}
               </Badge>
             )}
-          </div>
-
-          {/* District */}
-          {member.district && (
-            <div className="flex items-center gap-2 text-sm">
-              <MapPin className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-              <span className="truncate">District {member.district}</span>
-            </div>
-          )}
-
-          {/* Email */}
-          {member.email && (
-            <div className="flex items-center gap-2 text-sm">
-              <Mail className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-              <span className="truncate">{member.email}</span>
-            </div>
-          )}
-
-          {/* Phone */}
-          {member.phone_capitol && (
-            <div className="flex items-center gap-2 text-sm">
-              <Phone className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-              <span className="truncate">{member.phone_capitol}</span>
-            </div>
-          )}
-
-          {/* View Full Bio link */}
-          <div className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
-            <ExternalLink className="h-4 w-4 flex-shrink-0" />
-            <span>View Full Bio</span>
           </div>
         </div>
       </CardContent>
