@@ -257,7 +257,7 @@ export const Dashboard = () => {
                   <CardTitle className="text-base sm:text-lg">Recent Activity</CardTitle>
                 </div>
                 <Button variant="outline" onClick={handleViewAllBills} size="sm" className="self-start sm:self-auto">
-                  View All Bills
+                  View All
                 </Button>
               </div>
             </CardHeader>
