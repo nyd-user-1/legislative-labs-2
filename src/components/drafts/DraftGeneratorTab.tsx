@@ -62,7 +62,7 @@ export const DraftGeneratorTab = () => {
       {/* Problem Chats Grid Section */}
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-semibold text-gray-900 mb-2">Your Problem Statements</h2>
+          <h2 className="text-2xl font-semibold text-gray-900 mb-2">Trust The Process</h2>
           <p className="text-gray-600">
             View and continue working on your previous problem analyses.
           </p>
