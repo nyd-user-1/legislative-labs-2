@@ -41,7 +41,7 @@ export const MessageBubble = ({
         <div
           className={`w-full rounded-lg p-3 ${
             message.role === "user"
-              ? "bg-primary text-primary-foreground"
+              ? "bg-slate-800 text-white"
               : "bg-muted"
           }`}
         >
