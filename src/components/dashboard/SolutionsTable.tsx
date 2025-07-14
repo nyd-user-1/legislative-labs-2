@@ -1,6 +1,5 @@
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -88,91 +87,92 @@ export const SolutionsTable = ({ solutions }: SolutionsTableProps) => {
 
       {/* Desktop View with Horizontal Scroll */}
       <div className="hidden md:block">
-        <ScrollArea className="w-full whitespace-nowrap rounded-md border">
-          <Table className="min-w-[800px]">
-            <TableHeader>
-              <TableRow>
-                <TableHead className="min-w-[200px]">Solution Title</TableHead>
-                <TableHead className="min-w-[300px]">Content Preview</TableHead>
-                <TableHead className="min-w-[120px]">Status</TableHead>
-                <TableHead className="min-w-[150px]">Type</TableHead>
-                <TableHead className="min-w-[120px]">Last Action</TableHead>
-                <TableHead className="min-w-[120px] text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {solutions.map((solution) => (
-                <TableRow
-                  key={solution.id}
-                  className="cursor-pointer hover:bg-muted/50"
-                >
-                  <TableCell className="font-medium">
-                    {solution.title}
-                  </TableCell>
-                  <TableCell className="max-w-xs">
-                    <div className="truncate" title={solution.draft_content}>
-                      {solution.draft_content}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Select defaultValue={solution.status}>
-                      <SelectTrigger className="w-auto border-0 bg-transparent p-0 focus:ring-0">
-                        <SelectValue>
-                          <Badge variant={getStatusBadgeVariant(solution.status)}>
-                            {solution.status}
-                          </Badge>
-                        </SelectValue>
-                      </SelectTrigger>
-                      <SelectContent>
-                        {statusOptions.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </TableCell>
-                  <TableCell>
-                    <Select defaultValue={solution.type || "Legislative Draft"}>
-                      <SelectTrigger className="w-auto border-0 bg-transparent p-0 focus:ring-0">
-                        <SelectValue>{solution.type || "Legislative Draft"}</SelectValue>
-                      </SelectTrigger>
-                      <SelectContent>
-                        {typeOptions.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {formatDate(solution.updated_at)}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        title="Add to Favorites"
-                      >
-                        <Heart className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        title="AI Analysis"
-                      >
-                        <Sparkles className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
+        <div className="border rounded-md">
+          <div className="overflow-x-auto">
+            <Table className="min-w-[800px]">
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="min-w-[200px]">Solution Title</TableHead>
+                  <TableHead className="min-w-[300px]">Content Preview</TableHead>
+                  <TableHead className="min-w-[120px]">Status</TableHead>
+                  <TableHead className="min-w-[150px]">Type</TableHead>
+                  <TableHead className="min-w-[120px]">Last Action</TableHead>
+                  <TableHead className="min-w-[120px] text-right">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
+              </TableHeader>
+              <TableBody>
+                {solutions.map((solution) => (
+                  <TableRow
+                    key={solution.id}
+                    className="cursor-pointer hover:bg-muted/50"
+                  >
+                    <TableCell className="font-medium">
+                      {solution.title}
+                    </TableCell>
+                    <TableCell className="max-w-xs">
+                      <div className="truncate" title={solution.draft_content}>
+                        {solution.draft_content}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Select defaultValue={solution.status}>
+                        <SelectTrigger className="w-auto border-0 bg-transparent p-0 focus:ring-0">
+                          <SelectValue>
+                            <Badge variant={getStatusBadgeVariant(solution.status)}>
+                              {solution.status}
+                            </Badge>
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                          {statusOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
+                    <TableCell>
+                      <Select defaultValue={solution.type || "Legislative Draft"}>
+                        <SelectTrigger className="w-auto border-0 bg-transparent p-0 focus:ring-0">
+                          <SelectValue>{solution.type || "Legislative Draft"}</SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                          {typeOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {formatDate(solution.updated_at)}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          title="Add to Favorites"
+                        >
+                          <Heart className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          title="AI Analysis"
+                        >
+                          <Sparkles className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
       </div>
 
       {solutions.length === 0 && (

@@ -299,118 +299,122 @@ export const AllItemsTable = ({
         ))}
       </div>
 
-      {/* Desktop View */}
+      {/* Desktop View - Table Only Scrolls Horizontally */}
       <div className="hidden md:block">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Object</TableHead>
-              <TableHead>Number</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Last Action</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {allItems.map((item) => (
-              <TableRow
-                key={`${item.type}-${item.id}`}
-                className="cursor-pointer hover:bg-muted/50"
-                onClick={() => handleItemClick(item)}
-              >
-                <TableCell>
-                  <span className="text-sm font-medium">{getObjectTypeDisplay(item.type)}</span>
-                </TableCell>
-                <TableCell className="font-medium">
-                  {item.title}
-                </TableCell>
-                <TableCell className="max-w-xs">
-                  <div className="truncate" title={item.description}>
-                    {item.description}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Select defaultValue={item.status}>
-                    <SelectTrigger className="w-auto border-0 bg-transparent p-0 focus:ring-0">
-                      <SelectValue>
-                        <Badge className={getWorkflowPhaseColor(item.workflowPhase)}>
-                          {item.type === 'problem' && item.status === 'Problem Identified' ? 'Identified' : item.status}
-                        </Badge>
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {getStatusOptions(item.type).map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </TableCell>
-                <TableCell>
-                  <Select defaultValue={item.category}>
-                    <SelectTrigger className="w-auto border-0 bg-transparent p-0 focus:ring-0">
-                      <SelectValue>{item.category}</SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {getCategoryOptions(item.type).map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </TableCell>
-                <TableCell className="text-sm text-muted-foreground">
-                  {item.lastAction}
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex items-center justify-end gap-2">
-                    {item.type === 'bill' ? (
-                      <>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={(e) => onFavorite(item.data, e)}
-                          title="Add to Favorites"
-                        >
-                          <Heart className={`h-4 w-4 ${favoriteBillIds.has(item.data.bill_id) ? 'fill-red-500 text-red-500' : ''}`} />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={(e) => onAIAnalysis(item.data, e)}
-                          title="AI Analysis"
-                        >
-                          <Sparkles className={`h-4 w-4 ${billsWithAIChat.has(item.data.bill_id) ? 'fill-yellow-500 text-yellow-500' : ''}`} />
-                        </Button>
-                      </>
-                    ) : (
-                      <>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          title="Add to Favorites"
-                        >
-                          <Heart className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          title="AI Analysis"
-                        >
-                          <Sparkles className="h-4 w-4" />
-                        </Button>
-                      </>
-                    )}
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <div className="border rounded-md">
+          <div className="overflow-x-auto">
+            <Table className="min-w-[800px]">
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="min-w-[120px]">Object</TableHead>
+                  <TableHead className="min-w-[120px]">Number</TableHead>
+                  <TableHead className="min-w-[300px]">Description</TableHead>
+                  <TableHead className="min-w-[120px]">Status</TableHead>
+                  <TableHead className="min-w-[150px]">Category</TableHead>
+                  <TableHead className="min-w-[120px]">Last Action</TableHead>
+                  <TableHead className="min-w-[120px] text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {allItems.map((item) => (
+                  <TableRow
+                    key={`${item.type}-${item.id}`}
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => handleItemClick(item)}
+                  >
+                    <TableCell>
+                      <span className="text-sm font-medium">{getObjectTypeDisplay(item.type)}</span>
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      {item.title}
+                    </TableCell>
+                    <TableCell className="max-w-xs">
+                      <div className="truncate" title={item.description}>
+                        {item.description}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Select defaultValue={item.status}>
+                        <SelectTrigger className="w-auto border-0 bg-transparent p-0 focus:ring-0">
+                          <SelectValue>
+                            <Badge className={getWorkflowPhaseColor(item.workflowPhase)}>
+                              {item.type === 'problem' && item.status === 'Problem Identified' ? 'Identified' : item.status}
+                            </Badge>
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                          {getStatusOptions(item.type).map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
+                    <TableCell>
+                      <Select defaultValue={item.category}>
+                        <SelectTrigger className="w-auto border-0 bg-transparent p-0 focus:ring-0">
+                          <SelectValue>{item.category}</SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                          {getCategoryOptions(item.type).map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {item.lastAction}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        {item.type === 'bill' ? (
+                          <>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={(e) => onFavorite(item.data, e)}
+                              title="Add to Favorites"
+                            >
+                              <Heart className={`h-4 w-4 ${favoriteBillIds.has(item.data.bill_id) ? 'fill-red-500 text-red-500' : ''}`} />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={(e) => onAIAnalysis(item.data, e)}
+                              title="AI Analysis"
+                            >
+                              <Sparkles className={`h-4 w-4 ${billsWithAIChat.has(item.data.bill_id) ? 'fill-yellow-500 text-yellow-500' : ''}`} />
+                            </Button>
+                          </>
+                        ) : (
+                          <>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              title="Add to Favorites"
+                            >
+                              <Heart className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              title="AI Analysis"
+                            >
+                              <Sparkles className="h-4 w-4" />
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
       </div>
 
       {allItems.length === 0 && (

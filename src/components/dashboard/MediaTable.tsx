@@ -1,6 +1,5 @@
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -89,93 +88,94 @@ export const MediaTable = ({ media }: MediaTableProps) => {
 
       {/* Desktop View with Horizontal Scroll */}
       <div className="hidden md:block">
-        <ScrollArea className="w-full whitespace-nowrap rounded-md border">
-          <Table className="min-w-[800px]">
-            <TableHeader>
-              <TableRow>
-                <TableHead className="min-w-[200px]">Media Title</TableHead>
-                <TableHead className="min-w-[300px]">Content Preview</TableHead>
-                <TableHead className="min-w-[120px]">Status</TableHead>
-                <TableHead className="min-w-[150px]">Type</TableHead>
-                <TableHead className="min-w-[120px]">Last Action</TableHead>
-                <TableHead className="min-w-[120px] text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {media.map((mediaItem) => (
-                <TableRow
-                  key={mediaItem.id}
-                  className="cursor-pointer hover:bg-muted/50"
-                >
-                  <TableCell className="font-medium">
-                    {mediaItem.title}
-                  </TableCell>
-                  <TableCell className="max-w-xs">
-                    <div className="truncate" title={mediaItem.content}>
-                      {mediaItem.content}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Select defaultValue={mediaItem.status}>
-                      <SelectTrigger className="w-auto border-0 bg-transparent p-0 focus:ring-0">
-                        <SelectValue>
-                          <Badge variant={getStatusBadgeVariant(mediaItem.status)}>
-                            {mediaItem.status}
-                          </Badge>
-                        </SelectValue>
-                      </SelectTrigger>
-                      <SelectContent>
-                        {statusOptions.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </TableCell>
-                  <TableCell>
-                    <Select defaultValue={mediaItem.content_type}>
-                      <SelectTrigger className="w-auto border-0 bg-transparent p-0 focus:ring-0">
-                        <SelectValue>
-                          {contentTypeOptions.find(opt => opt.value === mediaItem.content_type)?.label || mediaItem.content_type}
-                        </SelectValue>
-                      </SelectTrigger>
-                      <SelectContent>
-                        {contentTypeOptions.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {formatDate(mediaItem.updated_at)}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        title="Add to Favorites"
-                      >
-                        <Heart className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        title="AI Analysis"
-                      >
-                        <Sparkles className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
+        <div className="border rounded-md">
+          <div className="overflow-x-auto">
+            <Table className="min-w-[800px]">
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="min-w-[200px]">Media Title</TableHead>
+                  <TableHead className="min-w-[300px]">Content Preview</TableHead>
+                  <TableHead className="min-w-[120px]">Status</TableHead>
+                  <TableHead className="min-w-[150px]">Type</TableHead>
+                  <TableHead className="min-w-[120px]">Last Action</TableHead>
+                  <TableHead className="min-w-[120px] text-right">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
+              </TableHeader>
+              <TableBody>
+                {media.map((mediaItem) => (
+                  <TableRow
+                    key={mediaItem.id}
+                    className="cursor-pointer hover:bg-muted/50"
+                  >
+                    <TableCell className="font-medium">
+                      {mediaItem.title}
+                    </TableCell>
+                    <TableCell className="max-w-xs">
+                      <div className="truncate" title={mediaItem.content}>
+                        {mediaItem.content}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Select defaultValue={mediaItem.status}>
+                        <SelectTrigger className="w-auto border-0 bg-transparent p-0 focus:ring-0">
+                          <SelectValue>
+                            <Badge variant={getStatusBadgeVariant(mediaItem.status)}>
+                              {mediaItem.status}
+                            </Badge>
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                          {statusOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
+                    <TableCell>
+                      <Select defaultValue={mediaItem.content_type}>
+                        <SelectTrigger className="w-auto border-0 bg-transparent p-0 focus:ring-0">
+                          <SelectValue>
+                            {contentTypeOptions.find(opt => opt.value === mediaItem.content_type)?.label || mediaItem.content_type}
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                          {contentTypeOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {formatDate(mediaItem.updated_at)}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          title="Add to Favorites"
+                        >
+                          <Heart className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          title="AI Analysis"
+                        >
+                          <Sparkles className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
       </div>
 
       {media.length === 0 && (
