@@ -43,7 +43,7 @@ const formatChatConversation = (messages: any[]): string => {
 };
 
 const Playground = () => {
-  const [prompt, setPrompt] = useState("Write a tagline for an ice cream shop");
+  const [prompt, setPrompt] = useState("It's a problem that...");
   const [selectedChat, setSelectedChat] = useState("");
   const [model, setModel] = useState("text-davinci-003");
   const [temperature, setTemperature] = useState([0.56]);
