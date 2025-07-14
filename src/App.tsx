@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -19,6 +18,7 @@ import Committees from "./pages/Committees";
 import Chats from "./pages/Chats";
 import Favorites from "./pages/Favorites";
 import LegislativeDrafts2 from "./pages/LegislativeDrafts2";
+import Playground from "./pages/Playground";
 import Plans from "./pages/Plans";
 import ChangeLog from "./pages/ChangeLog";
 
@@ -49,6 +49,7 @@ const AppLayout = () => {
                 <Route path="/chats" element={<Chats />} />
                 <Route path="/favorites" element={<Favorites />} />
                 <Route path="/process" element={<LegislativeDrafts2 />} />
+                <Route path="/playground" element={<Playground />} />
                 <Route path="/bills" element={<Bills />} />
                 <Route path="/members" element={<Members />} />
                 <Route path="/committees" element={<Committees />} />

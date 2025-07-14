@@ -1,0 +1,183 @@
+
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { RotateCcw, Download, Code, Share, MoreHorizontal, List, ChevronDown, SlidersHorizontal } from "lucide-react";
+
+const Playground = () => {
+  const [prompt, setPrompt] = useState("Write a tagline for an ice cream shop");
+  const [preset, setPreset] = useState("");
+  const [model, setModel] = useState("text-davinci-003");
+  const [temperature, setTemperature] = useState([0.56]);
+  const [maxLength, setMaxLength] = useState([256]);
+  const [topP, setTopP] = useState([0.9]);
+  const [mode, setMode] = useState("complete");
+
+  return (
+    <div className="flex h-full bg-gray-50">
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col">
+        {/* Header */}
+        <div className="bg-white border-b border-gray-200 px-6 py-4">
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-semibold text-gray-900">Playground</h1>
+            <div className="flex items-center gap-3">
+              <Select value={preset} onValueChange={setPreset}>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="Load a preset..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="preset1">Preset 1</SelectItem>
+                  <SelectItem value="preset2">Preset 2</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button variant="outline" size="sm">
+                Save
+              </Button>
+              <Button variant="outline" size="sm">
+                <Code className="h-4 w-4 mr-2" />
+                View code
+              </Button>
+              <Button variant="outline" size="sm">
+                <Share className="h-4 w-4 mr-2" />
+                Share
+              </Button>
+              <Button variant="ghost" size="sm">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 flex">
+          {/* Left Panel - Prompt Area */}
+          <div className="flex-1 p-6">
+            <div className="h-full flex flex-col">
+              <Textarea
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                placeholder="Enter your prompt here..."
+                className="flex-1 min-h-[500px] resize-none border border-gray-300 rounded-lg p-4 text-sm"
+              />
+              <div className="flex items-center justify-between mt-4">
+                <Button className="bg-black text-white hover:bg-gray-800 px-6">
+                  Submit
+                </Button>
+                <Button variant="ghost" size="sm">
+                  <RotateCcw className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Panel - Settings */}
+          <div className="w-80 bg-white border-l border-gray-200 p-6">
+            <div className="space-y-6">
+              {/* Mode */}
+              <div>
+                <Label className="text-sm font-medium text-gray-700 mb-3 block">Mode</Label>
+                <div className="flex rounded-lg border border-gray-300 p-1">
+                  <Button
+                    variant={mode === "complete" ? "default" : "ghost"}
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => setMode("complete")}
+                  >
+                    <List className="h-4 w-4 mr-1" />
+                  </Button>
+                  <Button
+                    variant={mode === "insert" ? "default" : "ghost"}
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => setMode("insert")}
+                  >
+                    <Download className="h-4 w-4 mr-1" />
+                  </Button>
+                  <Button
+                    variant={mode === "edit" ? "default" : "ghost"}
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => setMode("edit")}
+                  >
+                    <SlidersHorizontal className="h-4 w-4 mr-1" />
+                  </Button>
+                </div>
+              </div>
+
+              {/* Model */}
+              <div>
+                <Label className="text-sm font-medium text-gray-700 mb-3 block">Model</Label>
+                <Select value={model} onValueChange={setModel}>
+                  <SelectTrigger>
+                    <SelectValue />
+                    <ChevronDown className="h-4 w-4" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="text-davinci-003">text-davinci-003</SelectItem>
+                    <SelectItem value="gpt-4">gpt-4</SelectItem>
+                    <SelectItem value="gpt-3.5-turbo">gpt-3.5-turbo</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Temperature */}
+              <div>
+                <div className="flex justify-between items-center mb-3">
+                  <Label className="text-sm font-medium text-gray-700">Temperature</Label>
+                  <span className="text-sm text-gray-500">{temperature[0]}</span>
+                </div>
+                <Slider
+                  value={temperature}
+                  onValueChange={setTemperature}
+                  max={1}
+                  min={0}
+                  step={0.01}
+                  className="w-full"
+                />
+              </div>
+
+              {/* Maximum Length */}
+              <div>
+                <div className="flex justify-between items-center mb-3">
+                  <Label className="text-sm font-medium text-gray-700">Maximum Length</Label>
+                  <span className="text-sm text-gray-500">{maxLength[0]}</span>
+                </div>
+                <Slider
+                  value={maxLength}
+                  onValueChange={setMaxLength}
+                  max={4000}
+                  min={1}
+                  step={1}
+                  className="w-full"
+                />
+              </div>
+
+              {/* Top P */}
+              <div>
+                <div className="flex justify-between items-center mb-3">
+                  <Label className="text-sm font-medium text-gray-700">Top P</Label>
+                  <span className="text-sm text-gray-500">{topP[0]}</span>
+                </div>
+                <Slider
+                  value={topP}
+                  onValueChange={setTopP}
+                  max={1}
+                  min={0}
+                  step={0.01}
+                  className="w-full"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Playground;
