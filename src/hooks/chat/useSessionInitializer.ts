@@ -90,13 +90,14 @@ Keep it structured and comprehensive but concise. Do not include memorandum form
 
       setMessages(newMessages);
 
-      // Save the session immediately after creating initial messages
-      await saveChatSession(newMessages, '');
-
-      // For problem type, also create a problem chat entry
+      // For problem type, create a problem chat entry FIRST
       if (entityType === 'problem') {
-        await createProblemChatEntry(entity, newMessages);
+        const problemChatId = await createProblemChatEntry(entity);
+        console.log('Created problem chat entry with ID:', problemChatId);
       }
+
+      // Save the session after creating the problem chat entry
+      await saveChatSession(newMessages, '');
 
     } catch (error) {
       console.error('Error in initializeSession:', error);
@@ -110,21 +111,28 @@ Keep it structured and comprehensive but concise. Do not include memorandum form
     }
   }, [entity, entityType, toast]);
 
-  const createProblemChatEntry = async (entity: any, messages: Message[]) => {
+  const createProblemChatEntry = async (entity: any): Promise<string | null> => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      // Get the next problem number
-      const { data: problemNumber } = await supabase.rpc('generate_problem_number');
-      
-      if (!problemNumber) {
-        console.error('Failed to generate problem number');
-        return;
+      if (!user) {
+        console.error('No authenticated user found');
+        return null;
       }
 
+      console.log('Creating problem chat entry for user:', user.id);
+
+      // Get the next problem number using the database function
+      const { data: problemNumber, error: numberError } = await supabase.rpc('generate_problem_number');
+      
+      if (numberError || !problemNumber) {
+        console.error('Failed to generate problem number:', numberError);
+        return null;
+      }
+
+      console.log('Generated problem number:', problemNumber);
+
       // Create problem chat entry
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('problem_chats')
         .insert({
           user_id: user.id,
@@ -132,13 +140,20 @@ Keep it structured and comprehensive but concise. Do not include memorandum form
           title: entity.title || 'Problem Statement',
           problem_statement: entity.originalStatement || entity.description,
           current_state: 'Problem Identified'
-        });
+        })
+        .select()
+        .single();
 
       if (error) {
         console.error('Error creating problem chat entry:', error);
+        return null;
       }
+
+      console.log('Successfully created problem chat entry:', data);
+      return data.id;
     } catch (error) {
       console.error('Error in createProblemChatEntry:', error);
+      return null;
     }
   };
 

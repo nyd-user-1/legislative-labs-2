@@ -29,23 +29,35 @@ export const ProblemChatsGrid = () => {
   const { data: problemChats = [], isLoading, error } = useQuery({
     queryKey: ['problem-chats'],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          console.log('No authenticated user found');
+          return [];
+        }
 
-      const { data, error } = await supabase
-        .from('problem_chats')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+        console.log('Fetching problem chats for user:', user.id);
+        
+        const { data, error } = await supabase
+          .from('problem_chats')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Error fetching problem chats:', error);
+        if (error) {
+          console.error('Error fetching problem chats:', error);
+          throw error;
+        }
+
+        console.log('Successfully fetched problem chats:', data);
+        return data as ProblemChat[];
+      } catch (error) {
+        console.error('Query function error:', error);
         throw error;
       }
-
-      console.log('Fetched problem chats:', data);
-      return data as ProblemChat[];
-    }
+    },
+    retry: 1,
+    refetchOnWindowFocus: false
   });
 
   // Set up real-time subscription to refresh data when new problem chats are added
@@ -59,7 +71,8 @@ export const ProblemChatsGrid = () => {
           schema: 'public',
           table: 'problem_chats'
         },
-        () => {
+        (payload) => {
+          console.log('Real-time update received:', payload);
           // Invalidate and refetch the problem chats query
           queryClient.invalidateQueries({ queryKey: ['problem-chats'] });
         }
@@ -82,7 +95,6 @@ export const ProblemChatsGrid = () => {
   const handleAIAnalysis = (problemChat: ProblemChat, e: React.MouseEvent) => {
     e.stopPropagation();
     
-    // Create a problem object for the chat sheet
     const problemObject = {
       id: problemChat.id,
       title: problemChat.title,
@@ -96,7 +108,6 @@ export const ProblemChatsGrid = () => {
   };
 
   const handleProblemClick = (problemChat: ProblemChat) => {
-    // Handle problem chat selection - open AI analysis
     const problemObject = {
       id: problemChat.id,
       title: problemChat.title,
@@ -108,6 +119,14 @@ export const ProblemChatsGrid = () => {
     setSelectedProblem(problemChat);
     setChatSheetOpen(true);
   };
+
+  // Add debug logging
+  console.log('ProblemChatsGrid render:', { 
+    isLoading, 
+    error, 
+    problemChatsCount: problemChats?.length,
+    problemChats: problemChats 
+  });
 
   if (isLoading) {
     return (
@@ -130,14 +149,22 @@ export const ProblemChatsGrid = () => {
   }
 
   if (error) {
+    console.error('Error in ProblemChatsGrid:', error);
     return (
       <div className="text-center py-8">
-        <p className="text-gray-500">Error loading problem chats. Please try again later.</p>
+        <p className="text-gray-500">Error loading problem chats: {error.message}</p>
+        <Button 
+          onClick={() => queryClient.invalidateQueries({ queryKey: ['problem-chats'] })}
+          variant="outline"
+          className="mt-4"
+        >
+          Retry
+        </Button>
       </div>
     );
   }
 
-  if (!problemChats.length) {
+  if (!problemChats || problemChats.length === 0) {
     return (
       <div className="text-center py-8">
         <p className="text-gray-500">No problem chats available yet. Create your first problem statement above!</p>
@@ -188,12 +215,10 @@ export const ProblemChatsGrid = () => {
             
             <CardContent className="pt-0">
               <div className="space-y-3">
-                {/* Status Badge */}
                 <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-200">
                   {problemChat.current_state}
                 </Badge>
 
-                {/* Problem Statement Preview */}
                 <p className="text-sm text-gray-600 line-clamp-3">
                   {problemChat.problem_statement.length > 150 
                     ? `${problemChat.problem_statement.substring(0, 150)}...`
@@ -201,7 +226,6 @@ export const ProblemChatsGrid = () => {
                   }
                 </p>
 
-                {/* Date */}
                 <div className="flex items-center gap-2 text-sm text-gray-500">
                   <Calendar className="h-4 w-4 flex-shrink-0" />
                   <span>{new Date(problemChat.created_at).toLocaleDateString()}</span>
@@ -212,7 +236,6 @@ export const ProblemChatsGrid = () => {
         ))}
       </div>
 
-      {/* AI Chat Sheet */}
       {selectedProblem && (
         <AIChatSheet
           open={chatSheetOpen}
