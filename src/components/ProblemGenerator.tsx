@@ -149,7 +149,7 @@ Format it as a professional problem statement suitable for legislative drafting.
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-xl">
             <Lightbulb className="h-6 w-6 text-blue-600" />
-            Problem Statement
+            Problem Memo
           </CardTitle>
           <p className="text-gray-600 text-sm">
             Based on your problem statement, develop a comprehensive legislative idea.
