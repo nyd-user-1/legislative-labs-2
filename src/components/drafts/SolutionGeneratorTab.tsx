@@ -4,7 +4,7 @@ import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { AIChatSheet } from "../AIChatSheet";
-import { ProblemChatsGrid } from "./ProblemChatsGrid";
+import { SolutionChatsGrid } from "./SolutionChatsGrid";
 import { supabase } from "@/integrations/supabase/client";
 
 export const SolutionGeneratorTab = () => {
@@ -63,15 +63,15 @@ export const SolutionGeneratorTab = () => {
         </CardContent>
       </Card>
 
-      {/* Problem Chats Grid Section - showing existing problems to solve */}
+      {/* Solution Chats Grid Section - showing existing solutions */}
       <div className="space-y-6">
         <div>
-          <h2 className="text-2xl font-semibold text-gray-900 mb-2">Available Problems to Solve</h2>
+          <h2 className="text-2xl font-semibold text-gray-900 mb-2">Your Solution Statements</h2>
           <p className="text-gray-600">
-            Select a problem from your existing problem statements to develop solutions for.
+            Review and manage your generated solution statements. Click the Media Kit button to create talking points and media materials.
           </p>
         </div>
-        <ProblemChatsGrid />
+        <SolutionChatsGrid />
       </div>
 
       {/* AI Chat Sheet for Solution Generation */}
