@@ -6,7 +6,7 @@ import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { RotateCcw, Download, Code, Share, List, ChevronDown, SlidersHorizontal, Settings } from "lucide-react";
+import { RotateCcw, Download, Code, Share, List, SlidersHorizontal, Settings } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -43,7 +43,7 @@ const formatChatConversation = (messages: any[]): string => {
 };
 
 const Playground = () => {
-  const [prompt, setPrompt] = useState("It's a problem that...");
+  const [prompt, setPrompt] = useState("No complaints.");
   const [selectedChat, setSelectedChat] = useState("");
   const [model, setModel] = useState("text-davinci-003");
   const [temperature, setTemperature] = useState([0.56]);
@@ -202,7 +202,6 @@ const Playground = () => {
         <Select value={model} onValueChange={setModel}>
           <SelectTrigger>
             <SelectValue />
-            <ChevronDown className="h-4 w-4" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="text-davinci-003">text-davinci-003</SelectItem>
