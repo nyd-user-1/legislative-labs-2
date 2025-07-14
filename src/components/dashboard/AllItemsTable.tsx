@@ -2,6 +2,7 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Heart, Sparkles } from "lucide-react";
 import { Bill } from "./types";
 
@@ -26,6 +27,7 @@ type AllItem = {
   category: string;
   lastAction: string;
   data: any;
+  workflowPhase: number;
 };
 
 export const AllItemsTable = ({
@@ -52,20 +54,53 @@ export const AllItemsTable = ({
     }
   };
 
-  const getStatusBadgeVariant = (status: string) => {
-    switch (status?.toLowerCase()) {
-      case 'introduced':
-      case 'draft':
-      case 'problem identified':
-        return 'default';
-      case 'in_review':
-      case 'in progress':
-        return 'secondary';
-      case 'published':
-      case 'resolved':
-        return 'outline';
+  // 4-color workflow phase system
+  const getWorkflowPhase = (type: string, status: string): number => {
+    switch (type) {
+      case 'bill':
+        switch (status?.toLowerCase()) {
+          case 'introduced': return 1;
+          case 'in committee': return 2;
+          case 'passed': return 3;
+          case 'signed': return 4;
+          default: return 1;
+        }
+      case 'problem':
+        switch (status?.toLowerCase()) {
+          case 'problem identified': return 1;
+          case 'in progress': return 2;
+          case 'resolved': return 3;
+          case 'closed': return 4;
+          default: return 1;
+        }
+      case 'solution':
+        switch (status?.toLowerCase()) {
+          case 'draft': return 1;
+          case 'in_review': return 2;
+          case 'published': return 3;
+          case 'implemented': return 4;
+          default: return 1;
+        }
+      case 'media':
+        switch (status?.toLowerCase()) {
+          case 'draft': return 1;
+          case 'in_review': return 2;
+          case 'published': return 3;
+          case 'distributed': return 4;
+          default: return 1;
+        }
       default:
-        return 'secondary';
+        return 1;
+    }
+  };
+
+  const getWorkflowPhaseColor = (phase: number): string => {
+    switch (phase) {
+      case 1: return 'bg-red-50 text-red-700 border-red-200';
+      case 2: return 'bg-yellow-50 text-yellow-700 border-yellow-200';
+      case 3: return 'bg-blue-50 text-blue-700 border-blue-200';
+      case 4: return 'bg-green-50 text-green-700 border-green-200';
+      default: return 'bg-gray-50 text-gray-700 border-gray-200';
     }
   };
 
@@ -79,7 +114,8 @@ export const AllItemsTable = ({
       status: bill.status_desc || 'Unknown',
       category: bill.committee || 'N/A',
       lastAction: bill.last_action || 'No recent action',
-      data: bill
+      data: bill,
+      workflowPhase: getWorkflowPhase('bill', bill.status_desc || '')
     })),
     ...problems.slice(0, 3).map(problem => ({
       id: problem.id,
@@ -89,7 +125,8 @@ export const AllItemsTable = ({
       status: problem.current_state,
       category: 'General',
       lastAction: formatDate(problem.updated_at),
-      data: problem
+      data: problem,
+      workflowPhase: getWorkflowPhase('problem', problem.current_state)
     })),
     ...solutions.slice(0, 3).map(solution => ({
       id: solution.id,
@@ -99,7 +136,8 @@ export const AllItemsTable = ({
       status: solution.status,
       category: solution.type || 'Legislative Draft',
       lastAction: formatDate(solution.updated_at),
-      data: solution
+      data: solution,
+      workflowPhase: getWorkflowPhase('solution', solution.status)
     })),
     ...media.slice(0, 3).map(mediaItem => ({
       id: mediaItem.id,
@@ -109,7 +147,8 @@ export const AllItemsTable = ({
       status: mediaItem.status,
       category: mediaItem.content_type,
       lastAction: formatDate(mediaItem.updated_at),
-      data: mediaItem
+      data: mediaItem,
+      workflowPhase: getWorkflowPhase('media', mediaItem.status)
     }))
   ].sort((a, b) => {
     // Sort by last action date, most recent first
@@ -130,18 +169,13 @@ export const AllItemsTable = ({
     return 0;
   });
 
-  const getTypeIcon = (type: string) => {
+  const getObjectTypeDisplay = (type: string) => {
     switch (type) {
-      case 'bill':
-        return '📋';
-      case 'problem':
-        return '❓';
-      case 'solution':
-        return '💡';
-      case 'media':
-        return '📢';
-      default:
-        return '📄';
+      case 'bill': return 'Bill';
+      case 'problem': return 'Problem';
+      case 'solution': return 'Solution';
+      case 'media': return 'Media Kit';
+      default: return type;
     }
   };
 
@@ -150,6 +184,72 @@ export const AllItemsTable = ({
       onBillSelect(item.data);
     }
     // Add navigation logic for other types as needed
+  };
+
+  const getStatusOptions = (type: string) => {
+    switch (type) {
+      case 'bill':
+        return [
+          { value: 'Introduced', label: 'Introduced' },
+          { value: 'In Committee', label: 'In Committee' },
+          { value: 'Passed', label: 'Passed' },
+          { value: 'Signed', label: 'Signed' }
+        ];
+      case 'problem':
+        return [
+          { value: 'Problem Identified', label: 'Identified' },
+          { value: 'In Progress', label: 'In Progress' },
+          { value: 'Resolved', label: 'Resolved' },
+          { value: 'Closed', label: 'Closed' }
+        ];
+      case 'solution':
+        return [
+          { value: 'draft', label: 'Draft' },
+          { value: 'in_review', label: 'In Review' },
+          { value: 'published', label: 'Published' },
+          { value: 'implemented', label: 'Implemented' }
+        ];
+      case 'media':
+        return [
+          { value: 'draft', label: 'Draft' },
+          { value: 'in_review', label: 'In Review' },
+          { value: 'published', label: 'Published' },
+          { value: 'distributed', label: 'Distributed' }
+        ];
+      default:
+        return [];
+    }
+  };
+
+  const getCategoryOptions = (type: string) => {
+    switch (type) {
+      case 'bill':
+        return [
+          { value: 'Assembly Health', label: 'Assembly Health' },
+          { value: 'Assembly Education', label: 'Assembly Education' },
+          { value: 'Senate Finance', label: 'Senate Finance' }
+        ];
+      case 'problem':
+        return [
+          { value: 'General', label: 'General' },
+          { value: 'Healthcare', label: 'Healthcare' },
+          { value: 'Education', label: 'Education' }
+        ];
+      case 'solution':
+        return [
+          { value: 'Legislative Draft', label: 'Legislative Draft' },
+          { value: 'Policy Brief', label: 'Policy Brief' },
+          { value: 'Amendment', label: 'Amendment' }
+        ];
+      case 'media':
+        return [
+          { value: 'press_release', label: 'Press Release' },
+          { value: 'social_media', label: 'Social Media' },
+          { value: 'newsletter', label: 'Newsletter' }
+        ];
+      default:
+        return [];
+    }
   };
 
   return (
@@ -164,7 +264,7 @@ export const AllItemsTable = ({
           >
             <div className="flex justify-between items-start mb-2">
               <div className="flex items-center gap-2">
-                <span>{getTypeIcon(item.type)}</span>
+                <span className="text-sm font-medium">{getObjectTypeDisplay(item.type)}</span>
                 <h3 className="font-semibold text-lg line-clamp-1">{item.title}</h3>
               </div>
               {item.type === 'bill' && (
@@ -189,11 +289,8 @@ export const AllItemsTable = ({
             <p className="text-sm text-muted-foreground mb-2 line-clamp-2">{item.description}</p>
             <div className="flex justify-between items-center text-xs text-muted-foreground">
               <div className="flex gap-2">
-                <Badge variant="outline" className="text-xs">
-                  {item.type}
-                </Badge>
-                <Badge variant={getStatusBadgeVariant(item.status)}>
-                  {item.status}
+                <Badge className={`text-xs ${getWorkflowPhaseColor(item.workflowPhase)}`}>
+                  {item.type === 'problem' && item.status === 'Problem Identified' ? 'Identified' : item.status}
                 </Badge>
               </div>
               <span>{item.lastAction}</span>
@@ -207,8 +304,8 @@ export const AllItemsTable = ({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Type</TableHead>
-              <TableHead>Title/Number</TableHead>
+              <TableHead>Object</TableHead>
+              <TableHead>Number</TableHead>
               <TableHead>Description</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Category</TableHead>
@@ -224,12 +321,7 @@ export const AllItemsTable = ({
                 onClick={() => handleItemClick(item)}
               >
                 <TableCell>
-                  <div className="flex items-center gap-2">
-                    <span>{getTypeIcon(item.type)}</span>
-                    <Badge variant="outline" className="text-xs capitalize">
-                      {item.type}
-                    </Badge>
-                  </div>
+                  <span className="text-sm font-medium">{getObjectTypeDisplay(item.type)}</span>
                 </TableCell>
                 <TableCell className="font-medium">
                   {item.title}
@@ -240,11 +332,37 @@ export const AllItemsTable = ({
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge variant={getStatusBadgeVariant(item.status)}>
-                    {item.status}
-                  </Badge>
+                  <Select defaultValue={item.status}>
+                    <SelectTrigger className="w-auto border-0 bg-transparent p-0 focus:ring-0">
+                      <SelectValue>
+                        <Badge className={getWorkflowPhaseColor(item.workflowPhase)}>
+                          {item.type === 'problem' && item.status === 'Problem Identified' ? 'Identified' : item.status}
+                        </Badge>
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {getStatusOptions(item.type).map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </TableCell>
-                <TableCell>{item.category}</TableCell>
+                <TableCell>
+                  <Select defaultValue={item.category}>
+                    <SelectTrigger className="w-auto border-0 bg-transparent p-0 focus:ring-0">
+                      <SelectValue>{item.category}</SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {getCategoryOptions(item.type).map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </TableCell>
                 <TableCell className="text-sm text-muted-foreground">
                   {item.lastAction}
                 </TableCell>

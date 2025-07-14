@@ -2,6 +2,7 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Heart, Sparkles } from "lucide-react";
 
 interface Problem {
@@ -44,6 +45,19 @@ export const ProblemsTable = ({ problems }: ProblemsTableProps) => {
     }
   };
 
+  const statusOptions = [
+    { value: 'Problem Identified', label: 'Identified' },
+    { value: 'In Progress', label: 'In Progress' },
+    { value: 'Resolved', label: 'Resolved' }
+  ];
+
+  const categoryOptions = [
+    { value: 'General', label: 'General' },
+    { value: 'Healthcare', label: 'Healthcare' },
+    { value: 'Education', label: 'Education' },
+    { value: 'Environment', label: 'Environment' }
+  ];
+
   return (
     <div className="w-full">
       {/* Mobile View */}
@@ -64,7 +78,7 @@ export const ProblemsTable = ({ problems }: ProblemsTableProps) => {
             <p className="text-sm text-muted-foreground mb-2 line-clamp-2">{problem.problem_statement}</p>
             <div className="flex justify-between items-center text-xs text-muted-foreground">
               <Badge variant={getStatusBadgeVariant(problem.current_state)}>
-                {problem.current_state}
+                {problem.current_state === 'Problem Identified' ? 'Identified' : problem.current_state}
               </Badge>
               <span>{formatDate(problem.updated_at)}</span>
             </div>
@@ -79,7 +93,7 @@ export const ProblemsTable = ({ problems }: ProblemsTableProps) => {
             <TableRow>
               <TableHead>Problem Number</TableHead>
               <TableHead>Problem Statement</TableHead>
-              <TableHead>Identified</TableHead>
+              <TableHead>Status</TableHead>
               <TableHead>Category</TableHead>
               <TableHead>Last Action</TableHead>
               <TableHead className="text-right">Actions</TableHead>
@@ -100,11 +114,37 @@ export const ProblemsTable = ({ problems }: ProblemsTableProps) => {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge variant={getStatusBadgeVariant(problem.current_state)}>
-                    {problem.current_state}
-                  </Badge>
+                  <Select defaultValue={problem.current_state}>
+                    <SelectTrigger className="w-auto border-0 bg-transparent p-0 focus:ring-0">
+                      <SelectValue>
+                        <Badge variant={getStatusBadgeVariant(problem.current_state)}>
+                          {problem.current_state === 'Problem Identified' ? 'Identified' : problem.current_state}
+                        </Badge>
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {statusOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </TableCell>
-                <TableCell>General</TableCell>
+                <TableCell>
+                  <Select defaultValue="General">
+                    <SelectTrigger className="w-auto border-0 bg-transparent p-0 focus:ring-0">
+                      <SelectValue>General</SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categoryOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </TableCell>
                 <TableCell className="text-sm text-muted-foreground">
                   {formatDate(problem.updated_at)}
                 </TableCell>

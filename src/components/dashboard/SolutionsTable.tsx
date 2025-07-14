@@ -2,6 +2,7 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Heart, Sparkles } from "lucide-react";
 
 interface Solution {
@@ -43,6 +44,18 @@ export const SolutionsTable = ({ solutions }: SolutionsTableProps) => {
         return 'secondary';
     }
   };
+
+  const statusOptions = [
+    { value: 'draft', label: 'Draft' },
+    { value: 'in_review', label: 'In Review' },
+    { value: 'published', label: 'Published' }
+  ];
+
+  const typeOptions = [
+    { value: 'Legislative Draft', label: 'Legislative Draft' },
+    { value: 'Policy Brief', label: 'Policy Brief' },
+    { value: 'Amendment', label: 'Amendment' }
+  ];
 
   return (
     <div className="w-full">
@@ -100,11 +113,37 @@ export const SolutionsTable = ({ solutions }: SolutionsTableProps) => {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge variant={getStatusBadgeVariant(solution.status)}>
-                    {solution.status}
-                  </Badge>
+                  <Select defaultValue={solution.status}>
+                    <SelectTrigger className="w-auto border-0 bg-transparent p-0 focus:ring-0">
+                      <SelectValue>
+                        <Badge variant={getStatusBadgeVariant(solution.status)}>
+                          {solution.status}
+                        </Badge>
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {statusOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </TableCell>
-                <TableCell>{solution.type || "Legislative Draft"}</TableCell>
+                <TableCell>
+                  <Select defaultValue={solution.type || "Legislative Draft"}>
+                    <SelectTrigger className="w-auto border-0 bg-transparent p-0 focus:ring-0">
+                      <SelectValue>{solution.type || "Legislative Draft"}</SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {typeOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </TableCell>
                 <TableCell className="text-sm text-muted-foreground">
                   {formatDate(solution.updated_at)}
                 </TableCell>

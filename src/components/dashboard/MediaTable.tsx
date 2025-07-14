@@ -2,6 +2,7 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Heart, Sparkles } from "lucide-react";
 
 interface Media {
@@ -44,18 +45,18 @@ export const MediaTable = ({ media }: MediaTableProps) => {
     }
   };
 
-  const getContentTypeBadgeVariant = (contentType: string) => {
-    switch (contentType?.toLowerCase()) {
-      case 'press_release':
-        return 'default';
-      case 'social_media':
-        return 'secondary';
-      case 'newsletter':
-        return 'outline';
-      default:
-        return 'secondary';
-    }
-  };
+  const statusOptions = [
+    { value: 'draft', label: 'Draft' },
+    { value: 'in_review', label: 'In Review' },
+    { value: 'published', label: 'Published' }
+  ];
+
+  const contentTypeOptions = [
+    { value: 'press_release', label: 'Press Release' },
+    { value: 'social_media', label: 'Social Media' },
+    { value: 'newsletter', label: 'Newsletter' },
+    { value: 'media_kit', label: 'Media Kit' }
+  ];
 
   return (
     <div className="w-full">
@@ -76,14 +77,9 @@ export const MediaTable = ({ media }: MediaTableProps) => {
             </div>
             <p className="text-sm text-muted-foreground mb-2 line-clamp-2">{mediaItem.content}</p>
             <div className="flex justify-between items-center text-xs text-muted-foreground">
-              <div className="flex gap-2">
-                <Badge variant={getStatusBadgeVariant(mediaItem.status)}>
-                  {mediaItem.status}
-                </Badge>
-                <Badge variant={getContentTypeBadgeVariant(mediaItem.content_type)}>
-                  {mediaItem.content_type}
-                </Badge>
-              </div>
+              <Badge variant={getStatusBadgeVariant(mediaItem.status)}>
+                {mediaItem.status}
+              </Badge>
               <span>{formatDate(mediaItem.updated_at)}</span>
             </div>
           </div>
@@ -118,14 +114,38 @@ export const MediaTable = ({ media }: MediaTableProps) => {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge variant={getStatusBadgeVariant(mediaItem.status)}>
-                    {mediaItem.status}
-                  </Badge>
+                  <Select defaultValue={mediaItem.status}>
+                    <SelectTrigger className="w-auto border-0 bg-transparent p-0 focus:ring-0">
+                      <SelectValue>
+                        <Badge variant={getStatusBadgeVariant(mediaItem.status)}>
+                          {mediaItem.status}
+                        </Badge>
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {statusOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </TableCell>
                 <TableCell>
-                  <Badge variant={getContentTypeBadgeVariant(mediaItem.content_type)}>
-                    {mediaItem.content_type}
-                  </Badge>
+                  <Select defaultValue={mediaItem.content_type}>
+                    <SelectTrigger className="w-auto border-0 bg-transparent p-0 focus:ring-0">
+                      <SelectValue>
+                        {contentTypeOptions.find(opt => opt.value === mediaItem.content_type)?.label || mediaItem.content_type}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {contentTypeOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </TableCell>
                 <TableCell className="text-sm text-muted-foreground">
                   {formatDate(mediaItem.updated_at)}
