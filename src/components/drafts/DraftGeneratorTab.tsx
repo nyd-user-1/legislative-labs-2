@@ -4,6 +4,7 @@ import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { AIChatSheet } from "../AIChatSheet";
+import { ProblemChatsGrid } from "./ProblemChatsGrid";
 
 export const DraftGeneratorTab = () => {
   const [problemStatement, setProblemStatement] = useState("");
@@ -57,6 +58,12 @@ export const DraftGeneratorTab = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Problem Chats Grid Section */}
+      <div className="space-y-4">
+        <h2 className="text-xl font-semibold text-gray-900">Problem Chats</h2>
+        <ProblemChatsGrid />
+      </div>
 
       {/* AI Chat Sheet for Problem Analysis */}
       <AIChatSheet

@@ -557,6 +557,50 @@ export type Database = {
         }
         Relationships: []
       }
+      problem_chats: {
+        Row: {
+          chat_session_id: string | null
+          created_at: string
+          current_state: string
+          id: string
+          problem_number: string
+          problem_statement: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          chat_session_id?: string | null
+          created_at?: string
+          current_state?: string
+          id?: string
+          problem_number: string
+          problem_statement: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          chat_session_id?: string | null
+          created_at?: string
+          current_state?: string
+          id?: string
+          problem_number?: string
+          problem_statement?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_problem_chats_chat_session"
+            columns: ["chat_session_id"]
+            isOneToOne: false
+            referencedRelation: "chat_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       problem_statements: {
         Row: {
           category: string | null
@@ -847,7 +891,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_problem_number: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       subscription_tier_enum:
