@@ -299,20 +299,20 @@ export const AllItemsTable = ({
         ))}
       </div>
 
-      {/* Desktop View - Table Only Scrolls Horizontally */}
+      {/* Desktop View - Table with Proper Horizontal Scroll Containment */}
       <div className="hidden md:block">
-        <div className="border rounded-md">
-          <div className="overflow-x-auto">
-            <Table className="min-w-[800px]">
+        <div className="border rounded-md overflow-hidden">
+          <div className="overflow-x-auto max-w-full">
+            <Table className="min-w-[800px] w-full">
               <TableHeader>
                 <TableRow>
-                  <TableHead className="min-w-[120px]">Object</TableHead>
-                  <TableHead className="min-w-[120px]">Number</TableHead>
-                  <TableHead className="min-w-[300px]">Description</TableHead>
-                  <TableHead className="min-w-[120px]">Status</TableHead>
-                  <TableHead className="min-w-[150px]">Category</TableHead>
-                  <TableHead className="min-w-[120px]">Last Action</TableHead>
-                  <TableHead className="min-w-[120px] text-right">Actions</TableHead>
+                  <TableHead className="min-w-[120px] whitespace-nowrap">Object</TableHead>
+                  <TableHead className="min-w-[120px] whitespace-nowrap">Number</TableHead>
+                  <TableHead className="min-w-[300px] whitespace-nowrap">Description</TableHead>
+                  <TableHead className="min-w-[120px] whitespace-nowrap">Status</TableHead>
+                  <TableHead className="min-w-[150px] whitespace-nowrap">Category</TableHead>
+                  <TableHead className="min-w-[120px] whitespace-nowrap">Last Action</TableHead>
+                  <TableHead className="min-w-[120px] text-right whitespace-nowrap">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -322,10 +322,10 @@ export const AllItemsTable = ({
                     className="cursor-pointer hover:bg-muted/50"
                     onClick={() => handleItemClick(item)}
                   >
-                    <TableCell>
+                    <TableCell className="whitespace-nowrap">
                       <span className="text-sm font-medium">{getObjectTypeDisplay(item.type)}</span>
                     </TableCell>
-                    <TableCell className="font-medium">
+                    <TableCell className="font-medium whitespace-nowrap">
                       {item.title}
                     </TableCell>
                     <TableCell className="max-w-xs">
@@ -333,7 +333,7 @@ export const AllItemsTable = ({
                         {item.description}
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="whitespace-nowrap">
                       <Select defaultValue={item.status}>
                         <SelectTrigger className="w-auto border-0 bg-transparent p-0 focus:ring-0">
                           <SelectValue>
@@ -351,7 +351,7 @@ export const AllItemsTable = ({
                         </SelectContent>
                       </Select>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="whitespace-nowrap">
                       <Select defaultValue={item.category}>
                         <SelectTrigger className="w-auto border-0 bg-transparent p-0 focus:ring-0">
                           <SelectValue>{item.category}</SelectValue>
@@ -365,10 +365,10 @@ export const AllItemsTable = ({
                         </SelectContent>
                       </Select>
                     </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
+                    <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
                       {item.lastAction}
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-right whitespace-nowrap">
                       <div className="flex items-center justify-end gap-2">
                         {item.type === 'bill' ? (
                           <>

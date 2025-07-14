@@ -85,19 +85,19 @@ export const SolutionsTable = ({ solutions }: SolutionsTableProps) => {
         ))}
       </div>
 
-      {/* Desktop View with Horizontal Scroll */}
+      {/* Desktop View with Proper Horizontal Scroll Containment */}
       <div className="hidden md:block">
-        <div className="border rounded-md">
-          <div className="overflow-x-auto">
-            <Table className="min-w-[800px]">
+        <div className="border rounded-md overflow-hidden">
+          <div className="overflow-x-auto max-w-full">
+            <Table className="min-w-[800px] w-full">
               <TableHeader>
                 <TableRow>
-                  <TableHead className="min-w-[200px]">Solution Title</TableHead>
-                  <TableHead className="min-w-[300px]">Content Preview</TableHead>
-                  <TableHead className="min-w-[120px]">Status</TableHead>
-                  <TableHead className="min-w-[150px]">Type</TableHead>
-                  <TableHead className="min-w-[120px]">Last Action</TableHead>
-                  <TableHead className="min-w-[120px] text-right">Actions</TableHead>
+                  <TableHead className="min-w-[200px] whitespace-nowrap">Solution Title</TableHead>
+                  <TableHead className="min-w-[300px] whitespace-nowrap">Content Preview</TableHead>
+                  <TableHead className="min-w-[120px] whitespace-nowrap">Status</TableHead>
+                  <TableHead className="min-w-[150px] whitespace-nowrap">Type</TableHead>
+                  <TableHead className="min-w-[120px] whitespace-nowrap">Last Action</TableHead>
+                  <TableHead className="min-w-[120px] text-right whitespace-nowrap">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -106,7 +106,7 @@ export const SolutionsTable = ({ solutions }: SolutionsTableProps) => {
                     key={solution.id}
                     className="cursor-pointer hover:bg-muted/50"
                   >
-                    <TableCell className="font-medium">
+                    <TableCell className="font-medium whitespace-nowrap">
                       {solution.title}
                     </TableCell>
                     <TableCell className="max-w-xs">
@@ -114,7 +114,7 @@ export const SolutionsTable = ({ solutions }: SolutionsTableProps) => {
                         {solution.draft_content}
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="whitespace-nowrap">
                       <Select defaultValue={solution.status}>
                         <SelectTrigger className="w-auto border-0 bg-transparent p-0 focus:ring-0">
                           <SelectValue>
@@ -132,7 +132,7 @@ export const SolutionsTable = ({ solutions }: SolutionsTableProps) => {
                         </SelectContent>
                       </Select>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="whitespace-nowrap">
                       <Select defaultValue={solution.type || "Legislative Draft"}>
                         <SelectTrigger className="w-auto border-0 bg-transparent p-0 focus:ring-0">
                           <SelectValue>{solution.type || "Legislative Draft"}</SelectValue>
@@ -146,10 +146,10 @@ export const SolutionsTable = ({ solutions }: SolutionsTableProps) => {
                         </SelectContent>
                       </Select>
                     </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
+                    <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
                       {formatDate(solution.updated_at)}
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-right whitespace-nowrap">
                       <div className="flex items-center justify-end gap-2">
                         <Button
                           variant="outline"

@@ -86,19 +86,19 @@ export const ProblemsTable = ({ problems }: ProblemsTableProps) => {
         ))}
       </div>
 
-      {/* Desktop View with Horizontal Scroll */}
+      {/* Desktop View with Proper Horizontal Scroll Containment */}
       <div className="hidden md:block">
-        <div className="border rounded-md">
-          <div className="overflow-x-auto">
-            <Table className="min-w-[800px]">
+        <div className="border rounded-md overflow-hidden">
+          <div className="overflow-x-auto max-w-full">
+            <Table className="min-w-[800px] w-full">
               <TableHeader>
                 <TableRow>
-                  <TableHead className="min-w-[120px]">Problem Number</TableHead>
-                  <TableHead className="min-w-[300px]">Problem Statement</TableHead>
-                  <TableHead className="min-w-[120px]">Status</TableHead>
-                  <TableHead className="min-w-[120px]">Category</TableHead>
-                  <TableHead className="min-w-[120px]">Last Action</TableHead>
-                  <TableHead className="min-w-[120px] text-right">Actions</TableHead>
+                  <TableHead className="min-w-[120px] whitespace-nowrap">Problem Number</TableHead>
+                  <TableHead className="min-w-[300px] whitespace-nowrap">Problem Statement</TableHead>
+                  <TableHead className="min-w-[120px] whitespace-nowrap">Status</TableHead>
+                  <TableHead className="min-w-[120px] whitespace-nowrap">Category</TableHead>
+                  <TableHead className="min-w-[120px] whitespace-nowrap">Last Action</TableHead>
+                  <TableHead className="min-w-[120px] text-right whitespace-nowrap">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -107,7 +107,7 @@ export const ProblemsTable = ({ problems }: ProblemsTableProps) => {
                     key={problem.id}
                     className="cursor-pointer hover:bg-muted/50"
                   >
-                    <TableCell className="font-medium">
+                    <TableCell className="font-medium whitespace-nowrap">
                       {problem.problem_number}
                     </TableCell>
                     <TableCell className="max-w-xs">
@@ -115,7 +115,7 @@ export const ProblemsTable = ({ problems }: ProblemsTableProps) => {
                         {problem.problem_statement}
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="whitespace-nowrap">
                       <Select defaultValue={problem.current_state}>
                         <SelectTrigger className="w-auto border-0 bg-transparent p-0 focus:ring-0">
                           <SelectValue>
@@ -133,7 +133,7 @@ export const ProblemsTable = ({ problems }: ProblemsTableProps) => {
                         </SelectContent>
                       </Select>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="whitespace-nowrap">
                       <Select defaultValue="General">
                         <SelectTrigger className="w-auto border-0 bg-transparent p-0 focus:ring-0">
                           <SelectValue>General</SelectValue>
@@ -147,10 +147,10 @@ export const ProblemsTable = ({ problems }: ProblemsTableProps) => {
                         </SelectContent>
                       </Select>
                     </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
+                    <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
                       {formatDate(problem.updated_at)}
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-right whitespace-nowrap">
                       <div className="flex items-center justify-end gap-2">
                         <Button
                           variant="outline"

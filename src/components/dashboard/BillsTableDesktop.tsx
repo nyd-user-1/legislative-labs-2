@@ -25,17 +25,17 @@ export const BillsTableDesktop = ({
 }: BillsTableDesktopProps) => {
   return (
     <div className="hidden md:block">
-      <div className="border rounded-md">
-        <div className="overflow-x-auto">
-          <Table className="min-w-[800px]">
+      <div className="border rounded-md overflow-hidden">
+        <div className="overflow-x-auto max-w-full">
+          <Table className="min-w-[800px] w-full">
             <TableHeader>
               <TableRow>
-                <TableHead className="min-w-[120px]">Bill</TableHead>
-                <TableHead className="min-w-[300px]">Title</TableHead>
-                <TableHead className="min-w-[120px]">Status</TableHead>
-                <TableHead className="min-w-[150px]">Committee</TableHead>
-                <TableHead className="min-w-[150px]">Last Action</TableHead>
-                <TableHead className="min-w-[120px] text-right">Actions</TableHead>
+                <TableHead className="min-w-[120px] whitespace-nowrap">Bill</TableHead>
+                <TableHead className="min-w-[300px] whitespace-nowrap">Title</TableHead>
+                <TableHead className="min-w-[120px] whitespace-nowrap">Status</TableHead>
+                <TableHead className="min-w-[150px] whitespace-nowrap">Committee</TableHead>
+                <TableHead className="min-w-[150px] whitespace-nowrap">Last Action</TableHead>
+                <TableHead className="min-w-[120px] text-right whitespace-nowrap">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -45,7 +45,7 @@ export const BillsTableDesktop = ({
                   className="cursor-pointer hover:bg-muted/50"
                   onClick={() => onBillSelect && onBillSelect(bill)}
                 >
-                  <TableCell className="font-medium">
+                  <TableCell className="font-medium whitespace-nowrap">
                     {bill.bill_number || "No Number"}
                   </TableCell>
                   <TableCell className="max-w-xs">
@@ -53,16 +53,16 @@ export const BillsTableDesktop = ({
                       {bill.title || "No Title"}
                     </div>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="whitespace-nowrap">
                     <Badge variant={getStatusBadgeVariant(bill.status_desc)}>
                       {bill.status_desc || "Unknown"}
                     </Badge>
                   </TableCell>
-                  <TableCell>{bill.committee || "N/A"}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
+                  <TableCell className="whitespace-nowrap">{bill.committee || "N/A"}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
                     {bill.last_action || "No recent action"}
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-right whitespace-nowrap">
                     <div className="flex items-center justify-end gap-2">
                       <Button
                         variant="outline"
