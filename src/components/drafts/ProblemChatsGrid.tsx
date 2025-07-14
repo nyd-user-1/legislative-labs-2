@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -216,7 +215,7 @@ export const ProblemChatsGrid = () => {
             <CardContent className="pt-0">
               <div className="space-y-3">
                 <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-200">
-                  {problemChat.current_state}
+                  Problem Statement
                 </Badge>
 
                 <p className="text-sm text-gray-600 line-clamp-3">
