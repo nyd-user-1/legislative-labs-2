@@ -1,11 +1,10 @@
-
 import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Heart, Sparkles, User, Calendar, Globe } from "lucide-react";
+import { Heart, Sparkles, User, Calendar } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AIChatSheet } from "../AIChatSheet";
 
@@ -123,8 +122,8 @@ export const ProblemChatsGrid = () => {
   const handlePublishProblem = (problemChat: ProblemChat, e: React.MouseEvent) => {
     e.stopPropagation();
     toast({
-      title: "Publishing Problem",
-      description: `Problem ${problemChat.problem_number} will be published soon.`,
+      title: "Submitting Problem",
+      description: `Problem ${problemChat.problem_number} will be submitted soon.`,
     });
   };
 
@@ -223,7 +222,7 @@ export const ProblemChatsGrid = () => {
               <div className="mt-5"></div>
             </CardHeader>
             
-            <CardContent className="pt-0">
+            <CardContent className="pt-4">
               <div className="space-y-3">
                 <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-200">
                   Problem Statement
@@ -241,7 +240,7 @@ export const ProblemChatsGrid = () => {
                   <span>{new Date(problemChat.created_at).toLocaleDateString()}</span>
                 </div>
 
-                {/* Publish Problem button at the bottom, aligned left */}
+                {/* Submit button at the bottom, aligned left */}
                 <div className="pt-2">
                   <Button
                     variant="outline"
@@ -249,8 +248,7 @@ export const ProblemChatsGrid = () => {
                     className="w-auto"
                     onClick={(e) => handlePublishProblem(problemChat, e)}
                   >
-                    <Globe className="h-4 w-4 mr-2" />
-                    Publish Problem
+                    Submit
                   </Button>
                 </div>
               </div>
