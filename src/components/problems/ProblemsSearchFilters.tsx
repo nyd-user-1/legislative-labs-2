@@ -15,7 +15,7 @@ interface ProblemsSearchFiltersProps {
 }
 
 const stateOptions = [
-  { value: "", label: "All States" },
+  { value: "all", label: "All States" },
   { value: "Problem Identified", label: "Problem Identified" },
   { value: "Policy Development", label: "Policy Development" },
   { value: "Policy Submission", label: "Policy Submission" },
@@ -29,7 +29,9 @@ export const ProblemsSearchFilters = ({
   const [localFilters, setLocalFilters] = useState(filters);
 
   const handleFilterChange = (key: string, value: string) => {
-    const newFilters = { ...localFilters, [key]: value };
+    // Convert "all" back to empty string for the filtering logic
+    const filterValue = key === "state" && value === "all" ? "" : value;
+    const newFilters = { ...localFilters, [key]: filterValue };
     setLocalFilters(newFilters);
     onFiltersChange(newFilters);
   };
@@ -41,6 +43,9 @@ export const ProblemsSearchFilters = ({
   };
 
   const hasActiveFilters = localFilters.search || localFilters.state;
+
+  // Convert empty state back to "all" for display
+  const displayState = localFilters.state === "" ? "all" : localFilters.state;
 
   return (
     <Card>
@@ -60,7 +65,7 @@ export const ProblemsSearchFilters = ({
           {/* State Filter */}
           <div className="w-full sm:w-48">
             <Select
-              value={localFilters.state}
+              value={displayState}
               onValueChange={(value) => handleFilterChange("state", value)}
             >
               <SelectTrigger>
