@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,9 +11,6 @@ import { generateProblemFromScenario } from "@/utils/problemStatementHelpers";
 import { supabase } from "@/integrations/supabase/client";
 import { useModel } from "@/contexts/ModelContext";
 import ReactMarkdown from "react-markdown";
-import { useProblemsData } from "@/hooks/useProblemsData";
-import { ProblemsGrid } from "@/components/problems/ProblemsGrid";
-import { ProblemsSearchFilters } from "@/components/problems/ProblemsSearchFilters";
 
 interface ProblemStatement {
   id: string;
@@ -34,22 +30,6 @@ export const ProblemGenerator = ({ onProblemGenerated, onDraftBill }: ProblemGen
   const [isGeneratingProblem, setIsGeneratingProblem] = useState(false);
   const { toast } = useToast();
   const { selectedModel } = useModel();
-
-  // Use the problems data hook for the saved problem chats
-  const {
-    problemChats,
-    loading: problemsLoading,
-    error: problemsError,
-    searchTerm,
-    setSearchTerm,
-    stateFilter,
-    setStateFilter,
-    fetchProblems,
-    loadMoreProblems,
-    hasNextPage,
-    totalProblems,
-    currentPageProblems,
-  } = useProblemsData();
 
   const generateProblemStatement = async (retryOriginal = false) => {
     if (!scenarioInput.trim()) {
@@ -160,18 +140,6 @@ Format it as a professional problem statement suitable for legislative drafting.
 
   const handleTryAgain = () => {
     generateProblemStatement(true);
-  };
-
-  const handleProblemSelect = (problemChat: any) => {
-    console.log("Selected problem:", problemChat);
-  };
-
-  const handleFiltersChange = (newFilters: {
-    search: string;
-    state: string;
-  }) => {
-    setSearchTerm(newFilters.search);
-    setStateFilter(newFilters.state);
   };
 
   return (
@@ -296,83 +264,6 @@ Format it as a professional problem statement suitable for legislative drafting.
               </>
             )}
           </Button>
-        </CardContent>
-      </Card>
-
-      {/* Problem Chats Section */}
-      <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-xl">
-            <FileText className="h-6 w-6 text-blue-600" />
-            Saved Problem Chats
-          </CardTitle>
-          <p className="text-gray-600 text-sm">
-            View and manage your previously saved problem statements.
-            {totalProblems > 0 && (
-              <span className="ml-1">
-                ({totalProblems.toLocaleString()} problem{totalProblems !== 1 ? 's' : ''})
-              </span>
-            )}
-          </p>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <ProblemsSearchFilters
-            filters={{
-              search: searchTerm,
-              state: stateFilter,
-            }}
-            onFiltersChange={handleFiltersChange}
-          />
-
-          {problemsLoading ? (
-            <div className="flex items-center justify-center py-8">
-              <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
-              <span className="ml-2 text-gray-600">Loading problem chats...</span>
-            </div>
-          ) : problemsError ? (
-            <div className="text-center py-8">
-              <p className="text-red-600 mb-4">{problemsError}</p>
-              <Button onClick={fetchProblems} variant="outline">
-                Try Again
-              </Button>
-            </div>
-          ) : problemChats.length === 0 ? (
-            <div className="text-center py-8">
-              <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 mb-2">No problem chats found</p>
-              <p className="text-sm text-gray-500">
-                {searchTerm || stateFilter ? "Try adjusting your filters" : "Create your first problem statement above"}
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              <ProblemsGrid 
-                problemChats={problemChats} 
-                onProblemSelect={handleProblemSelect}
-                onRefresh={fetchProblems}
-              />
-              
-              {/* Pagination Controls */}
-              {hasNextPage && (
-                <div className="flex justify-center pt-4">
-                  <Button
-                    onClick={loadMoreProblems}
-                    disabled={problemsLoading}
-                    variant="outline"
-                  >
-                    {problemsLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Loading...
-                      </>
-                    ) : (
-                      "Load More Problems"
-                    )}
-                  </Button>
-                </div>
-              )}
-            </div>
-          )}
         </CardContent>
       </Card>
     </div>
