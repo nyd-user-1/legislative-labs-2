@@ -22,7 +22,6 @@ const workflowNavItems = [
   { title: "Drafts", url: "/drafts", icon: PenTool },
   { title: "Drafts 2", url: "/drafts2", icon: Edit3 },
   { title: "Problems", url: "/problems", icon: Search },
-  { title: "Ideas", url: "/ideas", icon: Lightbulb },
   { title: "Media Kits", url: "/media-kits", icon: BarChart3 },
 ];
 
