@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Heart, Sparkles, User, Calendar } from "lucide-react";
+import { Heart, Sparkles, User, Calendar, Lightbulb } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AIChatSheet } from "../AIChatSheet";
 
@@ -24,6 +24,7 @@ export const ProblemChatsGrid = () => {
   const queryClient = useQueryClient();
   const [selectedProblem, setSelectedProblem] = useState<ProblemChat | null>(null);
   const [chatSheetOpen, setChatSheetOpen] = useState(false);
+  const [chatEntityType, setChatEntityType] = useState<'problem' | 'solution'>('problem');
 
   const { data: problemChats = [], isLoading, error } = useQuery({
     queryKey: ['problem-chats'],
@@ -103,6 +104,23 @@ export const ProblemChatsGrid = () => {
     };
     
     setSelectedProblem(problemChat);
+    setChatEntityType('problem');
+    setChatSheetOpen(true);
+  };
+
+  const handleSolve = (problemChat: ProblemChat, e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    const solutionObject = {
+      id: problemChat.id,
+      title: problemChat.title,
+      description: problemChat.problem_statement,
+      originalStatement: problemChat.problem_statement,
+      problemNumber: problemChat.problem_number
+    };
+    
+    setSelectedProblem(problemChat);
+    setChatEntityType('solution');
     setChatSheetOpen(true);
   };
 
@@ -116,6 +134,7 @@ export const ProblemChatsGrid = () => {
     };
     
     setSelectedProblem(problemChat);
+    setChatEntityType('problem');
     setChatSheetOpen(true);
   };
 
@@ -241,8 +260,17 @@ export const ProblemChatsGrid = () => {
                 </div>
               </div>
 
-              {/* Submit button pinned to bottom right */}
-              <div className="flex justify-end pt-4">
+              {/* Buttons pinned to bottom */}
+              <div className="flex justify-between pt-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-auto"
+                  onClick={(e) => handleSolve(problemChat, e)}
+                >
+                  <Lightbulb className="h-4 w-4 mr-1" />
+                  Solve
+                </Button>
                 <Button
                   variant="outline"
                   size="sm"
@@ -261,13 +289,20 @@ export const ProblemChatsGrid = () => {
         <AIChatSheet
           open={chatSheetOpen}
           onOpenChange={setChatSheetOpen}
-          problem={{
+          problem={chatEntityType === 'problem' ? {
             id: selectedProblem.id,
             title: selectedProblem.title,
             description: selectedProblem.problem_statement,
             originalStatement: selectedProblem.problem_statement,
             problemNumber: selectedProblem.problem_number
-          }}
+          } : undefined}
+          solution={chatEntityType === 'solution' ? {
+            id: selectedProblem.id,
+            title: selectedProblem.title,
+            description: selectedProblem.problem_statement,
+            originalStatement: selectedProblem.problem_statement,
+            problemNumber: selectedProblem.problem_number
+          } : undefined}
         />
       )}
     </>

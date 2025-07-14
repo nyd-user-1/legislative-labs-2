@@ -15,6 +15,9 @@ export const DraftGeneratorTab = () => {
     
     // Open the AI Chat Sheet - let it handle the session creation
     setChatSheetOpen(true);
+    
+    // Clear the problem statement input after generating analysis
+    setProblemStatement("");
   };
 
   // Create a problem object to pass to the chat sheet

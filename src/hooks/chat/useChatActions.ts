@@ -1,25 +1,30 @@
 
-import { useCallback } from 'react';
-import { useToast } from '@/hooks/use-toast';
-import { Message, EntityType } from './types';
-import { getTitle } from './utils';
+import { EntityType } from './types';
 
 export const useChatActions = (entity: any, entityType: EntityType) => {
-  const { toast } = useToast();
-
-  const handleShareChat = useCallback(() => {
-    toast({
-      title: "Share functionality",
-      description: "Share functionality will be implemented soon.",
-    });
-  }, [toast]);
-
-  const getTitleCallback = useCallback(() => {
-    return getTitle(entity, entityType);
-  }, [entity, entityType]);
-
-  return {
-    handleShareChat,
-    getTitle: getTitleCallback
+  const handleShareChat = () => {
+    // Implementation for sharing chat
+    console.log('Sharing chat for:', entityType, entity);
   };
+
+  const getTitle = () => {
+    if (entityType === 'bill' && entity) {
+      return `Bill: ${entity.bill_number}`;
+    }
+    if (entityType === 'member' && entity) {
+      return `Member: ${entity.name}`;
+    }
+    if (entityType === 'committee' && entity) {
+      return `Committee: ${entity.name}`;
+    }
+    if (entityType === 'problem' && entity) {
+      return entity.problemNumber ? `Problem: ${entity.problemNumber}` : 'Problem Analysis';
+    }
+    if (entityType === 'solution' && entity) {
+      return entity.problemNumber ? `Solution: ${entity.problemNumber}` : 'Solution Development';
+    }
+    return 'AI Chat';
+  };
+
+  return { handleShareChat, getTitle };
 };

@@ -1,6 +1,8 @@
+
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DraftGeneratorTab } from "@/components/drafts/DraftGeneratorTab";
+import { SolutionGeneratorTab } from "@/components/drafts/SolutionGeneratorTab";
 import { MyDraftsTab } from "@/components/drafts/MyDraftsTab";
 import { CollaborativeDraftsTab } from "@/components/drafts/CollaborativeDraftsTab";
 import { PublicGalleryTab } from "@/components/drafts/PublicGalleryTab";
@@ -21,8 +23,9 @@ const LegislativeDrafts2 = () => {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-8">
+          <TabsList className="grid w-full grid-cols-5 mb-8">
             <TabsTrigger value="generator">Problem</TabsTrigger>
+            <TabsTrigger value="solution">Solution</TabsTrigger>
             <TabsTrigger value="my-drafts">Policy</TabsTrigger>
             <TabsTrigger value="collaborative">Partner</TabsTrigger>
             <TabsTrigger value="gallery">Project</TabsTrigger>
@@ -30,6 +33,10 @@ const LegislativeDrafts2 = () => {
 
           <TabsContent value="generator">
             <DraftGeneratorTab />
+          </TabsContent>
+
+          <TabsContent value="solution">
+            <SolutionGeneratorTab />
           </TabsContent>
 
           <TabsContent value="my-drafts">

@@ -39,6 +39,14 @@ User question: ${message}
 
 Please provide a detailed response addressing the user's question in the context of this problem statement.`;
         contextualPrompt = problemContext;
+      } else if (entityType === 'solution' && entity) {
+        // Add context for solution-specific prompts
+        const solutionContext = `Context: We are developing policy solutions for this problem: "${entity.originalStatement || entity.description}"
+
+User question: ${message}
+
+Please provide a detailed response addressing the user's question in the context of developing effective policy solutions for this problem.`;
+        contextualPrompt = solutionContext;
       }
 
       const { data, error } = await supabase.functions.invoke('generate-with-openai', {

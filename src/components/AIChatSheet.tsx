@@ -36,6 +36,13 @@ type Problem = {
   originalStatement: string;
   problemNumber?: string;
 };
+type Solution = {
+  id: string;
+  title: string;
+  description: string;
+  originalStatement: string;
+  problemNumber?: string;
+};
 
 interface AIChatSheetProps {
   open: boolean;
@@ -44,9 +51,10 @@ interface AIChatSheetProps {
   member?: Member | null;
   committee?: Committee | null;
   problem?: Problem | null;
+  solution?: Solution | null;
 }
 
-export const AIChatSheet = ({ open, onOpenChange, bill, member, committee, problem }: AIChatSheetProps) => {
+export const AIChatSheet = ({ open, onOpenChange, bill, member, committee, problem, solution }: AIChatSheetProps) => {
   const [citationsOpen, setCitationsOpen] = useState(false);
   const { toast } = useToast();
   
@@ -54,8 +62,8 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee, probl
   const hasInitialized = useRef(false);
   
   // Determine the entity and type for the chat session
-  const entity = bill || member || committee || problem || null;
-  const entityType = bill ? 'bill' : member ? 'member' : committee ? 'committee' : problem ? 'problem' : null;
+  const entity = bill || member || committee || problem || solution || null;
+  const entityType = bill ? 'bill' : member ? 'member' : committee ? 'committee' : problem ? 'problem' : solution ? 'solution' : null;
   
   const {
     inputValue,
@@ -116,8 +124,14 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee, probl
 
   // Get the appropriate title
   const getSheetTitle = () => {
+    if (solution && solution.problemNumber) {
+      return `Solution: ${solution.problemNumber}`;
+    }
     if (problem && problem.problemNumber) {
       return `Problem: ${problem.problemNumber}`;
+    }
+    if (solution) {
+      return "Solution";
     }
     return getTitle();
   };

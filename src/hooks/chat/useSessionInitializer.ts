@@ -44,6 +44,31 @@ Provide a clear, structured analysis that includes:
 5. Professional policy language
 
 Keep it structured and comprehensive but concise. Do not include memorandum formatting, headers, or formal document structure.`;
+      } else if (entityType === 'solution') {
+        // Create the user message first
+        const userMessage: Message = {
+          id: generateId(),
+          role: "user",
+          content: entity.originalStatement || entity.description,
+          timestamp: new Date()
+        };
+
+        setMessages([userMessage]);
+
+        // Then generate the solution
+        prompt = `Based on this problem statement, please develop a comprehensive policy solution:
+
+"${entity.originalStatement || entity.description}"
+
+Provide a detailed policy proposal that includes:
+1. Executive summary of the proposed solution
+2. Specific policy mechanisms and tools
+3. Implementation strategy and timeline
+4. Stakeholder analysis and engagement plan
+5. Expected outcomes and success metrics
+6. Potential challenges and mitigation strategies
+
+Keep it practical, actionable, and focused on real-world implementation.`;
       } else if (entityType === 'bill') {
         prompt = `Please provide a comprehensive analysis of this bill: ${entity.bill_number}. Include summary, key provisions, and potential impact.`;
       } else {
@@ -53,7 +78,7 @@ Keep it structured and comprehensive but concise. Do not include memorandum form
       const { data, error } = await supabase.functions.invoke('generate-with-openai', {
         body: { 
           prompt, 
-          type: entityType === 'problem' ? 'problem-refinement' : 'analysis',
+          type: entityType === 'problem' ? 'problem-refinement' : entityType === 'solution' ? 'solution-generation' : 'analysis',
           entityContext: { type: entityType, [entityType]: entity }
         }
       });
@@ -76,7 +101,7 @@ Keep it structured and comprehensive but concise. Do not include memorandum form
         timestamp: new Date()
       };
 
-      const newMessages = entityType === 'problem' 
+      const newMessages = (entityType === 'problem' || entityType === 'solution')
         ? [
             {
               id: generateId(),
