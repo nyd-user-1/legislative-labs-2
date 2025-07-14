@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -28,6 +27,20 @@ interface ChatOption {
   content: string;
   type: 'bill' | 'member' | 'committee' | 'problem' | 'solution' | 'mediaKit';
 }
+
+const formatChatConversation = (messages: any[]): string => {
+  if (!Array.isArray(messages) || messages.length === 0) {
+    return "";
+  }
+
+  return messages
+    .map((msg: any, index: number) => {
+      const role = msg.role === 'user' ? 'User' : 'Assistant';
+      const content = msg.content || '';
+      return `${role}: ${content}`;
+    })
+    .join('\n\n');
+};
 
 const Playground = () => {
   const [prompt, setPrompt] = useState("Write a tagline for an ice cream shop");
@@ -63,6 +76,7 @@ const Playground = () => {
       // Process chat sessions and create options
       chatSessions?.forEach((session: any) => {
         const messages = Array.isArray(session.messages) ? session.messages : JSON.parse(session.messages || '[]');
+        const formattedConversation = formatChatConversation(messages);
         const firstUserMessage = messages.find((msg: any) => msg.role === 'user')?.content || '';
 
         if (session.title.toLowerCase().includes('problem:')) {
@@ -70,7 +84,7 @@ const Playground = () => {
           options.push({
             id: session.id,
             label: `Problem ${problemNumber}: ${firstUserMessage.substring(0, 50)}...`,
-            content: firstUserMessage,
+            content: formattedConversation,
             type: 'problem'
           });
         } else if (session.title.toLowerCase().includes('solution:')) {
@@ -78,7 +92,7 @@ const Playground = () => {
           options.push({
             id: session.id,
             label: `Solution ${solutionNumber}: ${firstUserMessage.substring(0, 50)}...`,
-            content: firstUserMessage,
+            content: formattedConversation,
             type: 'solution'
           });
         } else if (session.title.toLowerCase().includes('media kit:')) {
@@ -86,7 +100,7 @@ const Playground = () => {
           options.push({
             id: session.id,
             label: `Media Kit ${mediaKitNumber}: ${firstUserMessage.substring(0, 50)}...`,
-            content: firstUserMessage,
+            content: formattedConversation,
             type: 'mediaKit'
           });
         } else if (session.bill_id) {
@@ -94,7 +108,7 @@ const Playground = () => {
           options.push({
             id: session.id,
             label: `Bill Chat: ${firstUserMessage.substring(0, 50)}...`,
-            content: firstUserMessage,
+            content: formattedConversation,
             type: 'bill'
           });
         } else if (session.member_id) {
@@ -102,7 +116,7 @@ const Playground = () => {
           options.push({
             id: session.id,
             label: `Member Chat: ${firstUserMessage.substring(0, 50)}...`,
-            content: firstUserMessage,
+            content: formattedConversation,
             type: 'member'
           });
         } else if (session.committee_id) {
@@ -110,7 +124,7 @@ const Playground = () => {
           options.push({
             id: session.id,
             label: `Committee Chat: ${firstUserMessage.substring(0, 50)}...`,
-            content: firstUserMessage,
+            content: formattedConversation,
             type: 'committee'
           });
         } else {
@@ -118,7 +132,7 @@ const Playground = () => {
           options.push({
             id: session.id,
             label: `Chat: ${firstUserMessage.substring(0, 50)}...`,
-            content: firstUserMessage,
+            content: formattedConversation,
             type: 'problem' // Default type
           });
         }
