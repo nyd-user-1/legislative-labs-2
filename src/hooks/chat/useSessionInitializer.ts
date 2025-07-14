@@ -91,8 +91,12 @@ Keep it structured and comprehensive but concise. Do not include memorandum form
       setMessages(newMessages);
 
       // Save the session immediately after creating initial messages
-      // The saveChatSession function will handle the proper naming and numbering
       await saveChatSession(newMessages, '');
+
+      // For problem type, also create a problem chat entry
+      if (entityType === 'problem') {
+        await createProblemChatEntry(entity, newMessages);
+      }
 
     } catch (error) {
       console.error('Error in initializeSession:', error);
@@ -105,6 +109,38 @@ Keep it structured and comprehensive but concise. Do not include memorandum form
       setIsLoading(false);
     }
   }, [entity, entityType, toast]);
+
+  const createProblemChatEntry = async (entity: any, messages: Message[]) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Get the next problem number
+      const { data: problemNumber } = await supabase.rpc('generate_problem_number');
+      
+      if (!problemNumber) {
+        console.error('Failed to generate problem number');
+        return;
+      }
+
+      // Create problem chat entry
+      const { error } = await supabase
+        .from('problem_chats')
+        .insert({
+          user_id: user.id,
+          problem_number: problemNumber,
+          title: entity.title || 'Problem Statement',
+          problem_statement: entity.originalStatement || entity.description,
+          current_state: 'Problem Identified'
+        });
+
+      if (error) {
+        console.error('Error creating problem chat entry:', error);
+      }
+    } catch (error) {
+      console.error('Error in createProblemChatEntry:', error);
+    }
+  };
 
   return { initializeSession };
 };

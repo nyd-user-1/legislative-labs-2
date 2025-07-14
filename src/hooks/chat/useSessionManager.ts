@@ -41,6 +41,8 @@ export const useSessionManager = (entity: any, entityType: EntityType) => {
         })))
       };
 
+      let chatSessionId = sessionId;
+
       if (sessionId) {
         // Update existing session
         const { error } = await supabase
@@ -58,8 +60,19 @@ export const useSessionManager = (entity: any, entityType: EntityType) => {
           .single();
         
         if (error) throw error;
+        chatSessionId = data.id;
         setSessionId(data.id);
       }
+
+      // For problem type, update the problem chat entry with the chat session ID
+      if (entityType === 'problem' && chatSessionId && entity?.problemNumber) {
+        await supabase
+          .from('problem_chats')
+          .update({ chat_session_id: chatSessionId })
+          .eq('user_id', user.id)
+          .eq('problem_number', entity.problemNumber);
+      }
+
     } catch (error) {
       console.error('Error saving chat session:', error);
     }
