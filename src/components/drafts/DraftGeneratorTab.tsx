@@ -4,22 +4,31 @@ import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { AIChatSheet } from "../AIChatSheet";
+import { useChatSession } from "@/hooks/useChatSession";
 
 export const DraftGeneratorTab = () => {
   const [problemStatement, setProblemStatement] = useState("");
-  const [currentStep, setCurrentStep] = useState(1);
   const [chatSheetOpen, setChatSheetOpen] = useState(false);
+  const { createNewSession } = useChatSession();
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     if (!problemStatement.trim()) return;
     
-    // Open the AI Chat Sheet instead of generating inline
-    setChatSheetOpen(true);
+    try {
+      // Create a new chat session with a proper title
+      const sessionTitle = `Problem Analysis: ${problemStatement.substring(0, 50)}${problemStatement.length > 50 ? '...' : ''}`;
+      await createNewSession(sessionTitle);
+      
+      // Open the AI Chat Sheet
+      setChatSheetOpen(true);
+    } catch (error) {
+      console.error('Error creating chat session:', error);
+    }
   };
 
-  // Create a mock problem object to pass to the chat sheet
-  const mockProblem = {
-    id: "00001",
+  // Create a problem object to pass to the chat sheet
+  const problemObject = {
+    id: "draft-problem",
     title: "Problem Statement",
     description: problemStatement,
     originalStatement: problemStatement
@@ -63,7 +72,7 @@ export const DraftGeneratorTab = () => {
       <AIChatSheet
         open={chatSheetOpen}
         onOpenChange={setChatSheetOpen}
-        problem={mockProblem}
+        problem={problemObject}
       />
     </div>
   );

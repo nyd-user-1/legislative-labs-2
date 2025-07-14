@@ -22,6 +22,7 @@ export const useChatLogic = (entity: any, entityType: 'bill' | 'member' | 'commi
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [citations, setCitations] = useState<Citation[]>([]);
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const { toast } = useToast();
 
   const generateId = () => Math.random().toString(36).substr(2, 9);
@@ -42,6 +43,47 @@ export const useChatLogic = (entity: any, entityType: 'bill' | 'member' | 'commi
     return 'AI Assistant';
   }, [entity, entityType]);
 
+  const saveChatSession = useCallback(async (messages: Message[], title: string) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+
+      const sessionData = {
+        user_id: user.id,
+        bill_id: entityType === 'bill' ? entity?.bill_id : null,
+        member_id: entityType === 'member' ? entity?.people_id : null,
+        committee_id: entityType === 'committee' ? entity?.committee_id : null,
+        title: title,
+        messages: JSON.stringify(messages.map(msg => ({
+          ...msg,
+          timestamp: msg.timestamp.toISOString()
+        })))
+      };
+
+      if (sessionId) {
+        // Update existing session
+        const { error } = await supabase
+          .from("chat_sessions")
+          .update(sessionData)
+          .eq("id", sessionId);
+        
+        if (error) throw error;
+      } else {
+        // Create new session
+        const { data, error } = await supabase
+          .from("chat_sessions")
+          .insert(sessionData)
+          .select()
+          .single();
+        
+        if (error) throw error;
+        setSessionId(data.id);
+      }
+    } catch (error) {
+      console.error('Error saving chat session:', error);
+    }
+  }, [sessionId, entity, entityType]);
+
   const initializeSession = useCallback(async (withInitialMessage = false) => {
     if (!withInitialMessage || !entity) return;
 
@@ -49,6 +91,7 @@ export const useChatLogic = (entity: any, entityType: 'bill' | 'member' | 'commi
     try {
       let prompt = "";
       let summaryContent = "";
+      const title = getTitle();
 
       if (entityType === 'problem') {
         summaryContent = entity.originalStatement || entity.description;
@@ -104,7 +147,11 @@ Keep it structured and comprehensive but concise.`;
         timestamp: new Date()
       };
 
-      setMessages([summaryMessage, analysisMessage]);
+      const newMessages = [summaryMessage, analysisMessage];
+      setMessages(newMessages);
+
+      // Save the session immediately after creating initial messages
+      await saveChatSession(newMessages, title);
 
     } catch (error) {
       console.error('Error in initializeSession:', error);
@@ -116,7 +163,7 @@ Keep it structured and comprehensive but concise.`;
     } finally {
       setIsLoading(false);
     }
-  }, [entity, entityType, toast]);
+  }, [entity, entityType, toast, getTitle, saveChatSession]);
 
   const sendMessage = useCallback(async (message: string) => {
     if (!message.trim()) return;
@@ -128,7 +175,8 @@ Keep it structured and comprehensive but concise.`;
       timestamp: new Date()
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
     setInputValue("");
     setIsLoading(true);
 
@@ -165,7 +213,11 @@ Please provide a detailed response addressing the user's question in the context
         timestamp: new Date()
       };
 
-      setMessages(prev => [...prev, assistantMessage]);
+      const finalMessages = [...updatedMessages, assistantMessage];
+      setMessages(finalMessages);
+
+      // Save updated messages to database
+      await saveChatSession(finalMessages, getTitle());
 
     } catch (error) {
       console.error('Error sending message:', error);
@@ -177,7 +229,7 @@ Please provide a detailed response addressing the user's question in the context
     } finally {
       setIsLoading(false);
     }
-  }, [entity, entityType, toast]);
+  }, [messages, entity, entityType, toast, saveChatSession, getTitle]);
 
   const handleShareChat = useCallback(() => {
     toast({
