@@ -185,7 +185,7 @@ export const ProblemChatsGrid = () => {
         {problemChats.map((problemChat) => (
           <Card 
             key={problemChat.id}
-            className="card hover:shadow-md transition-shadow cursor-pointer"
+            className="card hover:shadow-md transition-shadow cursor-pointer h-80 flex flex-col"
             onClick={() => handleProblemClick(problemChat)}
           >
             <CardHeader className="pb-3">
@@ -222,8 +222,8 @@ export const ProblemChatsGrid = () => {
               <div className="mt-5"></div>
             </CardHeader>
             
-            <CardContent className="pt-4">
-              <div className="space-y-3">
+            <CardContent className="pt-4 flex-1 flex flex-col">
+              <div className="flex-1 space-y-3">
                 <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-200">
                   Problem Statement
                 </Badge>
@@ -239,18 +239,18 @@ export const ProblemChatsGrid = () => {
                   <Calendar className="h-4 w-4 flex-shrink-0" />
                   <span>{new Date(problemChat.created_at).toLocaleDateString()}</span>
                 </div>
+              </div>
 
-                {/* Submit button at the bottom, aligned left */}
-                <div className="pt-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-auto"
-                    onClick={(e) => handlePublishProblem(problemChat, e)}
-                  >
-                    Submit
-                  </Button>
-                </div>
+              {/* Submit button pinned to bottom right */}
+              <div className="flex justify-end pt-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-auto"
+                  onClick={(e) => handlePublishProblem(problemChat, e)}
+                >
+                  Submit
+                </Button>
               </div>
             </CardContent>
           </Card>
