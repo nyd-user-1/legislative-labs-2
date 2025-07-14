@@ -19,10 +19,9 @@ export const useSessionInitializer = (entity: any, entityType: EntityType) => {
     setIsLoading(true);
     try {
       let prompt = "";
-      const title = getTitle(entity, entityType);
 
       if (entityType === 'problem') {
-        // First, add the user's original problem statement as a user message
+        // Create the user message first
         const userMessage: Message = {
           id: generateId(),
           role: "user",
@@ -92,7 +91,8 @@ Keep it structured and comprehensive but concise. Do not include memorandum form
       setMessages(newMessages);
 
       // Save the session immediately after creating initial messages
-      await saveChatSession(newMessages, title);
+      // The saveChatSession function will handle the proper naming and numbering
+      await saveChatSession(newMessages, '');
 
     } catch (error) {
       console.error('Error in initializeSession:', error);

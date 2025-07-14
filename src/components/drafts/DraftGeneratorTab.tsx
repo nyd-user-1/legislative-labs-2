@@ -4,26 +4,16 @@ import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { AIChatSheet } from "../AIChatSheet";
-import { useChatSession } from "@/hooks/useChatSession";
 
 export const DraftGeneratorTab = () => {
   const [problemStatement, setProblemStatement] = useState("");
   const [chatSheetOpen, setChatSheetOpen] = useState(false);
-  const { createNewSession } = useChatSession();
 
   const handleGenerate = async () => {
     if (!problemStatement.trim()) return;
     
-    try {
-      // Create a new chat session with a proper title
-      const sessionTitle = `Problem Analysis: ${problemStatement.substring(0, 50)}${problemStatement.length > 50 ? '...' : ''}`;
-      await createNewSession(sessionTitle);
-      
-      // Open the AI Chat Sheet
-      setChatSheetOpen(true);
-    } catch (error) {
-      console.error('Error creating chat session:', error);
-    }
+    // Open the AI Chat Sheet - let it handle the session creation
+    setChatSheetOpen(true);
   };
 
   // Create a problem object to pass to the chat sheet
