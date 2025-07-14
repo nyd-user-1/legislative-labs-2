@@ -49,14 +49,10 @@ const Playground = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
+      // First, get all chat sessions for the user
       const { data: chatSessions, error } = await supabase
         .from("chat_sessions")
-        .select(`
-          *,
-          Bills!inner(bill_number, title, description),
-          People!inner(name, chamber, district),
-          Committees!inner(committee_name, chair_name)
-        `)
+        .select("*")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
@@ -93,29 +89,37 @@ const Playground = () => {
             content: firstUserMessage,
             type: 'mediaKit'
           });
-        } else if (session.bill_id && session.Bills) {
-          const bill = Array.isArray(session.Bills) ? session.Bills[0] : session.Bills;
+        } else if (session.bill_id) {
+          // For bill-related chats, fetch bill info separately if needed
           options.push({
             id: session.id,
-            label: `Bill ${bill.bill_number}: ${bill.title || bill.description || 'No description'}`,
+            label: `Bill Chat: ${firstUserMessage.substring(0, 50)}...`,
             content: firstUserMessage,
             type: 'bill'
           });
-        } else if (session.member_id && session.People) {
-          const member = Array.isArray(session.People) ? session.People[0] : session.People;
+        } else if (session.member_id) {
+          // For member-related chats
           options.push({
             id: session.id,
-            label: `Member ${member.name} (${member.chamber}, ${member.district})`,
+            label: `Member Chat: ${firstUserMessage.substring(0, 50)}...`,
             content: firstUserMessage,
             type: 'member'
           });
-        } else if (session.committee_id && session.Committees) {
-          const committee = Array.isArray(session.Committees) ? session.Committees[0] : session.Committees;
+        } else if (session.committee_id) {
+          // For committee-related chats
           options.push({
             id: session.id,
-            label: `Committee ${committee.committee_name} (Chair: ${committee.chair_name})`,
+            label: `Committee Chat: ${firstUserMessage.substring(0, 50)}...`,
             content: firstUserMessage,
             type: 'committee'
+          });
+        } else {
+          // Generic chat session
+          options.push({
+            id: session.id,
+            label: `Chat: ${firstUserMessage.substring(0, 50)}...`,
+            content: firstUserMessage,
+            type: 'problem' // Default type
           });
         }
       });
