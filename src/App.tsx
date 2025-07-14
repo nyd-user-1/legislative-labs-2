@@ -14,13 +14,10 @@ import Index from "./pages/Index";
 import { Auth } from "./pages/Auth";
 import Profile from "./pages/Profile";
 import Bills from "./pages/Bills";
-import Problems from "./pages/Problems";
-
 import Members from "./pages/Members";
 import Committees from "./pages/Committees";
 import Chats from "./pages/Chats";
 import Favorites from "./pages/Favorites";
-import LegislativeDrafts from "./pages/LegislativeDrafts";
 import LegislativeDrafts2 from "./pages/LegislativeDrafts2";
 import Plans from "./pages/Plans";
 import ChangeLog from "./pages/ChangeLog";
@@ -51,13 +48,10 @@ const AppLayout = () => {
               <Routes>
                 <Route path="/chats" element={<Chats />} />
                 <Route path="/favorites" element={<Favorites />} />
-                <Route path="/problems" element={<Problems />} />
-                
+                <Route path="/process" element={<LegislativeDrafts2 />} />
                 <Route path="/bills" element={<Bills />} />
                 <Route path="/members" element={<Members />} />
                 <Route path="/committees" element={<Committees />} />
-                <Route path="/drafts" element={<LegislativeDrafts />} />
-                <Route path="/drafts2" element={<LegislativeDrafts2 />} />
                 <Route path="/plans" element={<Plans />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/changelog" element={<ChangeLog />} />

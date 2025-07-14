@@ -19,10 +19,7 @@ const researchNavItems = [
 const workflowNavItems = [
   { title: "Chats", url: "/chats", icon: MessageSquare },
   { title: "Favorites", url: "/favorites", icon: Heart },
-  { title: "Drafts", url: "/drafts", icon: PenTool },
-  { title: "Drafts 2", url: "/drafts2", icon: Edit3 },
-  { title: "Problems", url: "/problems", icon: Search },
-  
+  { title: "Process", url: "/process", icon: PenTool },
 ];
 
 const bottomNavItems = [
