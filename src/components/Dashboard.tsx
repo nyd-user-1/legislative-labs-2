@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -255,7 +254,7 @@ export const Dashboard = () => {
             <CardHeader className="px-4 sm:px-6">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div className="flex items-center gap-2">
-                  <CardTitle className="text-base sm:text-lg">Recent Legislative Activity</CardTitle>
+                  <CardTitle className="text-base sm:text-lg">Recent Activity</CardTitle>
                 </div>
                 <Button variant="outline" onClick={handleViewAllBills} size="sm" className="self-start sm:self-auto">
                   View All Bills
