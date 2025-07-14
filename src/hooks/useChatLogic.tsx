@@ -1,25 +1,32 @@
 
-import { useState, useCallback } from 'react';
-import { useToast } from '@/hooks/use-toast';
-import { Message, Citation, EntityType } from './chat/types';
-import { getTitle } from './chat/utils';
+import { useCallback } from 'react';
+import { EntityType } from './chat/types';
 import { useSessionManager } from './chat/useSessionManager';
 import { useMessageHandler } from './chat/useMessageHandler';
 import { useSessionInitializer } from './chat/useSessionInitializer';
+import { useChatState } from './chat/useChatState';
+import { useChatActions } from './chat/useChatActions';
 
 export const useChatLogic = (entity: any, entityType: EntityType) => {
-  const [inputValue, setInputValue] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [citations, setCitations] = useState<Citation[]>([]);
-  const [sessionId, setSessionId] = useState<string | null>(null);
-  const { toast } = useToast();
+  const {
+    inputValue,
+    setInputValue,
+    isLoading,
+    setIsLoading,
+    messages,
+    setMessages,
+    citations,
+    sessionId,
+    setSessionId
+  } = useChatState();
+
+  const { handleShareChat, getTitle } = useChatActions(entity, entityType);
 
   const { saveChatSession } = useSessionManager(entity, entityType);
   const { sendMessage: handleSendMessage } = useMessageHandler(entity, entityType);
   const { initializeSession: handleInitialization } = useSessionInitializer(entity, entityType);
 
-  const wrappedSaveChatSession = useCallback(async (messages: Message[], title?: string) => {
+  const wrappedSaveChatSession = useCallback(async (messages: any[], title?: string) => {
     await saveChatSession(messages, sessionId, setSessionId);
   }, [saveChatSession, sessionId]);
 
@@ -31,7 +38,7 @@ export const useChatLogic = (entity: any, entityType: EntityType) => {
       setIsLoading,
       wrappedSaveChatSession
     );
-  }, [handleSendMessage, messages, wrappedSaveChatSession]);
+  }, [handleSendMessage, messages, wrappedSaveChatSession, setMessages, setIsLoading]);
 
   const initializeSession = useCallback(async (withInitialMessage = false) => {
     await handleInitialization(
@@ -40,18 +47,7 @@ export const useChatLogic = (entity: any, entityType: EntityType) => {
       setIsLoading,
       wrappedSaveChatSession
     );
-  }, [handleInitialization, wrappedSaveChatSession]);
-
-  const handleShareChat = useCallback(() => {
-    toast({
-      title: "Share functionality",
-      description: "Share functionality will be implemented soon.",
-    });
-  }, [toast]);
-
-  const getTitleCallback = useCallback(() => {
-    return getTitle(entity, entityType);
-  }, [entity, entityType]);
+  }, [handleInitialization, wrappedSaveChatSession, setMessages, setIsLoading]);
 
   return {
     inputValue,
@@ -61,7 +57,7 @@ export const useChatLogic = (entity: any, entityType: EntityType) => {
     citations,
     sendMessage,
     handleShareChat,
-    getTitle: getTitleCallback,
+    getTitle,
     initializeSession
   };
 };
