@@ -2,9 +2,12 @@ import { useState } from "react";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export const DraftGeneratorTab = () => {
   const [problemStatement, setProblemStatement] = useState("");
+  const [refinedProblemStatement, setRefinedProblemStatement] = useState("");
   const [currentStep, setCurrentStep] = useState(1);
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -12,10 +15,41 @@ export const DraftGeneratorTab = () => {
     if (!problemStatement.trim()) return;
     
     setIsGenerating(true);
-    // Simulate AI processing
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setCurrentStep(2);
-    setIsGenerating(false);
+    
+    try {
+      const prompt = `Please refine this problem statement into a clear, structured legislative problem statement. Transform the casual description into professional policy language while maintaining the core issues:
+
+"${problemStatement}"
+
+Please provide a refined problem statement that:
+1. Clearly identifies the core issue
+2. Explains the impact on affected parties
+3. Describes why current laws/regulations may be insufficient
+4. Justifies the need for legislative action
+5. Is written in professional policy language
+
+Keep it concise but comprehensive (2-3 paragraphs maximum).`;
+
+      const { data, error } = await supabase.functions.invoke('generate-with-openai', {
+        body: { prompt, type: 'problem-refinement' }
+      });
+
+      if (error) {
+        console.error('Error calling OpenAI function:', error);
+        toast.error('Failed to generate refined problem statement. Please try again.');
+        return;
+      }
+
+      setRefinedProblemStatement(data.generatedText || 'Unable to generate refined problem statement. Please try again.');
+      setCurrentStep(2);
+      toast.success('Problem statement refined successfully!');
+      
+    } catch (error) {
+      console.error('Error generating refined problem statement:', error);
+      toast.error('Failed to generate refined problem statement. Please check your connection and try again.');
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (
@@ -36,7 +70,7 @@ export const DraftGeneratorTab = () => {
         <CardContent>
           <div className="space-y-4">
             <Textarea
-              placeholder="Describe the problem you want to address with legislation..."
+              placeholder="Describe the problem as you would to a friend."
               value={problemStatement}
               onChange={(e) => setProblemStatement(e.target.value)}
               className="min-h-[120px]"
@@ -69,10 +103,10 @@ export const DraftGeneratorTab = () => {
           <CardContent>
             <div className="space-y-4">
               <div className="p-4 bg-blue-50 rounded-lg">
-                <h4 className="mb-2">Suggested Approach</h4>
-                <p className="text-sm text-gray-700 mb-4">
-                  Based on your problem statement, we recommend creating legislation that addresses the core issues through targeted regulatory measures.
-                </p>
+                <h4 className="mb-2 font-semibold">Refined Problem Statement</h4>
+                <div className="text-sm text-gray-700 mb-4 whitespace-pre-wrap">
+                  {refinedProblemStatement}
+                </div>
                 <Button 
                   onClick={() => setCurrentStep(3)}
                   variant="outline"
