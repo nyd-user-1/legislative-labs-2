@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -7,19 +7,143 @@ import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { RotateCcw, Download, Code, Share, MoreHorizontal, List, ChevronDown, SlidersHorizontal, Settings } from "lucide-react";
+import { RotateCcw, Download, Code, Share, List, ChevronDown, SlidersHorizontal, Settings } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+
+interface ChatSession {
+  id: string;
+  title: string;
+  messages: any[];
+  bill_id?: number;
+  member_id?: number;
+  committee_id?: number;
+  created_at: string;
+}
+
+interface ChatOption {
+  id: string;
+  label: string;
+  content: string;
+  type: 'bill' | 'member' | 'committee' | 'problem' | 'solution' | 'mediaKit';
+}
 
 const Playground = () => {
   const [prompt, setPrompt] = useState("Write a tagline for an ice cream shop");
-  const [preset, setPreset] = useState("");
+  const [selectedChat, setSelectedChat] = useState("");
   const [model, setModel] = useState("text-davinci-003");
   const [temperature, setTemperature] = useState([0.56]);
   const [maxLength, setMaxLength] = useState([256]);
   const [topP, setTopP] = useState([0.9]);
   const [mode, setMode] = useState("complete");
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [chatOptions, setChatOptions] = useState<ChatOption[]>([]);
+  const [loading, setLoading] = useState(false);
   const isMobile = useIsMobile();
+  const { toast } = useToast();
+
+  const fetchUserChats = async () => {
+    try {
+      setLoading(true);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: chatSessions, error } = await supabase
+        .from("chat_sessions")
+        .select(`
+          *,
+          Bills!inner(bill_number, title, description),
+          People!inner(name, chamber, district),
+          Committees!inner(committee_name, chair_name)
+        `)
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      const options: ChatOption[] = [];
+
+      // Process chat sessions and create options
+      chatSessions?.forEach((session: any) => {
+        const messages = Array.isArray(session.messages) ? session.messages : JSON.parse(session.messages || '[]');
+        const firstUserMessage = messages.find((msg: any) => msg.role === 'user')?.content || '';
+
+        if (session.title.toLowerCase().includes('problem:')) {
+          const problemNumber = session.title.split(':')[1]?.trim() || 'Unknown';
+          options.push({
+            id: session.id,
+            label: `Problem ${problemNumber}: ${firstUserMessage.substring(0, 50)}...`,
+            content: firstUserMessage,
+            type: 'problem'
+          });
+        } else if (session.title.toLowerCase().includes('solution:')) {
+          const solutionNumber = session.title.split(':')[1]?.trim() || 'Unknown';
+          options.push({
+            id: session.id,
+            label: `Solution ${solutionNumber}: ${firstUserMessage.substring(0, 50)}...`,
+            content: firstUserMessage,
+            type: 'solution'
+          });
+        } else if (session.title.toLowerCase().includes('media kit:')) {
+          const mediaKitNumber = session.title.split(':')[1]?.trim() || 'Unknown';
+          options.push({
+            id: session.id,
+            label: `Media Kit ${mediaKitNumber}: ${firstUserMessage.substring(0, 50)}...`,
+            content: firstUserMessage,
+            type: 'mediaKit'
+          });
+        } else if (session.bill_id && session.Bills) {
+          const bill = Array.isArray(session.Bills) ? session.Bills[0] : session.Bills;
+          options.push({
+            id: session.id,
+            label: `Bill ${bill.bill_number}: ${bill.title || bill.description || 'No description'}`,
+            content: firstUserMessage,
+            type: 'bill'
+          });
+        } else if (session.member_id && session.People) {
+          const member = Array.isArray(session.People) ? session.People[0] : session.People;
+          options.push({
+            id: session.id,
+            label: `Member ${member.name} (${member.chamber}, ${member.district})`,
+            content: firstUserMessage,
+            type: 'member'
+          });
+        } else if (session.committee_id && session.Committees) {
+          const committee = Array.isArray(session.Committees) ? session.Committees[0] : session.Committees;
+          options.push({
+            id: session.id,
+            label: `Committee ${committee.committee_name} (Chair: ${committee.chair_name})`,
+            content: firstUserMessage,
+            type: 'committee'
+          });
+        }
+      });
+
+      setChatOptions(options);
+    } catch (error) {
+      console.error("Error fetching chats:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load chat sessions",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserChats();
+  }, []);
+
+  const handleChatSelection = (chatId: string) => {
+    const selectedOption = chatOptions.find(option => option.id === chatId);
+    if (selectedOption) {
+      setPrompt(selectedOption.content);
+      setSelectedChat(chatId);
+    }
+  };
 
   const SettingsContent = () => (
     <div className="space-y-6">
@@ -121,7 +245,7 @@ const Playground = () => {
   );
 
   return (
-    <div className="flex h-full bg-gray-50">
+    <div className="flex h-full bg-white">
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
@@ -129,30 +253,6 @@ const Playground = () => {
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-semibold text-gray-900">Playground</h1>
             <div className="flex items-center gap-3">
-              <Select value={preset} onValueChange={setPreset}>
-                <SelectTrigger className="w-32 sm:w-48">
-                  <SelectValue placeholder="Load a preset..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="preset1">Preset 1</SelectItem>
-                  <SelectItem value="preset2">Preset 2</SelectItem>
-                </SelectContent>
-              </Select>
-              <Button variant="outline" size="sm" className="hidden sm:flex">
-                Save
-              </Button>
-              <Button variant="outline" size="sm" className="hidden sm:flex">
-                <Code className="h-4 w-4 mr-2" />
-                View code
-              </Button>
-              <Button variant="outline" size="sm" className="hidden sm:flex">
-                <Share className="h-4 w-4 mr-2" />
-                Share
-              </Button>
-              <Button variant="ghost" size="sm">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-              
               {/* Mobile Settings Button */}
               {isMobile && (
                 <Sheet open={settingsOpen} onOpenChange={setSettingsOpen}>
@@ -171,6 +271,45 @@ const Playground = () => {
                   </SheetContent>
                 </Sheet>
               )}
+
+              {/* Desktop Settings Button */}
+              {!isMobile && (
+                <Button variant="outline" size="sm">
+                  <Settings className="h-4 w-4" />
+                </Button>
+              )}
+
+              {/* Load Chat Button */}
+              <Select value={selectedChat} onValueChange={handleChatSelection}>
+                <SelectTrigger className="w-32 sm:w-48">
+                  <SelectValue placeholder="Load" />
+                </SelectTrigger>
+                <SelectContent>
+                  {loading ? (
+                    <SelectItem value="loading" disabled>Loading chats...</SelectItem>
+                  ) : chatOptions.length === 0 ? (
+                    <SelectItem value="empty" disabled>No chats found</SelectItem>
+                  ) : (
+                    chatOptions.map((option) => (
+                      <SelectItem key={option.id} value={option.id}>
+                        {option.label}
+                      </SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
+
+              <Button variant="outline" size="sm" className="hidden sm:flex">
+                Save
+              </Button>
+              <Button variant="outline" size="sm" className="hidden sm:flex">
+                <Code className="h-4 w-4 mr-2" />
+                View code
+              </Button>
+              <Button variant="outline" size="sm" className="hidden sm:flex">
+                <Share className="h-4 w-4 mr-2" />
+                Share
+              </Button>
             </div>
           </div>
         </div>
