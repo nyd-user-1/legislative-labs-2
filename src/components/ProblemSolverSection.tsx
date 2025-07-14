@@ -148,7 +148,7 @@ Format it as a professional problem statement suitable for legislative drafting.
               <div className="flex-1 text-center md:text-left">
                 <h3 className="text-xl font-semibold">{tab.title}</h3>
                 <p className="text-gray-600 mb-3">{tab.subtitle}</p>
-                <p className="mb-4 text-gray-700">{tab.description}</p>
+                <p className="mb-4 text-gray-700">A problem statement is a concise description of an issue that needs to be addressed. It identifies the problem, explains why it matters, and sets the foundation for developing effective solutions.</p>
 
                 <div className="flex justify-center gap-3 md:justify-start">
                   {tab.id === "question" && (
