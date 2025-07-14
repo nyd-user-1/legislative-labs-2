@@ -11,7 +11,7 @@ interface SuggestedPromptsProps {
   onPromptClick: (prompt: string) => void;
   isLoading: boolean;
   showPrompts: boolean;
-  hasMessages: boolean; // Add this to track if there are any messages
+  hasMessages: boolean;
 }
 
 export const SuggestedPrompts = ({ 
@@ -40,6 +40,13 @@ export const SuggestedPrompts = ({
       "Stakeholder Analysis",
       "Policy Mechanisms",
       "Success Metrics"
+    ];
+  } else if (entityType === 'mediaKit') {
+    prompts = [
+      "Press Release Draft",
+      "Talking Points",
+      "Social Media Content",
+      "Stakeholder Messaging"
     ];
   } else {
     prompts = ContextBuilder.generateDynamicPrompts(entity, entityType);

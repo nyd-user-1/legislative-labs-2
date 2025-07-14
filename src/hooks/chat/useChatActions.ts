@@ -23,6 +23,9 @@ export const useChatActions = (entity: any, entityType: EntityType) => {
     if (entityType === 'solution' && entity) {
       return entity.problemNumber ? `Solution: ${entity.problemNumber}` : 'Solution Development';
     }
+    if (entityType === 'mediaKit' && entity) {
+      return entity.mediaKitNumber ? `Media Kit: ${entity.mediaKitNumber}` : 'Media Kit Generation';
+    }
     return 'AI Chat';
   };
 

@@ -19,7 +19,15 @@ const getTitle = (entity: any, entityType: EntityType): string => {
   if (entityType === 'solution' && entity) {
     return entity.problemNumber ? `Solution: ${entity.problemNumber}` : 'Solution Development';
   }
+  if (entityType === 'mediaKit' && entity) {
+    return entity.mediaKitNumber ? `Media Kit: ${entity.mediaKitNumber}` : 'Media Kit Generation';
+  }
   return 'AI Chat';
+};
+
+const generateMediaKitNumber = (count: number): string => {
+  const nextNumber = count + 1;
+  return `MK${nextNumber.toString().padStart(5, '0')}`;
 };
 
 const generateProblemNumber = (count: number): string => {
@@ -50,6 +58,23 @@ export const useSessionManager = (entity: any, entityType: EntityType) => {
           entity.problemNumber = problemNumber;
         }
         title = `Problem: ${problemNumber}`;
+      }
+
+      // For new media kit sessions, generate a sequential media kit number
+      if (entityType === 'mediaKit' && !sessionId && !entity?.mediaKitNumber) {
+        // Get count of existing media kit sessions for this user
+        const { count } = await supabase
+          .from('chat_sessions')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .like('title', 'Media Kit: MK%');
+        
+        const mediaKitNumber = generateMediaKitNumber(count || 0);
+        // Update entity with the media kit number for future reference
+        if (entity) {
+          entity.mediaKitNumber = mediaKitNumber;
+        }
+        title = `Media Kit: ${mediaKitNumber}`;
       }
 
       const sessionData = {

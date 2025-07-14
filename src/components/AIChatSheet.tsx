@@ -43,6 +43,13 @@ type Solution = {
   originalStatement: string;
   problemNumber?: string;
 };
+type MediaKit = {
+  id: string;
+  title: string;
+  description: string;
+  originalStatement: string;
+  mediaKitNumber?: string;
+};
 
 interface AIChatSheetProps {
   open: boolean;
@@ -52,9 +59,10 @@ interface AIChatSheetProps {
   committee?: Committee | null;
   problem?: Problem | null;
   solution?: Solution | null;
+  mediaKit?: MediaKit | null;
 }
 
-export const AIChatSheet = ({ open, onOpenChange, bill, member, committee, problem, solution }: AIChatSheetProps) => {
+export const AIChatSheet = ({ open, onOpenChange, bill, member, committee, problem, solution, mediaKit }: AIChatSheetProps) => {
   const [citationsOpen, setCitationsOpen] = useState(false);
   const { toast } = useToast();
   
@@ -62,8 +70,8 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee, probl
   const hasInitialized = useRef(false);
   
   // Determine the entity and type for the chat session
-  const entity = bill || member || committee || problem || solution || null;
-  const entityType = bill ? 'bill' : member ? 'member' : committee ? 'committee' : problem ? 'problem' : solution ? 'solution' : null;
+  const entity = bill || member || committee || problem || solution || mediaKit || null;
+  const entityType = bill ? 'bill' : member ? 'member' : committee ? 'committee' : problem ? 'problem' : solution ? 'solution' : mediaKit ? 'mediaKit' : null;
   
   const {
     inputValue,
@@ -124,11 +132,17 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee, probl
 
   // Get the appropriate title
   const getSheetTitle = () => {
+    if (mediaKit && mediaKit.mediaKitNumber) {
+      return `Media Kit: ${mediaKit.mediaKitNumber}`;
+    }
     if (solution && solution.problemNumber) {
       return `Solution: ${solution.problemNumber}`;
     }
     if (problem && problem.problemNumber) {
       return `Problem: ${problem.problemNumber}`;
+    }
+    if (mediaKit) {
+      return "Media Kit";
     }
     if (solution) {
       return "Solution";

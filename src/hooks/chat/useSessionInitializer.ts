@@ -69,6 +69,46 @@ Provide a detailed policy proposal that includes:
 6. Potential challenges and mitigation strategies
 
 Keep it practical, actionable, and focused on real-world implementation.`;
+      } else if (entityType === 'mediaKit') {
+        // Create the user message first
+        const userMessage: Message = {
+          id: generateId(),
+          role: "user",
+          content: entity.originalStatement || entity.description,
+          timestamp: new Date()
+        };
+
+        setMessages([userMessage]);
+
+        // Then generate the media kit
+        prompt = `Based on this policy solution, please create comprehensive media kit materials:
+
+"${entity.originalStatement || entity.description}"
+
+Please provide:
+
+1. **DRAFT PRESS RELEASE**
+   - Compelling headline
+   - Executive summary
+   - Key benefits and impact
+   - Call to action
+
+2. **TALKING POINTS**
+   - 5-7 key messages for stakeholders
+   - Supporting facts and statistics
+   - Responses to common objections
+
+3. **PERSUASION TECHNIQUES**
+   - Conversational approaches for friends and family
+   - Emotional appeals and logical arguments
+   - Simple explanations of complex policy
+
+4. **ACTIONABLE STEPS**
+   - How supporters can help advance the solution
+   - Contact information for representatives
+   - Social media strategies
+
+Keep all content professional yet accessible, compelling, and focused on building broad support for this policy solution.`;
       } else if (entityType === 'bill') {
         prompt = `Please provide a comprehensive analysis of this bill: ${entity.bill_number}. Include summary, key provisions, and potential impact.`;
       } else {
@@ -78,7 +118,7 @@ Keep it practical, actionable, and focused on real-world implementation.`;
       const { data, error } = await supabase.functions.invoke('generate-with-openai', {
         body: { 
           prompt, 
-          type: entityType === 'problem' ? 'problem-refinement' : entityType === 'solution' ? 'solution-generation' : 'analysis',
+          type: entityType === 'problem' ? 'problem-refinement' : entityType === 'solution' ? 'solution-generation' : entityType === 'mediaKit' ? 'media-kit-generation' : 'analysis',
           entityContext: { type: entityType, [entityType]: entity }
         }
       });
@@ -101,7 +141,7 @@ Keep it practical, actionable, and focused on real-world implementation.`;
         timestamp: new Date()
       };
 
-      const newMessages = (entityType === 'problem' || entityType === 'solution')
+      const newMessages = (entityType === 'problem' || entityType === 'solution' || entityType === 'mediaKit')
         ? [
             {
               id: generateId(),

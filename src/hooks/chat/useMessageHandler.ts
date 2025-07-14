@@ -47,12 +47,26 @@ User question: ${message}
 
 Please provide a detailed response addressing the user's question in the context of developing effective policy solutions for this problem.`;
         contextualPrompt = solutionContext;
+      } else if (entityType === 'mediaKit' && entity) {
+        // Add context for media kit-specific prompts
+        const mediaKitContext = `Context: We are creating media kit materials (press releases, talking points, persuasion techniques) for this policy solution: "${entity.originalStatement || entity.description}"
+
+User question: ${message}
+
+Please provide a detailed response that includes:
+1. Draft press release content
+2. Key talking points for stakeholders
+3. Conversational techniques to persuade friends and family
+4. Actionable steps to advance the solution
+
+Keep the tone professional yet accessible, and focus on compelling messaging that effectively communicates the benefits of this policy solution.`;
+        contextualPrompt = mediaKitContext;
       }
 
       const { data, error } = await supabase.functions.invoke('generate-with-openai', {
         body: { 
           prompt: contextualPrompt,
-          type: 'chat',
+          type: entityType === 'mediaKit' ? 'media' : 'chat',
           entityContext: { type: entityType, [entityType]: entity }
         }
       });

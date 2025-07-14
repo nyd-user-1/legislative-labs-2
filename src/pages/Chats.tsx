@@ -32,11 +32,17 @@ const Chats = () => {
     session.title.toLowerCase().includes('solution ')
   );
 
+  const mediaKitChats = chatSessions.filter(session => 
+    session.title.toLowerCase().includes('media kit:') ||
+    session.title.toLowerCase().includes('media kit ')
+  );
+
   // Get remaining chats that don't fit into the above categories
   const otherChats = chatSessions.filter(session => 
     !billChats.includes(session) && 
     !problemChats.includes(session) && 
-    !solutionChats.includes(session)
+    !solutionChats.includes(session) &&
+    !mediaKitChats.includes(session)
   );
 
   const totalChats = chatSessions.length;
@@ -49,7 +55,7 @@ const Chats = () => {
           <p className="text-muted-foreground">
             {totalChats === 0 
               ? "No saved chats yet" 
-              : `${billChats.length} bill chats, ${problemChats.length} problem chats, ${solutionChats.length} solution chats`
+              : `${billChats.length} bill chats, ${problemChats.length} problem chats, ${solutionChats.length} solution chats, ${mediaKitChats.length} media kit chats`
             }
           </p>
         </div>
@@ -58,10 +64,11 @@ const Chats = () => {
           <ChatsEmptyState />
         ) : (
           <Tabs defaultValue="bills" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="bills">Bills ({billChats.length})</TabsTrigger>
               <TabsTrigger value="problems">Problems ({problemChats.length})</TabsTrigger>
               <TabsTrigger value="solutions">Solutions ({solutionChats.length})</TabsTrigger>
+              <TabsTrigger value="media-kits">Media Kits ({mediaKitChats.length})</TabsTrigger>
             </TabsList>
             
             <TabsContent value="bills" className="space-y-4">
@@ -113,6 +120,26 @@ const Chats = () => {
                 </Card>
               ) : (
                 solutionChats.map((session) => (
+                  <ChatSessionCard
+                    key={session.id}
+                    session={session}
+                    onDelete={deleteSession}
+                    onCopy={copyToClipboard}
+                    onFeedback={handleFeedback}
+                  />
+                ))
+              )}
+            </TabsContent>
+
+            <TabsContent value="media-kits" className="space-y-4">
+              {mediaKitChats.length === 0 ? (
+                <Card>
+                  <CardContent className="flex flex-col items-center justify-center py-8">
+                    <p className="text-muted-foreground">No media kit chats yet</p>
+                  </CardContent>
+                </Card>
+              ) : (
+                mediaKitChats.map((session) => (
                   <ChatSessionCard
                     key={session.id}
                     session={session}
