@@ -53,15 +53,20 @@ export const DraftGeneratorTab = () => {
               disabled={!problemStatement.trim()}
               className="w-full sm:w-auto"
             >
-              Generate
+              Generate Analysis
             </Button>
           </div>
         </CardContent>
       </Card>
 
       {/* Problem Chats Grid Section */}
-      <div className="space-y-4">
-        <h2 className="text-xl font-semibold text-gray-900">Problem Chats</h2>
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-2xl font-semibold text-gray-900 mb-2">Your Problem Statements</h2>
+          <p className="text-gray-600">
+            View and continue working on your previous problem analyses.
+          </p>
+        </div>
         <ProblemChatsGrid />
       </div>
 

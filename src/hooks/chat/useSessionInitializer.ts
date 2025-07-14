@@ -121,11 +121,21 @@ Keep it structured and comprehensive but concise. Do not include memorandum form
 
       console.log('Creating problem chat entry for user:', user.id);
 
-      // Get the next problem number using the database function
+      // Get the next problem number using the fixed database function
       const { data: problemNumber, error: numberError } = await supabase.rpc('generate_problem_number');
       
-      if (numberError || !problemNumber) {
+      if (numberError) {
         console.error('Failed to generate problem number:', numberError);
+        toast({
+          title: "Error",
+          description: "Failed to generate problem number. Please try again.",
+          variant: "destructive"
+        });
+        return null;
+      }
+
+      if (!problemNumber) {
+        console.error('No problem number returned from function');
         return null;
       }
 
@@ -146,6 +156,11 @@ Keep it structured and comprehensive but concise. Do not include memorandum form
 
       if (error) {
         console.error('Error creating problem chat entry:', error);
+        toast({
+          title: "Error",
+          description: "Failed to save problem statement. Please try again.",
+          variant: "destructive"
+        });
         return null;
       }
 
@@ -153,6 +168,11 @@ Keep it structured and comprehensive but concise. Do not include memorandum form
       return data.id;
     } catch (error) {
       console.error('Error in createProblemChatEntry:', error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive"
+      });
       return null;
     }
   };
