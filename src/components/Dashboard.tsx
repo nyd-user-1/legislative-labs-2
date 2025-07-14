@@ -65,7 +65,7 @@ export const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="w-full">
+      <div className="w-full min-h-screen bg-gray-50">
         <div className="container mx-auto px-[27px] py-4 sm:py-6 max-w-7xl">
           <div className="space-y-4 sm:space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -94,7 +94,7 @@ export const Dashboard = () => {
 
   if (error) {
     return (
-      <div className="w-full">
+      <div className="w-full min-h-screen bg-gray-50">
         <div className="container mx-auto px-[27px] py-4 sm:py-6 max-w-7xl">
           <div className="text-center py-12">
             <h2 className="text-xl font-semibold text-destructive mb-2">Error Loading Dashboard</h2>
@@ -107,7 +107,7 @@ export const Dashboard = () => {
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full min-h-screen bg-gray-50">
       <div className="container mx-auto px-[27px] py-4 sm:py-6 max-w-7xl">
         <div className="space-y-4 sm:space-y-6">
           {/* Header Section */}

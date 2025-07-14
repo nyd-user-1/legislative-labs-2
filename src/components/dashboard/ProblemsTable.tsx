@@ -1,5 +1,6 @@
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -86,90 +87,93 @@ export const ProblemsTable = ({ problems }: ProblemsTableProps) => {
         ))}
       </div>
 
-      {/* Desktop View */}
+      {/* Desktop View with Horizontal Scroll */}
       <div className="hidden md:block">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Problem Number</TableHead>
-              <TableHead>Problem Statement</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Last Action</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {problems.map((problem) => (
-              <TableRow
-                key={problem.id}
-                className="cursor-pointer hover:bg-muted/50"
-              >
-                <TableCell className="font-medium">
-                  {problem.problem_number}
-                </TableCell>
-                <TableCell className="max-w-xs">
-                  <div className="truncate" title={problem.problem_statement}>
-                    {problem.problem_statement}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Select defaultValue={problem.current_state}>
-                    <SelectTrigger className="w-auto border-0 bg-transparent p-0 focus:ring-0">
-                      <SelectValue>
-                        <Badge variant={getStatusBadgeVariant(problem.current_state)}>
-                          {problem.current_state === 'Problem Identified' ? 'Identified' : problem.current_state}
-                        </Badge>
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {statusOptions.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </TableCell>
-                <TableCell>
-                  <Select defaultValue="General">
-                    <SelectTrigger className="w-auto border-0 bg-transparent p-0 focus:ring-0">
-                      <SelectValue>General</SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categoryOptions.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </TableCell>
-                <TableCell className="text-sm text-muted-foreground">
-                  {formatDate(problem.updated_at)}
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex items-center justify-end gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      title="Add to Favorites"
-                    >
-                      <Heart className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      title="AI Analysis"
-                    >
-                      <Sparkles className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
+        <ScrollArea className="w-full whitespace-nowrap rounded-md border">
+          <Table className="min-w-[800px]">
+            <TableHeader>
+              <TableRow>
+                <TableHead className="min-w-[120px]">Problem Number</TableHead>
+                <TableHead className="min-w-[300px]">Problem Statement</TableHead>
+                <TableHead className="min-w-[120px]">Status</TableHead>
+                <TableHead className="min-w-[120px]">Category</TableHead>
+                <TableHead className="min-w-[120px]">Last Action</TableHead>
+                <TableHead className="min-w-[120px] text-right">Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {problems.map((problem) => (
+                <TableRow
+                  key={problem.id}
+                  className="cursor-pointer hover:bg-muted/50"
+                >
+                  <TableCell className="font-medium">
+                    {problem.problem_number}
+                  </TableCell>
+                  <TableCell className="max-w-xs">
+                    <div className="truncate" title={problem.problem_statement}>
+                      {problem.problem_statement}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Select defaultValue={problem.current_state}>
+                      <SelectTrigger className="w-auto border-0 bg-transparent p-0 focus:ring-0">
+                        <SelectValue>
+                          <Badge variant={getStatusBadgeVariant(problem.current_state)}>
+                            {problem.current_state === 'Problem Identified' ? 'Identified' : problem.current_state}
+                          </Badge>
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {statusOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
+                  <TableCell>
+                    <Select defaultValue="General">
+                      <SelectTrigger className="w-auto border-0 bg-transparent p-0 focus:ring-0">
+                        <SelectValue>General</SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categoryOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
+                  <TableCell className="text-sm text-muted-foreground">
+                    {formatDate(problem.updated_at)}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex items-center justify-end gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        title="Add to Favorites"
+                      >
+                        <Heart className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        title="AI Analysis"
+                      >
+                        <Sparkles className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
       </div>
 
       {problems.length === 0 && (
