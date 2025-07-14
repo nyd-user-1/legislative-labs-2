@@ -114,14 +114,20 @@ export const AllItemsTable = ({
   ].sort((a, b) => {
     // Sort by last action date, most recent first
     if (a.type === 'bill' && b.type === 'bill') {
-      const aDate = a.data.last_action_date || a.data.created_at;
-      const bDate = b.data.last_action_date || b.data.created_at;
-      return new Date(bDate).getTime() - new Date(aDate).getTime();
+      const aDate = a.data.last_action_date || a.data.status_date;
+      const bDate = b.data.last_action_date || b.data.status_date;
+      if (aDate && bDate) {
+        return new Date(bDate).getTime() - new Date(aDate).getTime();
+      }
+      return 0;
     }
     // For non-bills, sort by updated_at
-    const aDate = a.data.updated_at || a.data.created_at;
-    const bDate = b.data.updated_at || b.data.created_at;
-    return new Date(bDate).getTime() - new Date(aDate).getTime();
+    const aDate = a.data.updated_at;
+    const bDate = b.data.updated_at;
+    if (aDate && bDate) {
+      return new Date(bDate).getTime() - new Date(aDate).getTime();
+    }
+    return 0;
   });
 
   const getTypeIcon = (type: string) => {
