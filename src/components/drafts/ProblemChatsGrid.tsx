@@ -1,10 +1,11 @@
+
 import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Heart, Sparkles, User, Calendar } from "lucide-react";
+import { Heart, Sparkles, User, Calendar, Globe } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AIChatSheet } from "../AIChatSheet";
 
@@ -119,6 +120,14 @@ export const ProblemChatsGrid = () => {
     setChatSheetOpen(true);
   };
 
+  const handlePublishProblem = (problemChat: ProblemChat, e: React.MouseEvent) => {
+    e.stopPropagation();
+    toast({
+      title: "Publishing Problem",
+      description: `Problem ${problemChat.problem_number} will be published soon.`,
+    });
+  };
+
   // Add debug logging
   console.log('ProblemChatsGrid render:', { 
     isLoading, 
@@ -186,7 +195,6 @@ export const ProblemChatsGrid = () => {
                   <CardTitle className="text-lg font-semibold mb-2">
                     {problemChat.problem_number}
                   </CardTitle>
-                  <p className="text-sm text-gray-600 mb-2">{problemChat.title}</p>
                 </div>
                 
                 <div className="flex items-center gap-2 flex-shrink-0">
@@ -210,6 +218,9 @@ export const ProblemChatsGrid = () => {
                   </Button>
                 </div>
               </div>
+              
+              {/* Spacer between problem number/buttons and badge */}
+              <div className="mt-5"></div>
             </CardHeader>
             
             <CardContent className="pt-0">
@@ -228,6 +239,19 @@ export const ProblemChatsGrid = () => {
                 <div className="flex items-center gap-2 text-sm text-gray-500">
                   <Calendar className="h-4 w-4 flex-shrink-0" />
                   <span>{new Date(problemChat.created_at).toLocaleDateString()}</span>
+                </div>
+
+                {/* Publish Problem button at the bottom, aligned left */}
+                <div className="pt-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-auto"
+                    onClick={(e) => handlePublishProblem(problemChat, e)}
+                  >
+                    <Globe className="h-4 w-4 mr-2" />
+                    Publish Problem
+                  </Button>
                 </div>
               </div>
             </CardContent>
