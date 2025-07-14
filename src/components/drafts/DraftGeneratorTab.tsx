@@ -64,7 +64,7 @@ export const DraftGeneratorTab = () => {
         <div>
           <h2 className="text-2xl font-semibold text-gray-900 mb-2">Trust The Process</h2>
           <p className="text-gray-600">
-            View and continue working on your previous problem analyses.
+            You have identified the problem. That's the first step in solving the problem. Keep going!
           </p>
         </div>
         <ProblemChatsGrid />
