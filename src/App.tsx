@@ -15,7 +15,7 @@ import { Auth } from "./pages/Auth";
 import Profile from "./pages/Profile";
 import Bills from "./pages/Bills";
 import Problems from "./pages/Problems";
-import MediaKits from "./pages/MediaKits";
+
 import Members from "./pages/Members";
 import Committees from "./pages/Committees";
 import Chats from "./pages/Chats";
@@ -52,7 +52,7 @@ const AppLayout = () => {
                 <Route path="/chats" element={<Chats />} />
                 <Route path="/favorites" element={<Favorites />} />
                 <Route path="/problems" element={<Problems />} />
-                <Route path="/media-kits" element={<MediaKits />} />
+                
                 <Route path="/bills" element={<Bills />} />
                 <Route path="/members" element={<Members />} />
                 <Route path="/committees" element={<Committees />} />
