@@ -3,6 +3,7 @@ import { useRef, useEffect } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { MessageBubble } from "@/pages/chats/components/MessageBubble";
 import { Message as ChatMessage } from "@/pages/chats/types";
+import { EntityType } from "@/hooks/chat/types";
 
 interface Message {
   id: string;
@@ -18,7 +19,7 @@ interface ChatMessagesProps {
   onShare: () => void;
   onSendPrompt: (prompt: string) => void;
   entity: any;
-  entityType: 'bill' | 'member' | 'committee' | 'problem' | 'solution' | null;
+  entityType: EntityType;
   onFeedback: (type: "thumbs-up" | "thumbs-down" | "citations") => void;
 }
 
@@ -51,6 +52,9 @@ export const ChatMessages = ({
             timestamp: message.timestamp.toISOString()
           };
           
+          // Map solution entity type to problem for MessageBubble compatibility
+          const messageEntityType = entityType === 'solution' ? 'problem' : entityType;
+          
           return (
             <MessageBubble 
               key={message.id}
@@ -60,7 +64,7 @@ export const ChatMessages = ({
               onShare={onShare}
               onSendPrompt={onSendPrompt}
               entity={entity}
-              entityType={entityType}
+              entityType={messageEntityType as 'bill' | 'member' | 'committee' | 'problem'}
             />
           );
         })}

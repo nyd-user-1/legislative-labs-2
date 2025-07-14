@@ -1,9 +1,9 @@
 
 import { Button } from "@/components/ui/button";
 import { ContextBuilder } from "@/utils/contextBuilder";
+import { EntityType } from "@/hooks/chat/types";
 
 type Entity = any;
-type EntityType = 'bill' | 'member' | 'committee' | 'problem' | 'solution' | null;
 
 interface SuggestedPromptsProps {
   entity: Entity;

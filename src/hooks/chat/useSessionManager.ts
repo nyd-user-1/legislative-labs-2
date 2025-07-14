@@ -2,7 +2,30 @@
 import { useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Message, EntityType } from './types';
-import { getTitle, generateProblemNumber } from './utils';
+
+const getTitle = (entity: any, entityType: EntityType): string => {
+  if (entityType === 'bill' && entity) {
+    return `Bill: ${entity.bill_number}`;
+  }
+  if (entityType === 'member' && entity) {
+    return `Member: ${entity.name}`;
+  }
+  if (entityType === 'committee' && entity) {
+    return `Committee: ${entity.name}`;
+  }
+  if (entityType === 'problem' && entity) {
+    return entity.problemNumber ? `Problem: ${entity.problemNumber}` : 'Problem Analysis';
+  }
+  if (entityType === 'solution' && entity) {
+    return entity.problemNumber ? `Solution: ${entity.problemNumber}` : 'Solution Development';
+  }
+  return 'AI Chat';
+};
+
+const generateProblemNumber = (count: number): string => {
+  const nextNumber = count + 1;
+  return `P${nextNumber.toString().padStart(5, '0')}`;
+};
 
 export const useSessionManager = (entity: any, entityType: EntityType) => {
   const saveChatSession = useCallback(async (messages: Message[], sessionId: string | null, setSessionId: (id: string) => void) => {
