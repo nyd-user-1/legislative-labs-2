@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -6,6 +7,7 @@ import { format } from "date-fns";
 import { ChatSession } from "../types";
 import { ConversationView } from "./ConversationView";
 import { parseMessages } from "../utils/messageParser";
+import { getBillChamber } from "@/hooks/chat/utils";
 
 interface ChatSessionCardProps {
   session: ChatSession;
@@ -23,6 +25,19 @@ export const ChatSessionCard = ({
   const messages = parseMessages(session.messages);
   const messageCount = messages.length;
 
+  // Extract chamber information for bill sessions
+  const getChamberInfo = () => {
+    if (session.title.startsWith('Analysis:') && session.bill_id) {
+      // Extract bill number from title (e.g., "Analysis: S1234" -> "S1234")
+      const billNumber = session.title.replace('Analysis: ', '');
+      const chamber = getBillChamber(billNumber);
+      return chamber;
+    }
+    return null;
+  };
+
+  const chamberInfo = getChamberInfo();
+
   return (
     <Card className="w-full">
       <CardHeader className="pb-3">
@@ -32,6 +47,7 @@ export const ChatSessionCard = ({
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
               <span>{format(new Date(session.updated_at), "MMM d, yyyy 'at' h:mm a")}</span>
               <span>{messageCount} messages</span>
+              {chamberInfo && <span>{chamberInfo}</span>}
             </div>
           </div>
           <Button

@@ -34,6 +34,7 @@ type Problem = {
   title: string;
   description: string;
   originalStatement: string;
+  problemNumber?: string;
 };
 
 interface AIChatSheetProps {
@@ -115,7 +116,9 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee, probl
 
   // Get the appropriate title
   const getSheetTitle = () => {
-    if (problem) return `Problem: ${problem.id}`;
+    if (problem && problem.problemNumber) {
+      return `Problem: ${problem.problemNumber}`;
+    }
     return getTitle();
   };
 
