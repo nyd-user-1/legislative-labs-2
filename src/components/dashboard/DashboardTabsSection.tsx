@@ -224,7 +224,7 @@ export const DashboardTabsSection = ({ bills }: DashboardTabsSectionProps) => {
 
   return (
     <>
-      <Card>
+      <Card className="overflow-hidden">
         <CardHeader className="px-4 sm:px-6">
           <CardTitle className="text-base sm:text-lg">Dashboard</CardTitle>
         </CardHeader>
@@ -238,7 +238,7 @@ export const DashboardTabsSection = ({ bills }: DashboardTabsSectionProps) => {
               <TabsTrigger value="media">Media</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="all" className="mt-6">
+            <TabsContent value="all" className="mt-6 overflow-hidden">
               <AllItemsTable 
                 bills={bills}
                 problems={problems}
@@ -252,8 +252,8 @@ export const DashboardTabsSection = ({ bills }: DashboardTabsSectionProps) => {
               />
             </TabsContent>
 
-            <TabsContent value="bill" className="mt-6">
-              <div className="w-full">
+            <TabsContent value="bill" className="mt-6 overflow-hidden">
+              <div className="w-full overflow-hidden">
                 <BillsTableMobile
                   bills={bills}
                   onBillSelect={handleBillSelect}
@@ -274,15 +274,15 @@ export const DashboardTabsSection = ({ bills }: DashboardTabsSectionProps) => {
               </div>
             </TabsContent>
 
-            <TabsContent value="problem" className="mt-6">
+            <TabsContent value="problem" className="mt-6 overflow-hidden">
               <ProblemsTable problems={problems} />
             </TabsContent>
 
-            <TabsContent value="solution" className="mt-6">
+            <TabsContent value="solution" className="mt-6 overflow-hidden">
               <SolutionsTable solutions={solutions} />
             </TabsContent>
 
-            <TabsContent value="media" className="mt-6">
+            <TabsContent value="media" className="mt-6 overflow-hidden">
               <MediaTable media={media} />
             </TabsContent>
           </Tabs>
