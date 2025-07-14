@@ -29,6 +29,12 @@ type Committee = {
   chamber: string;
   description?: string;
 };
+type Problem = {
+  id: string;
+  title: string;
+  description: string;
+  originalStatement: string;
+};
 
 interface AIChatSheetProps {
   open: boolean;
@@ -36,9 +42,10 @@ interface AIChatSheetProps {
   bill?: Bill | null;
   member?: Member | null;
   committee?: Committee | null;
+  problem?: Problem | null;
 }
 
-export const AIChatSheet = ({ open, onOpenChange, bill, member, committee }: AIChatSheetProps) => {
+export const AIChatSheet = ({ open, onOpenChange, bill, member, committee, problem }: AIChatSheetProps) => {
   const [citationsOpen, setCitationsOpen] = useState(false);
   const { toast } = useToast();
   
@@ -46,8 +53,8 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee }: AIC
   const hasInitialized = useRef(false);
   
   // Determine the entity and type for the chat session
-  const entity = bill || member || committee || null;
-  const entityType = bill ? 'bill' : member ? 'member' : committee ? 'committee' : null;
+  const entity = bill || member || committee || problem || null;
+  const entityType = bill ? 'bill' : member ? 'member' : committee ? 'committee' : problem ? 'problem' : null;
   
   const {
     inputValue,
@@ -106,11 +113,17 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee }: AIC
     }
   };
 
+  // Get the appropriate title
+  const getSheetTitle = () => {
+    if (problem) return `Problem: ${problem.id}`;
+    return getTitle();
+  };
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-2xl flex flex-col h-full">
         <SheetHeader className="flex-shrink-0">
-          <SheetTitle>{getTitle()}</SheetTitle>
+          <SheetTitle>{getSheetTitle()}</SheetTitle>
         </SheetHeader>
 
         <ChatContainer>

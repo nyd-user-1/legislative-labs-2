@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ContextBuilder } from "@/utils/contextBuilder";
 
 type Entity = any;
-type EntityType = 'bill' | 'member' | 'committee' | null;
+type EntityType = 'bill' | 'member' | 'committee' | 'problem' | null;
 
 interface SuggestedPromptsProps {
   entity: Entity;
@@ -22,7 +22,18 @@ export const SuggestedPrompts = ({
 }: SuggestedPromptsProps) => {
   if (!showPrompts) return null;
 
-  const prompts = ContextBuilder.generateDynamicPrompts(entity, entityType);
+  let prompts: string[] = [];
+
+  if (entityType === 'problem') {
+    prompts = [
+      "Similar Problems",
+      "Fiscal Analysis", 
+      "Root Cause",
+      "Likely Allies"
+    ];
+  } else {
+    prompts = ContextBuilder.generateDynamicPrompts(entity, entityType);
+  }
 
   return (
     <div className="space-y-3">

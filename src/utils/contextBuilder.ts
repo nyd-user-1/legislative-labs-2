@@ -1,190 +1,96 @@
 
-import { Tables } from "@/integrations/supabase/types";
-
-type Bill = Tables<"Bills">;
-type Member = {
-  people_id: number;
-  name: string;
-  party?: string;
-  district?: string;
-  chamber?: string;
-};
-type Committee = {
-  committee_id: number;
-  name: string;
-  chamber: string;
-  description?: string;
-};
-
-export interface EntityContext {
-  type: 'bill' | 'member' | 'committee';
-  bill?: Bill;
-  member?: Member;
-  committee?: Committee;
-}
-
 export class ContextBuilder {
-  static buildPromptContext(
-    entity: Bill | Member | Committee | null,
-    entityType: 'bill' | 'member' | 'committee' | null,
-    userPrompt: string
-  ): string {
-    if (!entity || !entityType) return userPrompt;
-
-    let contextInfo = "";
-    
-    switch (entityType) {
-      case 'bill':
-        const bill = entity as Bill;
-        
-        // Special handling for "Summary" prompt
-        if (userPrompt === "Summary") {
-          contextInfo = `
-BILL CONTEXT FOR SUMMARY:
-- Number: ${bill.bill_number || "Unknown"}
-- Title: ${bill.title || "No title"}
-- Status: ${bill.status_desc || "Unknown"}
-- Last Action: ${bill.last_action || "None"}
-- Committee: ${bill.committee || "Unknown"}
-- Description: ${bill.description || "No description"}
-
-Please provide a comprehensive summary of this bill in the following format:
-
-${bill.bill_number || "This bill"} is a New York State ${bill.bill_number?.startsWith('S') ? 'Senate' : 'Assembly'} bill number. In the 2025-2026 session, [describe what it proposes based on the title and description].
-
-Here's a more detailed breakdown:
-
-• Bill Title: [Provide the title]
-• Sponsors: [List sponsors if available]
-• Status: [Current status and committee assignment]
-• Key Provisions: [Main provisions of the bill]
-• Legislative Context: [Context about this legislation]
-
-Focus specifically on THIS bill: ${bill.bill_number || "the current bill"}.
-          `;
-        } else {
-          contextInfo = `
-BILL CONTEXT:
-- Number: ${bill.bill_number || "Unknown"}
-- Title: ${bill.title || "No title"}
-- Status: ${bill.status_desc || "Unknown"}
-- Last Action: ${bill.last_action || "None"}
-- Committee: ${bill.committee || "Unknown"}
-- Description: ${bill.description || "No description"}
-
-IMPORTANT: Focus your response specifically on ${bill.bill_number || "this bill"} only.
-          `;
-        }
-        break;
-        
-      case 'member':
-        const member = entity as Member;
-        contextInfo = `
-MEMBER CONTEXT:
-- Name: ${member.name}
-- Party: ${member.party || "Unknown"}
-- District: ${member.district || "Unknown"}
-- Chamber: ${member.chamber || "Unknown"}
-        `;
-        break;
-        
-      case 'committee':
-        const committee = entity as Committee;
-        contextInfo = `
-COMMITTEE CONTEXT:
-- Name: ${committee.name}
-- Chamber: ${committee.chamber}
-- Description: ${committee.description || "No description available"}
-        `;
-        break;
-    }
-
-    return `${contextInfo}
-
-USER QUESTION: ${userPrompt}`;
-  }
-
-  static getEntityContext(
-    entity: Bill | Member | Committee | null,
-    entityType: 'bill' | 'member' | 'committee' | null
-  ): EntityContext | null {
-    if (!entity || !entityType) return null;
-
-    const context: EntityContext = { type: entityType };
-    
-    switch (entityType) {
-      case 'bill':
-        context.bill = entity as Bill;
-        break;
-      case 'member':
-        context.member = entity as Member;
-        break;
-      case 'committee':
-        context.committee = entity as Committee;
-        break;
-    }
-
-    return context;
-  }
-
-  static generateDynamicPrompts(
-    entity: Bill | Member | Committee | null,
-    entityType: 'bill' | 'member' | 'committee' | null,
-    messageContent?: string
-  ): string[] {
-    const prompts: string[] = [];
-    
+  static generateDynamicPrompts(entity: any, entityType: 'bill' | 'member' | 'committee' | 'problem' | null): string[] {
     if (!entity || !entityType) {
-      return ['More Details', 'Related Topics', 'Current Status'];
+      return [
+        "What can you tell me about this?",
+        "What are the key points?",
+        "How does this work?",
+        "What should I know?"
+      ];
     }
 
     switch (entityType) {
+      case 'problem':
+        return [
+          "Similar Problems",
+          "Fiscal Analysis", 
+          "Root Cause",
+          "Likely Allies"
+        ];
+
       case 'bill':
-        prompts.push(
-          'Summary',
-          'Similar Bills',
-          'Fiscal Analysis',
-          'Key Provisions',
-          'Sponsors'
-        );
-        break;
-        
+        return [
+          "What does this bill do?",
+          "Who are the sponsors?",
+          "What's the current status?",
+          "What are the key provisions?",
+          "What's the fiscal impact?"
+        ];
+
       case 'member':
-        const member = entity as Member;
-        prompts.push(
-          `${member.name}'s recent legislation`,
-          `${member.name}'s voting patterns`,
-          `Committee roles for ${member.name}`
-        );
-        if (member.party) {
-          prompts.push(`${member.party} party alignment`);
-        }
-        break;
-        
+        return [
+          "What bills has this member sponsored?",
+          "What committees are they on?",
+          "What's their voting record?",
+          "What district do they represent?",
+          "What are their key issues?"
+        ];
+
       case 'committee':
-        const committee = entity as Committee;
-        prompts.push(
-          `Recent ${committee.name} activity`,
-          `Key members of ${committee.name}`,
-          `Bills in ${committee.name} pipeline`
-        );
-        break;
-    }
+        return [
+          "What bills is this committee considering?",
+          "Who are the committee members?",
+          "When do they meet?",
+          "What's their jurisdiction?",
+          "What's on their agenda?"
+        ];
 
-    // Add contextual prompts based on message content
-    if (messageContent) {
-      const lowerContent = messageContent.toLowerCase();
-      if (lowerContent.includes('fiscal') || lowerContent.includes('budget')) {
-        prompts.push('Budget implications');
-      }
-      if (lowerContent.includes('vote') || lowerContent.includes('support')) {
-        prompts.push('Stakeholder positions');
-      }
-      if (lowerContent.includes('timeline') || lowerContent.includes('schedule')) {
-        prompts.push('Legislative timeline');
-      }
+      default:
+        return [
+          "Tell me more about this",
+          "What are the details?",
+          "How does this work?",
+          "What should I know?"
+        ];
     }
+  }
 
-    return prompts.slice(0, 5); // Return top 5 prompts
+  static buildContextString(entity: any, entityType: string): string {
+    if (!entity || !entityType) return '';
+
+    switch (entityType) {
+      case 'problem':
+        return `Problem Context:
+Title: ${entity.title || 'Untitled Problem'}
+Original Statement: ${entity.originalStatement || entity.description || 'No description'}
+ID: ${entity.id || 'Unknown'}`;
+
+      case 'bill':
+        return `Bill Context:
+Bill Number: ${entity.bill_number || 'Unknown'}
+Title: ${entity.title || 'No title'}
+Status: ${entity.status_desc || 'Unknown status'}
+Committee: ${entity.committee || 'No committee assigned'}
+Last Action: ${entity.last_action || 'No recent action'}`;
+
+      case 'member':
+        return `Member Context:
+Name: ${entity.name || 'Unknown'}
+Party: ${entity.party || 'Unknown'}
+District: ${entity.district || 'Unknown'}
+Chamber: ${entity.chamber || 'Unknown'}
+Role: ${entity.role || 'Unknown'}`;
+
+      case 'committee':
+        return `Committee Context:
+Name: ${entity.name || entity.committee_name || 'Unknown'}
+Chamber: ${entity.chamber || 'Unknown'}
+Chair: ${entity.chair_name || 'Unknown'}
+Description: ${entity.description || 'No description'}`;
+
+      default:
+        return '';
+    }
   }
 }
