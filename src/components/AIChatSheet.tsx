@@ -134,6 +134,7 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee, probl
             onPromptClick={handlePromptClick}
             isLoading={isLoading}
             showPrompts={messages.length === 0}
+            hasMessages={messages.length > 0}
           />
 
           {/* Chat Messages */}

@@ -90,25 +90,33 @@ export const useChatLogic = (entity: any, entityType: 'bill' | 'member' | 'commi
     setIsLoading(true);
     try {
       let prompt = "";
-      let summaryContent = "";
       const title = getTitle();
 
       if (entityType === 'problem') {
-        summaryContent = entity.originalStatement || entity.description;
-        prompt = `Please provide a refined problem statement in memo format for the following problem description:
+        // First, add the user's original problem statement as a user message
+        const userMessage: Message = {
+          id: generateId(),
+          role: "user",
+          content: entity.originalStatement || entity.description,
+          timestamp: new Date()
+        };
+
+        setMessages([userMessage]);
+
+        // Then generate the refined analysis
+        prompt = `Please provide a refined problem statement for the following problem description:
 
 "${entity.originalStatement || entity.description}"
 
-Format your response as a professional policy memo with:
+Provide a clear, structured analysis that includes:
 1. A clear problem identification
 2. Impact analysis on affected parties  
 3. Assessment of current legal/regulatory gaps
 4. Justification for legislative action needed
 5. Professional policy language
 
-Keep it structured and comprehensive but concise.`;
+Keep it structured and comprehensive but concise. Do not include memorandum formatting, headers, or formal document structure.`;
       } else if (entityType === 'bill') {
-        summaryContent = entity.title || entity.description || "Bill analysis";
         prompt = `Please provide a comprehensive analysis of this bill: ${entity.bill_number}. Include summary, key provisions, and potential impact.`;
       } else {
         return;
@@ -132,14 +140,7 @@ Keep it structured and comprehensive but concise.`;
         return;
       }
 
-      // Create initial messages with summary and detailed response
-      const summaryMessage: Message = {
-        id: generateId(),
-        role: "assistant",
-        content: summaryContent,
-        timestamp: new Date()
-      };
-
+      // Add the AI response to the existing user message
       const analysisMessage: Message = {
         id: generateId(),
         role: "assistant", 
@@ -147,7 +148,18 @@ Keep it structured and comprehensive but concise.`;
         timestamp: new Date()
       };
 
-      const newMessages = [summaryMessage, analysisMessage];
+      const newMessages = entityType === 'problem' 
+        ? [
+            {
+              id: generateId(),
+              role: "user" as const,
+              content: entity.originalStatement || entity.description,
+              timestamp: new Date()
+            },
+            analysisMessage
+          ]
+        : [analysisMessage];
+
       setMessages(newMessages);
 
       // Save the session immediately after creating initial messages

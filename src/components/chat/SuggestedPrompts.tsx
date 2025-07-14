@@ -11,6 +11,7 @@ interface SuggestedPromptsProps {
   onPromptClick: (prompt: string) => void;
   isLoading: boolean;
   showPrompts: boolean;
+  hasMessages: boolean; // Add this to track if there are any messages
 }
 
 export const SuggestedPrompts = ({ 
@@ -18,9 +19,11 @@ export const SuggestedPrompts = ({
   entityType, 
   onPromptClick, 
   isLoading, 
-  showPrompts 
+  showPrompts,
+  hasMessages
 }: SuggestedPromptsProps) => {
-  if (!showPrompts) return null;
+  // Don't show prompts if there are already messages or if showPrompts is false
+  if (!showPrompts || hasMessages) return null;
 
   let prompts: string[] = [];
 
