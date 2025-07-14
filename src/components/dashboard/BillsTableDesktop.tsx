@@ -28,7 +28,7 @@ export const BillsTableDesktop = ({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Bill Number</TableHead>
+            <TableHead>Bill</TableHead>
             <TableHead>Title</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Committee</TableHead>
