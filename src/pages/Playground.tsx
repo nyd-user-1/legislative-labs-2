@@ -55,6 +55,7 @@ const Playground = () => {
   const [prompt, setPrompt] = useState("No complaints.");
   const [selectedChat, setSelectedChat] = useState("");
   const [selectedPersona, setSelectedPersona] = useState("");
+  const [selectedPersonaAct, setSelectedPersonaAct] = useState("");
   const [systemPrompt, setSystemPrompt] = useState("");
   const [temperature, setTemperature] = useState([0.56]);
   const [maxLength, setMaxLength] = useState([256]);
@@ -213,6 +214,7 @@ const Playground = () => {
     const selectedPersonaData = personas.find(persona => persona.act === personaAct);
     if (selectedPersonaData) {
       setSelectedPersona(personaAct);
+      setSelectedPersonaAct(personaAct);
       setSystemPrompt(selectedPersonaData.prompt || "");
       // Auto-switch to chat mode when persona is selected
       if (personaAct) {
@@ -220,6 +222,7 @@ const Playground = () => {
       }
     } else {
       setSelectedPersona("");
+      setSelectedPersonaAct("");
       setSystemPrompt("");
       // Switch back to text editor if no persona
       setMode('textEditor');
@@ -292,6 +295,7 @@ const Playground = () => {
     setPrompt('');
     setChatMessages([]);
     setSelectedPersona('');
+    setSelectedPersonaAct('');
     setSystemPrompt('');
     setMode('textEditor');
     toast({
@@ -457,14 +461,21 @@ const Playground = () => {
               {systemPrompt && (
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <button className="w-full mb-4 p-3 bg-blue-50 border-l-4 border-blue-400 rounded-md cursor-pointer hover:bg-blue-100 transition-colors text-left">
-                      <p className="text-sm font-medium text-blue-800 mb-1">System Prompt Active</p>
-                      <p className="text-xs text-blue-600 line-clamp-2">{systemPrompt}</p>
+                    <button 
+                      className="w-full mb-4 p-3 bg-blue-50 rounded-md cursor-pointer hover:bg-blue-100 transition-colors text-left"
+                      aria-label={`View ${selectedPersonaAct} system prompt details`}
+                      aria-describedby="system-prompt-status"
+                    >
+                      <p id="system-prompt-status" className="text-sm font-medium text-blue-800">
+                        {selectedPersonaAct} System Prompt Active
+                      </p>
                     </button>
                   </AlertDialogTrigger>
                   <AlertDialogContent className="max-w-2xl max-h-[80vh] overflow-hidden">
                     <AlertDialogHeader>
-                      <AlertDialogTitle className="text-blue-800">System Prompt Active</AlertDialogTitle>
+                      <AlertDialogTitle className="text-blue-800">
+                        {selectedPersonaAct} System Prompt Active
+                      </AlertDialogTitle>
                       <AlertDialogDescription asChild>
                         <div className="text-blue-700 max-h-[60vh] overflow-y-auto prose prose-sm max-w-none">
                           <ReactMarkdown>
