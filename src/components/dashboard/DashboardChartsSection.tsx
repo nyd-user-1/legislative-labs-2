@@ -152,12 +152,12 @@ export const DashboardChartsSection = () => {
       case "bar":
         return (
           <div className="w-full overflow-x-auto">
-            <div className="min-w-full" style={{ minWidth: '800px' }}>
+            <div style={{ width: '1200px', minWidth: '100%' }}>
               <ResponsiveContainer width="100%" height={400}>
                 <BarChart 
                   data={billsSponsorData.slice(0, 50)} 
-                  margin={{ top: 10, right: 10, left: 10, bottom: 60 }}
-                  barCategoryGap="1%"
+                  margin={{ top: 5, right: 5, left: 5, bottom: 60 }}
+                  barCategoryGap="2%"
                 >
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                   <XAxis 
