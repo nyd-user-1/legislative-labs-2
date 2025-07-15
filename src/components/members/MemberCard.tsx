@@ -60,7 +60,7 @@ export const MemberCard = ({
       </CardHeader>
       
       <CardContent className="pt-0">
-        <div className="space-y-6">
+        <div className="p-6">
           <div className="space-y-2 pt-2 border-t">
             {/* District */}
             {member.district && (
