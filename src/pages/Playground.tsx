@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { RotateCcw, Download, Code, Share, List, SlidersHorizontal, Settings, Eye, Edit } from "lucide-react";
+import { RotateCcw, Download, Code, Share, List, SlidersHorizontal, Settings, Eye, Edit, Info } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -466,7 +466,8 @@ const Playground = () => {
                       aria-label={`View ${selectedPersonaAct} system prompt details`}
                       aria-describedby="system-prompt-status"
                     >
-                      <p id="system-prompt-status" className="text-sm font-medium text-blue-800">
+                      <p id="system-prompt-status" className="text-sm font-medium text-blue-800 flex items-center gap-2">
+                        <Info className="h-4 w-4" />
                         {selectedPersonaAct} System Prompt Active
                       </p>
                     </button>
