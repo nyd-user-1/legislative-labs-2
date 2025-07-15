@@ -81,7 +81,7 @@ const Home = () => {
                 {/* Timeline line */}
                 {index !== milestones.length - 1 && (
                   <div
-                    className={`absolute left-6 top-12 h-full w-0.5 ${
+                    className={`absolute left-1/2 top-20 h-full w-0.5 transform -translate-x-1/2 ${
                       milestone.status === "Released"
                         ? "bg-primary"
                         : milestone.status === "In Progress"
@@ -91,22 +91,24 @@ const Home = () => {
                   ></div>
                 )}
 
-                <Card className="relative flex gap-6 p-6 hover:shadow-lg transition-all duration-300 bg-card/95 backdrop-blur-sm border-border/50">
-                  {/* Icon */}
-                  <div
-                    className={`w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-sm ${
-                      milestone.status === "Released"
-                        ? "bg-primary/10"
-                        : milestone.status === "In Progress"
-                        ? "bg-primary/5"
-                        : "bg-muted"
-                    }`}
-                  >
-                    {milestone.icon}
+                <Card className="relative p-6 hover:shadow-lg transition-all duration-300 bg-card/95 backdrop-blur-sm border-border/50">
+                  {/* Icon centered at top */}
+                  <div className="flex justify-center mb-6">
+                    <div
+                      className={`w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-sm ${
+                        milestone.status === "Released"
+                          ? "bg-primary/10"
+                          : milestone.status === "In Progress"
+                          ? "bg-primary/5"
+                          : "bg-muted"
+                      }`}
+                    >
+                      {milestone.icon}
+                    </div>
                   </div>
 
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
+                  <div className="text-center">
+                    <div className="flex items-center justify-center gap-3 mb-2">
                       <Badge
                         variant={
                           milestone.status === "Released"
