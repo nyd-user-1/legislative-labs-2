@@ -51,11 +51,16 @@ Use the real details, names, timelines, and specifics from the policy solution. 
       }
 
       if (initialPrompt) {
+        const contextType = entityType === 'member' || entityType === 'bill' || entityType === 'committee' ? 'chat' : 
+                           entityType === 'mediaKit' ? 'media' : 
+                           entityType === 'solution' ? 'idea' : 'chat';
+        
         const { data, error } = await supabase.functions.invoke('generate-with-openai', {
           body: { 
             prompt: initialPrompt,
-            type: entityType === 'mediaKit' ? 'media' : 'chat',
-            entityContext: { type: entityType, [entityType]: entity }
+            type: contextType,
+            entityContext: { type: entityType, [entityType]: entity },
+            enhanceWithNYSData: true
           }
         });
 

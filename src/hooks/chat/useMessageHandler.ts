@@ -80,11 +80,25 @@ DO NOT use generic placeholders like [Policy Solution Name] or [Organization Nam
         contextualPrompt = mediaKitContext;
       }
 
+      // Determine the appropriate context type for the AI
+      let contextType = 'chat';
+      if (entityType === 'problem') {
+        contextType = 'problem';
+      } else if (entityType === 'solution') {
+        contextType = 'idea';
+      } else if (entityType === 'mediaKit') {
+        contextType = 'media';
+      } else {
+        // For bills, members, committees - use 'chat' type for comprehensive analysis
+        contextType = 'chat';
+      }
+
       const { data, error } = await supabase.functions.invoke('generate-with-openai', {
         body: { 
           prompt: contextualPrompt,
-          type: entityType === 'mediaKit' ? 'media' : 'chat',
-          entityContext: { type: entityType, [entityType]: entity }
+          type: contextType,
+          entityContext: { type: entityType, [entityType]: entity },
+          enhanceWithNYSData: true
         }
       });
 
