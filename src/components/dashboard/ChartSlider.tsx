@@ -12,13 +12,13 @@ export const ChartSlider = () => {
 
   return (
     <div className="relative w-full">
-      <div className="overflow-hidden">
+      <div className="overflow-hidden rounded-lg">
         <div 
           className="flex transition-transform duration-300 ease-in-out"
           style={{ transform: `translateX(-${currentSlide * 100}%)` }}
         >
           {charts.map((Chart, index) => (
-            <div key={index} className="w-full flex-shrink-0">
+            <div key={index} className="w-full flex-shrink-0 px-1">
               <Chart />
             </div>
           ))}
@@ -31,8 +31,9 @@ export const ChartSlider = () => {
             key={index}
             onClick={() => setCurrentSlide(index)}
             className={`w-2 h-2 rounded-full transition-colors ${
-              index === currentSlide ? 'bg-primary' : 'bg-muted'
+              index === currentSlide ? 'bg-blue-500' : 'bg-gray-300'
             }`}
+            aria-label={`Go to chart ${index + 1}`}
           />
         ))}
       </div>

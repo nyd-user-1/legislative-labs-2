@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -120,11 +119,11 @@ const chartConfig = {
   },
   desktop: {
     label: "Desktop",
-    color: "var(--chart-2)",
+    color: "#60a5fa",
   },
   mobile: {
     label: "Mobile",
-    color: "var(--chart-1)",
+    color: "#3b82f6",
   },
 } satisfies ChartConfig
 
@@ -141,11 +140,11 @@ export function ChartBarInteractive() {
   )
 
   return (
-    <Card className="py-0">
+    <Card className="py-0 w-full">
       <CardHeader className="flex flex-col items-stretch border-b !p-0 sm:flex-row">
-        <div className="flex flex-1 flex-col justify-center gap-1 px-6 pt-4 pb-3 sm:!py-0">
-          <CardTitle>Bar Chart - Interactive</CardTitle>
-          <CardDescription>
+        <div className="flex flex-1 flex-col justify-center gap-1 px-4 pt-4 pb-3 sm:px-6 sm:!py-0">
+          <CardTitle className="text-lg sm:text-xl">Bar Chart - Interactive</CardTitle>
+          <CardDescription className="text-sm">
             Showing total visitors for the last 3 months
           </CardDescription>
         </div>
@@ -156,13 +155,13 @@ export function ChartBarInteractive() {
               <button
                 key={chart}
                 data-active={activeChart === chart}
-                className="data-[active=true]:bg-muted/50 relative z-30 flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l sm:border-t-0 sm:border-l sm:px-8 sm:py-6"
+                className="data-[active=true]:bg-muted/50 relative z-30 flex flex-1 flex-col justify-center gap-1 border-t px-4 py-3 text-left even:border-l sm:border-t-0 sm:border-l sm:px-6 sm:py-4"
                 onClick={() => setActiveChart(chart)}
               >
                 <span className="text-muted-foreground text-xs">
                   {chartConfig[chart].label}
                 </span>
-                <span className="text-lg leading-none font-bold sm:text-3xl">
+                <span className="text-lg leading-none font-bold sm:text-2xl">
                   {total[key as keyof typeof total].toLocaleString()}
                 </span>
               </button>
@@ -173,7 +172,7 @@ export function ChartBarInteractive() {
       <CardContent className="px-2 sm:p-6">
         <ChartContainer
           config={chartConfig}
-          className="aspect-auto h-[250px] w-full"
+          className="aspect-video sm:aspect-auto sm:h-[250px] w-full"
         >
           <BarChart
             accessibilityLayer
@@ -190,6 +189,7 @@ export function ChartBarInteractive() {
               axisLine={false}
               tickMargin={8}
               minTickGap={32}
+              fontSize={12}
               tickFormatter={(value) => {
                 const date = new Date(value)
                 return date.toLocaleDateString("en-US", {
