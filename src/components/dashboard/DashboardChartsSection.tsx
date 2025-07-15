@@ -1,9 +1,15 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { ChevronLeft, ChevronRight, Circle } from "lucide-react";
+import { BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid } from "recharts";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 
 interface BillSponsorData {
   bill_title: string;
@@ -201,172 +207,161 @@ export const DashboardChartsSection = () => {
       );
     }
 
+    // Chart configurations
+    const billsSponsorChartConfig = {
+      sponsor_count: {
+        label: "Sponsors",
+        color: "#3b82f6",
+      },
+    } satisfies ChartConfig;
+
+    const memberBillChartConfig = {
+      bill_count: {
+        label: "Bills Sponsored",
+        color: "#93c5fd",
+      },
+    } satisfies ChartConfig;
+
+    const memberNoVoteChartConfig = {
+      no_vote_count: {
+        label: "No Votes",
+        color: "#1e40af",
+      },
+    } satisfies ChartConfig;
+
     switch (chart.type) {
       case "bar":
-        const totalSponsors = billsSponsorData.reduce((sum, bill) => sum + bill.sponsor_count, 0);
-        const avgSponsors = billsSponsorData.length > 0 ? Math.round(totalSponsors / billsSponsorData.length) : 0;
-        
         return (
-          <div className="space-y-4">
-            {/* Summary Stats */}
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <div className="bg-muted/30 rounded-lg p-4 border">
-                <div className="text-sm text-muted-foreground">Total Bills</div>
-                <div className="text-2xl font-bold">{billsSponsorData.length.toLocaleString()}</div>
-              </div>
-              <div className="bg-muted/30 rounded-lg p-4 border">
-                <div className="text-sm text-muted-foreground">Avg Sponsors</div>
-                <div className="text-2xl font-bold">{avgSponsors}</div>
-              </div>
-            </div>
-            
-            <ResponsiveContainer width="100%" height={350}>
-              <BarChart data={billsSponsorData.slice(0, 20)} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis 
-                  dataKey="bill_number" 
-                  tick={{ fontSize: 10, fill: "#64748b" }}
-                  angle={-45}
-                  textAnchor="end"
-                  height={80}
-                  stroke="#94a3b8"
-                />
-                <YAxis 
-                  tick={{ fontSize: 11, fill: "#64748b" }}
-                  stroke="#94a3b8"
-                />
-                <Tooltip 
-                  contentStyle={{
-                    backgroundColor: '#ffffff',
-                    border: '1px solid #e2e8f0',
-                    borderRadius: '8px',
-                    fontSize: '12px',
-                    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
-                  }}
-                  formatter={(value, name) => [value, "Sponsors"]}
-                  labelFormatter={(label) => `Bill: ${label}`}
-                />
-                <Bar 
-                  dataKey="sponsor_count" 
-                  fill="#3b82f6"
-                  radius={[4, 4, 0, 0]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+          <ChartContainer config={billsSponsorChartConfig}>
+            <BarChart data={billsSponsorData.slice(0, 20)} margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
+              <CartesianGrid vertical={false} stroke="#e2e8f0" />
+              <XAxis 
+                dataKey="bill_number" 
+                tickLine={false}
+                tickMargin={10}
+                axisLine={false}
+                tick={{ fontSize: 10, fill: "#64748b" }}
+                angle={-45}
+                textAnchor="end"
+                height={60}
+              />
+              <YAxis 
+                tickLine={false}
+                axisLine={false}
+                tick={{ fontSize: 11, fill: "#64748b" }}
+              />
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent />}
+              />
+              <Bar 
+                dataKey="sponsor_count" 
+                fill="var(--color-sponsor_count)"
+                radius={4}
+              />
+            </BarChart>
+          </ChartContainer>
         );
 
       case "area":
         return (
-          <ResponsiveContainer width="100%" height={400}>
-            <AreaChart data={billsSponsorData.slice(0, 30)} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+          <ChartContainer config={billsSponsorChartConfig}>
+            <AreaChart data={billsSponsorData.slice(0, 30)} margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
+              <CartesianGrid vertical={false} stroke="#e2e8f0" />
               <XAxis 
                 dataKey="bill_number" 
+                tickLine={false}
+                tickMargin={10}
+                axisLine={false}
                 tick={{ fontSize: 10, fill: "#64748b" }}
                 interval="preserveStartEnd"
-                stroke="#94a3b8"
               />
               <YAxis 
+                tickLine={false}
+                axisLine={false}
                 tick={{ fontSize: 11, fill: "#64748b" }}
-                stroke="#94a3b8"
               />
-              <Tooltip 
-                contentStyle={{
-                  backgroundColor: '#ffffff',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '8px',
-                  fontSize: '12px',
-                  boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
-                }}
-                formatter={(value, name) => [value, "Sponsors"]}
-                labelFormatter={(label) => `Bill: ${label}`}
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent />}
               />
               <Area 
                 type="monotone" 
                 dataKey="sponsor_count" 
-                stroke="#3b82f6" 
+                stroke="var(--color-sponsor_count)" 
                 strokeWidth={2}
-                fill="#3b82f6"
+                fill="var(--color-sponsor_count)"
                 fillOpacity={0.2}
-                dot={{ fill: '#3b82f6', strokeWidth: 2, r: 3 }}
+                dot={{ fill: "var(--color-sponsor_count)", strokeWidth: 2, r: 3 }}
               />
             </AreaChart>
-          </ResponsiveContainer>
+          </ChartContainer>
         );
 
       case "member-bar":
         return (
-          <ResponsiveContainer width="100%" height={400}>
-            <BarChart data={memberBillData.slice(0, 20)} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+          <ChartContainer config={memberBillChartConfig}>
+            <BarChart data={memberBillData.slice(0, 20)} margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
+              <CartesianGrid vertical={false} stroke="#e2e8f0" />
               <XAxis 
                 dataKey="member_name" 
+                tickLine={false}
+                tickMargin={10}
+                axisLine={false}
                 tick={{ fontSize: 10, fill: "#64748b" }}
                 angle={-45}
                 textAnchor="end"
-                height={80}
-                stroke="#94a3b8"
+                height={60}
               />
               <YAxis 
+                tickLine={false}
+                axisLine={false}
                 tick={{ fontSize: 11, fill: "#64748b" }}
-                stroke="#94a3b8"
               />
-              <Tooltip 
-                contentStyle={{
-                  backgroundColor: '#ffffff',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '8px',
-                  fontSize: '12px',
-                  boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
-                }}
-                formatter={(value, name) => [value, "Bills Sponsored"]}
-                labelFormatter={(label) => `Member: ${label}`}
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent />}
               />
               <Bar 
                 dataKey="bill_count" 
-                fill="#93c5fd"
-                radius={[4, 4, 0, 0]}
+                fill="var(--color-bill_count)"
+                radius={4}
               />
             </BarChart>
-          </ResponsiveContainer>
+          </ChartContainer>
         );
 
       case "no-votes-bar":
         return (
-          <ResponsiveContainer width="100%" height={400}>
-            <BarChart data={memberNoVoteData.slice(0, 20)} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+          <ChartContainer config={memberNoVoteChartConfig}>
+            <BarChart data={memberNoVoteData.slice(0, 20)} margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
+              <CartesianGrid vertical={false} stroke="#e2e8f0" />
               <XAxis 
                 dataKey="member_name" 
+                tickLine={false}
+                tickMargin={10}
+                axisLine={false}
                 tick={{ fontSize: 10, fill: "#64748b" }}
                 angle={-45}
                 textAnchor="end"
-                height={80}
-                stroke="#94a3b8"
+                height={60}
               />
               <YAxis 
+                tickLine={false}
+                axisLine={false}
                 tick={{ fontSize: 11, fill: "#64748b" }}
-                stroke="#94a3b8"
               />
-              <Tooltip 
-                contentStyle={{
-                  backgroundColor: '#ffffff',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '8px',
-                  fontSize: '12px',
-                  boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
-                }}
-                formatter={(value, name) => [value, "No Votes"]}
-                labelFormatter={(label) => `Member: ${label}`}
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent />}
               />
               <Bar 
                 dataKey="no_vote_count" 
-                fill="#1e40af"
-                radius={[4, 4, 0, 0]}
+                fill="var(--color-no_vote_count)"
+                radius={4}
               />
             </BarChart>
-          </ResponsiveContainer>
+          </ChartContainer>
         );
 
       default:
@@ -405,7 +400,7 @@ export const DashboardChartsSection = () => {
         </CardDescription>
       </CardHeader>
       
-      <CardContent className="px-6 pb-6">
+      <CardContent className="p-0">
         <div className="relative">
           {/* Chart Container with horizontal scroll simulation */}
           <div className="w-full overflow-hidden">
@@ -414,7 +409,7 @@ export const DashboardChartsSection = () => {
               style={{ transform: `translateX(-${currentChart * 100}%)` }}
             >
               {charts.map((_, index) => (
-                <div key={index} className="w-full flex-shrink-0 px-4">
+                <div key={index} className="w-full flex-shrink-0 p-1">
                   {index === currentChart && renderChart()}
                 </div>
               ))}
