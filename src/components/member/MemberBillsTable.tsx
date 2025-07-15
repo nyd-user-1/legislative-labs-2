@@ -243,9 +243,11 @@ export const MemberBillsTable = ({ member }: MemberBillsTableProps) => {
                           <TableCell className="max-w-[300px]">
                             <div className="line-clamp-2 text-sm">{bill.title}</div>
                           </TableCell>
-                          <TableCell>
-                            <Badge variant="secondary">{bill.status_desc || "Unknown"}</Badge>
-                          </TableCell>
+                        <TableCell>
+                          <Badge variant={bill.status_desc?.toLowerCase() === "passed" ? "success" : "secondary"}>
+                            {bill.status_desc || "Unknown"}
+                          </Badge>
+                        </TableCell>
                           <TableCell className="max-w-[160px]">
                             <div className="line-clamp-2 text-sm" style={{ maxWidth: '20ch' }}>
                               {bill.committee || "N/A"}
