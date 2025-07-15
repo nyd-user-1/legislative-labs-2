@@ -287,6 +287,18 @@ const Playground = () => {
     }
   };
 
+  const handleRefresh = () => {
+    setPrompt('');
+    setChatMessages([]);
+    setSelectedPersona('');
+    setSystemPrompt('');
+    setMode('textEditor');
+    toast({
+      title: "Playground Cleared",
+      description: "All content has been reset",
+    });
+  };
+
   const SettingsContent = () => (
     <div className="space-y-6">
       {/* Load Chat */}
@@ -557,7 +569,7 @@ const Playground = () => {
                   >
                     {mode === 'chat' ? 'Start Chat' : 'Submit'}
                   </Button>
-                  <Button variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm" onClick={handleRefresh}>
                     <RotateCcw className="h-4 w-4" />
                   </Button>
                 </div>
