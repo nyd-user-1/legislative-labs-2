@@ -3,8 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { CardActionButtons } from "@/components/ui/CardActionButtons";
 import { AIChatSheet } from "@/components/AIChatSheet";
+import { useMemberBills } from "@/hooks/useMemberBills";
 import { Tables } from "@/integrations/supabase/types";
 
 type Member = Tables<"People">;
@@ -13,58 +15,11 @@ interface MemberBillsTableProps {
   member: Member;
 }
 
-// Mock data for demonstration - in real app this would come from API
-const mockBillData = [
-  {
-    bill_id: 1,
-    bill_number: "A05254",
-    title: "Enacts the \"New York open water data act...",
-    status: "Introduced",
-    committee: "Assembly Ways and Means",
-    last_action: "print number 5254a",
-    last_action_date: "2024-01-15"
-  },
-  {
-    bill_id: 2,
-    bill_number: "A06452", 
-    title: "Requires the superintendent of state polic...",
-    status: "Introduced",
-    committee: "Assembly Governmental Operations",
-    last_action: "print number 6452b",
-    last_action_date: "2024-01-18"
-  },
-  {
-    bill_id: 3,
-    bill_number: "A02193",
-    title: "Provides technical corrections to provision...",
-    status: "Introduced", 
-    committee: "Assembly Codes",
-    last_action: "print number 2193a",
-    last_action_date: "2024-01-12"
-  },
-  {
-    bill_id: 4,
-    bill_number: "A04179",
-    title: "Includes digital health care service platfor...",
-    status: "Introduced",
-    committee: "Assembly Health", 
-    last_action: "print number 4179a",
-    last_action_date: "2024-01-20"
-  },
-  {
-    bill_id: 5,
-    bill_number: "A05600",
-    title: "Relates to certain voidable transfers affect...",
-    status: "Introduced",
-    committee: "Assembly Rules",
-    last_action: "amend and recommit to rules 5600a",
-    last_action_date: "2024-01-25"
-  }
-];
 
 export const MemberBillsTable = ({ member }: MemberBillsTableProps) => {
   const [chatOpen, setChatOpen] = useState(false);
   const [selectedBill, setSelectedBill] = useState<any | null>(null);
+  const { bills, loading, error } = useMemberBills(member.people_id);
 
   const handleAIAnalysis = (bill: any, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -88,41 +43,59 @@ export const MemberBillsTable = ({ member }: MemberBillsTableProps) => {
           </Button>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Bill</TableHead>
-                <TableHead>Title</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Committee</TableHead>
-                <TableHead>Last Action</TableHead>
-                <TableHead className="w-[100px]">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {mockBillData.map((bill) => (
-                <TableRow key={bill.bill_id} className="cursor-pointer hover:bg-muted/50">
-                  <TableCell className="font-medium">{bill.bill_number}</TableCell>
-                  <TableCell className="max-w-xs truncate">{bill.title}</TableCell>
-                  <TableCell>
-                    <Badge variant="secondary">{bill.status}</Badge>
-                  </TableCell>
-                  <TableCell className="max-w-xs truncate">{bill.committee}</TableCell>
-                  <TableCell className="max-w-xs truncate text-sm text-muted-foreground">
-                    {bill.last_action}
-                  </TableCell>
-                  <TableCell>
-                    <CardActionButtons
-                      onFavorite={(e) => handleFavorite(bill, e)}
-                      onAIAnalysis={(e) => handleAIAnalysis(bill, e)}
-                      isFavorited={false}
-                      hasAIChat={false}
-                    />
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          {loading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-muted-foreground">Loading bills...</div>
+            </div>
+          ) : error ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-destructive">{error}</div>
+            </div>
+          ) : bills.length === 0 ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-muted-foreground">No bills found for this member</div>
+            </div>
+          ) : (
+            <ScrollArea className="w-full">
+              <div className="min-w-[800px]">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[120px]">Bill</TableHead>
+                      <TableHead className="min-w-[300px]">Title</TableHead>
+                      <TableHead className="w-[120px]">Status</TableHead>
+                      <TableHead className="min-w-[200px]">Committee</TableHead>
+                      <TableHead className="min-w-[250px]">Last Action</TableHead>
+                      <TableHead className="w-[100px]">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {bills.map((bill) => (
+                      <TableRow key={bill.bill_id} className="cursor-pointer hover:bg-muted/50">
+                        <TableCell className="font-medium">{bill.bill_number}</TableCell>
+                        <TableCell className="max-w-xs">{bill.title}</TableCell>
+                        <TableCell>
+                          <Badge variant="secondary">{bill.status_desc || "Unknown"}</Badge>
+                        </TableCell>
+                        <TableCell>{bill.committee || "N/A"}</TableCell>
+                        <TableCell className="text-sm text-muted-foreground">
+                          {bill.last_action || "No action recorded"}
+                        </TableCell>
+                        <TableCell>
+                          <CardActionButtons
+                            onFavorite={(e) => handleFavorite(bill, e)}
+                            onAIAnalysis={(e) => handleAIAnalysis(bill, e)}
+                            isFavorited={false}
+                            hasAIChat={false}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </ScrollArea>
+          )}
         </CardContent>
       </Card>
 

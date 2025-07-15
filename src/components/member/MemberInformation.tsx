@@ -15,8 +15,15 @@ interface MemberInformationProps {
 }
 
 export const MemberInformation = ({ member }: MemberInformationProps) => {
+  const memberName = member.name || `${member.first_name || ''} ${member.last_name || ''}`.trim() || `Member #${member.people_id}`;
+  
   return (
     <div className="space-y-6">
+      {/* Member Name Header */}
+      <div className="pb-4 border-b border-gray-200">
+        <h1 className="text-2xl font-semibold text-gray-900">{memberName}</h1>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Left Column */}
         <div className="space-y-6">
