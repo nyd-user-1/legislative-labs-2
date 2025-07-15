@@ -65,6 +65,8 @@ const Playground = () => {
   const [personasLoading, setPersonasLoading] = useState(false);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [mode, setMode] = useState<'textEditor' | 'chat'>('textEditor');
+  const [chatMessages, setChatMessages] = useState<Array<{role: 'user' | 'assistant', content: string}>>([]);
+  const [isChatting, setIsChatting] = useState(false);
   const isMobile = useIsMobile();
   const { toast } = useToast();
 
@@ -233,16 +235,33 @@ const Playground = () => {
       return;
     }
 
+    setIsChatting(true);
+    
     try {
-      // Here you would implement the actual chat functionality
-      // For now, we'll just show a toast
+      // Initialize chat with user message
+      const initialMessages = [{ role: 'user' as const, content: prompt }];
+      setChatMessages(initialMessages);
+
+      // Call the edge function
+      const response = await supabase.functions.invoke('chat-with-persona', {
+        body: {
+          messages: initialMessages,
+          systemPrompt: systemPrompt
+        }
+      });
+
+      if (response.error) {
+        throw new Error(response.error.message);
+      }
+
+      // Add AI response to chat
+      const aiMessage = { role: 'assistant' as const, content: response.data.message };
+      setChatMessages(prev => [...prev, aiMessage]);
+
       toast({
         title: "Chat Started",
-        description: `Starting chat with ${selectedPersona}`,
+        description: `Chat with ${selectedPersona} initiated successfully`,
       });
-      
-      // You can implement the actual AI chat integration here
-      // This would typically involve calling your AI service with the prompt and system prompt
       
     } catch (error) {
       console.error("Error starting chat:", error);
@@ -251,6 +270,8 @@ const Playground = () => {
         description: "Failed to start chat session",
         variant: "destructive",
       });
+    } finally {
+      setIsChatting(false);
     }
   };
 
@@ -450,7 +471,38 @@ const Playground = () => {
               </div>
               
               {/* Content Area */}
-              {isPreviewMode ? (
+              {mode === 'chat' && chatMessages.length > 0 ? (
+                <div className="flex-1 min-h-[300px] sm:min-h-[500px] border border-gray-300 rounded-lg p-4 overflow-y-auto bg-white">
+                  <div className="space-y-4">
+                    {chatMessages.map((message, index) => (
+                      <div key={index} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`max-w-[80%] p-3 rounded-lg ${
+                          message.role === 'user' 
+                            ? 'bg-gray-900 text-white' 
+                            : 'bg-gray-100 text-gray-900'
+                        }`}>
+                          <div className="text-xs font-medium mb-1 opacity-70">
+                            {message.role === 'user' ? 'You' : selectedPersona}
+                          </div>
+                          <ReactMarkdown>{message.content}</ReactMarkdown>
+                        </div>
+                      </div>
+                    ))}
+                    {isChatting && (
+                      <div className="flex justify-start">
+                        <div className="bg-gray-100 text-gray-900 p-3 rounded-lg">
+                          <div className="text-xs font-medium mb-1 opacity-70">{selectedPersona}</div>
+                          <div className="flex items-center space-x-1">
+                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : isPreviewMode ? (
                 <div className="flex-1 min-h-[300px] sm:min-h-[500px] border border-gray-300 rounded-lg p-4 overflow-y-auto bg-white prose prose-sm max-w-none">
                   <ReactMarkdown
                     components={{
