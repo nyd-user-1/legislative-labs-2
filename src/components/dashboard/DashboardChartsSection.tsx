@@ -17,12 +17,6 @@ interface MemberBillData {
   chamber: string;
 }
 
-interface CommitteeBillData {
-  committee_name: string;
-  bill_count: number;
-  chamber: string;
-}
-
 interface MemberNoVoteData {
   member_name: string;
   no_vote_count: number;
@@ -33,7 +27,6 @@ export const DashboardChartsSection = () => {
   const [currentChart, setCurrentChart] = useState(0);
   const [billsSponsorData, setBillsSponsorData] = useState<BillSponsorData[]>([]);
   const [memberBillData, setMemberBillData] = useState<MemberBillData[]>([]);
-  const [committeeBillData, setCommitteeBillData] = useState<CommitteeBillData[]>([]);
   const [memberNoVoteData, setMemberNoVoteData] = useState<MemberNoVoteData[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -107,37 +100,6 @@ export const DashboardChartsSection = () => {
         setMemberBillData(sortedMembers);
       }
 
-      // Fetch bills by committee
-      const { data: committeesData } = await supabase
-        .from("Committees")
-        .select("committee_id, committee_name, chamber")
-        .not("committee_name", "is", null)
-        .limit(100);
-
-      if (committeesData) {
-        const committeesWithBillCounts = await Promise.all(
-          committeesData.map(async (committee) => {
-            const { count } = await supabase
-              .from("Bills")
-              .select("*", { count: "exact", head: true })
-              .eq("committee_id", committee.committee_id.toString());
-
-            return {
-              committee_name: committee.committee_name || "Unknown Committee",
-              bill_count: count || 0,
-              chamber: committee.chamber || "Unknown"
-            };
-          })
-        );
-
-        // Sort by bill count and take top 50
-        const sortedCommittees = committeesWithBillCounts
-          .sort((a, b) => b.bill_count - a.bill_count)
-          .slice(0, 50);
-        
-        setCommitteeBillData(sortedCommittees);
-      }
-
       // Fetch no votes by member
       const { data: votesData } = await supabase
         .from("Votes")
@@ -209,12 +171,6 @@ export const DashboardChartsSection = () => {
       type: "member-bar" as const
     },
     {
-      id: "committees-bills-bar",
-      title: "Bar Chart - Committee Bills",
-      description: "Number of bills by committee, top 50",
-      type: "committee-bar" as const
-    },
-    {
       id: "members-no-votes-bar",
       title: "Bar Chart - No Votes",
       description: "Members with most no votes, top 50",
@@ -247,62 +203,81 @@ export const DashboardChartsSection = () => {
 
     switch (chart.type) {
       case "bar":
+        const totalSponsors = billsSponsorData.reduce((sum, bill) => sum + bill.sponsor_count, 0);
+        const avgSponsors = billsSponsorData.length > 0 ? Math.round(totalSponsors / billsSponsorData.length) : 0;
+        
         return (
-          <ResponsiveContainer width="100%" height={400}>
-            <BarChart data={billsSponsorData.slice(0, 20)} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-              <XAxis 
-                dataKey="bill_number" 
-                className="text-muted-foreground"
-                tick={{ fontSize: 10 }}
-                angle={-45}
-                textAnchor="end"
-                height={80}
-              />
-              <YAxis 
-                className="text-muted-foreground"
-                tick={{ fontSize: 11 }}
-              />
-              <Tooltip 
-                contentStyle={{
-                  backgroundColor: 'hsl(var(--background))',
-                  border: '1px solid hsl(var(--border))',
-                  borderRadius: 'var(--radius)',
-                  fontSize: '12px'
-                }}
-                formatter={(value, name) => [value, "Sponsors"]}
-                labelFormatter={(label) => `Bill: ${label}`}
-              />
-              <Bar 
-                dataKey="sponsor_count" 
-                fill="hsl(var(--primary))"
-                radius={[4, 4, 0, 0]}
-              />
-            </BarChart>
-          </ResponsiveContainer>
+          <div className="space-y-4">
+            {/* Summary Stats */}
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <div className="bg-muted/30 rounded-lg p-4 border">
+                <div className="text-sm text-muted-foreground">Total Bills</div>
+                <div className="text-2xl font-bold">{billsSponsorData.length.toLocaleString()}</div>
+              </div>
+              <div className="bg-muted/30 rounded-lg p-4 border">
+                <div className="text-sm text-muted-foreground">Avg Sponsors</div>
+                <div className="text-2xl font-bold">{avgSponsors}</div>
+              </div>
+            </div>
+            
+            <ResponsiveContainer width="100%" height={350}>
+              <BarChart data={billsSponsorData.slice(0, 20)} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis 
+                  dataKey="bill_number" 
+                  tick={{ fontSize: 10, fill: "#64748b" }}
+                  angle={-45}
+                  textAnchor="end"
+                  height={80}
+                  stroke="#94a3b8"
+                />
+                <YAxis 
+                  tick={{ fontSize: 11, fill: "#64748b" }}
+                  stroke="#94a3b8"
+                />
+                <Tooltip 
+                  contentStyle={{
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '8px',
+                    fontSize: '12px',
+                    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                  }}
+                  formatter={(value, name) => [value, "Sponsors"]}
+                  labelFormatter={(label) => `Bill: ${label}`}
+                />
+                <Bar 
+                  dataKey="sponsor_count" 
+                  fill="#3b82f6"
+                  radius={[4, 4, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         );
 
       case "area":
         return (
           <ResponsiveContainer width="100%" height={400}>
             <AreaChart data={billsSponsorData.slice(0, 30)} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
               <XAxis 
                 dataKey="bill_number" 
-                className="text-muted-foreground"
-                tick={{ fontSize: 10 }}
+                tick={{ fontSize: 10, fill: "#64748b" }}
                 interval="preserveStartEnd"
+                stroke="#94a3b8"
               />
               <YAxis 
-                className="text-muted-foreground"
-                tick={{ fontSize: 11 }}
+                tick={{ fontSize: 11, fill: "#64748b" }}
+                stroke="#94a3b8"
               />
               <Tooltip 
                 contentStyle={{
-                  backgroundColor: 'hsl(var(--background))',
-                  border: '1px solid hsl(var(--border))',
-                  borderRadius: 'var(--radius)',
-                  fontSize: '12px'
+                  backgroundColor: '#ffffff',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '8px',
+                  fontSize: '12px',
+                  boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
                 }}
                 formatter={(value, name) => [value, "Sponsors"]}
                 labelFormatter={(label) => `Bill: ${label}`}
@@ -310,11 +285,11 @@ export const DashboardChartsSection = () => {
               <Area 
                 type="monotone" 
                 dataKey="sponsor_count" 
-                stroke="hsl(var(--primary))" 
+                stroke="#3b82f6" 
                 strokeWidth={2}
-                fill="hsl(var(--primary))"
-                fillOpacity={0.3}
-                dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 3 }}
+                fill="#3b82f6"
+                fillOpacity={0.2}
+                dot={{ fill: '#3b82f6', strokeWidth: 2, r: 3 }}
               />
             </AreaChart>
           </ResponsiveContainer>
@@ -324,68 +299,33 @@ export const DashboardChartsSection = () => {
         return (
           <ResponsiveContainer width="100%" height={400}>
             <BarChart data={memberBillData.slice(0, 20)} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
               <XAxis 
                 dataKey="member_name" 
-                className="text-muted-foreground"
-                tick={{ fontSize: 10 }}
+                tick={{ fontSize: 10, fill: "#64748b" }}
                 angle={-45}
                 textAnchor="end"
                 height={80}
+                stroke="#94a3b8"
               />
               <YAxis 
-                className="text-muted-foreground"
-                tick={{ fontSize: 11 }}
+                tick={{ fontSize: 11, fill: "#64748b" }}
+                stroke="#94a3b8"
               />
               <Tooltip 
                 contentStyle={{
-                  backgroundColor: 'hsl(var(--background))',
-                  border: '1px solid hsl(var(--border))',
-                  borderRadius: 'var(--radius)',
-                  fontSize: '12px'
+                  backgroundColor: '#ffffff',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '8px',
+                  fontSize: '12px',
+                  boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
                 }}
                 formatter={(value, name) => [value, "Bills Sponsored"]}
                 labelFormatter={(label) => `Member: ${label}`}
               />
               <Bar 
                 dataKey="bill_count" 
-                fill="hsl(var(--secondary))"
-                radius={[4, 4, 0, 0]}
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        );
-
-      case "committee-bar":
-        return (
-          <ResponsiveContainer width="100%" height={400}>
-            <BarChart data={committeeBillData.slice(0, 20)} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-              <XAxis 
-                dataKey="committee_name" 
-                className="text-muted-foreground"
-                tick={{ fontSize: 10 }}
-                angle={-45}
-                textAnchor="end"
-                height={80}
-              />
-              <YAxis 
-                className="text-muted-foreground"
-                tick={{ fontSize: 11 }}
-              />
-              <Tooltip 
-                contentStyle={{
-                  backgroundColor: 'hsl(var(--background))',
-                  border: '1px solid hsl(var(--border))',
-                  borderRadius: 'var(--radius)',
-                  fontSize: '12px'
-                }}
-                formatter={(value, name) => [value, "Bills"]}
-                labelFormatter={(label) => `Committee: ${label}`}
-              />
-              <Bar 
-                dataKey="bill_count" 
-                fill="hsl(var(--accent))"
+                fill="#93c5fd"
                 radius={[4, 4, 0, 0]}
               />
             </BarChart>
@@ -396,32 +336,33 @@ export const DashboardChartsSection = () => {
         return (
           <ResponsiveContainer width="100%" height={400}>
             <BarChart data={memberNoVoteData.slice(0, 20)} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
               <XAxis 
                 dataKey="member_name" 
-                className="text-muted-foreground"
-                tick={{ fontSize: 10 }}
+                tick={{ fontSize: 10, fill: "#64748b" }}
                 angle={-45}
                 textAnchor="end"
                 height={80}
+                stroke="#94a3b8"
               />
               <YAxis 
-                className="text-muted-foreground"
-                tick={{ fontSize: 11 }}
+                tick={{ fontSize: 11, fill: "#64748b" }}
+                stroke="#94a3b8"
               />
               <Tooltip 
                 contentStyle={{
-                  backgroundColor: 'hsl(var(--background))',
-                  border: '1px solid hsl(var(--border))',
-                  borderRadius: 'var(--radius)',
-                  fontSize: '12px'
+                  backgroundColor: '#ffffff',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '8px',
+                  fontSize: '12px',
+                  boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
                 }}
                 formatter={(value, name) => [value, "No Votes"]}
                 labelFormatter={(label) => `Member: ${label}`}
               />
               <Bar 
                 dataKey="no_vote_count" 
-                fill="hsl(var(--destructive))"
+                fill="#1e40af"
                 radius={[4, 4, 0, 0]}
               />
             </BarChart>
