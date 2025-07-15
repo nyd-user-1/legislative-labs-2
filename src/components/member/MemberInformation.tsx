@@ -40,9 +40,9 @@ export const MemberInformation = ({ member }: MemberInformationProps) => {
                 <MapPin className="h-4 w-4" />
                 <span>District</span>
               </div>
-              <div className="text-gray-600 ml-6">
-                District {member.district}
-              </div>
+               <div className="text-gray-600 ml-6">
+                 {member.district}
+               </div>
             </div>
           )}
         </div>
