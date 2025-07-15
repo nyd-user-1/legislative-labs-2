@@ -35,7 +35,7 @@ export const MemberDetail = ({ member, onBack }: MemberDetailProps) => {
 
         {/* Member Header Card */}
         <Card className="overflow-hidden">
-          <CardContent>
+          <CardContent className="p-6">
             <MemberInformation member={member} />
           </CardContent>
         </Card>
