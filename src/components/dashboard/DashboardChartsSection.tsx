@@ -151,42 +151,47 @@ export const DashboardChartsSection = () => {
     switch (chart.type) {
       case "bar":
         return (
-          <ResponsiveContainer width="100%" height={400}>
-            <BarChart 
-              data={billsSponsorData.slice(0, 15)} 
-              margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
-              barCategoryGap="5%"
-            >
-              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-              <XAxis 
-                dataKey="bill_number" 
-                className="text-muted-foreground"
-                tick={{ fontSize: 10 }}
-                angle={-45}
-                textAnchor="end"
-                height={80}
-              />
-              <YAxis 
-                className="text-muted-foreground"
-                tick={{ fontSize: 11 }}
-              />
-              <Tooltip 
-                contentStyle={{
-                  backgroundColor: 'hsl(var(--background))',
-                  border: '1px solid hsl(var(--border))',
-                  borderRadius: 'var(--radius)',
-                  fontSize: '12px'
-                }}
-                formatter={(value, name) => [value, "Sponsors"]}
-                labelFormatter={(label) => `Bill: ${label}`}
-              />
-              <Bar 
-                dataKey="sponsor_count" 
-                fill="hsl(var(--primary))"
-                radius={[4, 4, 0, 0]}
-              />
-            </BarChart>
-          </ResponsiveContainer>
+          <div className="w-full overflow-x-auto">
+            <div className="min-w-full" style={{ minWidth: '800px' }}>
+              <ResponsiveContainer width="100%" height={400}>
+                <BarChart 
+                  data={billsSponsorData.slice(0, 50)} 
+                  margin={{ top: 10, right: 10, left: 10, bottom: 60 }}
+                  barCategoryGap="1%"
+                >
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                  <XAxis 
+                    dataKey="bill_number" 
+                    className="text-muted-foreground"
+                    tick={{ fontSize: 8 }}
+                    angle={-45}
+                    textAnchor="end"
+                    height={80}
+                    interval={0}
+                  />
+                  <YAxis 
+                    className="text-muted-foreground"
+                    tick={{ fontSize: 11 }}
+                  />
+                  <Tooltip 
+                    contentStyle={{
+                      backgroundColor: 'hsl(var(--background))',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: 'var(--radius)',
+                      fontSize: '12px'
+                    }}
+                    formatter={(value, name) => [value, "Sponsors"]}
+                    labelFormatter={(label) => `Bill: ${label}`}
+                  />
+                  <Bar 
+                    dataKey="sponsor_count" 
+                    fill="#3b82f6"
+                    radius={[2, 2, 0, 0]}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
         );
 
       case "area":
