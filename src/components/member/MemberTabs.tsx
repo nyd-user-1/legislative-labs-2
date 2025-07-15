@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   FileText, 
-  History,
+  User,
   Users,
   Vote
 } from "lucide-react";
@@ -26,10 +26,10 @@ export const MemberTabs = ({ member }: MemberTabsProps) => {
   };
 
   return (
-    <Tabs defaultValue="history" className="space-y-6">
+    <Tabs defaultValue="bio" className="space-y-6">
       <TabsList className="grid w-full grid-cols-4 h-12 p-1 bg-muted rounded-lg">
-        <TabsTrigger value="history" className="h-10 rounded-md text-sm font-medium">
-          History
+        <TabsTrigger value="bio" className="h-10 rounded-md text-sm font-medium">
+          Bio
         </TabsTrigger>
         <TabsTrigger value="bills" className="h-10 rounded-md text-sm font-medium">
           Bills
@@ -42,32 +42,32 @@ export const MemberTabs = ({ member }: MemberTabsProps) => {
         </TabsTrigger>
       </TabsList>
 
-      <TabsContent value="history">
+      <TabsContent value="bio">
         <Card>
           <CardHeader>
-            <CardTitle>Member History</CardTitle>
+            <CardTitle>Member Biography</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="flex gap-4 pb-4 border-b border-border">
-                <div className="flex-shrink-0 w-24 text-sm text-muted-foreground">
-                  Recent
+              {member.bio_long ? (
+                <div className="prose max-w-none">
+                  <p className="text-sm leading-relaxed">{member.bio_long}</p>
                 </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    {member.chamber && (
-                      <Badge variant="outline" className="text-xs">
-                        {member.chamber}
-                      </Badge>
-                    )}
-                  </div>
-                  <p className="text-sm font-medium">{getLatestAction()}</p>
-                  <p className="text-sm text-muted-foreground mt-1">Current status in legislative system</p>
+              ) : member.bio_short ? (
+                <div className="prose max-w-none">
+                  <p className="text-sm leading-relaxed">{member.bio_short}</p>
                 </div>
-              </div>
-              <p className="text-muted-foreground text-center py-8">
-                Detailed member history tracking coming soon.
-              </p>
+              ) : (
+                <div className="text-center py-8">
+                  <User className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground">
+                    Biography information is not available for this member.
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Additional biographical details may be available through the New York State Legislature website.
+                  </p>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
