@@ -163,14 +163,21 @@ const Playground = () => {
 
   const fetchPersonas = async () => {
     try {
+      console.log("Starting to fetch personas...");
       setPersonasLoading(true);
       const { data: personasData, error } = await supabase
         .from("Persona")
         .select("*")
         .order("act", { ascending: true });
 
-      if (error) throw error;
+      console.log("Personas query result:", { personasData, error });
 
+      if (error) {
+        console.error("Error fetching personas:", error);
+        throw error;
+      }
+
+      console.log(`Found ${personasData?.length || 0} personas`);
       setPersonas(personasData || []);
     } catch (error) {
       console.error("Error fetching personas:", error);
