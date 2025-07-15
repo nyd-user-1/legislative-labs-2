@@ -64,6 +64,7 @@ const Playground = () => {
   const [loading, setLoading] = useState(false);
   const [personasLoading, setPersonasLoading] = useState(false);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [mode, setMode] = useState<'textEditor' | 'chat'>('textEditor');
   const isMobile = useIsMobile();
   const { toast } = useToast();
 
@@ -210,6 +211,58 @@ const Playground = () => {
     if (selectedPersonaData) {
       setSelectedPersona(personaAct);
       setSystemPrompt(selectedPersonaData.prompt || "");
+      // Auto-switch to chat mode when persona is selected
+      if (personaAct) {
+        setMode('chat');
+      }
+    } else {
+      setSelectedPersona("");
+      setSystemPrompt("");
+      // Switch back to text editor if no persona
+      setMode('textEditor');
+    }
+  };
+
+  const handleChatSubmit = async () => {
+    if (!selectedPersona || !prompt.trim()) {
+      toast({
+        title: "Error",
+        description: "Please select a persona and enter a prompt",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      // Here you would implement the actual chat functionality
+      // For now, we'll just show a toast
+      toast({
+        title: "Chat Started",
+        description: `Starting chat with ${selectedPersona}`,
+      });
+      
+      // You can implement the actual AI chat integration here
+      // This would typically involve calling your AI service with the prompt and system prompt
+      
+    } catch (error) {
+      console.error("Error starting chat:", error);
+      toast({
+        title: "Error",
+        description: "Failed to start chat session",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSubmit = () => {
+    if (mode === 'chat') {
+      handleChatSubmit();
+    } else {
+      // Handle text editor submit (existing functionality)
+      toast({
+        title: "Text Submitted",
+        description: "Content processed in text editor mode",
+      });
     }
   };
 
@@ -428,12 +481,34 @@ const Playground = () => {
               )}
               
               <div className="flex items-center justify-between mt-4">
-                <Button className="bg-black text-white hover:bg-gray-800 px-6">
-                  Submit
-                </Button>
-                <Button variant="ghost" size="sm">
-                  <RotateCcw className="h-4 w-4" />
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant={mode === 'textEditor' ? "default" : "outline"}
+                    onClick={() => setMode('textEditor')}
+                    className="px-6"
+                  >
+                    Text Editor
+                  </Button>
+                  <Button
+                    variant={mode === 'chat' ? "default" : "outline"}
+                    onClick={() => setMode('chat')}
+                    className="px-6"
+                    disabled={!selectedPersona}
+                  >
+                    Chat
+                  </Button>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button 
+                    className="bg-black text-white hover:bg-gray-800 px-6"
+                    onClick={handleSubmit}
+                  >
+                    {mode === 'chat' ? 'Start Chat' : 'Submit'}
+                  </Button>
+                  <Button variant="ghost" size="sm">
+                    <RotateCcw className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
