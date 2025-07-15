@@ -26,50 +26,37 @@ export const useMemberBills = (memberId: number) => {
       setLoading(true);
       setError(null);
 
-      // Query bills where the member is the primary sponsor (position 1)
-      const { data, error } = await supabase
+      // First get the bill IDs where the member is the primary sponsor
+      const { data: sponsorData, error: sponsorError } = await supabase
         .from("Sponsors")
-        .select(`
-          position,
-          Bills (
-            bill_id,
-            bill_number,
-            title,
-            status,
-            status_desc,
-            committee,
-            last_action,
-            last_action_date,
-            description,
-            state_link,
-            url
-          )
-        `)
+        .select("bill_id, position")
         .eq("people_id", memberId)
-        .eq("position", 1) // Primary sponsor only
-        .order("position", { ascending: true });
+        .eq("position", 1); // Primary sponsor only
 
-      if (error) throw error;
+      if (sponsorError) throw sponsorError;
 
-      // Transform the data to flatten the Bills structure
-      const memberBills = data?.map(sponsor => {
-        const bill = sponsor.Bills as any;
-        if (!bill) return null;
-        return {
-          bill_id: bill.bill_id,
-          bill_number: bill.bill_number,
-          title: bill.title,
-          status: bill.status,
-          status_desc: bill.status_desc,
-          committee: bill.committee,
-          last_action: bill.last_action,
-          last_action_date: bill.last_action_date,
-          description: bill.description,
-          state_link: bill.state_link,
-          url: bill.url,
-          sponsor_position: sponsor.position
-        } as MemberBill;
-      }).filter(bill => bill !== null && bill.bill_id) || [];
+      if (!sponsorData || sponsorData.length === 0) {
+        setBills([]);
+        return;
+      }
+
+      // Get the bill IDs
+      const billIds = sponsorData.map(sponsor => sponsor.bill_id);
+
+      // Then fetch the bills using those IDs
+      const { data: billsData, error: billsError } = await supabase
+        .from("Bills")
+        .select("*")
+        .in("bill_id", billIds)
+        .order("bill_number", { ascending: true });
+
+      if (billsError) throw billsError;
+
+      // Transform the data to the expected format
+      const memberBills = billsData?.map(bill => ({
+        ...bill,
+        sponsor_position: 1 // We know it's position 1 since we filtered for it
+      })) || [];
 
       setBills(memberBills);
     } catch (err) {
