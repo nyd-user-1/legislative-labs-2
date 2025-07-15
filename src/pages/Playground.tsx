@@ -165,40 +165,32 @@ const Playground = () => {
 
   const SettingsContent = () => (
     <div className="space-y-6">
-      {/* Mode */}
+      {/* Load Chat */}
       <div>
-        <Label className="text-sm font-medium text-gray-700 mb-3 block">Mode</Label>
-        <div className="flex rounded-lg border border-gray-300 p-1">
-          <Button
-            variant={mode === "complete" ? "default" : "ghost"}
-            size="sm"
-            className="flex-1"
-            onClick={() => setMode("complete")}
-          >
-            <List className="h-4 w-4 mr-1" />
-          </Button>
-          <Button
-            variant={mode === "insert" ? "default" : "ghost"}
-            size="sm"
-            className="flex-1"
-            onClick={() => setMode("insert")}
-          >
-            <Download className="h-4 w-4 mr-1" />
-          </Button>
-          <Button
-            variant={mode === "edit" ? "default" : "ghost"}
-            size="sm"
-            className="flex-1"
-            onClick={() => setMode("edit")}
-          >
-            <SlidersHorizontal className="h-4 w-4 mr-1" />
-          </Button>
-        </div>
+        <Label className="text-sm font-medium text-gray-700 mb-3 block">Load</Label>
+        <Select value={selectedChat} onValueChange={handleChatSelection}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select a chat..." />
+          </SelectTrigger>
+          <SelectContent>
+            {loading ? (
+              <SelectItem value="loading" disabled>Loading chats...</SelectItem>
+            ) : chatOptions.length === 0 ? (
+              <SelectItem value="empty" disabled>No chats found</SelectItem>
+            ) : (
+              chatOptions.map((option) => (
+                <SelectItem key={option.id} value={option.id}>
+                  {option.label}
+                </SelectItem>
+              ))
+            )}
+          </SelectContent>
+        </Select>
       </div>
 
-      {/* Model */}
+      {/* Persona */}
       <div>
-        <Label className="text-sm font-medium text-gray-700 mb-3 block">Model</Label>
+        <Label className="text-sm font-medium text-gray-700 mb-3 block">Persona</Label>
         <Select value={model} onValueChange={setModel}>
           <SelectTrigger>
             <SelectValue />
@@ -295,26 +287,6 @@ const Playground = () => {
                   <Settings className="h-4 w-4" />
                 </Button>
               )}
-
-              {/* Load Chat Button */}
-              <Select value={selectedChat} onValueChange={handleChatSelection}>
-                <SelectTrigger className="w-32 sm:w-48">
-                  <SelectValue placeholder="Load" />
-                </SelectTrigger>
-                <SelectContent>
-                  {loading ? (
-                    <SelectItem value="loading" disabled>Loading chats...</SelectItem>
-                  ) : chatOptions.length === 0 ? (
-                    <SelectItem value="empty" disabled>No chats found</SelectItem>
-                  ) : (
-                    chatOptions.map((option) => (
-                      <SelectItem key={option.id} value={option.id}>
-                        {option.label}
-                      </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </Select>
 
               <Button variant="outline" size="sm" className="hidden sm:flex">
                 Save
