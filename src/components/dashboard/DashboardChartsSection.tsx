@@ -156,7 +156,7 @@ export const DashboardChartsSection = () => {
               <ResponsiveContainer width="100%" height={400}>
                 <BarChart 
                   data={billsSponsorData.slice(0, 50)} 
-                  margin={{ top: 5, right: 5, left: 5, bottom: 60 }}
+                  margin={{ top: 5, right: 0, left: 0, bottom: 60 }}
                   barCategoryGap="2%"
                 >
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
