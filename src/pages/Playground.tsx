@@ -457,10 +457,10 @@ const Playground = () => {
               {systemPrompt && (
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <div className="mb-4 p-3 bg-blue-50 border-l-4 border-blue-400 rounded-md cursor-pointer hover:bg-blue-100 transition-colors">
+                    <button className="w-full mb-4 p-3 bg-blue-50 border-l-4 border-blue-400 rounded-md cursor-pointer hover:bg-blue-100 transition-colors text-left">
                       <p className="text-sm font-medium text-blue-800 mb-1">System Prompt Active</p>
                       <p className="text-xs text-blue-600 line-clamp-2">{systemPrompt}</p>
-                    </div>
+                    </button>
                   </AlertDialogTrigger>
                   <AlertDialogContent className="max-w-2xl max-h-[80vh] overflow-hidden">
                     <AlertDialogHeader>
