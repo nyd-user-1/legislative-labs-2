@@ -2,10 +2,13 @@
 import { useState } from "react";
 import { ChartBarInteractive } from "./ChartBarInteractive";
 import { ChartBarDefault } from "./ChartBarDefault";
+import { ChartBarHorizontal } from "./ChartBarHorizontal";
+import { ChartBarMultiple } from "./ChartBarMultiple";
+import { ChartPieSimple } from "./ChartPieSimple";
 
 export const ChartSlider = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const charts = [ChartBarInteractive, ChartBarDefault];
+  const charts = [ChartBarInteractive, ChartBarDefault, ChartBarHorizontal, ChartBarMultiple, ChartPieSimple];
 
   return (
     <div className="relative w-full">
