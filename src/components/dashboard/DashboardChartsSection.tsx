@@ -233,18 +233,8 @@ export const DashboardChartsSection = () => {
       case "bar":
         return (
           <ChartContainer config={billsSponsorChartConfig}>
-            <BarChart data={billsSponsorData.slice(0, 20)} margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
+            <BarChart data={billsSponsorData.slice(0, 20)} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
               <CartesianGrid vertical={false} stroke="#e2e8f0" />
-              <XAxis 
-                dataKey="bill_number" 
-                tickLine={false}
-                tickMargin={10}
-                axisLine={false}
-                tick={{ fontSize: 10, fill: "#64748b" }}
-                angle={-45}
-                textAnchor="end"
-                height={60}
-              />
               <YAxis 
                 tickLine={false}
                 axisLine={false}
@@ -266,7 +256,7 @@ export const DashboardChartsSection = () => {
       case "area":
         return (
           <ChartContainer config={billsSponsorChartConfig}>
-            <AreaChart data={billsSponsorData.slice(0, 30)} margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
+            <AreaChart data={billsSponsorData.slice(0, 30)} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
               <CartesianGrid vertical={false} stroke="#e2e8f0" />
               <XAxis 
                 dataKey="bill_number" 
@@ -301,18 +291,8 @@ export const DashboardChartsSection = () => {
       case "member-bar":
         return (
           <ChartContainer config={memberBillChartConfig}>
-            <BarChart data={memberBillData.slice(0, 20)} margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
+            <BarChart data={memberBillData.slice(0, 20)} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
               <CartesianGrid vertical={false} stroke="#e2e8f0" />
-              <XAxis 
-                dataKey="member_name" 
-                tickLine={false}
-                tickMargin={10}
-                axisLine={false}
-                tick={{ fontSize: 10, fill: "#64748b" }}
-                angle={-45}
-                textAnchor="end"
-                height={60}
-              />
               <YAxis 
                 tickLine={false}
                 axisLine={false}
@@ -334,18 +314,8 @@ export const DashboardChartsSection = () => {
       case "no-votes-bar":
         return (
           <ChartContainer config={memberNoVoteChartConfig}>
-            <BarChart data={memberNoVoteData.slice(0, 20)} margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
+            <BarChart data={memberNoVoteData.slice(0, 20)} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
               <CartesianGrid vertical={false} stroke="#e2e8f0" />
-              <XAxis 
-                dataKey="member_name" 
-                tickLine={false}
-                tickMargin={10}
-                axisLine={false}
-                tick={{ fontSize: 10, fill: "#64748b" }}
-                angle={-45}
-                textAnchor="end"
-                height={60}
-              />
               <YAxis 
                 tickLine={false}
                 axisLine={false}
@@ -400,16 +370,16 @@ export const DashboardChartsSection = () => {
         </CardDescription>
       </CardHeader>
       
-      <CardContent className="p-0">
+      <CardContent className="px-6 pb-2">
         <div className="relative">
           {/* Chart Container with horizontal scroll simulation */}
-          <div className="w-full overflow-hidden">
+          <div className="w-full overflow-hidden h-[500px]">
             <div 
-              className="flex transition-transform duration-300 ease-in-out"
+              className="flex transition-transform duration-300 ease-in-out h-full"
               style={{ transform: `translateX(-${currentChart * 100}%)` }}
             >
               {charts.map((_, index) => (
-                <div key={index} className="w-full flex-shrink-0 p-1">
+                <div key={index} className="w-full flex-shrink-0 h-full">
                   {index === currentChart && renderChart()}
                 </div>
               ))}
@@ -417,7 +387,7 @@ export const DashboardChartsSection = () => {
           </div>
           
           {/* Chart Indicators */}
-          <div className="flex items-center justify-center gap-2 mt-6">
+          <div className="flex items-center justify-center gap-2 mt-4">
             {charts.map((_, index) => (
               <button
                 key={index}
