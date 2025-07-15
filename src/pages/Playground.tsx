@@ -30,6 +30,7 @@ interface ChatOption {
 }
 
 interface Persona {
+  id: string;
   act: string;
   prompt: string | null;
   for_devs: boolean | null;
