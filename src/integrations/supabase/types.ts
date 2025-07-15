@@ -561,16 +561,19 @@ export type Database = {
         Row: {
           act: string
           for_devs: boolean | null
+          id: string
           prompt: string | null
         }
         Insert: {
           act: string
           for_devs?: boolean | null
+          id?: string
           prompt?: string | null
         }
         Update: {
           act?: string
           for_devs?: boolean | null
+          id?: string
           prompt?: string | null
         }
         Relationships: []
