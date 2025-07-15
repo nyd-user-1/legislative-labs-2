@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -141,9 +140,9 @@ export function ChartBarInteractive() {
   )
 
   return (
-    <Card className="w-full">
+    <Card className="w-full overflow-hidden">
       <CardHeader className="flex flex-col items-stretch border-b p-0 sm:flex-row">
-        <div className="flex flex-1 flex-col justify-center gap-1 px-3 py-3 sm:px-6 sm:py-5">
+        <div className="flex flex-1 flex-col justify-center gap-1 px-2 py-2 sm:px-3 sm:py-3 md:px-6 md:py-4">
           <CardTitle className="text-sm sm:text-base lg:text-lg">Bar Chart - Interactive</CardTitle>
           <CardDescription className="text-xs sm:text-sm">
             Showing total visitors for the last 3 months
@@ -156,13 +155,13 @@ export function ChartBarInteractive() {
               <button
                 key={chart}
                 data-active={activeChart === chart}
-                className="data-[active=true]:bg-muted/50 relative z-30 flex flex-1 flex-col justify-center gap-1 border-t px-2 py-2 text-left even:border-l sm:border-t-0 sm:border-l sm:px-4 sm:py-3"
+                className="data-[active=true]:bg-muted/50 relative z-30 flex flex-1 flex-col justify-center gap-1 border-t px-2 py-1 text-left even:border-l sm:border-t-0 sm:border-l sm:px-3 sm:py-2"
                 onClick={() => setActiveChart(chart)}
               >
                 <span className="text-muted-foreground text-xs">
                   {chartConfig[chart].label}
                 </span>
-                <span className="text-xs leading-none font-bold sm:text-sm lg:text-lg">
+                <span className="text-xs leading-none font-bold sm:text-sm">
                   {total[key as keyof typeof total].toLocaleString()}
                 </span>
               </button>
@@ -170,17 +169,17 @@ export function ChartBarInteractive() {
           })}
         </div>
       </CardHeader>
-      <CardContent className="p-3 sm:p-4 lg:p-6">
+      <CardContent className="p-2 sm:p-3 md:p-4 lg:p-6">
         <ChartContainer
           config={chartConfig}
-          className="w-full h-[180px] sm:h-[220px] md:h-[280px] lg:h-[320px]"
+          className="w-full h-[160px] sm:h-[140px] md:h-[200px] lg:h-[250px]"
         >
           <BarChart
             accessibilityLayer
             data={chartData}
             margin={{
-              left: 8,
-              right: 8,
+              left: 5,
+              right: 5,
               top: 5,
               bottom: 5,
             }}
@@ -190,9 +189,10 @@ export function ChartBarInteractive() {
               dataKey="date"
               tickLine={false}
               axisLine={false}
-              tickMargin={8}
+              tickMargin={6}
               minTickGap={32}
-              fontSize={9}
+              fontSize={8}
+              className="sm:text-[10px]"
               tickFormatter={(value) => {
                 const date = new Date(value)
                 return date.toLocaleDateString("en-US", {
@@ -204,7 +204,7 @@ export function ChartBarInteractive() {
             <ChartTooltip
               content={
                 <ChartTooltipContent
-                  className="w-[120px] sm:w-[150px]"
+                  className="w-[120px]"
                   nameKey="views"
                   labelFormatter={(value) => {
                     return new Date(value).toLocaleDateString("en-US", {

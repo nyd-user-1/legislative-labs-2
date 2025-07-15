@@ -11,7 +11,7 @@ export const ChartSlider = () => {
   const charts = [ChartBarInteractive, ChartBarDefault, ChartBarHorizontal, ChartBarMultiple, ChartPieSimple];
 
   return (
-    <div className="relative w-full max-w-full">
+    <div className="relative w-full max-w-full overflow-hidden">
       <div className="overflow-hidden rounded-lg">
         <div 
           className="flex transition-transform duration-300 ease-in-out"
@@ -19,7 +19,7 @@ export const ChartSlider = () => {
         >
           {charts.map((Chart, index) => (
             <div key={index} className="w-full flex-shrink-0 px-1 min-w-0">
-              <div className="w-full min-h-0">
+              <div className="w-full min-h-0 overflow-hidden">
                 <Chart />
               </div>
             </div>
@@ -27,7 +27,7 @@ export const ChartSlider = () => {
         </div>
       </div>
       
-      <div className="flex justify-center mt-4 space-x-2">
+      <div className="flex justify-center mt-3 space-x-2">
         {charts.map((_, index) => (
           <button
             key={index}
