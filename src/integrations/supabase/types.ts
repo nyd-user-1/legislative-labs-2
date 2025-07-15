@@ -557,6 +557,24 @@ export type Database = {
         }
         Relationships: []
       }
+      Persona: {
+        Row: {
+          act: string
+          for_devs: boolean | null
+          prompt: string | null
+        }
+        Insert: {
+          act: string
+          for_devs?: boolean | null
+          prompt?: string | null
+        }
+        Update: {
+          act?: string
+          for_devs?: boolean | null
+          prompt?: string | null
+        }
+        Relationships: []
+      }
       problem_chats: {
         Row: {
           chat_session_id: string | null

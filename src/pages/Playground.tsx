@@ -28,6 +28,12 @@ interface ChatOption {
   type: 'bill' | 'member' | 'committee' | 'problem' | 'solution' | 'mediaKit';
 }
 
+interface Persona {
+  act: string;
+  prompt: string | null;
+  for_devs: boolean | null;
+}
+
 const formatChatConversation = (messages: any[]): string => {
   if (!Array.isArray(messages) || messages.length === 0) {
     return "";
@@ -45,14 +51,16 @@ const formatChatConversation = (messages: any[]): string => {
 const Playground = () => {
   const [prompt, setPrompt] = useState("No complaints.");
   const [selectedChat, setSelectedChat] = useState("");
-  const [model, setModel] = useState("text-davinci-003");
+  const [selectedPersona, setSelectedPersona] = useState("");
+  const [systemPrompt, setSystemPrompt] = useState("");
   const [temperature, setTemperature] = useState([0.56]);
   const [maxLength, setMaxLength] = useState([256]);
   const [topP, setTopP] = useState([0.9]);
-  const [mode, setMode] = useState("complete");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [chatOptions, setChatOptions] = useState<ChatOption[]>([]);
+  const [personas, setPersonas] = useState<Persona[]>([]);
   const [loading, setLoading] = useState(false);
+  const [personasLoading, setPersonasLoading] = useState(false);
   const isMobile = useIsMobile();
   const { toast } = useToast();
 
@@ -151,8 +159,32 @@ const Playground = () => {
     }
   };
 
+  const fetchPersonas = async () => {
+    try {
+      setPersonasLoading(true);
+      const { data: personasData, error } = await supabase
+        .from("Persona")
+        .select("*")
+        .order("act", { ascending: true });
+
+      if (error) throw error;
+
+      setPersonas(personasData || []);
+    } catch (error) {
+      console.error("Error fetching personas:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load personas",
+        variant: "destructive",
+      });
+    } finally {
+      setPersonasLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchUserChats();
+    fetchPersonas();
   }, []);
 
   const handleChatSelection = (chatId: string) => {
@@ -160,6 +192,14 @@ const Playground = () => {
     if (selectedOption) {
       setPrompt(selectedOption.content);
       setSelectedChat(chatId);
+    }
+  };
+
+  const handlePersonaSelection = (personaAct: string) => {
+    const selectedPersonaData = personas.find(persona => persona.act === personaAct);
+    if (selectedPersonaData) {
+      setSelectedPersona(personaAct);
+      setSystemPrompt(selectedPersonaData.prompt || "");
     }
   };
 
@@ -191,14 +231,22 @@ const Playground = () => {
       {/* Persona */}
       <div>
         <Label className="text-sm font-medium text-gray-700 mb-3 block">Persona</Label>
-        <Select value={model} onValueChange={setModel}>
+        <Select value={selectedPersona} onValueChange={handlePersonaSelection}>
           <SelectTrigger>
-            <SelectValue />
+            <SelectValue placeholder="Select a persona..." />
           </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="text-davinci-003">text-davinci-003</SelectItem>
-            <SelectItem value="gpt-4">gpt-4</SelectItem>
-            <SelectItem value="gpt-3.5-turbo">gpt-3.5-turbo</SelectItem>
+          <SelectContent className="max-h-60 overflow-y-auto">
+            {personasLoading ? (
+              <SelectItem value="loading" disabled>Loading personas...</SelectItem>
+            ) : personas.length === 0 ? (
+              <SelectItem value="empty" disabled>No personas found</SelectItem>
+            ) : (
+              personas.map((persona) => (
+                <SelectItem key={persona.act} value={persona.act}>
+                  {persona.act}
+                </SelectItem>
+              ))
+            )}
           </SelectContent>
         </Select>
       </div>
@@ -308,6 +356,14 @@ const Playground = () => {
           {/* Left Panel - Prompt Area */}
           <div className={`flex-1 p-4 sm:p-6 ${isMobile ? 'w-full' : ''}`}>
             <div className="h-full flex flex-col">
+              {/* System Prompt Indicator */}
+              {systemPrompt && (
+                <div className="mb-4 p-3 bg-blue-50 border-l-4 border-blue-400 rounded-md">
+                  <p className="text-sm font-medium text-blue-800 mb-1">System Prompt Active</p>
+                  <p className="text-xs text-blue-600 line-clamp-2">{systemPrompt}</p>
+                </div>
+              )}
+              
               <Textarea
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
