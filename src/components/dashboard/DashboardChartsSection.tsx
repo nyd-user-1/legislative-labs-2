@@ -17,10 +17,24 @@ interface MemberBillData {
   chamber: string;
 }
 
+interface CommitteeBillData {
+  committee_name: string;
+  bill_count: number;
+  chamber: string;
+}
+
+interface MemberNoVoteData {
+  member_name: string;
+  no_vote_count: number;
+  chamber: string;
+}
+
 export const DashboardChartsSection = () => {
   const [currentChart, setCurrentChart] = useState(0);
   const [billsSponsorData, setBillsSponsorData] = useState<BillSponsorData[]>([]);
   const [memberBillData, setMemberBillData] = useState<MemberBillData[]>([]);
+  const [committeeBillData, setCommitteeBillData] = useState<CommitteeBillData[]>([]);
+  const [memberNoVoteData, setMemberNoVoteData] = useState<MemberNoVoteData[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchChartsData = async () => {
@@ -93,6 +107,77 @@ export const DashboardChartsSection = () => {
         setMemberBillData(sortedMembers);
       }
 
+      // Fetch bills by committee
+      const { data: committeesData } = await supabase
+        .from("Committees")
+        .select("committee_id, committee_name, chamber")
+        .not("committee_name", "is", null)
+        .limit(100);
+
+      if (committeesData) {
+        const committeesWithBillCounts = await Promise.all(
+          committeesData.map(async (committee) => {
+            const { count } = await supabase
+              .from("Bills")
+              .select("*", { count: "exact", head: true })
+              .eq("committee_id", committee.committee_id.toString());
+
+            return {
+              committee_name: committee.committee_name || "Unknown Committee",
+              bill_count: count || 0,
+              chamber: committee.chamber || "Unknown"
+            };
+          })
+        );
+
+        // Sort by bill count and take top 50
+        const sortedCommittees = committeesWithBillCounts
+          .sort((a, b) => b.bill_count - a.bill_count)
+          .slice(0, 50);
+        
+        setCommitteeBillData(sortedCommittees);
+      }
+
+      // Fetch no votes by member
+      const { data: votesData } = await supabase
+        .from("Votes")
+        .select("people_id, vote_desc")
+        .in("vote_desc", ["Nay", "No", "NAY", "NO"])
+        .limit(1000);
+
+      if (votesData) {
+        // Group votes by people_id
+        const votesByMember = votesData.reduce((acc, vote) => {
+          if (vote.people_id) {
+            acc[vote.people_id] = (acc[vote.people_id] || 0) + 1;
+          }
+          return acc;
+        }, {} as Record<number, number>);
+
+        // Get member details for people with no votes
+        const memberIds = Object.keys(votesByMember).map(id => parseInt(id));
+        const { data: noVoteMembersData } = await supabase
+          .from("People")
+          .select("people_id, name, chamber")
+          .in("people_id", memberIds)
+          .not("name", "is", null);
+
+        if (noVoteMembersData) {
+          const membersWithNoVotes = noVoteMembersData.map(member => ({
+            member_name: member.name || "Unknown",
+            no_vote_count: votesByMember[member.people_id] || 0,
+            chamber: member.chamber || "Unknown"
+          }));
+
+          // Sort by no vote count and take top 50
+          const sortedNoVoteMembers = membersWithNoVotes
+            .sort((a, b) => b.no_vote_count - a.no_vote_count)
+            .slice(0, 50);
+          
+          setMemberNoVoteData(sortedNoVoteMembers);
+        }
+      }
+
     } catch (error) {
       console.error("Error fetching charts data:", error);
     } finally {
@@ -122,6 +207,18 @@ export const DashboardChartsSection = () => {
       title: "Bar Chart",
       description: "Most number of bills by individual members, top 50",
       type: "member-bar" as const
+    },
+    {
+      id: "committees-bills-bar",
+      title: "Bar Chart - Committee Bills",
+      description: "Number of bills by committee, top 50",
+      type: "committee-bar" as const
+    },
+    {
+      id: "members-no-votes-bar",
+      title: "Bar Chart - No Votes",
+      description: "Members with most no votes, top 50",
+      type: "no-votes-bar" as const
     }
   ];
 
@@ -253,6 +350,78 @@ export const DashboardChartsSection = () => {
               <Bar 
                 dataKey="bill_count" 
                 fill="hsl(var(--secondary))"
+                radius={[4, 4, 0, 0]}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        );
+
+      case "committee-bar":
+        return (
+          <ResponsiveContainer width="100%" height={400}>
+            <BarChart data={committeeBillData.slice(0, 20)} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
+              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+              <XAxis 
+                dataKey="committee_name" 
+                className="text-muted-foreground"
+                tick={{ fontSize: 10 }}
+                angle={-45}
+                textAnchor="end"
+                height={80}
+              />
+              <YAxis 
+                className="text-muted-foreground"
+                tick={{ fontSize: 11 }}
+              />
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--background))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: 'var(--radius)',
+                  fontSize: '12px'
+                }}
+                formatter={(value, name) => [value, "Bills"]}
+                labelFormatter={(label) => `Committee: ${label}`}
+              />
+              <Bar 
+                dataKey="bill_count" 
+                fill="hsl(var(--accent))"
+                radius={[4, 4, 0, 0]}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        );
+
+      case "no-votes-bar":
+        return (
+          <ResponsiveContainer width="100%" height={400}>
+            <BarChart data={memberNoVoteData.slice(0, 20)} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
+              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+              <XAxis 
+                dataKey="member_name" 
+                className="text-muted-foreground"
+                tick={{ fontSize: 10 }}
+                angle={-45}
+                textAnchor="end"
+                height={80}
+              />
+              <YAxis 
+                className="text-muted-foreground"
+                tick={{ fontSize: 11 }}
+              />
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--background))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: 'var(--radius)',
+                  fontSize: '12px'
+                }}
+                formatter={(value, name) => [value, "No Votes"]}
+                labelFormatter={(label) => `Member: ${label}`}
+              />
+              <Bar 
+                dataKey="no_vote_count" 
+                fill="hsl(var(--destructive))"
                 radius={[4, 4, 0, 0]}
               />
             </BarChart>
