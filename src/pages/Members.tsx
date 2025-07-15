@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { useMembersData } from "@/hooks/useMembersData";
 import { useMemberFavorites } from "@/hooks/useMemberFavorites";
 import { MembersHeader } from "@/components/members/MembersHeader";
@@ -17,6 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 const Members = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [selectedMember, setSelectedMember] = useState<any>(null);
   const [chatOpen, setChatOpen] = useState(false);
   const [selectedMemberForChat, setSelectedMemberForChat] = useState<any>(null);
@@ -48,11 +49,36 @@ const Members = () => {
   // Handle URL parameter for selected member
   useEffect(() => {
     const selectedId = searchParams.get('selected');
-    if (selectedId && members && members.length > 0) {
-      const member = members.find(m => m.people_id.toString() === selectedId);
-      if (member) {
-        setSelectedMember(member);
+    if (selectedId) {
+      // First check if member is in current filtered results
+      if (members && members.length > 0) {
+        const member = members.find(m => m.people_id.toString() === selectedId);
+        if (member) {
+          setSelectedMember(member);
+          return;
+        }
       }
+      
+      // If not found in filtered results, fetch directly from database
+      const fetchSelectedMember = async () => {
+        try {
+          const { data: member } = await supabase
+            .from('People')
+            .select('*')
+            .eq('people_id', parseInt(selectedId))
+            .single();
+          
+          if (member) {
+            setSelectedMember(member);
+          }
+        } catch (error) {
+          console.error('Error fetching selected member:', error);
+        }
+      };
+      
+      fetchSelectedMember();
+    } else {
+      setSelectedMember(null);
     }
   }, [searchParams, members]);
 
@@ -106,7 +132,10 @@ const Members = () => {
     return (
       <MemberDetail 
         member={selectedMember} 
-        onBack={() => setSelectedMember(null)} 
+        onBack={() => {
+          setSelectedMember(null);
+          navigate('/members');
+        }} 
       />
     );
   }
