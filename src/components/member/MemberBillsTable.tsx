@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -23,12 +24,17 @@ type SortField = 'bill_number' | 'title' | 'status_desc' | 'committee' | 'last_a
 type SortDirection = 'asc' | 'desc' | null;
 
 export const MemberBillsTable = ({ member }: MemberBillsTableProps) => {
+  const navigate = useNavigate();
   const [chatOpen, setChatOpen] = useState(false);
   const [selectedBill, setSelectedBill] = useState<any | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
   const { bills, loading, error } = useMemberBills(member.people_id);
+
+  const handleBillClick = (bill: any) => {
+    navigate(`/bills?selected=${bill.bill_id}`);
+  };
 
   const handleAIAnalysis = (bill: any, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -219,7 +225,11 @@ export const MemberBillsTable = ({ member }: MemberBillsTableProps) => {
                   </TableHeader>
                   <TableBody>
                     {filteredAndSortedBills.map((bill) => (
-                      <TableRow key={bill.bill_id} className="cursor-pointer hover:bg-muted/50">
+                      <TableRow 
+                        key={bill.bill_id} 
+                        className="cursor-pointer hover:bg-muted/50 transition-colors"
+                        onClick={() => handleBillClick(bill)}
+                      >
                         <TableCell className="font-medium">{bill.bill_number}</TableCell>
                         <TableCell className="max-w-xs">{bill.title}</TableCell>
                         <TableCell>
