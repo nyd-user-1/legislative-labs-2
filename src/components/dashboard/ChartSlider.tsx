@@ -11,15 +11,17 @@ export const ChartSlider = () => {
   const charts = [ChartBarInteractive, ChartBarDefault, ChartBarHorizontal, ChartBarMultiple, ChartPieSimple];
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-full max-w-full">
       <div className="overflow-hidden rounded-lg">
         <div 
           className="flex transition-transform duration-300 ease-in-out"
           style={{ transform: `translateX(-${currentSlide * 100}%)` }}
         >
           {charts.map((Chart, index) => (
-            <div key={index} className="w-full flex-shrink-0 px-1">
-              <Chart />
+            <div key={index} className="w-full flex-shrink-0 px-1 min-w-0">
+              <div className="w-full min-h-0">
+                <Chart />
+              </div>
             </div>
           ))}
         </div>

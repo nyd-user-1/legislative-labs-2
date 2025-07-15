@@ -44,13 +44,13 @@ const chartConfig = {
 export function ChartBarMultiple() {
   return (
     <Card className="w-full">
-      <CardHeader className="px-4 py-3 sm:px-6 sm:py-4">
-        <CardTitle className="text-base sm:text-lg">Bar Chart - Multiple</CardTitle>
+      <CardHeader className="px-3 py-3 sm:px-6 sm:py-4">
+        <CardTitle className="text-sm sm:text-base lg:text-lg">Bar Chart - Multiple</CardTitle>
         <CardDescription className="text-xs sm:text-sm">January - June 2024</CardDescription>
       </CardHeader>
-      <CardContent className="px-4 sm:px-6">
-        <ChartContainer config={chartConfig} className="w-full h-[200px] sm:h-[250px] md:h-[300px]">
-          <BarChart accessibilityLayer data={chartData}>
+      <CardContent className="px-3 sm:px-6">
+        <ChartContainer config={chartConfig} className="w-full h-[180px] sm:h-[220px] md:h-[280px] lg:h-[320px]">
+          <BarChart accessibilityLayer data={chartData} margin={{ left: 8, right: 8, top: 5, bottom: 5 }}>
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="month"
@@ -58,7 +58,7 @@ export function ChartBarMultiple() {
               tickMargin={10}
               axisLine={false}
               tickFormatter={(value) => value.slice(0, 3)}
-              fontSize={10}
+              fontSize={9}
             />
             <ChartTooltip
               cursor={false}
@@ -69,7 +69,7 @@ export function ChartBarMultiple() {
           </BarChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col items-start gap-2 text-xs sm:text-sm px-4 py-3 sm:px-6 sm:py-4">
+      <CardFooter className="flex-col items-start gap-2 text-xs sm:text-sm px-3 py-3 sm:px-6 sm:py-4">
         <div className="flex gap-2 leading-none font-medium">
           Trending up by 5.2% this month <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
         </div>

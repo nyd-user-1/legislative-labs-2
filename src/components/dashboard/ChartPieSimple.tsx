@@ -58,14 +58,14 @@ const chartConfig = {
 export function ChartPieSimple() {
   return (
     <Card className="flex flex-col w-full">
-      <CardHeader className="items-center pb-0 px-4 py-3 sm:px-6 sm:py-4">
-        <CardTitle className="text-base sm:text-lg">Pie Chart</CardTitle>
+      <CardHeader className="items-center pb-0 px-3 py-3 sm:px-6 sm:py-4">
+        <CardTitle className="text-sm sm:text-base lg:text-lg">Pie Chart</CardTitle>
         <CardDescription className="text-xs sm:text-sm">January - June 2024</CardDescription>
       </CardHeader>
-      <CardContent className="flex-1 pb-0 px-4 sm:px-6">
+      <CardContent className="flex-1 pb-0 px-3 sm:px-6">
         <ChartContainer
           config={chartConfig}
-          className="mx-auto w-full h-[150px] sm:h-[180px] md:h-[200px]"
+          className="mx-auto w-full h-[150px] sm:h-[180px] md:h-[220px] lg:h-[250px]"
         >
           <PieChart>
             <ChartTooltip
@@ -76,7 +76,7 @@ export function ChartPieSimple() {
           </PieChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col gap-2 text-xs sm:text-sm px-4 py-3 sm:px-6 sm:py-4">
+      <CardFooter className="flex-col gap-2 text-xs sm:text-sm px-3 py-3 sm:px-6 sm:py-4">
         <div className="flex items-center gap-2 leading-none font-medium">
           Trending up by 5.2% this month <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
         </div>

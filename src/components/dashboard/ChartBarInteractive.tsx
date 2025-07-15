@@ -143,8 +143,8 @@ export function ChartBarInteractive() {
   return (
     <Card className="w-full">
       <CardHeader className="flex flex-col items-stretch border-b p-0 sm:flex-row">
-        <div className="flex flex-1 flex-col justify-center gap-1 px-4 py-4 sm:px-6">
-          <CardTitle className="text-base sm:text-lg">Bar Chart - Interactive</CardTitle>
+        <div className="flex flex-1 flex-col justify-center gap-1 px-3 py-3 sm:px-6 sm:py-5">
+          <CardTitle className="text-sm sm:text-base lg:text-lg">Bar Chart - Interactive</CardTitle>
           <CardDescription className="text-xs sm:text-sm">
             Showing total visitors for the last 3 months
           </CardDescription>
@@ -156,13 +156,13 @@ export function ChartBarInteractive() {
               <button
                 key={chart}
                 data-active={activeChart === chart}
-                className="data-[active=true]:bg-muted/50 relative z-30 flex flex-1 flex-col justify-center gap-1 border-t px-3 py-2 text-left even:border-l sm:border-t-0 sm:border-l sm:px-4 sm:py-3"
+                className="data-[active=true]:bg-muted/50 relative z-30 flex flex-1 flex-col justify-center gap-1 border-t px-2 py-2 text-left even:border-l sm:border-t-0 sm:border-l sm:px-4 sm:py-3"
                 onClick={() => setActiveChart(chart)}
               >
                 <span className="text-muted-foreground text-xs">
                   {chartConfig[chart].label}
                 </span>
-                <span className="text-sm leading-none font-bold sm:text-lg">
+                <span className="text-xs leading-none font-bold sm:text-sm lg:text-lg">
                   {total[key as keyof typeof total].toLocaleString()}
                 </span>
               </button>
@@ -170,17 +170,19 @@ export function ChartBarInteractive() {
           })}
         </div>
       </CardHeader>
-      <CardContent className="p-4 sm:p-6">
+      <CardContent className="p-3 sm:p-4 lg:p-6">
         <ChartContainer
           config={chartConfig}
-          className="w-full h-[200px] sm:h-[250px] md:h-[300px]"
+          className="w-full h-[180px] sm:h-[220px] md:h-[280px] lg:h-[320px]"
         >
           <BarChart
             accessibilityLayer
             data={chartData}
             margin={{
-              left: 12,
-              right: 12,
+              left: 8,
+              right: 8,
+              top: 5,
+              bottom: 5,
             }}
           >
             <CartesianGrid vertical={false} />
@@ -190,7 +192,7 @@ export function ChartBarInteractive() {
               axisLine={false}
               tickMargin={8}
               minTickGap={32}
-              fontSize={10}
+              fontSize={9}
               tickFormatter={(value) => {
                 const date = new Date(value)
                 return date.toLocaleDateString("en-US", {
@@ -202,7 +204,7 @@ export function ChartBarInteractive() {
             <ChartTooltip
               content={
                 <ChartTooltipContent
-                  className="w-[150px]"
+                  className="w-[120px] sm:w-[150px]"
                   nameKey="views"
                   labelFormatter={(value) => {
                     return new Date(value).toLocaleDateString("en-US", {
