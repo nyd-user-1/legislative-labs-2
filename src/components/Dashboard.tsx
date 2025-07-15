@@ -8,7 +8,6 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { Activity, FileText, Users, Building2, TrendingUp, Calendar, Eye, MessageSquare } from "lucide-react";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { DashboardTabsSection } from "@/components/dashboard/DashboardTabsSection";
-import { DashboardChartsSection } from "@/components/dashboard/DashboardChartsSection";
 import { Tables } from "@/integrations/supabase/types";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -157,8 +156,97 @@ export const Dashboard = () => {
             </Card>
           </div>
 
-          {/* Charts Section */}
-          <DashboardChartsSection />
+          {/* Chart Section */}
+          <Card>
+            <CardHeader className="px-4 sm:px-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <CardTitle className="text-base sm:text-lg">Activity</CardTitle>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                    <SelectTrigger className="w-[100px]">
+                      <SelectValue placeholder="Month" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {months.map((month) => (
+                        <SelectItem key={month.value} value={month.value}>
+                          {month.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  
+                  <Select value={selectedYear} onValueChange={setSelectedYear}>
+                    <SelectTrigger className="w-[100px]">
+                      <SelectValue placeholder="Year" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {years.map((year) => (
+                        <SelectItem key={year.value} value={year.value}>
+                          {year.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <CardDescription className="text-sm">
+                Number of bills introduced over the selected time period
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="px-4 sm:px-6">
+              <div className="h-[250px] sm:h-[300px] lg:h-[350px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                    <XAxis 
+                      dataKey="period" 
+                      className="text-muted-foreground"
+                      tick={{ fontSize: 11 }}
+                      tickMargin={8}
+                    />
+                    <YAxis 
+                      className="text-muted-foreground"
+                      tick={{ fontSize: 11 }}
+                      tickMargin={8}
+                      width={40}
+                    />
+                    <Tooltip 
+                      contentStyle={{
+                        backgroundColor: 'hsl(var(--background))',
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: 'var(--radius)',
+                        fontSize: '12px'
+                      }}
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="assembly" 
+                      stackId="1"
+                      stroke="hsl(var(--primary))" 
+                      strokeWidth={2}
+                      fill="hsl(var(--muted))"
+                      fillOpacity={0.45}
+                      dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 3 }}
+                      activeDot={{ r: 5, stroke: 'hsl(var(--primary))', strokeWidth: 2 }}
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="senate" 
+                      stackId="1"
+                      stroke="hsl(var(--muted-foreground))" 
+                      strokeWidth={2}
+                      fill="hsl(var(--muted-foreground))"
+                      fillOpacity={0.3}
+                      dot={{ fill: 'hsl(var(--muted-foreground))', strokeWidth: 2, r: 3 }}
+                      activeDot={{ r: 5, stroke: 'hsl(var(--muted-foreground))', strokeWidth: 2 }}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Dashboard Tabs Section */}
           <DashboardTabsSection bills={recentBills} />
