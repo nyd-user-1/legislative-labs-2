@@ -45,7 +45,7 @@ export const ChatMessages = ({
   return (
     <ScrollArea ref={scrollAreaRef} className="flex-1 pr-4">
       <div className="space-y-4">
-        {messages.map((message) => {
+        {messages.map((message, index) => {
           // Convert Date to string for MessageBubble compatibility
           const chatMessage: ChatMessage = {
             ...message,
@@ -54,6 +54,10 @@ export const ChatMessages = ({
           
           // Map solution entity type to problem for MessageBubble compatibility
           const messageEntityType = entityType === 'solution' ? 'problem' : entityType;
+          
+          // Check if this is the first assistant message
+          const assistantMessageIndex = messages.filter((m, i) => i <= index && m.role === 'assistant').length;
+          const isFirstAssistantMessage = message.role === 'assistant' && assistantMessageIndex === 1;
           
           return (
             <MessageBubble 
@@ -65,6 +69,7 @@ export const ChatMessages = ({
               onSendPrompt={onSendPrompt}
               entity={entity}
               entityType={messageEntityType as 'bill' | 'member' | 'committee' | 'problem'}
+              isFirstAssistantMessage={isFirstAssistantMessage}
             />
           );
         })}

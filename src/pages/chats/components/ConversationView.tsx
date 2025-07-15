@@ -13,15 +13,22 @@ export const ConversationView = ({ messages, onCopy, onFeedback, onSendPrompt }:
   return (
     <ScrollArea className="h-[400px] w-full rounded-md border p-4">
       <div className="space-y-4">
-        {messages.map((message, index) => (
-          <MessageBubble
-            key={index}
-            message={message}
-            onCopy={onCopy}
-            onFeedback={onFeedback}
-            onSendPrompt={onSendPrompt}
-          />
-        ))}
+        {messages.map((message, index) => {
+          // Check if this is the first assistant message
+          const assistantMessageIndex = messages.filter((m, i) => i <= index && m.role === 'assistant').length;
+          const isFirstAssistantMessage = message.role === 'assistant' && assistantMessageIndex === 1;
+          
+          return (
+            <MessageBubble
+              key={index}
+              message={message}
+              onCopy={onCopy}
+              onFeedback={onFeedback}
+              onSendPrompt={onSendPrompt}
+              isFirstAssistantMessage={isFirstAssistantMessage}
+            />
+          );
+        })}
       </div>
     </ScrollArea>
   );

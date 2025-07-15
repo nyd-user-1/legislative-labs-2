@@ -14,6 +14,7 @@ interface MessageBubbleProps {
   onSendPrompt?: (prompt: string) => void;
   entity?: any;
   entityType?: 'bill' | 'member' | 'committee' | 'problem' | null;
+  isFirstAssistantMessage?: boolean;
 }
 
 export const MessageBubble = ({ 
@@ -23,12 +24,62 @@ export const MessageBubble = ({
   onShare, 
   onSendPrompt,
   entity,
-  entityType 
+  entityType,
+  isFirstAssistantMessage = false
 }: MessageBubbleProps) => {
   
-  // Generate dynamic prompts using ContextBuilder
+  // Generate dynamic prompts based on AI content for subsequent messages
   const getDynamicPrompts = () => {
-    return ContextBuilder.generateDynamicPrompts(entity, entityType);
+    if (isFirstAssistantMessage) {
+      return ContextBuilder.generateDynamicPrompts(entity, entityType);
+    }
+    
+    // For subsequent messages, generate prompts based on the AI response content
+    return generateResponseBasedPrompts(message.content);
+  };
+  
+  // Generate prompts based on AI response content
+  const generateResponseBasedPrompts = (content: string): string[] => {
+    const prompts = [];
+    
+    // Extract key topics from the AI response
+    if (content.toLowerCase().includes('bill') || content.toLowerCase().includes('legislation')) {
+      prompts.push("Show me similar bills");
+      prompts.push("What's the voting record?");
+    }
+    
+    if (content.toLowerCase().includes('committee') || content.toLowerCase().includes('hearing')) {
+      prompts.push("Committee schedule");
+      prompts.push("Meeting minutes");
+    }
+    
+    if (content.toLowerCase().includes('sponsor') || content.toLowerCase().includes('author')) {
+      prompts.push("Sponsor background");
+      prompts.push("Other bills by sponsor");
+    }
+    
+    if (content.toLowerCase().includes('impact') || content.toLowerCase().includes('effect')) {
+      prompts.push("Economic impact");
+      prompts.push("Implementation timeline");
+    }
+    
+    if (content.toLowerCase().includes('vote') || content.toLowerCase().includes('voting')) {
+      prompts.push("Voting history");
+      prompts.push("Party positions");
+    }
+    
+    // Add some generic follow-up prompts if we didn't find specific topics
+    if (prompts.length === 0) {
+      prompts.push("Tell me more");
+      prompts.push("What are the details?");
+      prompts.push("How does this work?");
+    }
+    
+    // Always add these common follow-ups
+    prompts.push("Sources and citations");
+    prompts.push("Related information");
+    
+    return prompts.slice(0, 6); // Limit to 6 prompts
   };
 
   return (
@@ -58,7 +109,7 @@ export const MessageBubble = ({
           )}
           
           {message.role === "assistant" ? (
-            <div className="text-sm prose prose-sm max-w-none dark:prose-invert pr-8">
+            <div className="text-sm prose prose-sm max-w-none dark:prose-invert pr-8 pb-8">
               <ReactMarkdown>{message.content}</ReactMarkdown>
             </div>
           ) : (
@@ -68,6 +119,18 @@ export const MessageBubble = ({
             <p className="text-xs opacity-70 mt-1">
               {format(new Date(message.timestamp), "h:mm a")}
             </p>
+          )}
+          
+          {/* Share button in bottom right for assistant messages */}
+          {message.role === "assistant" && onShare && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onShare}
+              className="absolute bottom-2 right-2 h-6 w-6 p-0 opacity-60 hover:opacity-100"
+            >
+              <ExternalLink className="h-3 w-3" />
+            </Button>
           )}
         </div>
       </div>
@@ -89,18 +152,8 @@ export const MessageBubble = ({
             ))}
           </div>
           
-          {/* Action buttons (excluding copy which is now in top right) */}
+          {/* Action buttons (only citations, share moved to bottom right of message) */}
           <div className="flex gap-2 justify-end">
-            {onShare && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onShare}
-                className="h-8 px-2"
-              >
-                <ExternalLink className="h-3 w-3" />
-              </Button>
-            )}
             <Button
               variant="ghost"
               size="sm"

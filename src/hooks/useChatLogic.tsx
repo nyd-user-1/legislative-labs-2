@@ -16,6 +16,7 @@ export const useChatLogic = (entity: any, entityType: EntityType) => {
     messages,
     setMessages,
     citations,
+    setCitations,
     sessionId,
     setSessionId
   } = useChatState();
@@ -36,9 +37,10 @@ export const useChatLogic = (entity: any, entityType: EntityType) => {
       messages,
       setMessages,
       setIsLoading,
-      wrappedSaveChatSession
+      wrappedSaveChatSession,
+      setCitations
     );
-  }, [handleSendMessage, messages, wrappedSaveChatSession, setMessages, setIsLoading]);
+  }, [handleSendMessage, messages, wrappedSaveChatSession, setMessages, setIsLoading, setCitations]);
 
   const initializeSession = useCallback(async (withInitialMessage = false) => {
     await handleInitialization(
