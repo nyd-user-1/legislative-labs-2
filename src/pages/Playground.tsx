@@ -6,10 +6,11 @@ import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { RotateCcw, Download, Code, Share, List, SlidersHorizontal, Settings } from "lucide-react";
+import { RotateCcw, Download, Code, Share, List, SlidersHorizontal, Settings, Eye, Edit } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import ReactMarkdown from 'react-markdown';
 
 interface ChatSession {
   id: string;
@@ -61,6 +62,7 @@ const Playground = () => {
   const [personas, setPersonas] = useState<Persona[]>([]);
   const [loading, setLoading] = useState(false);
   const [personasLoading, setPersonasLoading] = useState(false);
+  const [isPreviewMode, setIsPreviewMode] = useState(false);
   const isMobile = useIsMobile();
   const { toast } = useToast();
 
@@ -364,12 +366,59 @@ const Playground = () => {
                 </div>
               )}
               
-              <Textarea
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                placeholder="Enter your prompt here..."
-                className="flex-1 min-h-[300px] sm:min-h-[500px] resize-none border border-gray-300 rounded-lg p-4 text-sm"
-              />
+              {/* Preview/Edit Toggle */}
+              <div className="flex items-center gap-2 mb-4">
+                <Button
+                  variant={!isPreviewMode ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setIsPreviewMode(false)}
+                  className="flex items-center gap-2"
+                >
+                  <Edit className="h-4 w-4" />
+                  Edit
+                </Button>
+                <Button
+                  variant={isPreviewMode ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setIsPreviewMode(true)}
+                  className="flex items-center gap-2"
+                >
+                  <Eye className="h-4 w-4" />
+                  Preview
+                </Button>
+              </div>
+              
+              {/* Content Area */}
+              {isPreviewMode ? (
+                <div className="flex-1 min-h-[300px] sm:min-h-[500px] border border-gray-300 rounded-lg p-4 overflow-y-auto bg-white prose prose-sm max-w-none">
+                  <ReactMarkdown
+                    components={{
+                      h1: ({ children }) => <h1 className="text-xl font-bold mb-4 text-gray-900">{children}</h1>,
+                      h2: ({ children }) => <h2 className="text-lg font-semibold mb-3 text-gray-900">{children}</h2>,
+                      h3: ({ children }) => <h3 className="text-md font-medium mb-2 text-gray-900">{children}</h3>,
+                      p: ({ children }) => <p className="mb-3 text-gray-700 leading-relaxed">{children}</p>,
+                      strong: ({ children }) => <strong className="font-semibold text-gray-900">{children}</strong>,
+                      em: ({ children }) => <em className="italic text-gray-700">{children}</em>,
+                      ul: ({ children }) => <ul className="list-disc pl-6 mb-3 space-y-1">{children}</ul>,
+                      ol: ({ children }) => <ol className="list-decimal pl-6 mb-3 space-y-1">{children}</ol>,
+                      li: ({ children }) => <li className="text-gray-700">{children}</li>,
+                      code: ({ children }) => <code className="bg-gray-100 px-1 py-0.5 rounded text-sm font-mono">{children}</code>,
+                      pre: ({ children }) => <pre className="bg-gray-100 p-3 rounded mb-3 overflow-x-auto">{children}</pre>,
+                      blockquote: ({ children }) => <blockquote className="border-l-4 border-gray-300 pl-4 italic text-gray-600 mb-3">{children}</blockquote>,
+                    }}
+                  >
+                    {prompt || "Enter content in Edit mode to see preview..."}
+                  </ReactMarkdown>
+                </div>
+              ) : (
+                <Textarea
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  placeholder="Enter your prompt here..."
+                  className="flex-1 min-h-[300px] sm:min-h-[500px] resize-none border border-gray-300 rounded-lg p-4 text-sm"
+                />
+              )}
+              
               <div className="flex items-center justify-between mt-4">
                 <Button className="bg-black text-white hover:bg-gray-800 px-6">
                   Submit
