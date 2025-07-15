@@ -1,15 +1,9 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid } from "recharts";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { ChevronLeft, ChevronRight, Circle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
 
 interface BillSponsorData {
   bill_title: string;
@@ -23,17 +17,10 @@ interface MemberBillData {
   chamber: string;
 }
 
-interface MemberNoVoteData {
-  member_name: string;
-  no_vote_count: number;
-  chamber: string;
-}
-
 export const DashboardChartsSection = () => {
   const [currentChart, setCurrentChart] = useState(0);
   const [billsSponsorData, setBillsSponsorData] = useState<BillSponsorData[]>([]);
   const [memberBillData, setMemberBillData] = useState<MemberBillData[]>([]);
-  const [memberNoVoteData, setMemberNoVoteData] = useState<MemberNoVoteData[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchChartsData = async () => {
@@ -106,46 +93,6 @@ export const DashboardChartsSection = () => {
         setMemberBillData(sortedMembers);
       }
 
-      // Fetch no votes by member
-      const { data: votesData } = await supabase
-        .from("Votes")
-        .select("people_id, vote_desc")
-        .in("vote_desc", ["Nay", "No", "NAY", "NO"])
-        .limit(1000);
-
-      if (votesData) {
-        // Group votes by people_id
-        const votesByMember = votesData.reduce((acc, vote) => {
-          if (vote.people_id) {
-            acc[vote.people_id] = (acc[vote.people_id] || 0) + 1;
-          }
-          return acc;
-        }, {} as Record<number, number>);
-
-        // Get member details for people with no votes
-        const memberIds = Object.keys(votesByMember).map(id => parseInt(id));
-        const { data: noVoteMembersData } = await supabase
-          .from("People")
-          .select("people_id, name, chamber")
-          .in("people_id", memberIds)
-          .not("name", "is", null);
-
-        if (noVoteMembersData) {
-          const membersWithNoVotes = noVoteMembersData.map(member => ({
-            member_name: member.name || "Unknown",
-            no_vote_count: votesByMember[member.people_id] || 0,
-            chamber: member.chamber || "Unknown"
-          }));
-
-          // Sort by no vote count and take top 50
-          const sortedNoVoteMembers = membersWithNoVotes
-            .sort((a, b) => b.no_vote_count - a.no_vote_count)
-            .slice(0, 50);
-          
-          setMemberNoVoteData(sortedNoVoteMembers);
-        }
-      }
-
     } catch (error) {
       console.error("Error fetching charts data:", error);
     } finally {
@@ -175,12 +122,6 @@ export const DashboardChartsSection = () => {
       title: "Bar Chart",
       description: "Most number of bills by individual members, top 50",
       type: "member-bar" as const
-    },
-    {
-      id: "members-no-votes-bar",
-      title: "Bar Chart - No Votes",
-      description: "Members with most no votes, top 50",
-      type: "no-votes-bar" as const
     }
   ];
 
@@ -207,131 +148,115 @@ export const DashboardChartsSection = () => {
       );
     }
 
-    // Chart configurations
-    const billsSponsorChartConfig = {
-      sponsor_count: {
-        label: "Sponsors",
-        color: "#3b82f6",
-      },
-    } satisfies ChartConfig;
-
-    const memberBillChartConfig = {
-      bill_count: {
-        label: "Bills Sponsored",
-        color: "#93c5fd",
-      },
-    } satisfies ChartConfig;
-
-    const memberNoVoteChartConfig = {
-      no_vote_count: {
-        label: "No Votes",
-        color: "#1e40af",
-      },
-    } satisfies ChartConfig;
-
     switch (chart.type) {
       case "bar":
         return (
-          <ChartContainer config={billsSponsorChartConfig}>
-            <BarChart data={billsSponsorData.slice(0, 20)} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
-              <CartesianGrid vertical={false} stroke="#e2e8f0" />
-              <YAxis 
-                tickLine={false}
-                axisLine={false}
-                tick={{ fontSize: 11, fill: "#64748b" }}
+          <ResponsiveContainer width="100%" height={400}>
+            <BarChart data={billsSponsorData.slice(0, 20)} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
+              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+              <XAxis 
+                dataKey="bill_number" 
+                className="text-muted-foreground"
+                tick={{ fontSize: 10 }}
+                angle={-45}
+                textAnchor="end"
+                height={80}
               />
-              <ChartTooltip
-                cursor={false}
-                content={<ChartTooltipContent />}
+              <YAxis 
+                className="text-muted-foreground"
+                tick={{ fontSize: 11 }}
+              />
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--background))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: 'var(--radius)',
+                  fontSize: '12px'
+                }}
+                formatter={(value, name) => [value, "Sponsors"]}
+                labelFormatter={(label) => `Bill: ${label}`}
               />
               <Bar 
                 dataKey="sponsor_count" 
-                fill="var(--color-sponsor_count)"
-                radius={4}
+                fill="hsl(var(--primary))"
+                radius={[4, 4, 0, 0]}
               />
             </BarChart>
-          </ChartContainer>
+          </ResponsiveContainer>
         );
 
       case "area":
         return (
-          <ChartContainer config={billsSponsorChartConfig}>
-            <AreaChart data={billsSponsorData.slice(0, 30)} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
-              <CartesianGrid vertical={false} stroke="#e2e8f0" />
+          <ResponsiveContainer width="100%" height={400}>
+            <AreaChart data={billsSponsorData.slice(0, 30)} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
               <XAxis 
                 dataKey="bill_number" 
-                tickLine={false}
-                tickMargin={10}
-                axisLine={false}
-                tick={{ fontSize: 10, fill: "#64748b" }}
+                className="text-muted-foreground"
+                tick={{ fontSize: 10 }}
                 interval="preserveStartEnd"
               />
               <YAxis 
-                tickLine={false}
-                axisLine={false}
-                tick={{ fontSize: 11, fill: "#64748b" }}
+                className="text-muted-foreground"
+                tick={{ fontSize: 11 }}
               />
-              <ChartTooltip
-                cursor={false}
-                content={<ChartTooltipContent />}
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--background))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: 'var(--radius)',
+                  fontSize: '12px'
+                }}
+                formatter={(value, name) => [value, "Sponsors"]}
+                labelFormatter={(label) => `Bill: ${label}`}
               />
               <Area 
                 type="monotone" 
                 dataKey="sponsor_count" 
-                stroke="var(--color-sponsor_count)" 
+                stroke="hsl(var(--primary))" 
                 strokeWidth={2}
-                fill="var(--color-sponsor_count)"
-                fillOpacity={0.2}
-                dot={{ fill: "var(--color-sponsor_count)", strokeWidth: 2, r: 3 }}
+                fill="hsl(var(--primary))"
+                fillOpacity={0.3}
+                dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 3 }}
               />
             </AreaChart>
-          </ChartContainer>
+          </ResponsiveContainer>
         );
 
       case "member-bar":
         return (
-          <ChartContainer config={memberBillChartConfig}>
-            <BarChart data={memberBillData.slice(0, 20)} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
-              <CartesianGrid vertical={false} stroke="#e2e8f0" />
-              <YAxis 
-                tickLine={false}
-                axisLine={false}
-                tick={{ fontSize: 11, fill: "#64748b" }}
+          <ResponsiveContainer width="100%" height={400}>
+            <BarChart data={memberBillData.slice(0, 20)} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
+              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+              <XAxis 
+                dataKey="member_name" 
+                className="text-muted-foreground"
+                tick={{ fontSize: 10 }}
+                angle={-45}
+                textAnchor="end"
+                height={80}
               />
-              <ChartTooltip
-                cursor={false}
-                content={<ChartTooltipContent />}
+              <YAxis 
+                className="text-muted-foreground"
+                tick={{ fontSize: 11 }}
+              />
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--background))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: 'var(--radius)',
+                  fontSize: '12px'
+                }}
+                formatter={(value, name) => [value, "Bills Sponsored"]}
+                labelFormatter={(label) => `Member: ${label}`}
               />
               <Bar 
                 dataKey="bill_count" 
-                fill="var(--color-bill_count)"
-                radius={4}
+                fill="hsl(var(--secondary))"
+                radius={[4, 4, 0, 0]}
               />
             </BarChart>
-          </ChartContainer>
-        );
-
-      case "no-votes-bar":
-        return (
-          <ChartContainer config={memberNoVoteChartConfig}>
-            <BarChart data={memberNoVoteData.slice(0, 20)} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
-              <CartesianGrid vertical={false} stroke="#e2e8f0" />
-              <YAxis 
-                tickLine={false}
-                axisLine={false}
-                tick={{ fontSize: 11, fill: "#64748b" }}
-              />
-              <ChartTooltip
-                cursor={false}
-                content={<ChartTooltipContent />}
-              />
-              <Bar 
-                dataKey="no_vote_count" 
-                fill="var(--color-no_vote_count)"
-                radius={4}
-              />
-            </BarChart>
-          </ChartContainer>
+          </ResponsiveContainer>
         );
 
       default:
@@ -370,16 +295,16 @@ export const DashboardChartsSection = () => {
         </CardDescription>
       </CardHeader>
       
-      <CardContent className="px-6 pb-2">
+      <CardContent className="px-6 pb-6">
         <div className="relative">
           {/* Chart Container with horizontal scroll simulation */}
-          <div className="w-full overflow-hidden h-[500px]">
+          <div className="w-full overflow-hidden">
             <div 
-              className="flex transition-transform duration-300 ease-in-out h-full"
+              className="flex transition-transform duration-300 ease-in-out"
               style={{ transform: `translateX(-${currentChart * 100}%)` }}
             >
               {charts.map((_, index) => (
-                <div key={index} className="w-full flex-shrink-0 h-full">
+                <div key={index} className="w-full flex-shrink-0 px-4">
                   {index === currentChart && renderChart()}
                 </div>
               ))}
@@ -387,7 +312,7 @@ export const DashboardChartsSection = () => {
           </div>
           
           {/* Chart Indicators */}
-          <div className="flex items-center justify-center gap-2 mt-4">
+          <div className="flex items-center justify-center gap-2 mt-6">
             {charts.map((_, index) => (
               <button
                 key={index}
