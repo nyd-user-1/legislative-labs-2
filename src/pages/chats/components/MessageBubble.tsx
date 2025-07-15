@@ -39,14 +39,26 @@ export const MessageBubble = ({
         }`}
       >
         <div
-          className={`w-full rounded-lg p-3 ${
+          className={`w-full rounded-lg p-3 relative ${
             message.role === "user"
               ? "bg-slate-800 text-white"
               : "bg-muted"
           }`}
         >
+          {/* Copy button in top right for assistant messages */}
+          {message.role === "assistant" && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onCopy(message.content)}
+              className="absolute top-2 right-2 h-6 w-6 p-0 opacity-60 hover:opacity-100"
+            >
+              <Copy className="h-3 w-3" />
+            </Button>
+          )}
+          
           {message.role === "assistant" ? (
-            <div className="text-sm prose prose-sm max-w-none dark:prose-invert">
+            <div className="text-sm prose prose-sm max-w-none dark:prose-invert pr-8">
               <ReactMarkdown>{message.content}</ReactMarkdown>
             </div>
           ) : (
@@ -62,14 +74,14 @@ export const MessageBubble = ({
       
       {message.role === "assistant" && (
         <div className="space-y-2">
-          {/* Dynamic suggested prompts */}
-          <div className="flex flex-wrap gap-2">
+          {/* Dynamic suggested prompts with horizontal scrolling */}
+          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
             {getDynamicPrompts().map((prompt, index) => (
               <Button
                 key={index}
                 variant="outline"
                 size="sm"
-                className="h-7 px-3 text-xs whitespace-nowrap"
+                className="h-7 px-3 text-xs whitespace-nowrap flex-shrink-0"
                 onClick={() => onSendPrompt?.(prompt)}
               >
                 {prompt}
@@ -77,16 +89,8 @@ export const MessageBubble = ({
             ))}
           </div>
           
-          {/* Action buttons */}
+          {/* Action buttons (excluding copy which is now in top right) */}
           <div className="flex gap-2 justify-end">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onCopy(message.content)}
-              className="h-8 px-2"
-            >
-              <Copy className="h-3 w-3" />
-            </Button>
             {onShare && (
               <Button
                 variant="ghost"

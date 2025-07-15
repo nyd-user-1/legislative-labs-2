@@ -18,7 +18,16 @@ export const useSessionInitializer = (entity: any, entityType: EntityType) => {
     try {
       let initialPrompt = '';
 
-      if (entityType === 'problem') {
+      if (entityType === 'member') {
+        const memberName = entity.name || 'this member';
+        initialPrompt = `I'm here to help you analyze ${memberName}'s legislative activities and provide insights about their work in the New York State Legislature. What would you like to know about ${memberName}?`;
+      } else if (entityType === 'bill') {
+        const billTitle = entity.title || entity.bill_number || 'this bill';
+        initialPrompt = `I'm ready to analyze ${billTitle} and provide detailed insights about this legislation. What specific aspects would you like to explore?`;
+      } else if (entityType === 'committee') {
+        const committeeName = entity.committee_name || 'this committee';
+        initialPrompt = `I can help you understand ${committeeName}'s activities, jurisdiction, and current legislative work. What would you like to know?`;
+      } else if (entityType === 'problem') {
         initialPrompt = `Please analyze this problem statement and provide insights on potential legislative solutions: "${entity.originalStatement || entity.description}"`;
       } else if (entityType === 'solution') {
         initialPrompt = `Please analyze this policy solution and provide detailed implementation guidance: "${entity.originalStatement || entity.description}"`;
