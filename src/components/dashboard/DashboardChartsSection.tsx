@@ -153,10 +153,9 @@ export const DashboardChartsSection = () => {
         return (
           <ResponsiveContainer width="100%" height={400}>
             <BarChart 
-              data={billsSponsorData.slice(0, 20)} 
+              data={billsSponsorData.slice(0, 15)} 
               margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
-              barCategoryGap="20%"
-              maxBarSize={60}
+              barCategoryGap="5%"
             >
               <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
               <XAxis 
@@ -185,7 +184,6 @@ export const DashboardChartsSection = () => {
                 dataKey="sponsor_count" 
                 fill="hsl(var(--primary))"
                 radius={[4, 4, 0, 0]}
-                maxBarSize={60}
               />
             </BarChart>
           </ResponsiveContainer>
