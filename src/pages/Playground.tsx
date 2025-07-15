@@ -6,6 +6,7 @@ import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { RotateCcw, Download, Code, Share, List, SlidersHorizontal, Settings, Eye, Edit } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
@@ -454,10 +455,31 @@ const Playground = () => {
             <div className="h-full flex flex-col">
               {/* System Prompt Indicator */}
               {systemPrompt && (
-                <div className="mb-4 p-3 bg-blue-50 border-l-4 border-blue-400 rounded-md">
-                  <p className="text-sm font-medium text-blue-800 mb-1">System Prompt Active</p>
-                  <p className="text-xs text-blue-600 line-clamp-2">{systemPrompt}</p>
-                </div>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <div className="mb-4 p-3 bg-blue-50 border-l-4 border-blue-400 rounded-md cursor-pointer hover:bg-blue-100 transition-colors">
+                      <p className="text-sm font-medium text-blue-800 mb-1">System Prompt Active</p>
+                      <p className="text-xs text-blue-600 line-clamp-2">{systemPrompt}</p>
+                    </div>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent className="max-w-2xl max-h-[80vh] overflow-hidden">
+                    <AlertDialogHeader>
+                      <AlertDialogTitle className="text-blue-800">System Prompt Active</AlertDialogTitle>
+                      <AlertDialogDescription asChild>
+                        <div className="text-blue-700 max-h-[60vh] overflow-y-auto prose prose-sm max-w-none">
+                          <ReactMarkdown>
+                            {systemPrompt}
+                          </ReactMarkdown>
+                        </div>
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogAction className="bg-blue-600 hover:bg-blue-700">
+                        Close
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               )}
               
               {/* Preview/Edit Toggle */}
