@@ -10,6 +10,7 @@ import {
 import { Tables } from "@/integrations/supabase/types";
 import { MemberVotesTable } from "./MemberVotesTable";
 import { MemberCommitteesTable } from "./MemberCommitteesTable";
+import { MemberBillsTable } from "./MemberBillsTable";
 
 type Member = Tables<"People">;
 
@@ -30,8 +31,8 @@ export const MemberTabs = ({ member }: MemberTabsProps) => {
         <TabsTrigger value="history" className="h-10 rounded-md text-sm font-medium">
           History
         </TabsTrigger>
-        <TabsTrigger value="documents" className="h-10 rounded-md text-sm font-medium">
-          Documents
+        <TabsTrigger value="bills" className="h-10 rounded-md text-sm font-medium">
+          Bills
         </TabsTrigger>
         <TabsTrigger value="committees" className="h-10 rounded-md text-sm font-medium">
           Committees
@@ -72,17 +73,8 @@ export const MemberTabs = ({ member }: MemberTabsProps) => {
         </Card>
       </TabsContent>
 
-      <TabsContent value="documents">
-        <Card>
-          <CardHeader>
-            <CardTitle>Member Documents</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground text-center py-8">
-              Document management coming soon.
-            </p>
-          </CardContent>
-        </Card>
+      <TabsContent value="bills">
+        <MemberBillsTable member={member} />
       </TabsContent>
 
       <TabsContent value="committees">
