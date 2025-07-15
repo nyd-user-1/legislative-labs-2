@@ -6,9 +6,10 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { CardActionButtons } from "@/components/ui/CardActionButtons";
 import { AIChatSheet } from "@/components/AIChatSheet";
-import { ArrowUpDown, ArrowUp, ArrowDown, Search } from "lucide-react";
+import { ArrowUpDown, ArrowUp, ArrowDown, Search, HelpCircle } from "lucide-react";
 import { useMemberBills } from "@/hooks/useMemberBills";
 import { Tables } from "@/integrations/supabase/types";
 import { formatDate } from "@/utils/dateUtils";
@@ -121,144 +122,159 @@ export const MemberBillsTable = ({ member }: MemberBillsTableProps) => {
 
   return (
     <>
-      <Card>
-        <CardHeader className="space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <CardTitle>Member Bills</CardTitle>
-            <Button variant="outline" size="sm">
-              View All Bills
-            </Button>
-          </div>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search bills by number, title, description, or text..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
-            />
-          </div>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="text-muted-foreground">Loading bills...</div>
+      <TooltipProvider>
+        <Card>
+          <CardHeader className="space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <CardTitle>Member Bills</CardTitle>
+              <Button variant="outline" size="sm">
+                View All Bills
+              </Button>
             </div>
-          ) : error ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="text-destructive">{error}</div>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search bills by number, title, description, or text..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9"
+              />
             </div>
-          ) : filteredAndSortedBills.length === 0 ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="text-muted-foreground">
-                {searchQuery ? "No bills found matching your search" : "No bills found for this member"}
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="text-muted-foreground">Loading bills...</div>
               </div>
-            </div>
-          ) : (
-            <ScrollArea className="w-full">
-              <div className="min-w-[800px]">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[120px]">
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          onClick={() => handleSort('bill_number')}
-                          className="h-auto p-0 font-semibold hover:bg-transparent"
-                        >
-                          Bill {getSortIcon('bill_number')}
-                        </Button>
-                      </TableHead>
-                      <TableHead className="min-w-[300px]">
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          onClick={() => handleSort('title')}
-                          className="h-auto p-0 font-semibold hover:bg-transparent"
-                        >
-                          Title {getSortIcon('title')}
-                        </Button>
-                      </TableHead>
-                      <TableHead className="w-[120px]">
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          onClick={() => handleSort('status_desc')}
-                          className="h-auto p-0 font-semibold hover:bg-transparent"
-                        >
-                          Status {getSortIcon('status_desc')}
-                        </Button>
-                      </TableHead>
-                      <TableHead className="min-w-[200px]">
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          onClick={() => handleSort('committee')}
-                          className="h-auto p-0 font-semibold hover:bg-transparent"
-                        >
-                          Committee {getSortIcon('committee')}
-                        </Button>
-                      </TableHead>
-                      <TableHead className="min-w-[200px]">
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          onClick={() => handleSort('last_action')}
-                          className="h-auto p-0 font-semibold hover:bg-transparent"
-                        >
-                          Last Action {getSortIcon('last_action')}
-                        </Button>
-                      </TableHead>
-                      <TableHead className="min-w-[120px]">
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          onClick={() => handleSort('last_action_date')}
-                          className="h-auto p-0 font-semibold hover:bg-transparent"
-                        >
-                          Date {getSortIcon('last_action_date')}
-                        </Button>
-                      </TableHead>
-                      <TableHead className="w-[100px]">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredAndSortedBills.map((bill) => (
-                      <TableRow 
-                        key={bill.bill_id} 
-                        className="cursor-pointer hover:bg-muted/50 transition-colors"
-                        onClick={() => handleBillClick(bill)}
-                      >
-                        <TableCell className="font-medium">{bill.bill_number}</TableCell>
-                        <TableCell className="max-w-xs">{bill.title}</TableCell>
-                        <TableCell>
-                          <Badge variant="secondary">{bill.status_desc || "Unknown"}</Badge>
-                        </TableCell>
-                        <TableCell>{bill.committee || "N/A"}</TableCell>
-                        <TableCell className="text-sm text-muted-foreground">
-                          {bill.last_action || "No action recorded"}
-                        </TableCell>
-                        <TableCell className="text-sm text-muted-foreground">
-                          {formatDate(bill.last_action_date)}
-                        </TableCell>
-                        <TableCell>
-                          <CardActionButtons
-                            onFavorite={(e) => handleFavorite(bill, e)}
-                            onAIAnalysis={(e) => handleAIAnalysis(bill, e)}
-                            isFavorited={false}
-                            hasAIChat={false}
-                          />
-                        </TableCell>
+            ) : error ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="text-destructive">{error}</div>
+              </div>
+            ) : filteredAndSortedBills.length === 0 ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="text-muted-foreground">
+                  {searchQuery ? "No bills found matching your search" : "No bills found for this member"}
+                </div>
+              </div>
+            ) : (
+              <ScrollArea className="w-full">
+                <div className="min-w-[800px]">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[120px]">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => handleSort('bill_number')}
+                            className="h-auto p-0 font-semibold hover:bg-transparent"
+                          >
+                            Bill {getSortIcon('bill_number')}
+                          </Button>
+                        </TableHead>
+                        <TableHead className="min-w-[300px]">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => handleSort('title')}
+                            className="h-auto p-0 font-semibold hover:bg-transparent"
+                          >
+                            Description {getSortIcon('title')}
+                          </Button>
+                        </TableHead>
+                        <TableHead className="w-[120px]">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => handleSort('status_desc')}
+                            className="h-auto p-0 font-semibold hover:bg-transparent"
+                          >
+                            Status {getSortIcon('status_desc')}
+                          </Button>
+                        </TableHead>
+                        <TableHead className="w-[160px]">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => handleSort('committee')}
+                            className="h-auto p-0 font-semibold hover:bg-transparent"
+                          >
+                            Committee {getSortIcon('committee')}
+                          </Button>
+                        </TableHead>
+                        <TableHead className="min-w-[200px]">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                onClick={() => handleSort('last_action')}
+                                className="h-auto p-0 font-semibold hover:bg-transparent flex items-center gap-1"
+                              >
+                                Last Action {getSortIcon('last_action')} <HelpCircle className="h-3 w-3" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>ALL CAPS indicates Senate action, lowercase indicates Assembly action</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TableHead>
+                        <TableHead className="min-w-[120px]">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => handleSort('last_action_date')}
+                            className="h-auto p-0 font-semibold hover:bg-transparent"
+                          >
+                            Date {getSortIcon('last_action_date')}
+                          </Button>
+                        </TableHead>
+                        <TableHead className="w-[100px]">Actions</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </ScrollArea>
-          )}
-        </CardContent>
-      </Card>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredAndSortedBills.map((bill) => (
+                        <TableRow 
+                          key={bill.bill_id} 
+                          className="cursor-pointer hover:bg-muted/50 transition-colors"
+                          onClick={() => handleBillClick(bill)}
+                        >
+                          <TableCell className="font-medium">{bill.bill_number}</TableCell>
+                          <TableCell className="max-w-[300px]">
+                            <div className="line-clamp-2 text-sm">{bill.title}</div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="secondary">{bill.status_desc || "Unknown"}</Badge>
+                          </TableCell>
+                          <TableCell className="max-w-[160px]">
+                            <div className="line-clamp-2 text-sm" style={{ maxWidth: '20ch' }}>
+                              {bill.committee || "N/A"}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-sm text-muted-foreground">
+                            {bill.last_action || "No action recorded"}
+                          </TableCell>
+                          <TableCell className="text-sm text-muted-foreground">
+                            {formatDate(bill.last_action_date)}
+                          </TableCell>
+                          <TableCell>
+                            <CardActionButtons
+                              onFavorite={(e) => handleFavorite(bill, e)}
+                              onAIAnalysis={(e) => handleAIAnalysis(bill, e)}
+                              isFavorited={false}
+                              hasAIChat={false}
+                            />
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </ScrollArea>
+            )}
+          </CardContent>
+        </Card>
+      </TooltipProvider>
 
       <AIChatSheet
         open={chatOpen}
