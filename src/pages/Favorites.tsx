@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Tables } from "@/integrations/supabase/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -210,12 +211,20 @@ const Favorites = () => {
                     <Card key={favorite.id} className="w-full">
                       <CardHeader className="pb-3">
                         <div className="flex items-start justify-between">
-                          <div className="space-y-1 flex-1">
+                          <div className="space-y-3 flex-1">
                             <div className="flex items-center gap-3 flex-wrap">
                               <CardTitle className="text-lg">{bill.bill_number || "No Number"}</CardTitle>
                               <Badge variant={getStatusBadgeVariant(bill.status_desc)} className="text-xs">
                                 {bill.status_desc || "Unknown"}
                               </Badge>
+                              <div className="flex gap-2 ml-auto">
+                                <Button variant="ghost" size="sm" onClick={e => handleBillAIAnalysis(bill, e)} className="hover:bg-primary/10">
+                                  <Sparkles className="h-4 w-4" />
+                                </Button>
+                                <Button variant="ghost" size="sm" onClick={e => handleRemoveBillFavorite(bill.bill_id, e)} className="hover:bg-destructive hover:text-destructive-foreground">
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
                             </div>
                             <div className="flex items-center gap-4 text-sm text-muted-foreground">
                               <span>Added {format(new Date(favorite.created_at), "MMM d, yyyy 'at' h:mm a")}</span>
@@ -223,14 +232,6 @@ const Favorites = () => {
                                 <span>Last action: {format(new Date(bill.last_action_date), "MMM d, yyyy")}</span>
                               )}
                             </div>
-                          </div>
-                          <div className="flex gap-2 flex-shrink-0">
-                            <Button variant="ghost" size="sm" onClick={e => handleRemoveBillFavorite(bill.bill_id, e)} className="hover:bg-destructive hover:text-destructive-foreground">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="sm" onClick={e => handleBillAIAnalysis(bill, e)} className="hover:bg-primary/10">
-                              <Sparkles className="h-4 w-4" />
-                            </Button>
                           </div>
                         </div>
                       </CardHeader>
