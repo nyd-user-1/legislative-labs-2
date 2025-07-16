@@ -72,11 +72,6 @@ export const BillSummary = ({
             <p className="text-sm font-medium">
               {primarySponsor?.person?.name || "Not specified"}
             </p>
-            {primarySponsor?.person?.party && (
-              <Badge variant="outline" className="text-xs mt-1">
-                {primarySponsor.person.party}
-              </Badge>
-            )}
           </div>
           
           <div>
@@ -95,27 +90,14 @@ export const BillSummary = ({
           </div>
         </div>
         
-        <div className="mt-6 pt-6 border-t border-gray-200">
-          <div className="flex items-start justify-between gap-4 mb-4">
-            <div>
-              <h4 className="font-medium text-sm text-muted-foreground mb-2">Status</h4>
-              {bill.status !== null ? (
-                <BillStatusBadge status={bill.status} statusDesc={bill.status_desc} />
-              ) : (
-                <Badge variant="secondary">Unknown Status</Badge>
-              )}
-            </div>
+        {bill.description && (
+          <div className="mt-6 pt-6 border-t border-gray-200">
+            <h4 className="font-medium text-sm text-muted-foreground mb-2">Description</h4>
+            <p className="text-sm leading-relaxed text-gray-700">
+              {bill.description}
+            </p>
           </div>
-          
-          {bill.description && (
-            <div>
-              <h4 className="font-medium text-sm text-muted-foreground mb-2">Description</h4>
-              <p className="text-sm leading-relaxed text-gray-700">
-                {bill.description}
-              </p>
-            </div>
-          )}
-        </div>
+        )}
       </CardContent>
     </Card>
   );

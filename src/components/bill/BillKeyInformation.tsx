@@ -1,6 +1,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { BillStatusBadge } from "../BillStatusBadge";
 import { Tables } from "@/integrations/supabase/types";
 
 type Bill = Tables<"Bills">;
@@ -26,10 +27,17 @@ export const BillKeyInformation = ({ bill, sponsors, totalSponsors }: BillKeyInf
     }
   };
 
+  const primarySponsor = sponsors.find(s => s.position === 1);
+
   return (
     <Card className="card bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-      <CardHeader className="card-header px-6 py-4 border-b border-gray-200">
+      <CardHeader className="card-header px-6 py-4 border-b border-gray-200 relative">
         <CardTitle className="text-lg font-semibold">Key Information</CardTitle>
+        {bill.status !== null && (
+          <div className="absolute top-4 right-6">
+            <BillStatusBadge status={bill.status} statusDesc={bill.status_desc} />
+          </div>
+        )}
       </CardHeader>
       <CardContent className="card-body p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -50,8 +58,15 @@ export const BillKeyInformation = ({ bill, sponsors, totalSponsors }: BillKeyInf
           
           <div className="space-y-3">
             <div>
-              <h4 className="font-medium text-sm text-muted-foreground mb-1">Status Date</h4>
-              <p className="text-sm">{formatDate(bill.status_date)}</p>
+              <h4 className="font-medium text-sm text-muted-foreground mb-1">Party</h4>
+              <div className="flex items-center gap-2">
+                <p className="text-sm">{primarySponsor?.person?.party || "Not specified"}</p>
+                {primarySponsor?.person?.party && (
+                  <Badge variant="outline" className="text-xs">
+                    {primarySponsor.person.party}
+                  </Badge>
+                )}
+              </div>
             </div>
             
             <div>
@@ -62,8 +77,8 @@ export const BillKeyInformation = ({ bill, sponsors, totalSponsors }: BillKeyInf
           
           <div className="space-y-3">
             <div>
-              <h4 className="font-medium text-sm text-muted-foreground mb-1">Session ID</h4>
-              <p className="text-sm">{bill.session_id || "Not specified"}</p>
+              <h4 className="font-medium text-sm text-muted-foreground mb-1">Status Date</h4>
+              <p className="text-sm">{formatDate(bill.status_date)}</p>
             </div>
             
             <div>
@@ -75,7 +90,7 @@ export const BillKeyInformation = ({ bill, sponsors, totalSponsors }: BillKeyInf
           <div className="space-y-3">
             {bill.state_link && (
               <div>
-                <h4 className="font-medium text-sm text-muted-foreground mb-1">State Link</h4>
+                <h4 className="font-medium text-sm text-muted-foreground mb-1">NYS</h4>
                 <a 
                   href={bill.state_link} 
                   target="_blank" 
@@ -89,7 +104,7 @@ export const BillKeyInformation = ({ bill, sponsors, totalSponsors }: BillKeyInf
             
             {bill.url && (
               <div>
-                <h4 className="font-medium text-sm text-muted-foreground mb-1">Bill URL</h4>
+                <h4 className="font-medium text-sm text-muted-foreground mb-1">LegiScan</h4>
                 <a 
                   href={bill.url} 
                   target="_blank" 
