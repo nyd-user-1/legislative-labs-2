@@ -11,6 +11,7 @@ import {
   Calendar, 
   User, 
   FileText, 
+  History,
   Users,
   Vote
 } from "lucide-react";
@@ -188,10 +189,12 @@ export const BillDetail = ({ bill, onBack }: BillDetailProps) => {
                   <Users className="h-4 w-4" />
                   Sponsors
                 </TabsTrigger>
-                <TabsTrigger value="history" className="h-10 rounded-md text-sm font-medium">
+                <TabsTrigger value="history" className="flex items-center gap-2 h-10 rounded-md text-sm font-medium">
+                  <History className="h-4 w-4" />
                   History
                 </TabsTrigger>
-                <TabsTrigger value="votes" className="h-10 rounded-md text-sm font-medium">
+                <TabsTrigger value="votes" className="flex items-center gap-2 h-10 rounded-md text-sm font-medium">
+                  <Vote className="h-4 w-4" />
                   Votes
                 </TabsTrigger>
               </TabsList>

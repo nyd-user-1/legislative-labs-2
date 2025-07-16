@@ -3,19 +3,28 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
-export interface NYSApiParams {
+interface NYSSearchParams {
   searchType: 'bills' | 'members' | 'laws' | 'agendas' | 'calendars';
   query: string;
   sessionYear?: number;
   limit?: number;
 }
 
+interface NYSSearchResult {
+  success: boolean;
+  result?: {
+    items: any[];
+    total: number;
+  };
+  error?: string;
+}
+
 export const useNYSLegislation = () => {
   const [loading, setLoading] = useState(false);
-  const [searchResults, setSearchResults] = useState<any>(null);
+  const [results, setResults] = useState<any[]>([]);
   const { toast } = useToast();
 
-  const searchNYSData = async (params: NYSApiParams) => {
+  const searchNYS = async (params: NYSSearchParams): Promise<NYSSearchResult | null> => {
     setLoading(true);
     
     try {
@@ -23,23 +32,28 @@ export const useNYSLegislation = () => {
         body: params
       });
 
-      if (error || !data || !data.success) {
-        console.error('NYS API error:', error || data?.error);
+      if (error) {
+        console.error('NYS search error:', error);
         toast({
-          title: "NYS API Error",
-          description: error?.message || data?.error || "Failed to search NYS legislation",
+          title: "Search Error",
+          description: "Failed to search NYS legislation data",
           variant: "destructive",
         });
         return null;
       }
 
-      setSearchResults(data);
-      return data;
+      if (data?.success && data?.result?.items) {
+        setResults(data.result.items);
+        return data;
+      } else {
+        setResults([]);
+        return { success: false, error: 'No results found' };
+      }
     } catch (error) {
-      console.error('NYS API error:', error);
+      console.error('NYS search error:', error);
       toast({
-        title: "API Error",
-        description: "Failed to call NYS Legislation API",
+        title: "Search Error",
+        description: "Failed to search NYS legislation data",
         variant: "destructive",
       });
       return null;
@@ -48,14 +62,34 @@ export const useNYSLegislation = () => {
     }
   };
 
-  const clearResults = () => {
-    setSearchResults(null);
+  const searchBills = (query: string, sessionYear?: number, limit = 20) => {
+    return searchNYS({ searchType: 'bills', query, sessionYear, limit });
+  };
+
+  const searchMembers = (query: string, limit = 20) => {
+    return searchNYS({ searchType: 'members', query, limit });
+  };
+
+  const searchLaws = (query: string, limit = 20) => {
+    return searchNYS({ searchType: 'laws', query, limit });
+  };
+
+  const searchAgendas = (query: string, limit = 20) => {
+    return searchNYS({ searchType: 'agendas', query, limit });
+  };
+
+  const searchCalendars = (query: string, limit = 20) => {
+    return searchNYS({ searchType: 'calendars', query, limit });
   };
 
   return {
     loading,
-    searchResults,
-    searchNYSData,
-    clearResults,
+    results,
+    searchNYS,
+    searchBills,
+    searchMembers,
+    searchLaws,
+    searchAgendas,
+    searchCalendars,
   };
 };

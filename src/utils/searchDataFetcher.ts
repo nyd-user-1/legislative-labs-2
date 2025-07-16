@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { SearchResult } from "@/types/search";
 
@@ -42,7 +41,7 @@ export const fetchAllSearchContent = async (): Promise<SearchResult[]> => {
       media = mediaResult.data;
     }
 
-    // Fetch public legislative data (no auth required) - NY ONLY
+    // Fetch public legislative data (no auth required)
     const { data: bills } = await supabase
       .from('Bills')
       .select('*')
@@ -52,10 +51,15 @@ export const fetchAllSearchContent = async (): Promise<SearchResult[]> => {
     const { data: members } = await supabase
       .from('People')
       .select('*')
-      .limit(1000)
+      .limit(1000) // Increased to include more members like Joseph Addabbo
       .order('people_id', { ascending: false });
 
     console.log('Raw members data:', members?.length);
+    console.log('First 5 members:', members?.slice(0, 5).map(m => ({ id: m.people_id, name: m.name, first_name: m.first_name, last_name: m.last_name })));
+    console.log('Joseph Addabbo search:', members?.find(m => 
+      m.name?.toLowerCase().includes('addabbo') || 
+      (m.first_name?.toLowerCase().includes('joseph') && m.last_name?.toLowerCase().includes('addabbo'))
+    ));
 
     const { data: committees } = await supabase
       .from('Committees')
@@ -71,8 +75,7 @@ export const fetchAllSearchContent = async (): Promise<SearchResult[]> => {
         type: 'problem' as const,
         content: p.description,
         created_at: p.created_at,
-        url: `/problems?id=${p.id}`,
-        source: 'local' as const
+        url: `/problems?id=${p.id}`
       })) || []),
       ...(ideas?.map(i => ({
         id: i.id,
@@ -80,8 +83,7 @@ export const fetchAllSearchContent = async (): Promise<SearchResult[]> => {
         type: 'idea' as const,
         content: i.improved_idea || i.original_idea,
         created_at: i.created_at,
-        url: `/ideas?id=${i.id}`,
-        source: 'local' as const
+        url: `/ideas?id=${i.id}`
       })) || []),
       ...(drafts?.map(d => ({
         id: d.id,
@@ -89,8 +91,7 @@ export const fetchAllSearchContent = async (): Promise<SearchResult[]> => {
         type: 'draft' as const,
         content: d.draft_content,
         created_at: d.created_at,
-        url: `/?id=${d.id}`,
-        source: 'local' as const
+        url: `/?id=${d.id}`
       })) || []),
       ...(media?.map(m => ({
         id: m.id,
@@ -98,18 +99,16 @@ export const fetchAllSearchContent = async (): Promise<SearchResult[]> => {
         type: 'media' as const,
         content: m.content,
         created_at: m.created_at,
-        url: `/media-kits?id=${m.id}`,
-        source: 'local' as const
+        url: `/media-kits?id=${m.id}`
       })) || []),
-      // Legislative data - NY ONLY (from our NY database)
+      // Legislative data
       ...(bills?.map(b => ({
         id: b.bill_id.toString(),
         title: b.title || b.bill_number || 'Untitled Bill',
         type: 'bill' as const,
         content: b.description || b.last_action || '',
         created_at: b.status_date || new Date().toISOString(),
-        url: `/bills?selected=${b.bill_id}`,
-        source: 'nys' as const
+        url: `/bills?selected=${b.bill_id}`
       })) || []),
       ...(members?.map(m => ({
         id: m.people_id.toString(),
@@ -117,8 +116,7 @@ export const fetchAllSearchContent = async (): Promise<SearchResult[]> => {
         type: 'member' as const,
         content: `${m.party || ''} ${m.chamber || ''} ${m.district || ''}`.trim() || m.bio_short || '',
         created_at: new Date().toISOString(),
-        url: `/members?selected=${m.people_id}`,
-        source: 'nys' as const
+        url: `/members?selected=${m.people_id}`
       })) || []),
       ...(committees?.map(c => ({
         id: c.committee_id.toString(),
@@ -126,8 +124,7 @@ export const fetchAllSearchContent = async (): Promise<SearchResult[]> => {
         type: 'committee' as const,
         content: c.description || c.chair_name || '',
         created_at: new Date().toISOString(),
-        url: `/committees?selected=${c.committee_id}`,
-        source: 'nys' as const
+        url: `/committees?selected=${c.committee_id}`
       })) || [])
     ];
 
@@ -136,50 +133,4 @@ export const fetchAllSearchContent = async (): Promise<SearchResult[]> => {
     console.error('Error fetching content:', error);
     throw error;
   }
-};
-
-// RESTRICTED TO NY ONLY - Do not use this for general searches
-export const searchLegiscanContent = async (searchTerm: string, allowAllStates = false): Promise<SearchResult[]> => {
-  try {
-    const { data, error } = await supabase.functions.invoke('legiscan-search', {
-      body: {
-        operation: 'search',
-        params: {
-          query: searchTerm,
-          // ALWAYS restrict to NY unless explicitly allowed for AI chat
-          state: allowAllStates ? undefined : 'NY',
-          page: 1
-        }
-      }
-    });
-
-    if (error || !data || data.status === 'ERROR') {
-      console.error('Legiscan search error:', error || data?.error);
-      return [];
-    }
-
-    if (!data.searchresult?.results) {
-      return [];
-    }
-
-    return data.searchresult.results.map((bill: any) => ({
-      id: `legiscan-${bill.bill_id}`,
-      title: bill.title || bill.bill_number || 'Untitled Bill',
-      type: 'bill' as const,
-      content: bill.description || bill.last_action || '',
-      created_at: bill.status_date || new Date().toISOString(),
-      url: bill.state_link || bill.url || '#',
-      source: 'legiscan' as const
-    }));
-  } catch (error) {
-    console.error('Error searching Legiscan:', error);
-    return [];
-  }
-};
-
-// Function specifically for AI chat similar bills analysis (allows all states)
-// This is the ONLY exception to the NY-only rule
-export const searchSimilarBillsAllStates = async (searchTerm: string): Promise<SearchResult[]> => {
-  console.log('AI Chat: Searching similar bills across all states for analysis');
-  return await searchLegiscanContent(searchTerm, true);
 };
