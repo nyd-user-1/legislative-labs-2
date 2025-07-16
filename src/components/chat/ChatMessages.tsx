@@ -52,9 +52,6 @@ export const ChatMessages = ({
             timestamp: message.timestamp.toISOString()
           };
           
-          // Map solution entity type to problem for MessageBubble compatibility
-          const messageEntityType = entityType === 'solution' ? 'problem' : entityType;
-          
           // Check if this is the first assistant message
           const assistantMessageIndex = messages.filter((m, i) => i <= index && m.role === 'assistant').length;
           const isFirstAssistantMessage = message.role === 'assistant' && assistantMessageIndex === 1;
@@ -68,7 +65,7 @@ export const ChatMessages = ({
               onShare={onShare}
               onSendPrompt={onSendPrompt}
               entity={entity}
-              entityType={messageEntityType as 'bill' | 'member' | 'committee' | 'problem'}
+              entityType={entityType as 'bill' | 'member' | 'committee'}
               isFirstAssistantMessage={isFirstAssistantMessage}
             />
           );
