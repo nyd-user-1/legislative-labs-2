@@ -10,6 +10,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { ModelSelector } from "@/components/ModelSelector";
+import Landing from "./pages/Landing";
 import Index from "./pages/Index";
 import Home from "./pages/Home";
 import { Auth } from "./pages/Auth";
@@ -57,7 +58,7 @@ const AppLayout = () => {
                 <Route path="/plans" element={<Plans />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/changelog" element={<ChangeLog />} />
-                <Route path="/" element={<Index />} />
+                <Route path="/dashboard" element={<Index />} />
               </Routes>
             </main>
           </SidebarInset>
@@ -79,6 +80,7 @@ const App = () => {
             <Sonner />
             <BrowserRouter>
               <Routes>
+                <Route path="/" element={<Landing />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="*" element={<AppLayout />} />
               </Routes>
