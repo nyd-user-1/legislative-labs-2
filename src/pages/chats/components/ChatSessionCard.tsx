@@ -77,11 +77,8 @@ export const ChatSessionCard = ({
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="space-y-1">
-            <CardTitle className="text-lg">{session.title}</CardTitle>
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              <span>{format(new Date(session.updated_at), "MMM d, yyyy 'at' h:mm a")}</span>
-              <span>{messageCount} messages</span>
-              {chamberInfo && <span>{chamberInfo}</span>}
+            <div className="flex items-center gap-2">
+              <CardTitle className="text-lg">{session.title}</CardTitle>
               {session.bill_id && (
                 <Button 
                   variant="ghost" 
@@ -93,6 +90,11 @@ export const ChatSessionCard = ({
                   <Heart className={`h-4 w-4 ${isFavorited ? 'fill-red-500 text-red-500' : ''}`} />
                 </Button>
               )}
+            </div>
+            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+              <span>{format(new Date(session.updated_at), "MMM d, yyyy 'at' h:mm a")}</span>
+              <span>{messageCount} messages</span>
+              {chamberInfo && <span>{chamberInfo}</span>}
             </div>
           </div>
           <Button
