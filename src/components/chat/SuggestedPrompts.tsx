@@ -25,32 +25,7 @@ export const SuggestedPrompts = ({
   // Don't show prompts if there are already messages or if showPrompts is false
   if (!showPrompts || hasMessages) return null;
 
-  let prompts: string[] = [];
-
-  if (entityType === 'problem') {
-    prompts = [
-      "Similar Problems",
-      "Fiscal Analysis", 
-      "Root Cause",
-      "Likely Allies"
-    ];
-  } else if (entityType === 'solution') {
-    prompts = [
-      "Implementation Timeline",
-      "Stakeholder Analysis",
-      "Policy Mechanisms",
-      "Success Metrics"
-    ];
-  } else if (entityType === 'mediaKit') {
-    prompts = [
-      "Press Release Draft",
-      "Talking Points",
-      "Social Media Content",
-      "Stakeholder Messaging"
-    ];
-  } else {
-    prompts = ContextBuilder.generateDynamicPrompts(entity, entityType);
-  }
+  const prompts = ContextBuilder.generateDynamicPrompts(entity, entityType);
 
   return (
     <div className="space-y-3">
