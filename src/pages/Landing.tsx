@@ -204,56 +204,58 @@ const Landing = () => {
             {/* Input Section */}
             <div className="max-w-2xl mx-auto mb-8">
               <form onSubmit={handleSubmit} className="relative">
-                <div className="relative">
-                  <Input
-                    ref={inputRef}
-                    type="text"
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    placeholder={placeholderTexts[currentPlaceholder]}
-                    className="h-14 pr-20 text-lg bg-background/50 backdrop-blur-sm border-border/50 focus:border-primary/50 transition-all duration-300 rounded-2xl"
-                    disabled={isTyping}
-                  />
-                  <Button
-                    type="submit"
-                    className="absolute right-2 top-2 h-10 w-10 p-0 rounded-xl"
-                    disabled={!inputValue.trim() || isTyping}
-                  >
-                    {isTyping ? (
-                      <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                    ) : (
-                      <ArrowUp className="w-4 h-4" />
-                    )}
-                  </Button>
+                <div className="relative bg-background/50 backdrop-blur-sm border border-border/50 rounded-2xl p-3 focus-within:border-primary/50 transition-all duration-300">
+                  <div className="relative">
+                    <Input
+                      ref={inputRef}
+                      type="text"
+                      value={inputValue}
+                      onChange={(e) => setInputValue(e.target.value)}
+                      placeholder={placeholderTexts[currentPlaceholder]}
+                      className="h-10 pr-16 text-lg bg-transparent border-0 focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground"
+                      disabled={isTyping}
+                    />
+                    <Button
+                      type="submit"
+                      className="absolute right-1 top-1 h-8 w-8 p-0 rounded-lg"
+                      disabled={!inputValue.trim() || isTyping}
+                    >
+                      {isTyping ? (
+                        <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <ArrowUp className="w-3 h-3" />
+                      )}
+                    </Button>
+                  </div>
+                  
+                  {/* Toolbar inside input */}
+                  <div className="flex items-center justify-between mt-3 pt-3 border-t border-border/30">
+                    <div className="flex items-center gap-4">
+                      <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+                        <Plus className="w-3 h-3" />
+                      </button>
+                      <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+                        <Image className="w-3 h-3" />
+                        <span className="text-xs">Attach</span>
+                      </button>
+                      <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors" onClick={() => navigate('/plans')}>
+                        <Share2 className="w-3 h-3" />
+                        <span className="text-xs">Workspace</span>
+                      </button>
+                      <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+                        <div className="w-3 h-3 bg-green-500 rounded flex items-center justify-center">
+                          <span className="text-[8px] text-white font-bold">⚡</span>
+                        </div>
+                        <span className="text-xs">Supabase</span>
+                        <ChevronDown className="w-2 h-2" />
+                      </button>
+                    </div>
+                    <button type="button" className="w-6 h-6 rounded-full bg-muted/50 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
+                      <ArrowUp className="w-3 h-3" />
+                    </button>
+                  </div>
                 </div>
               </form>
-              
-              {/* Input toolbar */}
-              <div className="flex items-center justify-between mt-4 px-4">
-                <div className="flex items-center gap-4">
-                  <button className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-                    <Plus className="w-4 h-4" />
-                  </button>
-                  <button className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-                    <Image className="w-4 h-4" />
-                    <span className="text-sm">Attach</span>
-                  </button>
-                  <button className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors" onClick={() => navigate('/plans')}>
-                    <Share2 className="w-4 h-4" />
-                    <span className="text-sm">Workspace</span>
-                  </button>
-                  <button className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-                    <div className="w-4 h-4 bg-green-500 rounded flex items-center justify-center">
-                      <span className="text-xs text-white font-bold">⚡</span>
-                    </div>
-                    <span className="text-sm">Supabase</span>
-                    <ChevronDown className="w-3 h-3" />
-                  </button>
-                </div>
-                <button className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
-                  <ArrowUp className="w-4 h-4" />
-                </button>
-              </div>
             </div>
 
             {/* Demo Button */}
