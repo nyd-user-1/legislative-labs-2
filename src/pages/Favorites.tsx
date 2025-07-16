@@ -217,11 +217,11 @@ const Favorites = () => {
                                 {bill.status_desc || "Unknown"}
                               </Badge>
                               <div className="flex gap-1">
-                                <Button variant="ghost" size="sm" onClick={e => e.stopPropagation()} className="hover:bg-red-50">
+                                <Button variant="ghost" size="sm" onClick={e => e.stopPropagation()}>
                                   <Heart className="h-4 w-4 fill-red-500 text-red-500" />
                                 </Button>
-                                <Button variant="ghost" size="sm" onClick={e => handleBillAIAnalysis(bill, e)} className="hover:bg-primary/10">
-                                  <Sparkles className="h-4 w-4" />
+                                <Button variant="ghost" size="sm" onClick={e => handleBillAIAnalysis(bill, e)}>
+                                  <Sparkles className="h-4 w-4 fill-yellow-500 text-yellow-500" />
                                 </Button>
                               </div>
                             </div>
