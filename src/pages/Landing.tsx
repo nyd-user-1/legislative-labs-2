@@ -16,7 +16,12 @@ import {
   Github,
   Twitter,
   Menu,
-  X
+  X,
+  Plus,
+  FileText,
+  MessageSquare,
+  Share2,
+  Database
 } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 
@@ -28,11 +33,11 @@ const Landing = () => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const placeholderTexts = [
-    "Create a modern dashboard for my startup",
-    "Build a todo app with drag and drop",
-    "Make a landing page for my restaurant",
-    "Design a portfolio website",
-    "Create a chat application"
+    "Solve a problem",
+    "Write a new contract for your union",
+    "Draft a constitutional amendment",
+    "Eliminate addictive tech design features",
+    "Develop a program for universal pre-k"
   ];
 
   const [currentPlaceholder, setCurrentPlaceholder] = useState(0);
@@ -123,7 +128,7 @@ const Landing = () => {
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                 <Sparkles className="w-5 h-5 text-primary-foreground" />
               </div>
-              <span className="text-xl font-bold">Lovable</span>
+              <span className="text-xl font-bold">Goodable</span>
             </div>
 
             {/* Desktop Navigation */}
@@ -182,7 +187,7 @@ const Landing = () => {
             {/* Badge */}
             <Badge variant="outline" className="mb-8 bg-background/50 backdrop-blur-sm border-primary/20">
               <Sparkles className="w-4 h-4 mr-2" />
-              AI-Powered Development Platform
+              AI-Powered Policy Development
             </Badge>
 
             {/* Main Heading */}
@@ -198,7 +203,7 @@ const Landing = () => {
 
             {/* Subheading */}
             <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
-              The fastest way to turn your ideas into reality. Just describe what you want to build and watch as Lovable creates it for you.
+              The fastest way to turn your ideas into reality. Just describe what you want to build and watch as Goodable creates it for you.
             </p>
 
             {/* Input Section */}
@@ -233,8 +238,36 @@ const Landing = () => {
                 </div>
               </form>
               
+              {/* Input toolbar */}
+              <div className="flex items-center justify-between mt-4 px-4">
+                <div className="flex items-center gap-4">
+                  <button className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+                    <Plus className="w-4 h-4" />
+                  </button>
+                  <button className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+                    <FileText className="w-4 h-4" />
+                    <span className="text-sm">Import doc</span>
+                  </button>
+                  <button className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+                    <MessageSquare className="w-4 h-4" />
+                    <span className="text-sm">Insert prompt</span>
+                  </button>
+                  <button className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors" onClick={() => navigate('/plans')}>
+                    <Share2 className="w-4 h-4" />
+                    <span className="text-sm">Workspace</span>
+                  </button>
+                  <button className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+                    <Database className="w-4 h-4" />
+                    <span className="text-sm">NYS Legislature</span>
+                  </button>
+                </div>
+                <button className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+              
               <p className="text-sm text-muted-foreground mt-4">
-                No credit card required • Free tier available
+                It's not a complaint • It's a problem
               </p>
             </div>
 
@@ -255,7 +288,7 @@ const Landing = () => {
                     </div>
                   ))}
                 </div>
-                <span>10,000+ developers building with Lovable</span>
+                <span>10,000+ developers building with Goodable</span>
               </div>
             </div>
           </div>
@@ -266,7 +299,7 @@ const Landing = () => {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Why developers love Lovable
+                Why developers love Goodable
               </h2>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
                 Build faster, deploy easier, and focus on what matters most
@@ -294,7 +327,7 @@ const Landing = () => {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Built with Lovable
+                Built with Goodable
               </h2>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
                 See what others have created in minutes
@@ -336,7 +369,7 @@ const Landing = () => {
               Ready to build something amazing?
             </h2>
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Join thousands of developers who are already building the future with Lovable
+              Join thousands of developers who are already building the future with Goodable
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Button size="lg" onClick={() => navigate('/auth')}>
@@ -361,7 +394,7 @@ const Landing = () => {
                 <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                   <Sparkles className="w-5 h-5 text-primary-foreground" />
                 </div>
-                <span className="text-xl font-bold">Lovable</span>
+                <span className="text-xl font-bold">Goodable</span>
               </div>
               <p className="text-muted-foreground text-sm">
                 The AI-powered development platform that turns your ideas into reality.
@@ -402,7 +435,7 @@ const Landing = () => {
           </div>
           
           <div className="border-t border-border/50 mt-8 pt-8 text-center text-sm text-muted-foreground">
-            <p>&copy; 2024 Lovable. All rights reserved.</p>
+            <p>&copy; 2024 Goodable. All rights reserved.</p>
           </div>
         </div>
       </footer>
