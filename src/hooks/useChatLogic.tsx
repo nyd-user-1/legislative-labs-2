@@ -7,7 +7,7 @@ import { useSessionInitializer } from './chat/useSessionInitializer';
 import { useChatState } from './chat/useChatState';
 import { useChatActions } from './chat/useChatActions';
 
-export const useChatLogic = (entity: any, entityType: EntityType) => {
+export const useChatLogic = (entity: any, entityType: EntityType | null) => {
   const {
     inputValue,
     setInputValue,

@@ -4,7 +4,6 @@ import { ChatsEmptyState } from "./chats/components/ChatsEmptyState";
 import { ChatSessionCard } from "./chats/components/ChatSessionCard";
 import { useChatSessions } from "./chats/hooks/useChatSessions";
 import { useChatActions } from "./chats/hooks/useChatActions";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 
 const Chats = () => {
@@ -15,31 +14,18 @@ const Chats = () => {
     return <ChatsLoadingSkeleton />;
   }
 
-  // Categorize chat sessions based on their titles and content
-  const billChats = chatSessions.filter(session => 
+  // Filter to only include bill, member, and committee chats
+  const relevantChats = chatSessions.filter(session => 
     session.bill_id || 
+    session.member_id ||
+    session.committee_id ||
     session.title.toLowerCase().includes('analysis:') ||
-    session.title.toLowerCase().includes('bill')
+    session.title.toLowerCase().includes('bill') ||
+    session.title.toLowerCase().includes('member') ||
+    session.title.toLowerCase().includes('committee')
   );
 
-  const problemChats = chatSessions.filter(session => 
-    session.title.toLowerCase().includes('problem:') ||
-    session.title.toLowerCase().includes('problem ')
-  );
-
-  const solutionChats = chatSessions.filter(session => 
-    session.title.toLowerCase().includes('solution:') ||
-    session.title.toLowerCase().includes('solution ')
-  );
-
-  // Get remaining chats that don't fit into the above categories
-  const otherChats = chatSessions.filter(session => 
-    !billChats.includes(session) && 
-    !problemChats.includes(session) && 
-    !solutionChats.includes(session)
-  );
-
-  const totalChats = chatSessions.length;
+  const totalChats = relevantChats.length;
 
   return (
     <div className="container mx-auto px-4 sm:px-6 py-6">
@@ -49,7 +35,7 @@ const Chats = () => {
           <p className="text-muted-foreground">
             {totalChats === 0 
               ? "No saved chats yet" 
-              : `${billChats.length} bill chats, ${problemChats.length} problem chats, ${solutionChats.length} solution chats`
+              : `${totalChats} chat session${totalChats === 1 ? '' : 's'}`
             }
           </p>
         </div>
@@ -57,80 +43,8 @@ const Chats = () => {
         {totalChats === 0 ? (
           <ChatsEmptyState />
         ) : (
-          <Tabs defaultValue="bills" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="bills">Bills</TabsTrigger>
-              <TabsTrigger value="problems">Problems</TabsTrigger>
-              <TabsTrigger value="solutions">Solutions</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="bills" className="space-y-4">
-              {billChats.length === 0 ? (
-                <Card>
-                  <CardContent className="flex flex-col items-center justify-center py-8">
-                    <p className="text-muted-foreground">No bill chats yet</p>
-                  </CardContent>
-                </Card>
-              ) : (
-                billChats.map((session) => (
-                  <ChatSessionCard
-                    key={session.id}
-                    session={session}
-                    onDelete={deleteSession}
-                    onCopy={copyToClipboard}
-                    onFeedback={handleFeedback}
-                  />
-                ))
-              )}
-            </TabsContent>
-
-            <TabsContent value="problems" className="space-y-4">
-              {problemChats.length === 0 ? (
-                <Card>
-                  <CardContent className="flex flex-col items-center justify-center py-8">
-                    <p className="text-muted-foreground">No problem chats yet</p>
-                  </CardContent>
-                </Card>
-              ) : (
-                problemChats.map((session) => (
-                  <ChatSessionCard
-                    key={session.id}
-                    session={session}
-                    onDelete={deleteSession}
-                    onCopy={copyToClipboard}
-                    onFeedback={handleFeedback}
-                  />
-                ))
-              )}
-            </TabsContent>
-
-            <TabsContent value="solutions" className="space-y-4">
-              {solutionChats.length === 0 ? (
-                <Card>
-                  <CardContent className="flex flex-col items-center justify-center py-8">
-                    <p className="text-muted-foreground">No solution chats yet</p>
-                  </CardContent>
-                </Card>
-              ) : (
-                solutionChats.map((session) => (
-                  <ChatSessionCard
-                    key={session.id}
-                    session={session}
-                    onDelete={deleteSession}
-                    onCopy={copyToClipboard}
-                    onFeedback={handleFeedback}
-                  />
-                ))
-              )}
-            </TabsContent>
-          </Tabs>
-        )}
-
-        {/* Show other/uncategorized chats if any exist */}
-        {otherChats.length > 0 && (
           <div className="space-y-4">
-            <h2 className="text-xl font-semibold">Other Chats</h2>
-            {otherChats.map((session) => (
+            {relevantChats.map((session) => (
               <ChatSessionCard
                 key={session.id}
                 session={session}

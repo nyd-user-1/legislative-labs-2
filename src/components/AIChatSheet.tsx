@@ -29,27 +29,6 @@ type Committee = {
   chamber: string;
   description?: string;
 };
-type Problem = {
-  id: string;
-  title: string;
-  description: string;
-  originalStatement: string;
-  problemNumber?: string;
-};
-type Solution = {
-  id: string;
-  title: string;
-  description: string;
-  originalStatement: string;
-  problemNumber?: string;
-};
-type MediaKit = {
-  id: string;
-  title: string;
-  description: string;
-  originalStatement: string;
-  mediaKitNumber?: string;
-};
 
 interface AIChatSheetProps {
   open: boolean;
@@ -57,12 +36,9 @@ interface AIChatSheetProps {
   bill?: Bill | null;
   member?: Member | null;
   committee?: Committee | null;
-  problem?: Problem | null;
-  solution?: Solution | null;
-  mediaKit?: MediaKit | null;
 }
 
-export const AIChatSheet = ({ open, onOpenChange, bill, member, committee, problem, solution, mediaKit }: AIChatSheetProps) => {
+export const AIChatSheet = ({ open, onOpenChange, bill, member, committee }: AIChatSheetProps) => {
   const [citationsOpen, setCitationsOpen] = useState(false);
   const { toast } = useToast();
   
@@ -70,8 +46,8 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee, probl
   const hasInitialized = useRef(false);
   
   // Determine the entity and type for the chat session
-  const entity = bill || member || committee || problem || solution || mediaKit || null;
-  const entityType = bill ? 'bill' : member ? 'member' : committee ? 'committee' : problem ? 'problem' : solution ? 'solution' : mediaKit ? 'mediaKit' : null;
+  const entity = bill || member || committee || null;
+  const entityType = bill ? 'bill' : member ? 'member' : committee ? 'committee' : null;
   
   const {
     inputValue,
@@ -130,31 +106,11 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee, probl
     }
   };
 
-  // Get the appropriate title
-  const getSheetTitle = () => {
-    if (mediaKit && mediaKit.mediaKitNumber) {
-      return `Media Kit: ${mediaKit.mediaKitNumber}`;
-    }
-    if (solution && solution.problemNumber) {
-      return `Solution: ${solution.problemNumber}`;
-    }
-    if (problem && problem.problemNumber) {
-      return `Problem: ${problem.problemNumber}`;
-    }
-    if (mediaKit) {
-      return "Media Kit";
-    }
-    if (solution) {
-      return "Solution";
-    }
-    return getTitle();
-  };
-
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-2xl flex flex-col h-full">
         <SheetHeader className="flex-shrink-0">
-          <SheetTitle>{getSheetTitle()}</SheetTitle>
+          <SheetTitle>{getTitle()}</SheetTitle>
         </SheetHeader>
 
         <ChatContainer>
