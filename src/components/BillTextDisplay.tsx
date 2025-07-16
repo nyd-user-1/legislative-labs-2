@@ -11,12 +11,6 @@ interface BillTextProps {
   className?: string;
 }
 
-interface BillTextData {
-  text: string;
-  mime: string;
-  mime_id: number;
-}
-
 export const BillTextDisplay = ({ billId, className }: BillTextProps) => {
   const [billText, setBillText] = useState<string>("");
   const [loading, setLoading] = useState(false);
@@ -29,25 +23,51 @@ export const BillTextDisplay = ({ billId, className }: BillTextProps) => {
         setLoading(true);
         setError(null);
         
+        console.log('Fetching bill text for bill ID:', billId);
         const billIdNumber = parseInt(billId.toString());
         const response = await getBillText(billIdNumber);
         
-        if (response?.text) {
-          // Handle both string and object responses
+        console.log('Bill text API response:', response);
+        
+        if (response && response.text) {
           let textContent = "";
+          
+          // Handle different response structures
           if (typeof response.text === 'string') {
             textContent = response.text;
+          } else if (response.text.doc) {
+            // Legiscan often returns text in a 'doc' field
+            textContent = response.text.doc;
           } else if (response.text.text) {
             textContent = response.text.text;
+          } else if (typeof response.text === 'object' && response.text.bill_text) {
+            textContent = response.text.bill_text;
           }
           
-          setBillText(textContent);
+          // If we have base64 encoded content, decode it
+          if (textContent && textContent.includes('base64,')) {
+            try {
+              const base64Content = textContent.split('base64,')[1];
+              textContent = atob(base64Content);
+            } catch (decodeError) {
+              console.error('Error decoding base64 content:', decodeError);
+            }
+          }
+          
+          console.log('Processed bill text length:', textContent?.length || 0);
+          
+          if (textContent && textContent.trim()) {
+            setBillText(textContent);
+          } else {
+            setError("Bill text content is empty");
+          }
         } else {
-          setError("Bill text not available");
+          console.error('No text field in response:', response);
+          setError("Bill text not available in API response");
         }
       } catch (err) {
         console.error("Error fetching bill text:", err);
-        setError("Failed to load bill text");
+        setError(`Failed to load bill text: ${err instanceof Error ? err.message : 'Unknown error'}`);
       } finally {
         setLoading(false);
       }
@@ -67,7 +87,6 @@ export const BillTextDisplay = ({ billId, className }: BillTextProps) => {
       let processedLine = line;
       
       // Simple regex to find text that might be amendments (words in brackets or with specific formatting)
-      // This is a basic implementation - actual bill formatting can be complex
       processedLine = processedLine.replace(
         /(\[.*?\]|\b(?:added|amended|inserted|deleted|substituted)\b)/gi,
         '<span class="text-green-700 underline decoration-green-600">$1</span>'
