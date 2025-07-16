@@ -19,9 +19,9 @@ export const useCommitteeChatSessions = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
 
-      // For mock committees (committee_id 0 or null), don't create database sessions
-      if (!committee.committee_id) {
-        return null;
+      // Only proceed if we have a valid committee_id
+      if (!committee.committee_id || committee.committee_id <= 0) {
+        throw new Error("Invalid committee ID");
       }
 
       // Check if a chat session already exists for this committee
@@ -38,21 +38,15 @@ export const useCommitteeChatSessions = () => {
         return existingSession;
       }
 
-      // Create a new chat session - but only set committee_id if it exists in the Committees table
-      const sessionData: any = {
-        user_id: user.id,
-        title: `Committee: ${committee.committee_name}`,
-        messages: JSON.stringify([])
-      };
-
-      // Only add committee_id if it's a real committee (not mock data)
-      if (committee.committee_id > 0) {
-        sessionData.committee_id = committee.committee_id;
-      }
-
+      // Create a new chat session
       const { data: newSession, error: createError } = await supabase
         .from("chat_sessions")
-        .insert(sessionData)
+        .insert({
+          user_id: user.id,
+          committee_id: committee.committee_id,
+          title: `Committee: ${committee.committee_name}`,
+          messages: JSON.stringify([])
+        })
         .select()
         .single();
 

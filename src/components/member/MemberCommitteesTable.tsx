@@ -13,6 +13,8 @@ import { Heart, Sparkles } from "lucide-react";
 import { Tables } from "@/integrations/supabase/types";
 import { AIChatSheet } from "@/components/AIChatSheet";
 import { useCommitteeChatSessions } from "@/hooks/useCommitteeChatSessions";
+import { useMemberCommittees } from "@/hooks/useMemberCommittees";
+import { useCommitteeFavorites } from "@/hooks/useCommitteeFavorites";
 
 type Member = Tables<"People">;
 
@@ -20,58 +22,23 @@ interface MemberCommitteesTableProps {
   member: Member;
 }
 
-// Mock committee data for now - replace with real data when available
-// Using null for committee_id since these are mock committees that don't exist in the database
-const mockCommitteeData = [
-  {
-    id: 1,
-    committee_name: "Senate Finance Committee",
-    role: "Chair",
-    chamber: "Senate",
-    description: "Reviews and approves state budget allocations and fiscal policies.",
-    committee_id: null // Using null for mock data to avoid foreign key constraint issues
-  },
-  {
-    id: 2,
-    committee_name: "Assembly Education Committee",
-    role: "Member", 
-    chamber: "Assembly",
-    description: "Oversees education policy and funding for public schools and universities.",
-    committee_id: null
-  },
-  {
-    id: 3,
-    committee_name: "Joint Committee on Technology",
-    role: "Ranking",
-    chamber: "Joint", 
-    description: "Addresses technology infrastructure and digital governance initiatives.",
-    committee_id: null
-  }
-];
-
 export const MemberCommitteesTable = ({ member }: MemberCommitteesTableProps) => {
   const [chatOpen, setChatOpen] = useState(false);
   const [selectedCommitteeForChat, setSelectedCommitteeForChat] = useState<any>(null);
   const { createOrGetChatSession, loading: chatLoading } = useCommitteeChatSessions();
+  const { committees, loading, error } = useMemberCommittees(member);
+  const { favoriteCommitteeIds, toggleFavorite } = useCommitteeFavorites();
 
   const handleAIAnalysis = async (committee: any, e: React.MouseEvent) => {
     e.stopPropagation();
     
     // Create the committee object with the correct structure for AIChatSheet
     const committeeForChat = {
-      committee_id: committee.committee_id || 0, // Use 0 for mock committees
+      committee_id: committee.committee_id,
       name: committee.committee_name,
       chamber: committee.chamber,
       description: committee.description,
     };
-
-    // For mock committees (committee_id is null), skip database session creation
-    // and just open the chat directly
-    if (committee.committee_id === null) {
-      setSelectedCommitteeForChat(committeeForChat);
-      setChatOpen(true);
-      return;
-    }
 
     const session = await createOrGetChatSession({
       committee_id: committee.committee_id,
@@ -79,7 +46,7 @@ export const MemberCommitteesTable = ({ member }: MemberCommitteesTableProps) =>
       description: committee.description,
     });
     
-    if (session) {
+    if (session !== null) {
       setSelectedCommitteeForChat(committeeForChat);
       setChatOpen(true);
     }
@@ -87,9 +54,40 @@ export const MemberCommitteesTable = ({ member }: MemberCommitteesTableProps) =>
 
   const handleFavorite = async (committee: any, e: React.MouseEvent) => {
     e.stopPropagation();
-    // TODO: Implement favorite functionality for committees
-    console.log("Favorite committee:", committee);
+    await toggleFavorite(committee.committee_id);
   };
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold">Committees</h3>
+          <Button variant="outline" size="sm">
+            All Committees
+          </Button>
+        </div>
+        <div className="text-center py-8">
+          <p className="text-muted-foreground">Loading committee assignments...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold">Committees</h3>
+          <Button variant="outline" size="sm">
+            All Committees
+          </Button>
+        </div>
+        <div className="text-center py-8">
+          <p className="text-red-600">Error loading committee assignments: {error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -114,9 +112,9 @@ export const MemberCommitteesTable = ({ member }: MemberCommitteesTableProps) =>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {mockCommitteeData.map((committee) => (
+                {committees.map((committee) => (
                   <TableRow 
-                    key={committee.id}
+                    key={committee.committee_id}
                     className="hover:bg-muted/50 cursor-pointer transition-colors"
                     onClick={() => console.log("Navigate to committee:", committee.committee_id)}
                   >
@@ -129,7 +127,7 @@ export const MemberCommitteesTable = ({ member }: MemberCommitteesTableProps) =>
                           className="h-8 w-8 p-0 hover:bg-muted"
                           disabled={chatLoading}
                         >
-                          <Heart className="h-4 w-4" />
+                          <Heart className={`h-4 w-4 ${favoriteCommitteeIds.has(committee.committee_id) ? 'fill-red-500 text-red-500' : ''}`} />
                         </Button>
                         <Button
                           variant="ghost"
@@ -160,14 +158,14 @@ export const MemberCommitteesTable = ({ member }: MemberCommitteesTableProps) =>
                       {committee.chamber}
                     </TableCell>
                     <TableCell className="max-w-[300px]">
-                      {committee.description}
+                      {committee.description || "No description available"}
                     </TableCell>
                   </TableRow>
                 ))}
-                {mockCommitteeData.length === 0 && (
+                {committees.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
-                      No committee assignments found
+                      No committee assignments found for this member
                     </TableCell>
                   </TableRow>
                 )}
