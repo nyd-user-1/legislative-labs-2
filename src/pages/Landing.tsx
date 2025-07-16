@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,8 +13,6 @@ import {
   Star,
   Github,
   Twitter,
-  Menu,
-  X,
   Image,
   Share2,
   ChevronDown,
@@ -31,7 +28,6 @@ import { useNavigate } from 'react-router-dom';
 
 const Landing = () => {
   const [inputValue, setInputValue] = useState('');
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -140,7 +136,7 @@ const Landing = () => {
             </nav>
 
             {/* Desktop Actions */}
-            <div className="hidden md:flex items-center space-x-4">
+            <div className="flex items-center space-x-4">
               <Button variant="ghost" onClick={() => navigate('/auth')}>
                 Sign In
               </Button>
@@ -148,35 +144,7 @@ const Landing = () => {
                 Get Started
               </Button>
             </div>
-
-            {/* Mobile Menu Button */}
-            <button
-              className="md:hidden"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
-              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
           </div>
-
-          {/* Mobile Menu */}
-          {isMenuOpen && (
-            <div className="md:hidden border-t border-border/50 py-4">
-              <nav className="space-y-4">
-                <a href="#features" className="block text-muted-foreground hover:text-foreground">Features</a>
-                <a href="#examples" className="block text-muted-foreground hover:text-foreground">Examples</a>
-                <a href="#pricing" className="block text-muted-foreground hover:text-foreground">Pricing</a>
-                <a href="#docs" className="block text-muted-foreground hover:text-foreground">Docs</a>
-                <div className="pt-4 space-y-2">
-                  <Button variant="ghost" className="w-full" onClick={() => navigate('/auth')}>
-                    Sign In
-                  </Button>
-                  <Button className="w-full" onClick={() => navigate('/auth')}>
-                    Get Started
-                  </Button>
-                </div>
-              </nav>
-            </div>
-          )}
         </div>
       </header>
 
@@ -197,7 +165,7 @@ const Landing = () => {
 
             {/* Subheading */}
             <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
-              Create policy and legislation by chatting with AI
+              Create legislation by chatting with AI
             </p>
 
             {/* Input Section */}
@@ -247,8 +215,7 @@ const Landing = () => {
 
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all duration-200 px-2 py-1 rounded">
-                            <Image className="w-3 h-3" />
+                          <button type="button" className="text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all duration-200 px-2 py-1 rounded">
                             <span className="text-xs">Prompt</span>
                           </button>
                         </DropdownMenuTrigger>
@@ -261,8 +228,7 @@ const Landing = () => {
 
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all duration-200 px-2 py-1 rounded" onClick={() => navigate('/plans')}>
-                            <Share2 className="w-3 h-3" />
+                          <button type="button" className="text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all duration-200 px-2 py-1 rounded" onClick={() => navigate('/plans')}>
                             <span className="text-xs">Workspace</span>
                           </button>
                         </DropdownMenuTrigger>
@@ -296,18 +262,18 @@ const Landing = () => {
             </div>
 
             {/* User Count */}
-            <div className="flex flex-wrap items-center justify-center gap-4 mb-16">
-              <div className="flex items-center text-sm text-muted-foreground">
-                <div className="flex -space-x-2 mr-3">
-                  {[1, 2, 3, 4].map((i) => (
-                    <div
-                      key={i}
-                      className="w-8 h-8 rounded-full bg-muted border-2 border-background flex items-center justify-center text-xs"
-                    >
-                      {i}
-                    </div>
-                  ))}
-                </div>
+            <div className="flex flex-col items-center justify-center gap-4 mb-16">
+              <div className="flex -space-x-2">
+                {[1, 2, 3, 4].map((i) => (
+                  <div
+                    key={i}
+                    className="w-8 h-8 rounded-full bg-muted border-2 border-background flex items-center justify-center text-xs"
+                  >
+                    {i}
+                  </div>
+                ))}
+              </div>
+              <div className="text-sm text-muted-foreground">
                 <span>10,000+ developers building with Goodable</span>
               </div>
             </div>
