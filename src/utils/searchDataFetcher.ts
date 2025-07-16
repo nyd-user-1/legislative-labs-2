@@ -42,7 +42,7 @@ export const fetchAllSearchContent = async (): Promise<SearchResult[]> => {
       media = mediaResult.data;
     }
 
-    // Fetch public legislative data (no auth required) - NY only
+    // Fetch public legislative data (no auth required) - NY ONLY
     const { data: bills } = await supabase
       .from('Bills')
       .select('*')
@@ -101,7 +101,7 @@ export const fetchAllSearchContent = async (): Promise<SearchResult[]> => {
         url: `/media-kits?id=${m.id}`,
         source: 'local' as const
       })) || []),
-      // Legislative data - NY only
+      // Legislative data - NY ONLY (from our NY database)
       ...(bills?.map(b => ({
         id: b.bill_id.toString(),
         title: b.title || b.bill_number || 'Untitled Bill',
@@ -138,7 +138,7 @@ export const fetchAllSearchContent = async (): Promise<SearchResult[]> => {
   }
 };
 
-// Updated function to restrict Legiscan search to NY only
+// RESTRICTED TO NY ONLY - Do not use this for general searches
 export const searchLegiscanContent = async (searchTerm: string, allowAllStates = false): Promise<SearchResult[]> => {
   try {
     const { data, error } = await supabase.functions.invoke('legiscan-search', {
@@ -146,7 +146,7 @@ export const searchLegiscanContent = async (searchTerm: string, allowAllStates =
         operation: 'search',
         params: {
           query: searchTerm,
-          // Only restrict to NY unless explicitly allowed to search all states
+          // ALWAYS restrict to NY unless explicitly allowed for AI chat
           state: allowAllStates ? undefined : 'NY',
           page: 1
         }
@@ -178,6 +178,8 @@ export const searchLegiscanContent = async (searchTerm: string, allowAllStates =
 };
 
 // Function specifically for AI chat similar bills analysis (allows all states)
+// This is the ONLY exception to the NY-only rule
 export const searchSimilarBillsAllStates = async (searchTerm: string): Promise<SearchResult[]> => {
+  console.log('AI Chat: Searching similar bills across all states for analysis');
   return await searchLegiscanContent(searchTerm, true);
 };

@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FiscalImpactCard } from "./FiscalImpactCard";
@@ -39,7 +40,7 @@ export const AnalysisResults = ({ analysisData, onGenerateNew }: AnalysisResults
         <ImplementationTimelineCard implementationTimeline={analysisData.implementationTimeline} />
       </div>
 
-      <SimilarLegislationCard similarLegislation={analysisData.similarLegislation} />
+      <SimilarLegislationCard searchQuery={analysisData?.searchQuery} currentBillTitle={analysisData?.title} />
       <StakeholderAnalysisCard stakeholders={analysisData.stakeholders} />
       <RiskAssessmentCard riskFactors={analysisData.riskFactors} />
     </div>

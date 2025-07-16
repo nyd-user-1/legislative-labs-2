@@ -51,14 +51,14 @@ export const useLegiscan = () => {
     }
   };
 
-  // Restrict searches to NY only unless explicitly allowed
-  const searchBills = async (query: string, allowAllStates = false, year?: number, page = 1) => {
+  // ALL SEARCHES RESTRICTED TO NY ONLY
+  const searchBills = async (query: string, year?: number, page = 1) => {
+    console.log('Searching bills - RESTRICTED TO NY ONLY');
     const result = await callLegiscanApi({
       operation: 'search',
       params: {
         query,
-        // Only restrict to NY unless explicitly allowed
-        state: allowAllStates ? undefined : 'NY',
+        state: 'NY', // ALWAYS restrict to NY
         year,
         page
       }
@@ -71,14 +71,31 @@ export const useLegiscan = () => {
     return result;
   };
 
-  // For similar bills analysis in AI chat - allows all states
+  // SPECIAL METHOD FOR AI CHAT ONLY - allows all states for similar bills analysis
   const searchSimilarBills = async (query: string, year?: number, page = 1) => {
-    return await searchBills(query, true, year, page);
+    console.log('AI Chat: Searching similar bills across all states for analysis');
+    const result = await callLegiscanApi({
+      operation: 'search',
+      params: {
+        query,
+        // Allow all states for AI chat similar bills analysis
+        state: undefined,
+        year,
+        page
+      }
+    });
+
+    if (result) {
+      setSearchResults(result);
+    }
+
+    return result;
   };
 
   const getSessionList = async (state?: string) => {
-    // Default to NY if no state specified
-    const targetState = state || 'NY';
+    // ALWAYS default to NY
+    const targetState = 'NY';
+    console.log('Getting session list - RESTRICTED TO NY ONLY');
     
     const result = await callLegiscanApi({
       operation: 'getSessionList',
@@ -115,9 +132,9 @@ export const useLegiscan = () => {
     loading,
     searchResults,
     sessions,
-    searchBills,
-    searchSimilarBills, // New method for AI chat similar bills
-    getSessionList,
+    searchBills, // NY ONLY
+    searchSimilarBills, // AI Chat exception - all states for similar bills analysis
+    getSessionList, // NY ONLY
     getBill,
     getBillText,
     clearResults,

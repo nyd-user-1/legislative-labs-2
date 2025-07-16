@@ -25,6 +25,7 @@ export const SimilarLegislationCard = ({ searchQuery, currentBillTitle }: Simila
       if (searchQuery || currentBillTitle) {
         const query = searchQuery || currentBillTitle || '';
         try {
+          console.log('AI Chat Analysis: Searching for similar legislation across all states');
           // Use searchSimilarBills which allows all states for AI chat analysis
           const results = await searchSimilarBills(query);
           
