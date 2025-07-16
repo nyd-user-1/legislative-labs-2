@@ -7,13 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   ArrowLeft, 
-  ExternalLink, 
-  Calendar, 
-  User, 
-  FileText, 
-  History,
-  Users,
-  Vote
+  User
 } from "lucide-react";
 import { BillStatusBadge } from "./BillStatusBadge";
 import { BillJourney } from "./BillJourney";
@@ -181,20 +175,16 @@ export const BillDetail = ({ bill, onBack }: BillDetailProps) => {
           <section>
             <Tabs defaultValue="overview" className="space-y-6">
               <TabsList className="grid w-full grid-cols-4 h-12 p-1 bg-muted rounded-lg">
-                <TabsTrigger value="overview" className="flex items-center gap-2 h-10 rounded-md text-sm font-medium">
-                  <FileText className="h-4 w-4" />
+                <TabsTrigger value="overview" className="h-10 rounded-md text-sm font-medium">
                   Overview
                 </TabsTrigger>
-                <TabsTrigger value="sponsors" className="flex items-center gap-2 h-10 rounded-md text-sm font-medium">
-                  <Users className="h-4 w-4" />
+                <TabsTrigger value="sponsors" className="h-10 rounded-md text-sm font-medium">
                   Sponsors
                 </TabsTrigger>
-                <TabsTrigger value="history" className="flex items-center gap-2 h-10 rounded-md text-sm font-medium">
-                  <History className="h-4 w-4" />
+                <TabsTrigger value="history" className="h-10 rounded-md text-sm font-medium">
                   History
                 </TabsTrigger>
-                <TabsTrigger value="votes" className="flex items-center gap-2 h-10 rounded-md text-sm font-medium">
-                  <Vote className="h-4 w-4" />
+                <TabsTrigger value="votes" className="h-10 rounded-md text-sm font-medium">
                   Votes
                 </TabsTrigger>
               </TabsList>
@@ -418,7 +408,7 @@ export const BillDetail = ({ bill, onBack }: BillDetailProps) => {
                       </div>
                     ) : rollCalls.length === 0 ? (
                       <div className="text-center py-12">
-                        <Vote className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                        <div className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                         <h3 className="text-lg font-medium mb-2">No Voting Records</h3>
                         <p className="text-muted-foreground text-sm max-w-md mx-auto">
                           No roll call votes have been recorded for this bill yet.
