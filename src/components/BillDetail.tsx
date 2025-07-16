@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,7 @@ import {
 } from "lucide-react";
 import { BillStatusBadge } from "./BillStatusBadge";
 import { BillJourney } from "./BillJourney";
+import { BillTextDisplay } from "./BillTextDisplay";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
 
@@ -175,7 +177,6 @@ export const BillDetail = ({ bill, onBack }: BillDetailProps) => {
             Back to Bills
           </Button>
 
-
           {/* Bill Tabs Section */}
           <section>
             <Tabs defaultValue="overview" className="space-y-6">
@@ -197,70 +198,74 @@ export const BillDetail = ({ bill, onBack }: BillDetailProps) => {
               </TabsList>
 
               <TabsContent value="overview" className="mt-6">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* Bill Summary Card */}
-                  <Card className="min-h-[320px] flex flex-col">
-                    <CardHeader>
-                      <CardTitle className="text-lg">Bill Summary</CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex-1 flex flex-col justify-between space-y-4">
-                      <div className="flex-1">
-                        <h4 className="font-medium text-sm text-muted-foreground mb-2">Description</h4>
-                        <p className="text-sm leading-relaxed">
-                          {bill.description || bill.title || "No description available for this bill."}
-                        </p>
-                      </div>
-                      
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t mt-auto">
-                        <div>
-                          <h4 className="font-medium text-sm text-muted-foreground mb-1">Session</h4>
-                          <p className="text-sm">{bill.session_id || "Not specified"}</p>
-                        </div>
-                        <div>
-                          <h4 className="font-medium text-sm text-muted-foreground mb-1">Committee</h4>
-                          <p className="text-sm">{bill.committee || "Not assigned"}</p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Key Information Card */}
-                  <Card className="min-h-[320px] flex flex-col">
-                    <CardHeader>
-                      <CardTitle className="text-lg">Key Information</CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex-1 flex flex-col justify-between">
-                      <div className="space-y-3 flex-1 flex flex-col justify-evenly">
-                        <div className="flex justify-between items-center py-2 border-b border-border/50">
-                          <span className="text-sm text-muted-foreground">Bill Number</span>
-                          <span className="text-sm font-medium">{bill.bill_number || "Not available"}</span>
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Bill Summary Card */}
+                    <Card className="min-h-[320px] flex flex-col">
+                      <CardHeader>
+                        <CardTitle className="text-lg">Bill Summary</CardTitle>
+                      </CardHeader>
+                      <CardContent className="flex-1 flex flex-col justify-between space-y-4">
+                        <div className="flex-1">
+                          <h4 className="font-medium text-sm text-muted-foreground mb-2">Description</h4>
+                          <p className="text-sm leading-relaxed">
+                            {bill.description || bill.title || "No description available for this bill."}
+                          </p>
                         </div>
                         
-                        <div className="flex justify-between items-center py-2 border-b border-border/50">
-                          <span className="text-sm text-muted-foreground">Status</span>
-                          <div className="text-right">
-                            {bill.status !== null ? (
-                              <BillStatusBadge status={bill.status} statusDesc={bill.status_desc} />
-                            ) : (
-                              <span className="text-sm">Unknown</span>
-                            )}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t mt-auto">
+                          <div>
+                            <h4 className="font-medium text-sm text-muted-foreground mb-1">Session</h4>
+                            <p className="text-sm">{bill.session_id || "Not specified"}</p>
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-sm text-muted-foreground mb-1">Committee</h4>
+                            <p className="text-sm">{bill.committee || "Not assigned"}</p>
                           </div>
                         </div>
-                        
-                        <div className="flex justify-between items-center py-2 border-b border-border/50">
-                          <span className="text-sm text-muted-foreground">Last Action</span>
-                          <span className="text-sm font-medium">{formatDate(bill.last_action_date)}</span>
-                        </div>
-                        
-                        <div className="flex justify-between items-center py-2">
-                          <span className="text-sm text-muted-foreground">Total Sponsors</span>
-                          <span className="text-sm font-medium">{sponsors.length}</span>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
+                      </CardContent>
+                    </Card>
 
+                    {/* Key Information Card */}
+                    <Card className="min-h-[320px] flex flex-col">
+                      <CardHeader>
+                        <CardTitle className="text-lg">Key Information</CardTitle>
+                      </CardHeader>
+                      <CardContent className="flex-1 flex flex-col justify-between">
+                        <div className="space-y-3 flex-1 flex flex-col justify-evenly">
+                          <div className="flex justify-between items-center py-2 border-b border-border/50">
+                            <span className="text-sm text-muted-foreground">Bill Number</span>
+                            <span className="text-sm font-medium">{bill.bill_number || "Not available"}</span>
+                          </div>
+                          
+                          <div className="flex justify-between items-center py-2 border-b border-border/50">
+                            <span className="text-sm text-muted-foreground">Status</span>
+                            <div className="text-right">
+                              {bill.status !== null ? (
+                                <BillStatusBadge status={bill.status} statusDesc={bill.status_desc} />
+                              ) : (
+                                <span className="text-sm">Unknown</span>
+                              )}
+                            </div>
+                          </div>
+                          
+                          <div className="flex justify-between items-center py-2 border-b border-border/50">
+                            <span className="text-sm text-muted-foreground">Last Action</span>
+                            <span className="text-sm font-medium">{formatDate(bill.last_action_date)}</span>
+                          </div>
+                          
+                          <div className="flex justify-between items-center py-2">
+                            <span className="text-sm text-muted-foreground">Total Sponsors</span>
+                            <span className="text-sm font-medium">{sponsors.length}</span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Bill Text Display */}
+                  <BillTextDisplay billId={bill.bill_id.toString()} className="w-full" />
+                </div>
               </TabsContent>
 
               <TabsContent value="sponsors" className="mt-6">
