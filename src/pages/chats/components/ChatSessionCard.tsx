@@ -2,7 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Trash2 } from "lucide-react";
+import { Trash2, Heart, Sparkles } from "lucide-react";
 import { format } from "date-fns";
 import { ChatSession } from "../types";
 import { ConversationView } from "./ConversationView";
@@ -38,6 +38,18 @@ export const ChatSessionCard = ({
 
   const chamberInfo = getChamberInfo();
 
+  const handleFavorite = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // TODO: Implement favorite functionality for chat sessions
+    console.log('Favorite chat session:', session.id);
+  };
+
+  const handleAIAnalysis = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // TODO: Implement AI analysis functionality for chat sessions
+    console.log('AI Analysis for chat session:', session.id);
+  };
+
   return (
     <Card className="w-full">
       <CardHeader className="pb-3">
@@ -48,6 +60,14 @@ export const ChatSessionCard = ({
               <span>{format(new Date(session.updated_at), "MMM d, yyyy 'at' h:mm a")}</span>
               <span>{messageCount} messages</span>
               {chamberInfo && <span>{chamberInfo}</span>}
+              <div className="flex gap-1">
+                <Button variant="ghost" size="sm" onClick={handleFavorite}>
+                  <Heart className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="sm" onClick={handleAIAnalysis}>
+                  <Sparkles className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
           <Button
