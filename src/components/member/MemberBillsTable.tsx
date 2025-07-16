@@ -1,3 +1,4 @@
+
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -5,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { CardActionButtons } from "@/components/ui/CardActionButtons";
 import { AIChatSheet } from "@/components/AIChatSheet";
@@ -122,7 +122,7 @@ export const MemberBillsTable = ({ member }: MemberBillsTableProps) => {
   return (
     <>
       <TooltipProvider>
-        <Card className="w-full">
+        <Card className="w-full max-w-full overflow-hidden">
           <CardHeader className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <CardTitle>Member Bills</CardTitle>
@@ -156,120 +156,169 @@ export const MemberBillsTable = ({ member }: MemberBillsTableProps) => {
                 </div>
               </div>
             ) : (
-              <div className="w-full overflow-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="hover:bg-transparent">
-                      <TableHead className="w-[120px]">
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          onClick={() => handleSort('bill_number')}
-                          className="h-auto p-0 font-semibold hover:bg-transparent"
-                        >
-                          Bill {getSortIcon('bill_number')}
-                        </Button>
-                      </TableHead>
-                      <TableHead className="min-w-[300px]">
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          onClick={() => handleSort('title')}
-                          className="h-auto p-0 font-semibold hover:bg-transparent"
-                        >
-                          Description {getSortIcon('title')}
-                        </Button>
-                      </TableHead>
-                      <TableHead className="w-[120px]">
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          onClick={() => handleSort('status_desc')}
-                          className="h-auto p-0 font-semibold hover:bg-transparent"
-                        >
-                          Status {getSortIcon('status_desc')}
-                        </Button>
-                      </TableHead>
-                      <TableHead className="w-[160px]">
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          onClick={() => handleSort('committee')}
-                          className="h-auto p-0 font-semibold hover:bg-transparent"
-                        >
-                          Committee {getSortIcon('committee')}
-                        </Button>
-                      </TableHead>
-                      <TableHead className="min-w-[200px]">
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              onClick={() => handleSort('last_action')}
-                              className="h-auto p-0 font-semibold hover:bg-transparent flex items-center gap-1"
-                            >
-                              Last Action {getSortIcon('last_action')} <HelpCircle className="h-3 w-3" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>ALL CAPS indicates Senate action, lowercase indicates Assembly action</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TableHead>
-                      <TableHead className="min-w-[120px]">
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          onClick={() => handleSort('last_action_date')}
-                          className="h-auto p-0 font-semibold hover:bg-transparent"
-                        >
-                          Date {getSortIcon('last_action_date')}
-                        </Button>
-                      </TableHead>
-                      <TableHead className="w-[100px]">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredAndSortedBills.map((bill) => (
-                      <TableRow 
-                        key={bill.bill_id} 
-                        className="cursor-pointer"
-                        onClick={() => handleBillClick(bill)}
-                      >
-                        <TableCell className="font-medium">{bill.bill_number}</TableCell>
-                        <TableCell className="max-w-[300px]">
-                          <div className="line-clamp-2 text-sm">{bill.title}</div>
-                        </TableCell>
-                        <TableCell>
+              <>
+                {/* Mobile Card Layout */}
+                <div className="block md:hidden space-y-4 p-4">
+                  {filteredAndSortedBills.map((bill) => (
+                    <div 
+                      key={bill.bill_id} 
+                      className="border rounded-lg p-4 bg-card cursor-pointer hover:bg-accent/50 transition-colors"
+                      onClick={() => handleBillClick(bill)}
+                    >
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="font-semibold text-lg">{bill.bill_number}</div>
+                        <CardActionButtons
+                          onFavorite={(e) => handleFavorite(bill, e)}
+                          onAIAnalysis={(e) => handleAIAnalysis(bill, e)}
+                          isFavorited={false}
+                          hasAIChat={false}
+                          size="sm"
+                          variant="outline"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <div className="text-sm font-medium line-clamp-2">{bill.title}</div>
+                        <div className="flex items-center gap-2">
                           <Badge variant={bill.status_desc?.toLowerCase() === "passed" ? "success" : "secondary"}>
                             {bill.status_desc || "Unknown"}
                           </Badge>
-                        </TableCell>
-                        <TableCell className="max-w-[160px]">
-                          <div className="line-clamp-2 text-sm truncate">
-                            {bill.committee || "N/A"}
+                        </div>
+                        {bill.committee && (
+                          <div className="text-xs text-muted-foreground">
+                            <span className="font-medium">Committee:</span> {bill.committee}
                           </div>
-                        </TableCell>
-                        <TableCell className="text-sm text-muted-foreground">
-                          {bill.last_action || "No action recorded"}
-                        </TableCell>
-                        <TableCell className="text-sm text-muted-foreground">
-                          {formatDate(bill.last_action_date)}
-                        </TableCell>
-                        <TableCell>
-                          <CardActionButtons
-                            onFavorite={(e) => handleFavorite(bill, e)}
-                            onAIAnalysis={(e) => handleAIAnalysis(bill, e)}
-                            isFavorited={false}
-                            hasAIChat={false}
-                          />
-                        </TableCell>
+                        )}
+                        {bill.last_action && (
+                          <div className="text-xs text-muted-foreground">
+                            <span className="font-medium">Last Action:</span> {bill.last_action}
+                          </div>
+                        )}
+                        <div className="text-xs text-muted-foreground">
+                          <span className="font-medium">Date:</span> {formatDate(bill.last_action_date)}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Desktop Table Layout */}
+                <div className="hidden md:block w-full overflow-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="hover:bg-transparent">
+                        <TableHead className="w-auto">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => handleSort('bill_number')}
+                            className="h-auto p-0 font-semibold hover:bg-transparent"
+                          >
+                            Bill {getSortIcon('bill_number')}
+                          </Button>
+                        </TableHead>
+                        <TableHead className="w-auto">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => handleSort('title')}
+                            className="h-auto p-0 font-semibold hover:bg-transparent"
+                          >
+                            Description {getSortIcon('title')}
+                          </Button>
+                        </TableHead>
+                        <TableHead className="w-auto">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => handleSort('status_desc')}
+                            className="h-auto p-0 font-semibold hover:bg-transparent"
+                          >
+                            Status {getSortIcon('status_desc')}
+                          </Button>
+                        </TableHead>
+                        <TableHead className="w-auto">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => handleSort('committee')}
+                            className="h-auto p-0 font-semibold hover:bg-transparent"
+                          >
+                            Committee {getSortIcon('committee')}
+                          </Button>
+                        </TableHead>
+                        <TableHead className="w-auto">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                onClick={() => handleSort('last_action')}
+                                className="h-auto p-0 font-semibold hover:bg-transparent flex items-center gap-1"
+                              >
+                                Last Action {getSortIcon('last_action')} <HelpCircle className="h-3 w-3" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>ALL CAPS indicates Senate action, lowercase indicates Assembly action</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TableHead>
+                        <TableHead className="w-auto">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => handleSort('last_action_date')}
+                            className="h-auto p-0 font-semibold hover:bg-transparent"
+                          >
+                            Date {getSortIcon('last_action_date')}
+                          </Button>
+                        </TableHead>
+                        <TableHead className="w-auto">Actions</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredAndSortedBills.map((bill) => (
+                        <TableRow 
+                          key={bill.bill_id} 
+                          className="cursor-pointer"
+                          onClick={() => handleBillClick(bill)}
+                        >
+                          <TableCell className="font-medium">{bill.bill_number}</TableCell>
+                          <TableCell className="max-w-xs">
+                            <div className="line-clamp-2 text-sm">{bill.title}</div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={bill.status_desc?.toLowerCase() === "passed" ? "success" : "secondary"}>
+                              {bill.status_desc || "Unknown"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="max-w-xs">
+                            <div className="truncate text-sm">
+                              {bill.committee || "N/A"}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-sm text-muted-foreground max-w-xs">
+                            <div className="truncate">
+                              {bill.last_action || "No action recorded"}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-sm text-muted-foreground">
+                            {formatDate(bill.last_action_date)}
+                          </TableCell>
+                          <TableCell>
+                            <CardActionButtons
+                              onFavorite={(e) => handleFavorite(bill, e)}
+                              onAIAnalysis={(e) => handleAIAnalysis(bill, e)}
+                              isFavorited={false}
+                              hasAIChat={false}
+                            />
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </>
             )}
           </CardContent>
         </Card>
