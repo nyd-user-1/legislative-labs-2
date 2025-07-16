@@ -2,14 +2,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Trash2, Heart, Sparkles } from "lucide-react";
+import { Trash2, Heart } from "lucide-react";
 import { format } from "date-fns";
 import { ChatSession } from "../types";
 import { ConversationView } from "./ConversationView";
 import { parseMessages } from "../utils/messageParser";
 import { getBillChamber } from "@/hooks/chat/utils";
 import { useFavorites } from "@/hooks/useFavorites";
-import { useChatLogic } from "@/hooks/useChatLogic";
 import { useToast } from "@/hooks/use-toast";
 
 interface ChatSessionCardProps {
@@ -32,10 +31,6 @@ export const ChatSessionCard = ({
   // Initialize favorites hook
   const { favoriteBillIds, toggleFavorite } = useFavorites();
   const isFavorited = session.bill_id ? favoriteBillIds.has(session.bill_id) : false;
-
-  // Initialize chat logic for AI analysis if this is a bill session
-  const billEntity = session.bill_id ? { bill_id: session.bill_id, bill_number: session.title.replace('Analysis: ', '') } : null;
-  const { initializeSession } = useChatLogic(billEntity, session.bill_id ? 'bill' : null);
 
   // Extract chamber information for bill sessions
   const getChamberInfo = () => {
@@ -77,33 +72,6 @@ export const ChatSessionCard = ({
     }
   };
 
-  const handleAIAnalysis = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    
-    if (!session.bill_id) {
-      toast({
-        title: "AI Analysis not available",
-        description: "AI analysis is only available for bill chat sessions",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      await initializeSession(true);
-      toast({
-        title: "AI Analysis started",
-        description: "Starting new AI analysis session for this bill",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to start AI analysis",
-        variant: "destructive",
-      });
-    }
-  };
-
   return (
     <Card className="w-full">
       <CardHeader className="pb-3">
@@ -123,15 +91,6 @@ export const ChatSessionCard = ({
                   title={session.bill_id ? "Add to Favorites" : "Only available for bill sessions"}
                 >
                   <Heart className={`h-4 w-4 ${isFavorited ? 'fill-red-500 text-red-500' : ''}`} />
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={handleAIAnalysis}
-                  disabled={!session.bill_id}
-                  title={session.bill_id ? "AI Analysis" : "Only available for bill sessions"}
-                >
-                  <Sparkles className="h-4 w-4" />
                 </Button>
               </div>
             </div>
