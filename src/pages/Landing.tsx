@@ -229,12 +229,12 @@ const Landing = () => {
                     )}
                   </div>
                   
-                  {/* Toolbar inside input */}
-                  <div className="flex items-center justify-between mt-3 pt-3 border-t border-border/30">
+                  {/* Toolbar inside input with 55px spacing */}
+                  <div className="flex items-center justify-between pt-[55px] border-t border-border/30" style={{ marginTop: '55px' }}>
                     <div className="flex items-center gap-4">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <button type="button" className="text-muted-foreground hover:text-foreground transition-colors text-xs">
+                          <button type="button" className="text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all duration-200 text-xs px-2 py-1 rounded">
                             Doc
                           </button>
                         </DropdownMenuTrigger>
@@ -247,7 +247,7 @@ const Landing = () => {
 
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+                          <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all duration-200 px-2 py-1 rounded">
                             <Image className="w-3 h-3" />
                             <span className="text-xs">Prompt</span>
                           </button>
@@ -261,7 +261,7 @@ const Landing = () => {
 
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors" onClick={() => navigate('/plans')}>
+                          <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all duration-200 px-2 py-1 rounded" onClick={() => navigate('/plans')}>
                             <Share2 className="w-3 h-3" />
                             <span className="text-xs">Workspace</span>
                           </button>
@@ -275,7 +275,7 @@ const Landing = () => {
 
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+                          <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all duration-200 px-2 py-1 rounded">
                             <div className="w-3 h-3 bg-green-500 rounded flex items-center justify-center">
                               <span className="text-[8px] text-white font-bold">⚡</span>
                             </div>
