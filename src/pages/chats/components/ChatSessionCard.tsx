@@ -29,9 +29,9 @@ export const ChatSessionCard = ({
   const messageCount = messages.length;
   const { toast } = useToast();
 
-  // Initialize favorites hook if this is a bill session
-  const { favorites, toggleFavorite } = useFavorites(session.bill_id ? 'bill' : null);
-  const isFavorited = session.bill_id ? favorites.includes(session.bill_id) : false;
+  // Initialize favorites hook
+  const { favoriteBillIds, toggleFavorite } = useFavorites();
+  const isFavorited = session.bill_id ? favoriteBillIds.has(session.bill_id) : false;
 
   // Initialize chat logic for AI analysis if this is a bill session
   const billEntity = session.bill_id ? { bill_id: session.bill_id, bill_number: session.title.replace('Analysis: ', '') } : null;
