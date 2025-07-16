@@ -51,12 +51,14 @@ export const useLegiscan = () => {
     }
   };
 
-  const searchBills = async (query: string, state?: string, year?: number, page = 1) => {
+  // Restrict searches to NY only unless explicitly allowed
+  const searchBills = async (query: string, allowAllStates = false, year?: number, page = 1) => {
     const result = await callLegiscanApi({
       operation: 'search',
       params: {
         query,
-        state,
+        // Only restrict to NY unless explicitly allowed
+        state: allowAllStates ? undefined : 'NY',
         year,
         page
       }
@@ -69,10 +71,18 @@ export const useLegiscan = () => {
     return result;
   };
 
+  // For similar bills analysis in AI chat - allows all states
+  const searchSimilarBills = async (query: string, year?: number, page = 1) => {
+    return await searchBills(query, true, year, page);
+  };
+
   const getSessionList = async (state?: string) => {
+    // Default to NY if no state specified
+    const targetState = state || 'NY';
+    
     const result = await callLegiscanApi({
       operation: 'getSessionList',
-      params: state ? { state } : {}
+      params: { state: targetState }
     });
 
     if (result) {
@@ -106,6 +116,7 @@ export const useLegiscan = () => {
     searchResults,
     sessions,
     searchBills,
+    searchSimilarBills, // New method for AI chat similar bills
     getSessionList,
     getBill,
     getBillText,

@@ -42,7 +42,7 @@ export const fetchAllSearchContent = async (): Promise<SearchResult[]> => {
       media = mediaResult.data;
     }
 
-    // Fetch public legislative data (no auth required)
+    // Fetch public legislative data (no auth required) - NY only
     const { data: bills } = await supabase
       .from('Bills')
       .select('*')
@@ -71,7 +71,8 @@ export const fetchAllSearchContent = async (): Promise<SearchResult[]> => {
         type: 'problem' as const,
         content: p.description,
         created_at: p.created_at,
-        url: `/problems?id=${p.id}`
+        url: `/problems?id=${p.id}`,
+        source: 'local' as const
       })) || []),
       ...(ideas?.map(i => ({
         id: i.id,
@@ -79,7 +80,8 @@ export const fetchAllSearchContent = async (): Promise<SearchResult[]> => {
         type: 'idea' as const,
         content: i.improved_idea || i.original_idea,
         created_at: i.created_at,
-        url: `/ideas?id=${i.id}`
+        url: `/ideas?id=${i.id}`,
+        source: 'local' as const
       })) || []),
       ...(drafts?.map(d => ({
         id: d.id,
@@ -87,7 +89,8 @@ export const fetchAllSearchContent = async (): Promise<SearchResult[]> => {
         type: 'draft' as const,
         content: d.draft_content,
         created_at: d.created_at,
-        url: `/?id=${d.id}`
+        url: `/?id=${d.id}`,
+        source: 'local' as const
       })) || []),
       ...(media?.map(m => ({
         id: m.id,
@@ -95,16 +98,18 @@ export const fetchAllSearchContent = async (): Promise<SearchResult[]> => {
         type: 'media' as const,
         content: m.content,
         created_at: m.created_at,
-        url: `/media-kits?id=${m.id}`
+        url: `/media-kits?id=${m.id}`,
+        source: 'local' as const
       })) || []),
-      // Legislative data
+      // Legislative data - NY only
       ...(bills?.map(b => ({
         id: b.bill_id.toString(),
         title: b.title || b.bill_number || 'Untitled Bill',
         type: 'bill' as const,
         content: b.description || b.last_action || '',
         created_at: b.status_date || new Date().toISOString(),
-        url: `/bills?selected=${b.bill_id}`
+        url: `/bills?selected=${b.bill_id}`,
+        source: 'nys' as const
       })) || []),
       ...(members?.map(m => ({
         id: m.people_id.toString(),
@@ -112,7 +117,8 @@ export const fetchAllSearchContent = async (): Promise<SearchResult[]> => {
         type: 'member' as const,
         content: `${m.party || ''} ${m.chamber || ''} ${m.district || ''}`.trim() || m.bio_short || '',
         created_at: new Date().toISOString(),
-        url: `/members?selected=${m.people_id}`
+        url: `/members?selected=${m.people_id}`,
+        source: 'nys' as const
       })) || []),
       ...(committees?.map(c => ({
         id: c.committee_id.toString(),
@@ -120,7 +126,8 @@ export const fetchAllSearchContent = async (): Promise<SearchResult[]> => {
         type: 'committee' as const,
         content: c.description || c.chair_name || '',
         created_at: new Date().toISOString(),
-        url: `/committees?selected=${c.committee_id}`
+        url: `/committees?selected=${c.committee_id}`,
+        source: 'nys' as const
       })) || [])
     ];
 
@@ -131,14 +138,16 @@ export const fetchAllSearchContent = async (): Promise<SearchResult[]> => {
   }
 };
 
-// New function specifically for Legiscan search integration
-export const searchLegiscanContent = async (searchTerm: string): Promise<SearchResult[]> => {
+// Updated function to restrict Legiscan search to NY only
+export const searchLegiscanContent = async (searchTerm: string, allowAllStates = false): Promise<SearchResult[]> => {
   try {
     const { data, error } = await supabase.functions.invoke('legiscan-search', {
       body: {
         operation: 'search',
         params: {
           query: searchTerm,
+          // Only restrict to NY unless explicitly allowed to search all states
+          state: allowAllStates ? undefined : 'NY',
           page: 1
         }
       }
@@ -159,10 +168,16 @@ export const searchLegiscanContent = async (searchTerm: string): Promise<SearchR
       type: 'bill' as const,
       content: bill.description || bill.last_action || '',
       created_at: bill.status_date || new Date().toISOString(),
-      url: bill.state_link || bill.url || '#'
+      url: bill.state_link || bill.url || '#',
+      source: 'legiscan' as const
     }));
   } catch (error) {
     console.error('Error searching Legiscan:', error);
     return [];
   }
+};
+
+// Function specifically for AI chat similar bills analysis (allows all states)
+export const searchSimilarBillsAllStates = async (searchTerm: string): Promise<SearchResult[]> => {
+  return await searchLegiscanContent(searchTerm, true);
 };
