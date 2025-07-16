@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -123,7 +122,7 @@ export const MemberBillsTable = ({ member }: MemberBillsTableProps) => {
   return (
     <>
       <TooltipProvider>
-        <Card>
+        <Card className="w-full">
           <CardHeader className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <CardTitle>Member Bills</CardTitle>
@@ -141,7 +140,7 @@ export const MemberBillsTable = ({ member }: MemberBillsTableProps) => {
               />
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-0">
             {loading ? (
               <div className="flex items-center justify-center py-8">
                 <div className="text-muted-foreground">Loading bills...</div>
@@ -157,11 +156,11 @@ export const MemberBillsTable = ({ member }: MemberBillsTableProps) => {
                 </div>
               </div>
             ) : (
-              <div className="relative w-full overflow-auto">
-                <Table className="w-full caption-bottom text-sm">
+              <div className="w-full overflow-auto">
+                <Table>
                   <TableHeader>
-                    <TableRow className="border-b hover:bg-transparent">
-                      <TableHead className="w-[120px] h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                    <TableRow className="hover:bg-transparent">
+                      <TableHead className="w-[120px]">
                         <Button 
                           variant="ghost" 
                           size="sm" 
@@ -171,7 +170,7 @@ export const MemberBillsTable = ({ member }: MemberBillsTableProps) => {
                           Bill {getSortIcon('bill_number')}
                         </Button>
                       </TableHead>
-                      <TableHead className="min-w-[300px] h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                      <TableHead className="min-w-[300px]">
                         <Button 
                           variant="ghost" 
                           size="sm" 
@@ -181,7 +180,7 @@ export const MemberBillsTable = ({ member }: MemberBillsTableProps) => {
                           Description {getSortIcon('title')}
                         </Button>
                       </TableHead>
-                      <TableHead className="w-[120px] h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                      <TableHead className="w-[120px]">
                         <Button 
                           variant="ghost" 
                           size="sm" 
@@ -191,7 +190,7 @@ export const MemberBillsTable = ({ member }: MemberBillsTableProps) => {
                           Status {getSortIcon('status_desc')}
                         </Button>
                       </TableHead>
-                      <TableHead className="w-[160px] h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                      <TableHead className="w-[160px]">
                         <Button 
                           variant="ghost" 
                           size="sm" 
@@ -201,7 +200,7 @@ export const MemberBillsTable = ({ member }: MemberBillsTableProps) => {
                           Committee {getSortIcon('committee')}
                         </Button>
                       </TableHead>
-                      <TableHead className="min-w-[200px] h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                      <TableHead className="min-w-[200px]">
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button 
@@ -218,7 +217,7 @@ export const MemberBillsTable = ({ member }: MemberBillsTableProps) => {
                           </TooltipContent>
                         </Tooltip>
                       </TableHead>
-                      <TableHead className="min-w-[120px] h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                      <TableHead className="min-w-[120px]">
                         <Button 
                           variant="ghost" 
                           size="sm" 
@@ -228,37 +227,37 @@ export const MemberBillsTable = ({ member }: MemberBillsTableProps) => {
                           Date {getSortIcon('last_action_date')}
                         </Button>
                       </TableHead>
-                      <TableHead className="w-[100px] h-12 px-4 text-left align-middle font-medium text-muted-foreground">Actions</TableHead>
+                      <TableHead className="w-[100px]">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredAndSortedBills.map((bill) => (
                       <TableRow 
                         key={bill.bill_id} 
-                        className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted cursor-pointer"
+                        className="cursor-pointer"
                         onClick={() => handleBillClick(bill)}
                       >
-                        <TableCell className="p-4 align-middle font-medium">{bill.bill_number}</TableCell>
-                        <TableCell className="p-4 align-middle max-w-[300px]">
+                        <TableCell className="font-medium">{bill.bill_number}</TableCell>
+                        <TableCell className="max-w-[300px]">
                           <div className="line-clamp-2 text-sm">{bill.title}</div>
                         </TableCell>
-                        <TableCell className="p-4 align-middle">
+                        <TableCell>
                           <Badge variant={bill.status_desc?.toLowerCase() === "passed" ? "success" : "secondary"}>
                             {bill.status_desc || "Unknown"}
                           </Badge>
                         </TableCell>
-                        <TableCell className="p-4 align-middle max-w-[160px]">
-                          <div className="line-clamp-2 text-sm" style={{ maxWidth: '20ch' }}>
+                        <TableCell className="max-w-[160px]">
+                          <div className="line-clamp-2 text-sm truncate">
                             {bill.committee || "N/A"}
                           </div>
                         </TableCell>
-                        <TableCell className="p-4 align-middle text-sm text-muted-foreground">
+                        <TableCell className="text-sm text-muted-foreground">
                           {bill.last_action || "No action recorded"}
                         </TableCell>
-                        <TableCell className="p-4 align-middle text-sm text-muted-foreground">
+                        <TableCell className="text-sm text-muted-foreground">
                           {formatDate(bill.last_action_date)}
                         </TableCell>
-                        <TableCell className="p-4 align-middle">
+                        <TableCell>
                           <CardActionButtons
                             onFavorite={(e) => handleFavorite(bill, e)}
                             onAIAnalysis={(e) => handleAIAnalysis(bill, e)}
