@@ -75,7 +75,7 @@ export const BillSummary = ({
           </div>
           
           <div>
-            <h4 className="font-medium text-sm text-muted-foreground mb-2">Session</h4>
+            <h4 className="font-medium text-sm text-muted-foreground mb-2">Party</h4>
             <p className="text-sm">{bill.session_id || "Not specified"}</p>
           </div>
           
