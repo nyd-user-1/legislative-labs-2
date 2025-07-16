@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -295,7 +296,7 @@ const Landing = () => {
             </div>
 
             {/* User Count */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+            <div className="flex flex-wrap items-center justify-center gap-4 mb-16">
               <div className="flex items-center text-sm text-muted-foreground">
                 <div className="flex -space-x-2 mr-3">
                   {[1, 2, 3, 4].map((i) => (
