@@ -8,6 +8,9 @@ import { ChatSession } from "../types";
 import { ConversationView } from "./ConversationView";
 import { parseMessages } from "../utils/messageParser";
 import { getBillChamber } from "@/hooks/chat/utils";
+import { useFavorites } from "@/hooks/useFavorites";
+import { useChatLogic } from "@/hooks/useChatLogic";
+import { useToast } from "@/hooks/use-toast";
 
 interface ChatSessionCardProps {
   session: ChatSession;
@@ -24,6 +27,15 @@ export const ChatSessionCard = ({
 }: ChatSessionCardProps) => {
   const messages = parseMessages(session.messages);
   const messageCount = messages.length;
+  const { toast } = useToast();
+
+  // Initialize favorites hook if this is a bill session
+  const { favorites, toggleFavorite } = useFavorites(session.bill_id ? 'bill' : null);
+  const isFavorited = session.bill_id ? favorites.includes(session.bill_id) : false;
+
+  // Initialize chat logic for AI analysis if this is a bill session
+  const billEntity = session.bill_id ? { bill_id: session.bill_id, bill_number: session.title.replace('Analysis: ', '') } : null;
+  const { initializeSession } = useChatLogic(billEntity, session.bill_id ? 'bill' : null);
 
   // Extract chamber information for bill sessions
   const getChamberInfo = () => {
@@ -38,16 +50,58 @@ export const ChatSessionCard = ({
 
   const chamberInfo = getChamberInfo();
 
-  const handleFavorite = (e: React.MouseEvent) => {
+  const handleFavorite = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    // TODO: Implement favorite functionality for chat sessions
-    console.log('Favorite chat session:', session.id);
+    
+    if (!session.bill_id) {
+      toast({
+        title: "Cannot favorite",
+        description: "Only bill chat sessions can be favorited",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      await toggleFavorite(session.bill_id);
+      toast({
+        title: isFavorited ? "Removed from favorites" : "Added to favorites",
+        description: isFavorited ? "Chat session removed from your favorites" : "Chat session added to your favorites",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update favorites",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleAIAnalysis = (e: React.MouseEvent) => {
+  const handleAIAnalysis = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    // TODO: Implement AI analysis functionality for chat sessions
-    console.log('AI Analysis for chat session:', session.id);
+    
+    if (!session.bill_id) {
+      toast({
+        title: "AI Analysis not available",
+        description: "AI analysis is only available for bill chat sessions",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      await initializeSession(true);
+      toast({
+        title: "AI Analysis started",
+        description: "Starting new AI analysis session for this bill",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to start AI analysis",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -61,10 +115,22 @@ export const ChatSessionCard = ({
               <span>{messageCount} messages</span>
               {chamberInfo && <span>{chamberInfo}</span>}
               <div className="flex gap-1">
-                <Button variant="ghost" size="sm" onClick={handleFavorite}>
-                  <Heart className="h-4 w-4" />
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={handleFavorite}
+                  disabled={!session.bill_id}
+                  title={session.bill_id ? "Add to Favorites" : "Only available for bill sessions"}
+                >
+                  <Heart className={`h-4 w-4 ${isFavorited ? 'fill-red-500 text-red-500' : ''}`} />
                 </Button>
-                <Button variant="ghost" size="sm" onClick={handleAIAnalysis}>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={handleAIAnalysis}
+                  disabled={!session.bill_id}
+                  title={session.bill_id ? "AI Analysis" : "Only available for bill sessions"}
+                >
                   <Sparkles className="h-4 w-4" />
                 </Button>
               </div>
