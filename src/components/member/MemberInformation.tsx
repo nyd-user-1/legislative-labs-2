@@ -1,9 +1,8 @@
+
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { CardActionButtons } from "@/components/ui/CardActionButtons";
 import { AIChatSheet } from "@/components/AIChatSheet";
 import { 
-  ExternalLink, 
   MapPin,
   Phone,
   Mail,
@@ -122,33 +121,6 @@ export const MemberInformation = ({ member }: MemberInformationProps) => {
             )}
           </div>
         </div>
-
-        {/* External Link */}
-        {member.ballotpedia && (
-          <div className="space-y-2">
-            <div className="text-gray-900 font-medium">
-              External Link
-            </div>
-            <div className="ml-0">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                asChild 
-                className="text-gray-700 border-gray-300 hover:bg-gray-50"
-              >
-                <a 
-                  href={member.ballotpedia} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2"
-                >
-                  <ExternalLink className="h-4 w-4" />
-                  View Profile
-                </a>
-              </Button>
-            </div>
-          </div>
-        )}
       </div>
 
       <AIChatSheet
