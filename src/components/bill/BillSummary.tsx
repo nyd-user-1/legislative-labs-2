@@ -1,18 +1,31 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { BillStatusBadge } from "../BillStatusBadge";
+import { CardActionButtons } from "@/components/ui/CardActionButtons";
 import { Tables } from "@/integrations/supabase/types";
+
 type Bill = Tables<"Bills">;
 type Sponsor = Tables<"Sponsors"> & {
   person?: Tables<"People">;
 };
+
 interface BillSummaryProps {
   bill: Bill;
   sponsors: Sponsor[];
+  onFavorite?: (e: React.MouseEvent) => void;
+  onAIAnalysis?: (e: React.MouseEvent) => void;
+  isFavorited?: boolean;
+  hasAIChat?: boolean;
 }
+
 export const BillSummary = ({
   bill,
-  sponsors
+  sponsors,
+  onFavorite,
+  onAIAnalysis,
+  isFavorited = false,
+  hasAIChat = false
 }: BillSummaryProps) => {
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "No date";
@@ -26,18 +39,29 @@ export const BillSummary = ({
       return dateString;
     }
   };
+
   const primarySponsor = sponsors.find(s => s.position === 1);
-  return <Card className="card bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+
+  return (
+    <Card className="card bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
       <CardHeader className="card-header px-6 py-4 border-b border-gray-200">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
             <CardTitle className="text-xl font-semibold mb-2">
               {bill.bill_number || "Unknown Bill Number"}
             </CardTitle>
-            
           </div>
-          <div className="flex flex-col items-end gap-2">
-            {bill.status !== null ? <BillStatusBadge status={bill.status} statusDesc={bill.status_desc} /> : <Badge variant="secondary">Unknown Status</Badge>}
+          <div className="flex items-center gap-3">
+            <CardActionButtons
+              onFavorite={onFavorite}
+              onAIAnalysis={onAIAnalysis}
+              isFavorited={isFavorited}
+              hasAIChat={hasAIChat}
+              showFavorite={!!onFavorite}
+              showAIAnalysis={!!onAIAnalysis}
+              size="sm"
+              variant="outline"
+            />
           </div>
         </div>
       </CardHeader>
@@ -48,9 +72,11 @@ export const BillSummary = ({
             <p className="text-sm font-medium">
               {primarySponsor?.person?.name || "Not specified"}
             </p>
-            {primarySponsor?.person?.party && <Badge variant="outline" className="text-xs mt-1">
+            {primarySponsor?.person?.party && (
+              <Badge variant="outline" className="text-xs mt-1">
                 {primarySponsor.person.party}
-              </Badge>}
+              </Badge>
+            )}
           </div>
           
           <div>
@@ -69,12 +95,28 @@ export const BillSummary = ({
           </div>
         </div>
         
-        {bill.description && <div className="mt-6 pt-6 border-t border-gray-200">
-            <h4 className="font-medium text-sm text-muted-foreground mb-2">Description</h4>
-            <p className="text-sm leading-relaxed text-gray-700">
-              {bill.description}
-            </p>
-          </div>}
+        <div className="mt-6 pt-6 border-t border-gray-200">
+          <div className="flex items-start justify-between gap-4 mb-4">
+            <div>
+              <h4 className="font-medium text-sm text-muted-foreground mb-2">Status</h4>
+              {bill.status !== null ? (
+                <BillStatusBadge status={bill.status} statusDesc={bill.status_desc} />
+              ) : (
+                <Badge variant="secondary">Unknown Status</Badge>
+              )}
+            </div>
+          </div>
+          
+          {bill.description && (
+            <div>
+              <h4 className="font-medium text-sm text-muted-foreground mb-2">Description</h4>
+              <p className="text-sm leading-relaxed text-gray-700">
+                {bill.description}
+              </p>
+            </div>
+          )}
+        </div>
       </CardContent>
-    </Card>;
+    </Card>
+  );
 };

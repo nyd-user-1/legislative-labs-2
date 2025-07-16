@@ -8,6 +8,7 @@ import { ArrowLeft, User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
 import { BillSummary, BillKeyInformation, BillText } from "./bill";
+import { useFavorites } from "@/hooks/useFavorites";
 
 type Bill = Tables<"Bills">;
 type HistoryEntry = Tables<"History Table">;
@@ -26,6 +27,8 @@ export const BillDetail = ({ bill, onBack }: BillDetailProps) => {
   const [sponsors, setSponsors] = useState<(Sponsor & { person?: Person })[]>([]);
   const [rollCalls, setRollCalls] = useState<(RollCall & { votes?: (Vote & { person?: Person })[] })[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  const { favoriteBillIds, toggleFavorite } = useFavorites();
 
   useEffect(() => {
     fetchBillDetails();
@@ -134,6 +137,17 @@ export const BillDetail = ({ bill, onBack }: BillDetailProps) => {
     }
   };
 
+  const handleFavorite = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    toggleFavorite(bill.bill_id);
+  };
+
+  const handleAIAnalysis = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // TODO: Implement AI analysis functionality
+    console.log("AI Analysis clicked for bill:", bill.bill_id);
+  };
+
   return (
     <div className="page-container min-h-screen bg-white p-4 sm:p-6 lg:p-8">
       <div className="content-wrapper max-w-7xl mx-auto">
@@ -149,18 +163,22 @@ export const BillDetail = ({ bill, onBack }: BillDetailProps) => {
           </Button>
 
           {/* Bill Summary Section - Full Width */}
-          <BillSummary bill={bill} sponsors={sponsors} />
-
-          {/* Bill Key Information Section - Full Width */}
-          <BillKeyInformation bill={bill} sponsors={sponsors} totalSponsors={sponsors.length} />
-
-          {/* Bill Text Section - Full Width */}
-          <BillText billId={bill.bill_id} />
+          <BillSummary 
+            bill={bill} 
+            sponsors={sponsors}
+            onFavorite={handleFavorite}
+            onAIAnalysis={handleAIAnalysis}
+            isFavorited={favoriteBillIds.has(bill.bill_id)}
+            hasAIChat={false}
+          />
 
           {/* Bill Tabs Section */}
           <section>
-            <Tabs defaultValue="sponsors" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-3 h-12 p-1 bg-muted rounded-lg">
+            <Tabs defaultValue="overview" className="space-y-6">
+              <TabsList className="grid w-full grid-cols-4 h-12 p-1 bg-muted rounded-lg">
+                <TabsTrigger value="overview" className="h-10 rounded-md text-sm font-medium">
+                  Overview
+                </TabsTrigger>
                 <TabsTrigger value="sponsors" className="h-10 rounded-md text-sm font-medium">
                   Sponsors
                 </TabsTrigger>
@@ -171,6 +189,14 @@ export const BillDetail = ({ bill, onBack }: BillDetailProps) => {
                   Votes
                 </TabsTrigger>
               </TabsList>
+
+              <TabsContent value="overview" className="mt-6 space-y-6">
+                {/* Bill Key Information Section */}
+                <BillKeyInformation bill={bill} sponsors={sponsors} totalSponsors={sponsors.length} />
+
+                {/* Bill Text Section */}
+                <BillText billId={bill.bill_id} />
+              </TabsContent>
 
               <TabsContent value="sponsors" className="mt-6">
                 <div className="space-y-4">
