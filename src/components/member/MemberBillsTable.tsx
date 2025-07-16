@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +11,8 @@ import { CardActionButtons } from "@/components/ui/CardActionButtons";
 import { AIChatSheet } from "@/components/AIChatSheet";
 import { ArrowUpDown, ArrowUp, ArrowDown, Search, HelpCircle } from "lucide-react";
 import { useMemberBills } from "@/hooks/useMemberBills";
+import { useFavorites } from "@/hooks/useFavorites";
+import { useBillChatSessions } from "@/hooks/useBillChatSessions";
 import { Tables } from "@/integrations/supabase/types";
 import { formatDate } from "@/utils/dateUtils";
 
@@ -31,22 +32,28 @@ export const MemberBillsTable = ({ member }: MemberBillsTableProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
+  
   const { bills, loading, error } = useMemberBills(member.people_id);
+  const { favoriteBillIds, toggleFavorite } = useFavorites();
+  const { createOrGetChatSession, loading: chatLoading } = useBillChatSessions();
 
   const handleBillClick = (bill: any) => {
     navigate(`/bills?selected=${bill.bill_id}`);
   };
 
-  const handleAIAnalysis = (bill: any, e: React.MouseEvent) => {
+  const handleAIAnalysis = async (bill: any, e: React.MouseEvent) => {
     e.stopPropagation();
-    setSelectedBill(bill);
-    setChatOpen(true);
+    
+    const session = await createOrGetChatSession(bill);
+    if (session) {
+      setSelectedBill(bill);
+      setChatOpen(true);
+    }
   };
 
-  const handleFavorite = (bill: any, e: React.MouseEvent) => {
+  const handleFavorite = async (bill: any, e: React.MouseEvent) => {
     e.stopPropagation();
-    // Handle favorite functionality here
-    console.log("Favoriting bill:", bill.bill_number);
+    await toggleFavorite(bill.bill_id);
   };
 
   const handleSort = (field: SortField) => {
@@ -259,7 +266,7 @@ export const MemberBillsTable = ({ member }: MemberBillsTableProps) => {
                             <CardActionButtons
                               onFavorite={(e) => handleFavorite(bill, e)}
                               onAIAnalysis={(e) => handleAIAnalysis(bill, e)}
-                              isFavorited={false}
+                              isFavorited={favoriteBillIds.has(bill.bill_id)}
                               hasAIChat={false}
                             />
                           </TableCell>
