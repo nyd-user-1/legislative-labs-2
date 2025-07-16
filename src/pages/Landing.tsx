@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,10 +17,10 @@ import {
   Menu,
   X,
   Plus,
-  FileText,
-  MessageSquare,
+  Image,
   Share2,
-  Database
+  ChevronDown,
+  ArrowUp
 } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 
@@ -33,11 +32,7 @@ const Landing = () => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const placeholderTexts = [
-    "Solve a problem",
-    "Write a new contract for your union",
-    "Draft a constitutional amendment",
-    "Eliminate addictive tech design features",
-    "Develop a program for universal pre-k"
+    "Ask Lovable to create a landing"
   ];
 
   const [currentPlaceholder, setCurrentPlaceholder] = useState(0);
@@ -216,23 +211,18 @@ const Landing = () => {
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
                     placeholder={placeholderTexts[currentPlaceholder]}
-                    className="h-14 pr-32 text-lg bg-background/50 backdrop-blur-sm border-border/50 focus:border-primary/50 transition-all duration-300"
+                    className="h-14 pr-20 text-lg bg-background/50 backdrop-blur-sm border-border/50 focus:border-primary/50 transition-all duration-300 rounded-2xl"
                     disabled={isTyping}
                   />
                   <Button
                     type="submit"
-                    className="absolute right-2 top-2 h-10 px-6"
+                    className="absolute right-2 top-2 h-10 w-10 p-0 rounded-xl"
                     disabled={!inputValue.trim() || isTyping}
                   >
                     {isTyping ? (
-                      <div className="flex items-center">
-                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
-                        Building...
-                      </div>
+                      <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
                     ) : (
-                      <>
-                        Build <ArrowRight className="w-4 h-4 ml-2" />
-                      </>
+                      <ArrowUp className="w-4 h-4" />
                     )}
                   </Button>
                 </div>
@@ -245,30 +235,25 @@ const Landing = () => {
                     <Plus className="w-4 h-4" />
                   </button>
                   <button className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-                    <FileText className="w-4 h-4" />
-                    <span className="text-sm">Import doc</span>
-                  </button>
-                  <button className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-                    <MessageSquare className="w-4 h-4" />
-                    <span className="text-sm">Insert prompt</span>
+                    <Image className="w-4 h-4" />
+                    <span className="text-sm">Attach</span>
                   </button>
                   <button className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors" onClick={() => navigate('/plans')}>
                     <Share2 className="w-4 h-4" />
                     <span className="text-sm">Workspace</span>
                   </button>
                   <button className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-                    <Database className="w-4 h-4" />
-                    <span className="text-sm">NYS Legislature</span>
+                    <div className="w-4 h-4 bg-green-500 rounded flex items-center justify-center">
+                      <span className="text-xs text-white font-bold">⚡</span>
+                    </div>
+                    <span className="text-sm">Supabase</span>
+                    <ChevronDown className="w-3 h-3" />
                   </button>
                 </div>
                 <button className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowUp className="w-4 h-4" />
                 </button>
               </div>
-              
-              <p className="text-sm text-muted-foreground mt-4">
-                It's not a complaint • It's a problem
-              </p>
             </div>
 
             {/* Demo Button */}
