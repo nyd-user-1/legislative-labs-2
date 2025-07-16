@@ -27,13 +27,38 @@ export const useSessionInitializer = (entity: any, entityType: EntityType) => {
       } else if (entityType === 'committee') {
         const committeeName = entity.committee_name || 'this committee';
         initialPrompt = `I can help you understand ${committeeName}'s activities, jurisdiction, and current legislative work. What would you like to know?`;
+      } else if (entityType === 'problem') {
+        initialPrompt = `Please analyze this problem statement and provide insights on potential legislative solutions: "${entity.originalStatement || entity.description}"`;
+      } else if (entityType === 'solution') {
+        initialPrompt = `Please analyze this policy solution and provide detailed implementation guidance: "${entity.originalStatement || entity.description}"`;
+      } else if (entityType === 'mediaKit') {
+        // Create comprehensive initial media kit prompt with actual solution content
+        const solutionContent = entity.solutionContent || entity.originalStatement || entity.description;
+        
+        initialPrompt = `Please create a comprehensive media kit for the following policy solution:
+
+POLICY SOLUTION:
+${solutionContent}
+
+Generate a complete media kit that includes:
+
+1. **PROFESSIONAL PRESS RELEASE** - Using the actual policy name, specific mechanisms, timeline, and outcomes mentioned in the solution
+2. **STRATEGIC TALKING POINTS** - Key messages for stakeholders based on the actual benefits and implementation strategy
+3. **STAKEHOLDER-SPECIFIC MESSAGING** - Targeted communications for the specific audiences identified in the policy
+4. **CONCRETE ACTION STEPS** - Specific actions supporters can take based on the implementation and engagement plans
+
+Use the real details, names, timelines, and specifics from the policy solution. Do not use generic placeholders.`;
       }
 
       if (initialPrompt) {
+        const contextType = entityType === 'member' || entityType === 'bill' || entityType === 'committee' ? 'chat' : 
+                           entityType === 'mediaKit' ? 'media' : 
+                           entityType === 'solution' ? 'idea' : 'chat';
+        
         const { data, error } = await supabase.functions.invoke('generate-with-openai', {
           body: { 
             prompt: initialPrompt,
-            type: 'chat',
+            type: contextType,
             entityContext: { type: entityType, [entityType]: entity },
             enhanceWithNYSData: true
           }

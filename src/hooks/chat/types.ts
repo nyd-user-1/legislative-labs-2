@@ -1,6 +1,4 @@
 
-export type EntityType = 'bill' | 'member' | 'committee';
-
 export interface Message {
   id: string;
   role: "user" | "assistant";
@@ -14,3 +12,5 @@ export interface Citation {
   url: string;
   excerpt: string;
 }
+
+export type EntityType = 'bill' | 'member' | 'committee' | 'problem' | 'solution' | 'mediaKit' | null;

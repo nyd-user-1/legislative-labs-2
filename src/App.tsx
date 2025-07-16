@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -11,6 +10,7 @@ import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/s
 import { AppSidebar } from "@/components/AppSidebar";
 import { ModelSelector } from "@/components/ModelSelector";
 import Index from "./pages/Index";
+import Home from "./pages/Home";
 import { Auth } from "./pages/Auth";
 import Profile from "./pages/Profile";
 import Bills from "./pages/Bills";
@@ -18,6 +18,7 @@ import Members from "./pages/Members";
 import Committees from "./pages/Committees";
 import Chats from "./pages/Chats";
 import Favorites from "./pages/Favorites";
+import LegislativeDrafts2 from "./pages/LegislativeDrafts2";
 import Playground from "./pages/Playground";
 import Plans from "./pages/Plans";
 import ChangeLog from "./pages/ChangeLog";
@@ -46,8 +47,10 @@ const AppLayout = () => {
             </header>
             <main className="flex-1">
               <Routes>
+                <Route path="/home" element={<Home />} />
                 <Route path="/chats" element={<Chats />} />
                 <Route path="/favorites" element={<Favorites />} />
+                <Route path="/process" element={<LegislativeDrafts2 />} />
                 <Route path="/playground" element={<Playground />} />
                 <Route path="/bills" element={<Bills />} />
                 <Route path="/members" element={<Members />} />

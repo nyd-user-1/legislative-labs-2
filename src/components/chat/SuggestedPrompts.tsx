@@ -27,26 +27,26 @@ export const SuggestedPrompts = ({
 
   let prompts: string[] = [];
 
-  if (entityType === 'bill') {
+  if (entityType === 'problem') {
     prompts = [
-      "Analyze Impact",
-      "Similar Bills", 
-      "Voting History",
-      "Committee Process"
+      "Similar Problems",
+      "Fiscal Analysis", 
+      "Root Cause",
+      "Likely Allies"
     ];
-  } else if (entityType === 'member') {
+  } else if (entityType === 'solution') {
     prompts = [
-      "Voting Record",
-      "Sponsored Bills",
-      "Committee Memberships",
-      "District Info"
+      "Implementation Timeline",
+      "Stakeholder Analysis",
+      "Policy Mechanisms",
+      "Success Metrics"
     ];
-  } else if (entityType === 'committee') {
+  } else if (entityType === 'mediaKit') {
     prompts = [
-      "Recent Activity",
-      "Bill Pipeline",
-      "Member List",
-      "Meeting Schedule"
+      "Press Release Draft",
+      "Talking Points",
+      "Social Media Content",
+      "Stakeholder Messaging"
     ];
   } else {
     prompts = ContextBuilder.generateDynamicPrompts(entity, entityType);
