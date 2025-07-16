@@ -76,7 +76,7 @@ export const BillSummary = ({
           
           <div>
             <h4 className="font-medium text-sm text-muted-foreground mb-2">Party</h4>
-            <p className="text-sm">{bill.session_id || "Not specified"}</p>
+            <p className="text-sm">{primarySponsor?.person?.party || "Not specified"}</p>
           </div>
           
           <div>
