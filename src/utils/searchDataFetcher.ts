@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { SearchResult } from "@/types/search";
 
@@ -51,15 +52,10 @@ export const fetchAllSearchContent = async (): Promise<SearchResult[]> => {
     const { data: members } = await supabase
       .from('People')
       .select('*')
-      .limit(1000) // Increased to include more members like Joseph Addabbo
+      .limit(1000)
       .order('people_id', { ascending: false });
 
     console.log('Raw members data:', members?.length);
-    console.log('First 5 members:', members?.slice(0, 5).map(m => ({ id: m.people_id, name: m.name, first_name: m.first_name, last_name: m.last_name })));
-    console.log('Joseph Addabbo search:', members?.find(m => 
-      m.name?.toLowerCase().includes('addabbo') || 
-      (m.first_name?.toLowerCase().includes('joseph') && m.last_name?.toLowerCase().includes('addabbo'))
-    ));
 
     const { data: committees } = await supabase
       .from('Committees')
@@ -132,5 +128,41 @@ export const fetchAllSearchContent = async (): Promise<SearchResult[]> => {
   } catch (error) {
     console.error('Error fetching content:', error);
     throw error;
+  }
+};
+
+// New function specifically for Legiscan search integration
+export const searchLegiscanContent = async (searchTerm: string): Promise<SearchResult[]> => {
+  try {
+    const { data, error } = await supabase.functions.invoke('legiscan-search', {
+      body: {
+        operation: 'search',
+        params: {
+          query: searchTerm,
+          page: 1
+        }
+      }
+    });
+
+    if (error || !data || data.status === 'ERROR') {
+      console.error('Legiscan search error:', error || data?.error);
+      return [];
+    }
+
+    if (!data.searchresult?.results) {
+      return [];
+    }
+
+    return data.searchresult.results.map((bill: any) => ({
+      id: `legiscan-${bill.bill_id}`,
+      title: bill.title || bill.bill_number || 'Untitled Bill',
+      type: 'bill' as const,
+      content: bill.description || bill.last_action || '',
+      created_at: bill.status_date || new Date().toISOString(),
+      url: bill.state_link || bill.url || '#'
+    }));
+  } catch (error) {
+    console.error('Error searching Legiscan:', error);
+    return [];
   }
 };

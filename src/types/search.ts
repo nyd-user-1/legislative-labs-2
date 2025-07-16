@@ -1,3 +1,4 @@
+
 export interface SearchResult {
   id: string;
   title: string;
@@ -5,4 +6,5 @@ export interface SearchResult {
   content: string;
   created_at: string;
   url: string;
+  source?: 'local' | 'legiscan' | 'nys'; // Optional field to track data source
 }
