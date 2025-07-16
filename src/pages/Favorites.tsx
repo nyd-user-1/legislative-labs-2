@@ -216,15 +216,12 @@ const Favorites = () => {
                               <Badge variant={getStatusBadgeVariant(bill.status_desc)} className="text-xs">
                                 {bill.status_desc || "Unknown"}
                               </Badge>
-                              <div className="flex gap-2">
+                              <div className="flex gap-1">
                                 <Button variant="ghost" size="sm" onClick={e => e.stopPropagation()} className="hover:bg-red-50">
                                   <Heart className="h-4 w-4 fill-red-500 text-red-500" />
                                 </Button>
                                 <Button variant="ghost" size="sm" onClick={e => handleBillAIAnalysis(bill, e)} className="hover:bg-primary/10">
                                   <Sparkles className="h-4 w-4" />
-                                </Button>
-                                <Button variant="ghost" size="sm" onClick={e => handleRemoveBillFavorite(bill.bill_id, e)} className="hover:bg-destructive hover:text-destructive-foreground">
-                                  <Trash2 className="h-4 w-4" />
                                 </Button>
                               </div>
                             </div>
@@ -235,6 +232,9 @@ const Favorites = () => {
                               )}
                             </div>
                           </div>
+                          <Button variant="ghost" size="sm" onClick={e => handleRemoveBillFavorite(bill.bill_id, e)} className="hover:bg-destructive hover:text-destructive-foreground ml-4">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         </div>
                       </CardHeader>
 
