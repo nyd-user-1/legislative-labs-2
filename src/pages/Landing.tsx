@@ -201,7 +201,7 @@ const Landing = () => {
             </p>
 
             {/* Input Section */}
-            <div className="max-w-2xl mx-auto mb-8">
+            <div className="max-w-2xl mx-auto mb-16">
               <form onSubmit={handleSubmit} className="relative">
                 <div className="relative bg-background/50 backdrop-blur-sm border border-border/50 rounded-2xl p-3 focus-within:border-primary/50 transition-all duration-300">
                   <div className="relative">
