@@ -27,79 +27,42 @@ export const BillTextDisplay = ({ billId, className }: BillTextProps) => {
         const billIdNumber = parseInt(billId.toString());
         const response = await getBillText(billIdNumber);
         
-        console.log('Full Bill text API response:', JSON.stringify(response, null, 2));
+        console.log('Bill text API response:', response);
         
         if (response && response.text) {
           let textContent = "";
           
-          // Handle different response structures - be more aggressive in finding text
+          // Handle different response structures
           if (typeof response.text === 'string') {
             textContent = response.text;
           } else if (response.text.doc) {
+            // Legiscan often returns text in a 'doc' field
             textContent = response.text.doc;
           } else if (response.text.text) {
             textContent = response.text.text;
-          } else if (typeof response.text === 'object') {
-            // Try to find any text field in the object
-            const textFields = ['bill_text', 'document', 'content', 'body'];
-            for (const field of textFields) {
-              if (response.text[field]) {
-                textContent = response.text[field];
-                break;
-              }
-            }
-            
-            // If still no text found, try to get the first string value
-            if (!textContent) {
-              const values = Object.values(response.text);
-              const firstStringValue = values.find(val => typeof val === 'string' && val.length > 10);
-              if (firstStringValue) {
-                textContent = firstStringValue as string;
-              }
-            }
+          } else if (typeof response.text === 'object' && response.text.bill_text) {
+            textContent = response.text.bill_text;
           }
           
-          console.log('Raw text content found:', textContent?.substring(0, 200) + '...');
-          
-          // Handle base64 encoded content
+          // If we have base64 encoded content, decode it
           if (textContent && textContent.includes('base64,')) {
             try {
               const base64Content = textContent.split('base64,')[1];
               textContent = atob(base64Content);
-              console.log('Decoded base64 content');
             } catch (decodeError) {
               console.error('Error decoding base64 content:', decodeError);
             }
           }
           
-          // Handle URL encoded content
-          if (textContent && textContent.includes('%')) {
-            try {
-              textContent = decodeURIComponent(textContent);
-              console.log('Decoded URL encoded content');
-            } catch (decodeError) {
-              console.error('Error decoding URL content:', decodeError);
-            }
-          }
-          
-          console.log('Final processed bill text length:', textContent?.length || 0);
+          console.log('Processed bill text length:', textContent?.length || 0);
           
           if (textContent && textContent.trim()) {
-            setBillText(textContent.trim());
+            setBillText(textContent);
           } else {
-            setError("Bill text content is empty or could not be processed");
-          }
-        } else if (response && typeof response === 'object') {
-          // Sometimes the entire response might be the text content
-          console.log('Attempting to use entire response as text');
-          const responseStr = JSON.stringify(response, null, 2);
-          if (responseStr.length > 50) {
-            setBillText(responseStr);
-          } else {
-            setError("Bill text not available in API response");
+            setError("Bill text content is empty");
           }
         } else {
-          console.error('No usable text field in response:', response);
+          console.error('No text field in response:', response);
           setError("Bill text not available in API response");
         }
       } catch (err) {
@@ -118,8 +81,7 @@ export const BillTextDisplay = ({ billId, className }: BillTextProps) => {
   const formatBillText = (text: string) => {
     if (!text) return [];
     
-    // Split by lines and handle various line endings
-    const lines = text.split(/\r?\n|\r/);
+    const lines = text.split('\n');
     return lines.map((line, index) => {
       // Process line for highlighting
       let processedLine = line;
@@ -196,15 +158,15 @@ export const BillTextDisplay = ({ billId, className }: BillTextProps) => {
         <CardTitle className="text-lg">Bill Text</CardTitle>
       </CardHeader>
       <CardContent className="p-6">
-        <ScrollArea className="max-h-[600px] overflow-y-auto">
-          <div className="font-mono text-sm leading-relaxed">
+        <ScrollArea className="max-h-screen overflow-y-auto">
+          <div className="font-mono text-sm leading-relaxed whitespace-pre-wrap">
             {formattedLines.map((line, index) => (
               <div key={index} className="flex">
                 <span className="text-gray-400 text-sm w-8 inline-block text-right mr-4 flex-shrink-0 select-none">
                   {line.lineNumber}
                 </span>
                 <span 
-                  className="flex-1 whitespace-pre-wrap break-words"
+                  className="flex-1"
                   dangerouslySetInnerHTML={{ __html: line.content }}
                 />
               </div>
