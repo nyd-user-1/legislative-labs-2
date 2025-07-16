@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import {
   Table,
@@ -11,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Heart, Sparkles } from "lucide-react";
 import { Tables } from "@/integrations/supabase/types";
 import { AIChatSheet } from "@/components/AIChatSheet";
+import { useCommitteeChatSessions } from "@/hooks/useCommitteeChatSessions";
 
 type Member = Tables<"People">;
 
@@ -49,15 +51,29 @@ const mockCommitteeData = [
 export const MemberCommitteesTable = ({ member }: MemberCommitteesTableProps) => {
   const [chatOpen, setChatOpen] = useState(false);
   const [selectedCommitteeForChat, setSelectedCommitteeForChat] = useState<any>(null);
+  const { createOrGetChatSession, loading: chatLoading } = useCommitteeChatSessions();
 
-  const handleAIAnalysis = (committee: any, e: React.MouseEvent) => {
+  const handleAIAnalysis = async (committee: any, e: React.MouseEvent) => {
     e.stopPropagation();
-    setSelectedCommitteeForChat({
+    
+    // Create the committee object with the correct structure for AIChatSheet
+    const committeeForChat = {
+      committee_id: committee.committee_id,
+      name: committee.committee_name,
+      chamber: committee.chamber,
+      description: committee.description,
+    };
+
+    const session = await createOrGetChatSession({
       committee_id: committee.committee_id,
       committee_name: committee.committee_name,
-      title: committee.description,
+      description: committee.description,
     });
-    setChatOpen(true);
+    
+    if (session) {
+      setSelectedCommitteeForChat(committeeForChat);
+      setChatOpen(true);
+    }
   };
 
   const handleFavorite = async (committee: any, e: React.MouseEvent) => {
@@ -102,6 +118,7 @@ export const MemberCommitteesTable = ({ member }: MemberCommitteesTableProps) =>
                           size="sm"
                           onClick={(e) => handleFavorite(committee, e)}
                           className="h-8 w-8 p-0 hover:bg-muted"
+                          disabled={chatLoading}
                         >
                           <Heart className="h-4 w-4" />
                         </Button>
@@ -110,6 +127,7 @@ export const MemberCommitteesTable = ({ member }: MemberCommitteesTableProps) =>
                           size="sm"
                           onClick={(e) => handleAIAnalysis(committee, e)}
                           className="h-8 w-8 p-0 hover:bg-muted"
+                          disabled={chatLoading}
                         >
                           <Sparkles className="h-4 w-4" />
                         </Button>
@@ -153,7 +171,7 @@ export const MemberCommitteesTable = ({ member }: MemberCommitteesTableProps) =>
       <AIChatSheet
         open={chatOpen}
         onOpenChange={setChatOpen}
-        bill={selectedCommitteeForChat}
+        committee={selectedCommitteeForChat}
       />
     </div>
   );
