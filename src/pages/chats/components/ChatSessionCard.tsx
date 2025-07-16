@@ -82,17 +82,17 @@ export const ChatSessionCard = ({
               <span>{format(new Date(session.updated_at), "MMM d, yyyy 'at' h:mm a")}</span>
               <span>{messageCount} messages</span>
               {chamberInfo && <span>{chamberInfo}</span>}
-              <div className="flex gap-1">
+              {session.bill_id && (
                 <Button 
                   variant="ghost" 
                   size="sm" 
                   onClick={handleFavorite}
-                  disabled={!session.bill_id}
-                  title={session.bill_id ? "Add to Favorites" : "Only available for bill sessions"}
+                  className="h-auto p-1 hover:bg-transparent"
+                  title={isFavorited ? "Remove from favorites" : "Add to favorites"}
                 >
                   <Heart className={`h-4 w-4 ${isFavorited ? 'fill-red-500 text-red-500' : ''}`} />
                 </Button>
-              </div>
+              )}
             </div>
           </div>
           <Button
