@@ -21,6 +21,7 @@ interface MemberCommitteesTableProps {
 }
 
 // Mock committee data for now - replace with real data when available
+// Using null for committee_id since these are mock committees that don't exist in the database
 const mockCommitteeData = [
   {
     id: 1,
@@ -28,7 +29,7 @@ const mockCommitteeData = [
     role: "Chair",
     chamber: "Senate",
     description: "Reviews and approves state budget allocations and fiscal policies.",
-    committee_id: 1001
+    committee_id: null // Using null for mock data to avoid foreign key constraint issues
   },
   {
     id: 2,
@@ -36,7 +37,7 @@ const mockCommitteeData = [
     role: "Member", 
     chamber: "Assembly",
     description: "Oversees education policy and funding for public schools and universities.",
-    committee_id: 1002
+    committee_id: null
   },
   {
     id: 3,
@@ -44,7 +45,7 @@ const mockCommitteeData = [
     role: "Ranking",
     chamber: "Joint", 
     description: "Addresses technology infrastructure and digital governance initiatives.",
-    committee_id: 1003
+    committee_id: null
   }
 ];
 
@@ -58,11 +59,19 @@ export const MemberCommitteesTable = ({ member }: MemberCommitteesTableProps) =>
     
     // Create the committee object with the correct structure for AIChatSheet
     const committeeForChat = {
-      committee_id: committee.committee_id,
+      committee_id: committee.committee_id || 0, // Use 0 for mock committees
       name: committee.committee_name,
       chamber: committee.chamber,
       description: committee.description,
     };
+
+    // For mock committees (committee_id is null), skip database session creation
+    // and just open the chat directly
+    if (committee.committee_id === null) {
+      setSelectedCommitteeForChat(committeeForChat);
+      setChatOpen(true);
+      return;
+    }
 
     const session = await createOrGetChatSession({
       committee_id: committee.committee_id,
