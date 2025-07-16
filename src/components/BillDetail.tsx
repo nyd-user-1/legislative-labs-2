@@ -1,21 +1,15 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  ArrowLeft, 
-  User
-} from "lucide-react";
-import { BillStatusBadge } from "./BillStatusBadge";
-import { BillJourney } from "./BillJourney";
+import { ArrowLeft, User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
+import { BillSummary, BillKeyInformation, BillText } from "./bill";
 
 type Bill = Tables<"Bills">;
-type Document = Tables<"Documents">;
 type HistoryEntry = Tables<"History Table">;
 type Sponsor = Tables<"Sponsors">;
 type Person = Tables<"People">;
@@ -28,7 +22,6 @@ interface BillDetailProps {
 }
 
 export const BillDetail = ({ bill, onBack }: BillDetailProps) => {
-  const [documents, setDocuments] = useState<Document[]>([]);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [sponsors, setSponsors] = useState<(Sponsor & { person?: Person })[]>([]);
   const [rollCalls, setRollCalls] = useState<(RollCall & { votes?: (Vote & { person?: Person })[] })[]>([]);
@@ -41,13 +34,6 @@ export const BillDetail = ({ bill, onBack }: BillDetailProps) => {
   const fetchBillDetails = async () => {
     try {
       setLoading(true);
-
-      // Fetch documents
-      const { data: documentsData } = await supabase
-        .from("Documents")
-        .select("*")
-        .eq("bill_id", bill.bill_id)
-        .order("document_id");
 
       // Fetch history
       const { data: historyData } = await supabase
@@ -124,7 +110,6 @@ export const BillDetail = ({ bill, onBack }: BillDetailProps) => {
         );
       }
 
-      setDocuments(documentsData || []);
       setHistory(historyData || []);
       setSponsors(sponsorsWithPeople);
       setRollCalls(rollCallsWithVotes);
@@ -149,13 +134,6 @@ export const BillDetail = ({ bill, onBack }: BillDetailProps) => {
     }
   };
 
-  const formatFileSize = (bytes: number | null) => {
-    if (!bytes) return "";
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
-  };
-
   return (
     <div className="page-container min-h-screen bg-white p-4 sm:p-6 lg:p-8">
       <div className="content-wrapper max-w-7xl mx-auto">
@@ -170,14 +148,19 @@ export const BillDetail = ({ bill, onBack }: BillDetailProps) => {
             Back to Bills
           </Button>
 
+          {/* Bill Summary Section - Full Width */}
+          <BillSummary bill={bill} sponsors={sponsors} />
+
+          {/* Bill Key Information Section - Full Width */}
+          <BillKeyInformation bill={bill} sponsors={sponsors} totalSponsors={sponsors.length} />
+
+          {/* Bill Text Section - Full Width */}
+          <BillText billId={bill.bill_id} />
 
           {/* Bill Tabs Section */}
           <section>
-            <Tabs defaultValue="overview" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-4 h-12 p-1 bg-muted rounded-lg">
-                <TabsTrigger value="overview" className="h-10 rounded-md text-sm font-medium">
-                  Overview
-                </TabsTrigger>
+            <Tabs defaultValue="sponsors" className="space-y-6">
+              <TabsList className="grid w-full grid-cols-3 h-12 p-1 bg-muted rounded-lg">
                 <TabsTrigger value="sponsors" className="h-10 rounded-md text-sm font-medium">
                   Sponsors
                 </TabsTrigger>
@@ -188,73 +171,6 @@ export const BillDetail = ({ bill, onBack }: BillDetailProps) => {
                   Votes
                 </TabsTrigger>
               </TabsList>
-
-              <TabsContent value="overview" className="mt-6">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* Bill Summary Card */}
-                  <Card className="min-h-[320px] flex flex-col">
-                    <CardHeader>
-                      <CardTitle className="text-lg">Bill Summary</CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex-1 flex flex-col justify-between space-y-4">
-                      <div className="flex-1">
-                        <h4 className="font-medium text-sm text-muted-foreground mb-2">Description</h4>
-                        <p className="text-sm leading-relaxed">
-                          {bill.description || bill.title || "No description available for this bill."}
-                        </p>
-                      </div>
-                      
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t mt-auto">
-                        <div>
-                          <h4 className="font-medium text-sm text-muted-foreground mb-1">Session</h4>
-                          <p className="text-sm">{bill.session_id || "Not specified"}</p>
-                        </div>
-                        <div>
-                          <h4 className="font-medium text-sm text-muted-foreground mb-1">Committee</h4>
-                          <p className="text-sm">{bill.committee || "Not assigned"}</p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Key Information Card */}
-                  <Card className="min-h-[320px] flex flex-col">
-                    <CardHeader>
-                      <CardTitle className="text-lg">Key Information</CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex-1 flex flex-col justify-between">
-                      <div className="space-y-3 flex-1 flex flex-col justify-evenly">
-                        <div className="flex justify-between items-center py-2 border-b border-border/50">
-                          <span className="text-sm text-muted-foreground">Bill Number</span>
-                          <span className="text-sm font-medium">{bill.bill_number || "Not available"}</span>
-                        </div>
-                        
-                        <div className="flex justify-between items-center py-2 border-b border-border/50">
-                          <span className="text-sm text-muted-foreground">Status</span>
-                          <div className="text-right">
-                            {bill.status !== null ? (
-                              <BillStatusBadge status={bill.status} statusDesc={bill.status_desc} />
-                            ) : (
-                              <span className="text-sm">Unknown</span>
-                            )}
-                          </div>
-                        </div>
-                        
-                        <div className="flex justify-between items-center py-2 border-b border-border/50">
-                          <span className="text-sm text-muted-foreground">Last Action</span>
-                          <span className="text-sm font-medium">{formatDate(bill.last_action_date)}</span>
-                        </div>
-                        
-                        <div className="flex justify-between items-center py-2">
-                          <span className="text-sm text-muted-foreground">Total Sponsors</span>
-                          <span className="text-sm font-medium">{sponsors.length}</span>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-
-              </TabsContent>
 
               <TabsContent value="sponsors" className="mt-6">
                 <div className="space-y-4">
