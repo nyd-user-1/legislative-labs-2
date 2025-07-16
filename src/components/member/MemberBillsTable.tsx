@@ -1,3 +1,4 @@
+
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,7 +20,6 @@ type Member = Tables<"People">;
 interface MemberBillsTableProps {
   member: Member;
 }
-
 
 type SortField = 'bill_number' | 'title' | 'status_desc' | 'committee' | 'last_action' | 'last_action_date';
 type SortDirection = 'asc' | 'desc' | null;
@@ -158,7 +158,7 @@ export const MemberBillsTable = ({ member }: MemberBillsTableProps) => {
               </div>
             ) : (
               <ScrollArea className="w-full">
-                <div className="min-w-[800px]">
+                <div className="min-w-[700px]">
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -202,7 +202,7 @@ export const MemberBillsTable = ({ member }: MemberBillsTableProps) => {
                             Committee {getSortIcon('committee')}
                           </Button>
                         </TableHead>
-                        <TableHead className="min-w-[200px]">
+                        <TableHead className="min-w-[250px]">
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <Button 
@@ -219,16 +219,6 @@ export const MemberBillsTable = ({ member }: MemberBillsTableProps) => {
                             </TooltipContent>
                           </Tooltip>
                         </TableHead>
-                        <TableHead className="min-w-[120px]">
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            onClick={() => handleSort('last_action_date')}
-                            className="h-auto p-0 font-semibold hover:bg-transparent"
-                          >
-                            Date {getSortIcon('last_action_date')}
-                          </Button>
-                        </TableHead>
                         <TableHead className="w-[100px]">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -243,21 +233,27 @@ export const MemberBillsTable = ({ member }: MemberBillsTableProps) => {
                           <TableCell className="max-w-[300px]">
                             <div className="line-clamp-2 text-sm">{bill.title}</div>
                           </TableCell>
-                        <TableCell>
-                          <Badge variant={bill.status_desc?.toLowerCase() === "passed" ? "success" : "secondary"}>
-                            {bill.status_desc || "Unknown"}
-                          </Badge>
-                        </TableCell>
+                          <TableCell>
+                            <Badge variant={bill.status_desc?.toLowerCase() === "passed" ? "success" : "secondary"}>
+                              {bill.status_desc || "Unknown"}
+                            </Badge>
+                          </TableCell>
                           <TableCell className="max-w-[160px]">
                             <div className="line-clamp-2 text-sm" style={{ maxWidth: '20ch' }}>
                               {bill.committee || "N/A"}
                             </div>
                           </TableCell>
                           <TableCell className="text-sm text-muted-foreground">
-                            {bill.last_action || "No action recorded"}
-                          </TableCell>
-                          <TableCell className="text-sm text-muted-foreground">
-                            {formatDate(bill.last_action_date)}
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div className="cursor-help">
+                                  {bill.last_action || "No action recorded"}
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>{formatDate(bill.last_action_date)}</p>
+                              </TooltipContent>
+                            </Tooltip>
                           </TableCell>
                           <TableCell>
                             <CardActionButtons
