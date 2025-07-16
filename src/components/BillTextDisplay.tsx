@@ -15,56 +15,85 @@ export const BillTextDisplay = ({ billId, className }: BillTextProps) => {
   const [billText, setBillText] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { getBillText } = useLegiscan();
+  const { getBill, getBillText } = useLegiscan();
 
   useEffect(() => {
     const fetchBillText = async () => {
+      if (!billId) return;
+      
       try {
         setLoading(true);
         setError(null);
         
         console.log('Fetching bill text for bill ID:', billId);
+        
+        // First, get the bill details to find the text document ID
         const billIdNumber = parseInt(billId.toString());
-        const response = await getBillText(billIdNumber);
+        const billResponse = await getBill(billIdNumber);
         
-        console.log('Bill text API response:', response);
+        console.log('Bill details response:', billResponse);
         
-        if (response && response.text) {
-          let textContent = "";
-          
-          // Handle different response structures
-          if (typeof response.text === 'string') {
-            textContent = response.text;
-          } else if (response.text.doc) {
-            // Legiscan often returns text in a 'doc' field
-            textContent = response.text.doc;
-          } else if (response.text.text) {
-            textContent = response.text.text;
-          } else if (typeof response.text === 'object' && response.text.bill_text) {
-            textContent = response.text.bill_text;
-          }
-          
-          // If we have base64 encoded content, decode it
-          if (textContent && textContent.includes('base64,')) {
-            try {
-              const base64Content = textContent.split('base64,')[1];
-              textContent = atob(base64Content);
-            } catch (decodeError) {
-              console.error('Error decoding base64 content:', decodeError);
-            }
-          }
-          
-          console.log('Processed bill text length:', textContent?.length || 0);
-          
-          if (textContent && textContent.trim()) {
-            setBillText(textContent);
-          } else {
-            setError("Bill text content is empty");
-          }
-        } else {
-          console.error('No text field in response:', response);
-          setError("Bill text not available in API response");
+        if (!billResponse || !billResponse.bill) {
+          setError("Unable to retrieve bill details from API");
+          return;
         }
+        
+        // Check if the bill has text documents
+        if (!billResponse.bill.texts || billResponse.bill.texts.length === 0) {
+          setError("No bill text documents available for this legislation");
+          return;
+        }
+        
+        // Get the text document ID (usually the first/latest version)
+        const textDocument = billResponse.bill.texts[0];
+        const textDocId = textDocument.doc_id;
+        
+        console.log('Fetching text document ID:', textDocId);
+        
+        // Now get the actual bill text
+        const textResponse = await getBillText(textDocId);
+        
+        console.log('Bill text API response:', textResponse);
+        
+        if (!textResponse) {
+          setError("No response received from bill text API");
+          return;
+        }
+        
+        if (!textResponse.text) {
+          setError("Bill text data not found in API response");
+          return;
+        }
+        
+        // Handle different response structures and decode base64
+        let decodedText = "";
+        
+        if (textResponse.text.doc) {
+          // The main content is in the 'doc' field and is base64 encoded
+          try {
+            decodedText = atob(textResponse.text.doc);
+            console.log('Successfully decoded base64 content, length:', decodedText.length);
+          } catch (decodeError) {
+            console.error('Error decoding base64 content:', decodeError);
+            setError("Unable to decode bill text content");
+            return;
+          }
+        } else if (typeof textResponse.text === 'string') {
+          // Sometimes the text might be directly available
+          decodedText = textResponse.text;
+        } else {
+          console.error('Unexpected text response structure:', textResponse.text);
+          setError("Unexpected bill text format received from API");
+          return;
+        }
+        
+        if (!decodedText || decodedText.trim().length === 0) {
+          setError("Bill text content is empty");
+          return;
+        }
+        
+        setBillText(decodedText);
+        
       } catch (err) {
         console.error("Error fetching bill text:", err);
         setError(`Failed to load bill text: ${err instanceof Error ? err.message : 'Unknown error'}`);
@@ -73,32 +102,8 @@ export const BillTextDisplay = ({ billId, className }: BillTextProps) => {
       }
     };
 
-    if (billId) {
-      fetchBillText();
-    }
-  }, [billId, getBillText]);
-
-  const formatBillText = (text: string) => {
-    if (!text) return [];
-    
-    const lines = text.split('\n');
-    return lines.map((line, index) => {
-      // Process line for highlighting
-      let processedLine = line;
-      
-      // Simple regex to find text that might be amendments (words in brackets or with specific formatting)
-      processedLine = processedLine.replace(
-        /(\[.*?\]|\b(?:added|amended|inserted|deleted|substituted)\b)/gi,
-        '<span class="text-green-700 underline decoration-green-600">$1</span>'
-      );
-      
-      return {
-        lineNumber: index + 1,
-        content: processedLine,
-        originalContent: line
-      };
-    });
-  };
+    fetchBillText();
+  }, [billId, getBill, getBillText]);
 
   if (loading) {
     return (
@@ -133,9 +138,7 @@ export const BillTextDisplay = ({ billId, className }: BillTextProps) => {
     );
   }
 
-  const formattedLines = formatBillText(billText);
-
-  if (!billText || formattedLines.length === 0) {
+  if (!billText) {
     return (
       <Card className={className}>
         <CardHeader>
@@ -159,19 +162,18 @@ export const BillTextDisplay = ({ billId, className }: BillTextProps) => {
       </CardHeader>
       <CardContent className="p-6">
         <ScrollArea className="max-h-screen overflow-y-auto">
-          <div className="font-mono text-sm leading-relaxed whitespace-pre-wrap">
-            {formattedLines.map((line, index) => (
-              <div key={index} className="flex">
-                <span className="text-gray-400 text-sm w-8 inline-block text-right mr-4 flex-shrink-0 select-none">
-                  {line.lineNumber}
-                </span>
-                <span 
-                  className="flex-1"
-                  dangerouslySetInnerHTML={{ __html: line.content }}
-                />
-              </div>
-            ))}
-          </div>
+          <div 
+            className="bill-text-content font-mono text-sm leading-relaxed"
+            dangerouslySetInnerHTML={{ __html: billText }}
+            style={{
+              fontFamily: "'Courier New', monospace",
+              fontSize: '13px',
+              lineHeight: '1.5',
+              color: '#333',
+              whiteSpace: 'pre-wrap',
+              wordBreak: 'break-word'
+            }}
+          />
         </ScrollArea>
       </CardContent>
     </Card>
