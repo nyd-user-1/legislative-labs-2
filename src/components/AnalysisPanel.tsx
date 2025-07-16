@@ -1,25 +1,27 @@
+
 import { LegislativeDraft } from "@/types/legislation";
-import { useState } from "react";
-import { AnalysisGenerator } from "./analysis/AnalysisGenerator";
-import { AnalysisResults } from "./analysis/AnalysisResults";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface AnalysisPanelProps {
   draft: LegislativeDraft | null;
 }
 
 export const AnalysisPanel = ({ draft }: AnalysisPanelProps) => {
-  const [analysisData, setAnalysisData] = useState<any>(null);
-
-  const handleAnalysisGenerated = (data: any) => {
-    setAnalysisData(data);
-  };
-
-  const handleGenerateNew = () => {
-    setAnalysisData(null);
-  };
+  if (!draft) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Analysis</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground">Select a draft to view analysis</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   // Default analysis data for when a draft is selected
-  const defaultAnalysisData = {
+  const analysisData = {
     fiscalImpact: {
       estimatedCost: "$2.5M - $5.2M annually",
       confidence: 75,
@@ -55,15 +57,41 @@ export const AnalysisPanel = ({ draft }: AnalysisPanelProps) => {
     ]
   };
 
-  const currentAnalysis = analysisData || (draft ? defaultAnalysisData : null);
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Analysis Results</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-6">
+          <div>
+            <h3 className="font-semibold mb-2">Fiscal Impact</h3>
+            <p className="text-sm text-muted-foreground">{analysisData.fiscalImpact.estimatedCost}</p>
+          </div>
+          
+          <div>
+            <h3 className="font-semibold mb-2">Implementation Timeline</h3>
+            <div className="space-y-1">
+              {analysisData.implementationTimeline.phases.map((phase, index) => (
+                <div key={index} className="text-sm">
+                  {phase.name}: {phase.duration}
+                </div>
+              ))}
+            </div>
+          </div>
 
-  if (!draft && !analysisData) {
-    return <AnalysisGenerator onAnalysisGenerated={handleAnalysisGenerated} />;
-  }
-
-  if (currentAnalysis) {
-    return <AnalysisResults analysisData={currentAnalysis} onGenerateNew={handleGenerateNew} />;
-  }
-
-  return null;
+          <div>
+            <h3 className="font-semibold mb-2">Similar Legislation</h3>
+            <div className="space-y-1">
+              {analysisData.similarLegislation.map((item, index) => (
+                <div key={index} className="text-sm">
+                  {item.state} {item.bill} - {item.status}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
 };

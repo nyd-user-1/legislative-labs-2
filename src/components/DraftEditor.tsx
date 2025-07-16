@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -6,8 +7,6 @@ import { detectLegislativeCategory, extractTitleFromIdea } from "@/utils/legisla
 import { ProblemGenerator } from "./ProblemGenerator";
 import { DraftGenerator } from "./DraftGenerator";
 import { DraftDisplay } from "./DraftDisplay";
-import { MediaPlanning } from "./MediaPlanning";
-import { Newspaper } from "lucide-react";
 
 interface DraftEditorProps {
   draft: LegislativeDraft | null;
@@ -20,11 +19,9 @@ export const DraftEditor = ({ draft, onDraftChange, onProgressChange, saveTrigge
   const [idea, setIdea] = useState("");
   const [draftContent, setDraftContent] = useState("");
   const [problemStatement, setProblemStatement] = useState("");
-  const [showMediaPlanning, setShowMediaPlanning] = useState(false);
   const { toast } = useToast();
   
   const ideationRef = useRef<HTMLDivElement>(null);
-  const mediaPlanningRef = useRef<HTMLDivElement>(null);
 
   const smoothScrollTo = (ref: React.RefObject<HTMLDivElement>) => {
     ref.current?.scrollIntoView({ 
@@ -93,18 +90,12 @@ export const DraftEditor = ({ draft, onDraftChange, onProgressChange, saveTrigge
     setTimeout(() => smoothScrollTo(ideationRef), 100);
   };
 
-  const handleEnterPressroom = () => {
-    setShowMediaPlanning(true);
-    setTimeout(() => smoothScrollTo(mediaPlanningRef), 100);
-  };
-
   const handleProblemGenerated = (problem: string) => {
     setProblemStatement(problem);
   };
 
   const handleSaveAndSubmit = () => {
     saveDraft();
-    // TODO: Add submit to public gallery functionality
     toast({
       title: "Draft saved and submitted!",
       description: "Your draft has been saved and submitted to the public gallery.",
@@ -139,25 +130,6 @@ export const DraftEditor = ({ draft, onDraftChange, onProgressChange, saveTrigge
               Save and Submit
             </Button>
           </div>
-          
-          <Button 
-            onClick={handleEnterPressroom}
-            variant="outline"
-            className="touch-manipulation"
-          >
-            <Newspaper className="mr-2 h-4 w-4" />
-            Media Kit
-          </Button>
-        </div>
-      )}
-
-      {showMediaPlanning && (
-        <div ref={mediaPlanningRef}>
-          <MediaPlanning 
-            problemStatement={problemStatement}
-            legislativeIdea={idea}
-            shouldPopulateInput={showMediaPlanning}
-          />
         </div>
       )}
     </div>
