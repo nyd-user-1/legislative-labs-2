@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -5,7 +6,6 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { 
   ArrowRight, 
-  Play, 
   Sparkles, 
   Zap, 
   Code, 
@@ -16,12 +16,17 @@ import {
   Twitter,
   Menu,
   X,
-  Plus,
   Image,
   Share2,
   ChevronDown,
   ArrowUp
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useNavigate } from 'react-router-dom';
 
 const Landing = () => {
@@ -179,26 +184,20 @@ const Landing = () => {
       <main className="relative z-10">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
           <div className="text-center max-w-4xl mx-auto">
-            {/* Badge */}
-            <Badge variant="outline" className="mb-8 bg-background/50 backdrop-blur-sm border-primary/20">
-              <Sparkles className="w-4 h-4 mr-2" />
-              AI-Powered Policy Development
-            </Badge>
-
             {/* Main Heading */}
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6">
               <span className="bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
-                Build anything,
+                Do something,
               </span>
               <br />
               <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                ship everywhere
+                something good
               </span>
             </h1>
 
             {/* Subheading */}
             <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
-              The fastest way to turn your ideas into reality. Just describe what you want to build and watch as Goodable creates it for you.
+              Create policy and legislation by chatting with AI
             </p>
 
             {/* Input Section */}
@@ -215,55 +214,89 @@ const Landing = () => {
                       className="h-10 pr-16 text-lg bg-transparent border-0 focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground"
                       disabled={isTyping}
                     />
-                    <Button
-                      type="submit"
-                      className="absolute right-1 top-1 h-8 w-8 p-0 rounded-lg"
-                      disabled={!inputValue.trim() || isTyping}
-                    >
-                      {isTyping ? (
-                        <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                      ) : (
-                        <ArrowUp className="w-3 h-3" />
-                      )}
-                    </Button>
+                    {inputValue.trim() && (
+                      <Button
+                        type="submit"
+                        className="absolute right-1 top-1 h-8 w-8 p-0 rounded-lg"
+                        disabled={isTyping}
+                      >
+                        {isTyping ? (
+                          <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <ArrowUp className="w-3 h-3" />
+                        )}
+                      </Button>
+                    )}
                   </div>
                   
                   {/* Toolbar inside input */}
                   <div className="flex items-center justify-between mt-3 pt-3 border-t border-border/30">
                     <div className="flex items-center gap-4">
-                      <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-                        <Plus className="w-3 h-3" />
-                      </button>
-                      <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-                        <Image className="w-3 h-3" />
-                        <span className="text-xs">Attach</span>
-                      </button>
-                      <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors" onClick={() => navigate('/plans')}>
-                        <Share2 className="w-3 h-3" />
-                        <span className="text-xs">Workspace</span>
-                      </button>
-                      <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-                        <div className="w-3 h-3 bg-green-500 rounded flex items-center justify-center">
-                          <span className="text-[8px] text-white font-bold">⚡</span>
-                        </div>
-                        <span className="text-xs">Supabase</span>
-                        <ChevronDown className="w-2 h-2" />
-                      </button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button type="button" className="text-muted-foreground hover:text-foreground transition-colors text-xs">
+                            Doc
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem>Option 1</DropdownMenuItem>
+                          <DropdownMenuItem>Option 2</DropdownMenuItem>
+                          <DropdownMenuItem>Option 3</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+                            <Image className="w-3 h-3" />
+                            <span className="text-xs">Prompt</span>
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem>Option 1</DropdownMenuItem>
+                          <DropdownMenuItem>Option 2</DropdownMenuItem>
+                          <DropdownMenuItem>Option 3</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors" onClick={() => navigate('/plans')}>
+                            <Share2 className="w-3 h-3" />
+                            <span className="text-xs">Workspace</span>
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem>Option 1</DropdownMenuItem>
+                          <DropdownMenuItem>Option 2</DropdownMenuItem>
+                          <DropdownMenuItem>Option 3</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+                            <div className="w-3 h-3 bg-green-500 rounded flex items-center justify-center">
+                              <span className="text-[8px] text-white font-bold">⚡</span>
+                            </div>
+                            <span className="text-xs">Supabase</span>
+                            <ChevronDown className="w-2 h-2" />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem>Option 1</DropdownMenuItem>
+                          <DropdownMenuItem>Option 2</DropdownMenuItem>
+                          <DropdownMenuItem>Option 3</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
-                    <button type="button" className="w-6 h-6 rounded-full bg-muted/50 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
-                      <ArrowUp className="w-3 h-3" />
-                    </button>
                   </div>
                 </div>
               </form>
             </div>
 
-            {/* Demo Button */}
+            {/* User Count */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-              <Button variant="outline" size="lg" className="bg-background/50 backdrop-blur-sm">
-                <Play className="w-4 h-4 mr-2" />
-                Watch Demo
-              </Button>
               <div className="flex items-center text-sm text-muted-foreground">
                 <div className="flex -space-x-2 mr-3">
                   {[1, 2, 3, 4].map((i) => (
