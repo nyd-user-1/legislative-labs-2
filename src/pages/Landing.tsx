@@ -173,7 +173,7 @@ const Landing = () => {
       </header>
 
       <main className="relative z-10">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center min-h-screen" style={{ paddingTop: '175px' }}>
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center min-h-screen" style={{ paddingTop: '328px' }}>
           <div className="text-center max-w-4xl mx-auto">
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6">
               <span className="bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
@@ -303,7 +303,7 @@ const Landing = () => {
                 Just do goodable
               </h2>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                See the good others are doing
+                See what others are doing right now
               </p>
             </div>
 
@@ -321,7 +321,7 @@ const Landing = () => {
                       {category.subtitle}
                     </p>
                     <div className="text-sm text-[#0066cc] hover:underline">
-                      Learn more →
+                      Browse tutorials →
                     </div>
                   </div>
                 ))}
