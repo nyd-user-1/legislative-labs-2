@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -163,7 +164,7 @@ const Landing = () => {
         <div className="absolute bottom-20 left-1/4 w-40 h-40 bg-muted/10 rounded-full blur-xl animate-pulse delay-2000" />
       </div>
 
-      <header className="relative z-10 bg-background/80 backdrop-blur-lg">
+      <header className="relative z-10" style={{ backgroundColor: '#F6F4ED' }}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-2">
@@ -176,9 +177,6 @@ const Landing = () => {
             <div className="flex items-center space-x-4">
               <Button variant="ghost" onClick={() => navigate('/auth')}>
                 Sign In
-              </Button>
-              <Button variant="ghost" onClick={() => navigate('/auth')}>
-                Get Started
               </Button>
             </div>
           </div>
@@ -343,7 +341,7 @@ const Landing = () => {
         userProblem={userProblem}
       />
 
-      <footer className="border-t border-border/50 bg-background/80 backdrop-blur-lg">
+      <footer className="border-t border-border/50" style={{ backgroundColor: '#F6F4ED' }}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
