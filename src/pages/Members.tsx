@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense, useMemo } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useMembersData } from "@/hooks/useMembersData";
 import { useMemberFavorites } from "@/hooks/useMemberFavorites";
@@ -9,8 +9,7 @@ import { MembersGrid } from "@/components/members/MembersGrid";
 import { MembersEmptyState } from "@/components/members/MembersEmptyState";
 import { MembersLoadingSkeleton } from "@/components/members/MembersLoadingSkeleton";
 import { MembersErrorState } from "@/components/members/MembersErrorState";
-import { MemberDetail } from "@/components/MemberDetail";
-import { AIChatSheet } from "@/components/AIChatSheet";
+import { LazyMemberDetail, LazyAIChatSheet } from "@/components/LazyComponents";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -82,28 +81,28 @@ const Members = () => {
     }
   }, [searchParams, members]);
 
-  // Fetch members that have AI chat sessions
-  useEffect(() => {
-    const fetchMembersWithAIChat = async () => {
-      try {
-        const { data: sessions } = await supabase
-          .from("chat_sessions")
-          .select("member_id")
-          .not("member_id", "is", null);
+  // Memoize the AI chat fetch to prevent unnecessary API calls
+  const fetchMembersWithAIChat = useMemo(() => async () => {
+    try {
+      const { data: sessions } = await supabase
+        .from("chat_sessions")
+        .select("member_id")
+        .not("member_id", "is", null);
 
-        if (sessions) {
-          const memberIdsWithChat = new Set(
-            sessions.map((session: any) => session.member_id).filter(Boolean)
-          );
-          setMembersWithAIChat(memberIdsWithChat);
-        }
-      } catch (error) {
-        console.error("Error fetching AI chat sessions:", error);
+      if (sessions) {
+        const memberIdsWithChat = new Set(
+          sessions.map((session: any) => session.member_id).filter(Boolean)
+        );
+        setMembersWithAIChat(memberIdsWithChat);
       }
-    };
-
-    fetchMembersWithAIChat();
+    } catch (error) {
+      console.error("Error fetching AI chat sessions:", error);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchMembersWithAIChat();
+  }, [fetchMembersWithAIChat]);
 
   const handleFavorite = async (member: any, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -130,13 +129,15 @@ const Members = () => {
   // Show member detail if one is selected
   if (selectedMember) {
     return (
-      <MemberDetail 
-        member={selectedMember} 
-        onBack={() => {
-          setSelectedMember(null);
-          navigate('/members');
-        }} 
-      />
+      <Suspense fallback={<MembersLoadingSkeleton />}>
+        <LazyMemberDetail 
+          member={selectedMember} 
+          onBack={() => {
+            setSelectedMember(null);
+            navigate('/members');
+          }} 
+        />
+      </Suspense>
     );
   }
 
@@ -211,11 +212,13 @@ const Members = () => {
         </div>
       </div>
 
-      <AIChatSheet
-        open={chatOpen}
-        onOpenChange={setChatOpen}
-        member={selectedMemberForChat}
-      />
+      <Suspense fallback={null}>
+        <LazyAIChatSheet
+          open={chatOpen}
+          onOpenChange={setChatOpen}
+          member={selectedMemberForChat}
+        />
+      </Suspense>
     </>
   );
 }
