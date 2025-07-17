@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +12,7 @@ import {
   Palette, 
   Users, 
   Star,
-  Github,
+  Heart,
   Twitter,
   Image,
   Share2,
@@ -33,7 +34,11 @@ const Landing = () => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const placeholderTexts = [
-    "Ask Lovable to create a landing"
+    "Solve a problem",
+    "Write a new contract for your union",
+    "Draft a constitutional amendment", 
+    "Eliminate addictive tech design features",
+    "Develop a program for universal pre-k"
   ];
 
   const [currentPlaceholder, setCurrentPlaceholder] = useState(0);
@@ -54,6 +59,13 @@ const Landing = () => {
       setTimeout(() => {
         navigate('/home');
       }, 1000);
+    }
+  };
+
+  const handleDoSomethingClick = () => {
+    if (inputRef.current) {
+      inputRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      inputRef.current.focus();
     }
   };
 
@@ -116,24 +128,16 @@ const Landing = () => {
       </div>
 
       {/* Header */}
-      <header className="relative z-10 border-b border-border/50 bg-background/80 backdrop-blur-lg">
+      <header className="relative z-10 bg-background/80 backdrop-blur-lg">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-primary-foreground" />
+                <span className="text-lg">❤️</span>
               </div>
               <span className="text-xl font-bold">Goodable</span>
             </div>
-
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-8">
-              <a href="#features" className="text-muted-foreground hover:text-foreground transition-colors">Features</a>
-              <a href="#examples" className="text-muted-foreground hover:text-foreground transition-colors">Examples</a>
-              <a href="#pricing" className="text-muted-foreground hover:text-foreground transition-colors">Pricing</a>
-              <a href="#docs" className="text-muted-foreground hover:text-foreground transition-colors">Docs</a>
-            </nav>
 
             {/* Desktop Actions */}
             <div className="flex items-center space-x-4">
@@ -202,7 +206,7 @@ const Landing = () => {
                     <div className="flex items-center gap-4">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <button type="button" className="text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all duration-200 text-xs px-3 py-2 rounded-md border border-border/30 hover:border-border/50">
+                          <button type="button" className="text-muted-foreground hover:text-foreground hover:bg-blue-50 transition-all duration-200 text-xs px-3 py-2 rounded-[128px] border border-border/30 hover:border-border/50">
                             Doc
                           </button>
                         </DropdownMenuTrigger>
@@ -215,7 +219,7 @@ const Landing = () => {
 
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <button type="button" className="text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all duration-200 px-3 py-2 rounded-md border border-border/30 hover:border-border/50">
+                          <button type="button" className="text-muted-foreground hover:text-foreground hover:bg-blue-50 transition-all duration-200 px-3 py-2 rounded-[128px] border border-border/30 hover:border-border/50">
                             <span className="text-xs">Prompt</span>
                           </button>
                         </DropdownMenuTrigger>
@@ -228,7 +232,7 @@ const Landing = () => {
 
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <button type="button" className="text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all duration-200 px-3 py-2 rounded-md border border-border/30 hover:border-border/50" onClick={() => navigate('/plans')}>
+                          <button type="button" className="text-muted-foreground hover:text-foreground hover:bg-blue-50 transition-all duration-200 px-3 py-2 rounded-[128px] border border-border/30 hover:border-border/50" onClick={() => navigate('/plans')}>
                             <span className="text-xs">Workspace</span>
                           </button>
                         </DropdownMenuTrigger>
@@ -241,7 +245,7 @@ const Landing = () => {
 
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all duration-200 px-3 py-2 rounded-md border border-border/30 hover:border-border/50">
+                          <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-blue-50 transition-all duration-200 px-3 py-2 rounded-[128px] border border-border/30 hover:border-border/50">
                             <span className="text-xs">Supabase</span>
                             <ChevronDown className="w-2 h-2" />
                           </button>
@@ -271,7 +275,7 @@ const Landing = () => {
                 ))}
               </div>
               <div className="text-sm text-muted-foreground">
-                <span>10,000+ developers building with Goodable</span>
+                <span>10,000+ people building with Goodable</span>
               </div>
             </div>
           </div>
@@ -282,10 +286,10 @@ const Landing = () => {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Why developers love Goodable
+                Why people love Goodable
               </h2>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                Build faster, deploy easier, and focus on what matters most
+                Identify the problem, develop a solution, and focus on what matters most
               </p>
             </div>
 
@@ -310,10 +314,10 @@ const Landing = () => {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Built with Goodable
+                Do good with Goodable
               </h2>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                See what others have created in minutes
+                See what others are doing right now
               </p>
             </div>
 
@@ -349,19 +353,15 @@ const Landing = () => {
         <section className="py-20 bg-primary/5">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Ready to build something amazing?
+              Ready to do something amazing?
             </h2>
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Join thousands of people who are building a future that's goodable
+              Join thousands of people who are collaborating on a future that's Goodable.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button size="lg" onClick={() => navigate('/auth')}>
-                Start Building Now
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-              <Button variant="outline" size="lg">
-                <Github className="w-4 h-4 mr-2" />
-                View on GitHub
+              <Button variant="outline" size="lg" onClick={handleDoSomethingClick}>
+                <Heart className="w-4 h-4 mr-2" />
+                Do Something
               </Button>
             </div>
           </div>
@@ -375,7 +375,7 @@ const Landing = () => {
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                  <Sparkles className="w-5 h-5 text-primary-foreground" />
+                  <span className="text-lg">❤️</span>
                 </div>
                 <span className="text-xl font-bold">Goodable</span>
               </div>
@@ -411,7 +411,7 @@ const Landing = () => {
                   <Twitter className="w-5 h-5" />
                 </a>
                 <a href="#" className="text-muted-foreground hover:text-foreground">
-                  <Github className="w-5 h-5" />
+                  <Heart className="w-5 h-5" />
                 </a>
               </div>
             </div>

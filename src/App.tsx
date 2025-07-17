@@ -12,7 +12,6 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { ModelSelector } from "@/components/ModelSelector";
 import Landing from "./pages/Landing";
 import Index from "./pages/Index";
-import Home from "./pages/Home";
 import { Auth } from "./pages/Auth";
 import Profile from "./pages/Profile";
 import Bills from "./pages/Bills";
@@ -48,7 +47,7 @@ const AppLayout = () => {
             </header>
             <main className="flex-1">
               <Routes>
-                <Route path="/home" element={<Home />} />
+                <Route path="/home" element={<Landing />} />
                 <Route path="/chats" element={<Chats />} />
                 <Route path="/favorites" element={<Favorites />} />
                 <Route path="/playground" element={<Playground />} />
