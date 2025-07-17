@@ -150,7 +150,7 @@ const Landing = () => {
                         <DropdownMenuContent>
                           <DropdownMenuItem>Option 1</DropdownMenuItem>
                           <DropdownMenuItem>Option 2</DropdownMenuItem>
-                          <DropdownMenuItem>Option 3</DropdownMenuItem>
+                          <DropdownMenuItem>How to use goodable</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
 
