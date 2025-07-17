@@ -1,7 +1,7 @@
 
-import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -23,18 +23,11 @@ import Playground from "./pages/Playground";
 import Plans from "./pages/Plans";
 import ChangeLog from "./pages/ChangeLog";
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 1,
-      refetchOnWindowFocus: false,
-    },
-  },
-});
+const queryClient = new QueryClient();
 
 console.log("App component is loading");
 
-const AppLayout: React.FC = () => {
+const AppLayout = () => {
   const { selectedModel, setSelectedModel } = useModel();
   
   return (
@@ -74,24 +67,26 @@ const AppLayout: React.FC = () => {
   );
 };
 
-const App: React.FC = () => {
+const App = () => {
   console.log("App component is rendering");
   
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <ModelProvider>
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Landing />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="*" element={<AppLayout />} />
-            </Routes>
-          </BrowserRouter>
-          <Toaster />
-          <Sonner />
-        </ModelProvider>
-      </AuthProvider>
+      <TooltipProvider>
+        <AuthProvider>
+          <ModelProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Landing />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="*" element={<AppLayout />} />
+              </Routes>
+            </BrowserRouter>
+          </ModelProvider>
+        </AuthProvider>
+      </TooltipProvider>
     </QueryClientProvider>
   );
 };

@@ -1,7 +1,7 @@
-
 import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Users, Crown, Edit, Eye } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
@@ -97,43 +97,46 @@ export const CoAuthorAttribution = ({ draftId, ownerId, compact = false }: CoAut
 
   if (compact) {
     return (
-      <div className="flex items-center gap-2">
-        <div className="flex -space-x-2">
-          {allContributors.slice(0, 3).map((contributor, index) => {
-            const RoleIcon = getRoleIcon(contributor.role);
-            return (
-              <div key={contributor.id} className="relative group">
-                <Avatar className="h-8 w-8 border-2 border-background">
-                  <AvatarFallback className="text-xs">
-                    {contributor.profile?.display_name?.charAt(0) || "U"}
-                  </AvatarFallback>
-                </Avatar>
-                {/* Simple hover card replacement */}
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-popover text-popover-foreground text-xs rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
-                  <div className="flex items-center gap-2">
-                    <span>{contributor.profile?.display_name || "Unknown"}</span>
-                    <Badge variant={getRoleColor(contributor.role)} className="text-xs">
-                      <RoleIcon className="h-3 w-3 mr-1" />
-                      {contributor.role}
-                    </Badge>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+      <TooltipProvider>
+        <div className="flex items-center gap-2">
+          <div className="flex -space-x-2">
+            {allContributors.slice(0, 3).map((contributor, index) => {
+              const RoleIcon = getRoleIcon(contributor.role);
+              return (
+                <Tooltip key={contributor.id}>
+                  <TooltipTrigger>
+                    <Avatar className="h-8 w-8 border-2 border-background">
+                      <AvatarFallback className="text-xs">
+                        {contributor.profile?.display_name?.charAt(0) || "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <div className="flex items-center gap-2">
+                      <span>{contributor.profile?.display_name || "Unknown"}</span>
+                      <Badge variant={getRoleColor(contributor.role)} className="text-xs">
+                        <RoleIcon className="h-3 w-3 mr-1" />
+                        {contributor.role}
+                      </Badge>
+                    </div>
+                  </TooltipContent>
+                </Tooltip>
+              );
+            })}
+          </div>
+          {allContributors.length > 3 && (
+            <span className="text-xs text-muted-foreground">
+              +{allContributors.length - 3} more
+            </span>
+          )}
+          {allContributors.length > 1 && (
+            <Badge variant="outline" className="text-xs">
+              <Users className="h-3 w-3 mr-1" />
+              Collaborative
+            </Badge>
+          )}
         </div>
-        {allContributors.length > 3 && (
-          <span className="text-xs text-muted-foreground">
-            +{allContributors.length - 3} more
-          </span>
-        )}
-        {allContributors.length > 1 && (
-          <Badge variant="outline" className="text-xs">
-            <Users className="h-3 w-3 mr-1" />
-            Collaborative
-          </Badge>
-        )}
-      </div>
+      </TooltipProvider>
     );
   }
 
