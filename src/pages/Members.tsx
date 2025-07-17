@@ -5,7 +5,7 @@ import { useMembersData } from "@/hooks/useMembersData";
 import { useMemberFavorites } from "@/hooks/useMemberFavorites";
 import { MembersHeader } from "@/components/members/MembersHeader";
 import { MembersSearchFilters } from "@/components/members/MembersSearchFilters";
-import { MembersGrid } from "@/components/members/MembersGrid";
+import { OptimizedMembersGrid } from "@/components/members/OptimizedMembersGrid";
 import { MembersEmptyState } from "@/components/members/MembersEmptyState";
 import { MembersLoadingSkeleton } from "@/components/members/MembersLoadingSkeleton";
 import { MembersErrorState } from "@/components/members/MembersErrorState";
@@ -170,7 +170,7 @@ const Members = () => {
             <MembersEmptyState hasFilters={hasFilters} />
           ) : (
             <>
-              <MembersGrid 
+              <OptimizedMembersGrid 
                 members={members} 
                 onMemberSelect={setSelectedMember}
                 onFavorite={handleFavorite}

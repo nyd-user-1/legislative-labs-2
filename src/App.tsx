@@ -10,20 +10,33 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { ModelSelector } from "@/components/ModelSelector";
+import { RouteLoadingFallback } from "@/components/RouteLoadingFallback";
+import { Suspense } from "react";
 import Landing from "./pages/Landing";
-import Index from "./pages/Index";
 import { Auth } from "./pages/Auth";
-import Profile from "./pages/Profile";
-import Bills from "./pages/Bills";
-import Members from "./pages/Members";
-import Committees from "./pages/Committees";
-import Chats from "./pages/Chats";
-import Favorites from "./pages/Favorites";
-import Playground from "./pages/Playground";
-import Plans from "./pages/Plans";
-import ChangeLog from "./pages/ChangeLog";
+import {
+  LazyBills,
+  LazyMembers,
+  LazyCommittees,
+  LazyChangeLog,
+  LazyChats,
+  LazyFavorites,
+  LazyPlayground,
+  LazyPlans,
+  LazyProfile,
+  LazyIndex
+} from "@/components/LazyRoutes";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 10 * 60 * 1000, // 10 minutes
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 console.log("App component is loading");
 
@@ -46,19 +59,21 @@ const AppLayout = () => {
               </div>
             </header>
             <main className="flex-1">
-              <Routes>
-                <Route path="/home" element={<Landing />} />
-                <Route path="/chats" element={<Chats />} />
-                <Route path="/favorites" element={<Favorites />} />
-                <Route path="/playground" element={<Playground />} />
-                <Route path="/bills" element={<Bills />} />
-                <Route path="/members" element={<Members />} />
-                <Route path="/committees" element={<Committees />} />
-                <Route path="/plans" element={<Plans />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/changelog" element={<ChangeLog />} />
-                <Route path="/dashboard" element={<Index />} />
-              </Routes>
+              <Suspense fallback={<RouteLoadingFallback />}>
+                <Routes>
+                  <Route path="/home" element={<Landing />} />
+                  <Route path="/chats" element={<LazyChats />} />
+                  <Route path="/favorites" element={<LazyFavorites />} />
+                  <Route path="/playground" element={<LazyPlayground />} />
+                  <Route path="/bills" element={<LazyBills />} />
+                  <Route path="/members" element={<LazyMembers />} />
+                  <Route path="/committees" element={<LazyCommittees />} />
+                  <Route path="/plans" element={<LazyPlans />} />
+                  <Route path="/profile" element={<LazyProfile />} />
+                  <Route path="/changelog" element={<LazyChangeLog />} />
+                  <Route path="/dashboard" element={<LazyIndex />} />
+                </Routes>
+              </Suspense>
             </main>
           </SidebarInset>
         </div>

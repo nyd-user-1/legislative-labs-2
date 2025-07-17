@@ -14,6 +14,12 @@ export const LazyCommitteeDetail = lazy(() => import('./CommitteeDetail').then(m
   default: module.CommitteeDetail
 })));
 
+// Chat functionality as separate chunk
 export const LazyAIChatSheet = lazy(() => import('./AIChatSheet').then(module => ({
   default: module.AIChatSheet
+})));
+
+// Additional performance-critical components
+export const LazyOptimizedBillsGrid = lazy(() => import('./bills/OptimizedBillsGrid').then(module => ({
+  default: module.OptimizedBillsGrid
 })));
