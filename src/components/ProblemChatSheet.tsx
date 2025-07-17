@@ -8,6 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Copy } from "lucide-react";
+import { ChatInput } from "@/components/chat/ChatInput";
 import { generateProblemFromScenario } from "@/utils/problemStatementHelpers";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -26,6 +27,7 @@ export const ProblemChatSheet = ({ open, onOpenChange, userProblem }: ProblemCha
   const [suggestedPrompts, setSuggestedPrompts] = useState<string[]>([]);
   const [chatTitle, setChatTitle] = useState('Problem 1');
   const [chatSessionId, setChatSessionId] = useState<string | null>(null);
+  const [inputValue, setInputValue] = useState('');
   const { toast } = useToast();
   const { user } = useAuth();
   const streamingRef = useRef<string>('');
@@ -214,14 +216,17 @@ export const ProblemChatSheet = ({ open, onOpenChange, userProblem }: ProblemCha
 
       if (response.ok) {
         const data = await response.json();
-        const title = data.generatedText?.trim().replace(/['"]/g, '') || chatTitle;
-        setChatTitle(title);
+        let rawTitle = data.generatedText?.trim().replace(/['"]/g, '') || chatTitle;
+        
+        // Clean markdown from title
+        const cleanTitle = rawTitle.replace(/\*\*/g, '').replace(/\*/g, '').replace(/^#+\s*/g, '').trim();
+        setChatTitle(cleanTitle);
 
-        // Update the database with the new title
+        // Update the database with the clean title
         if (sessionId) {
           await supabase
             .from('problem_chats')
-            .update({ title })
+            .update({ title: cleanTitle })
             .eq('id', sessionId);
         }
       }
@@ -240,11 +245,17 @@ export const ProblemChatSheet = ({ open, onOpenChange, userProblem }: ProblemCha
   };
 
   const handlePromptClick = (prompt: string) => {
-    // For now, just show a toast. This could be extended to continue the conversation
-    toast({
-      title: "Prompt selected",
-      description: `You selected: ${prompt}`,
-    });
+    setInputValue(prompt);
+  };
+
+  const handleSendMessage = () => {
+    if (inputValue.trim()) {
+      toast({
+        title: "Message sent",
+        description: `You sent: ${inputValue}`,
+      });
+      setInputValue('');
+    }
   };
 
   return (
@@ -307,6 +318,17 @@ export const ProblemChatSheet = ({ open, onOpenChange, userProblem }: ProblemCha
               </div>
             </div>
           )}
+        </div>
+
+        {/* Chat Input - Fixed at bottom */}
+        <div className="flex-shrink-0 border-t pt-4">
+          <ChatInput
+            inputValue={inputValue}
+            onInputChange={setInputValue}
+            onSendMessage={handleSendMessage}
+            isLoading={isStreaming}
+            placeholder="Ask a follow-up question..."
+          />
         </div>
       </SheetContent>
     </Sheet>
