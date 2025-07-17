@@ -29,11 +29,11 @@ export default defineConfig(({ mode }) => ({
           'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-popover', '@radix-ui/react-select'],
           'query-vendor': ['@tanstack/react-query'],
           'supabase-vendor': ['@supabase/supabase-js'],
-          // Feature chunks
-          'chat-features': ['./src/components/AIChatSheet.tsx', './src/hooks/useChatLogic.tsx'],
-          'bills-features': ['./src/pages/Bills.tsx', './src/components/bills'],
-          'members-features': ['./src/pages/Members.tsx', './src/components/members'],
-          'committees-features': ['./src/pages/Committees.tsx', './src/components/committees'],
+          // Feature chunks - fix the paths to match actual file structure
+          'chat-features': ['./src/components/AIChatSheet.tsx'],
+          'bills-features': ['./src/pages/Bills.tsx', './src/pages/OptimizedBills.tsx'],
+          'members-features': ['./src/pages/Members.tsx'],
+          'committees-features': ['./src/pages/Committees.tsx'],
         },
       },
     },
