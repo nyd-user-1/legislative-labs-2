@@ -1,18 +1,17 @@
-
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { LazyBillDetail } from "@/components/LazyComponents";
+import { BillDetail } from "@/components/BillDetail";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
 import { useBillsData } from "@/hooks/useBillsData";
 import { 
   BillsHeader, 
   BillsSearchFilters, 
+  BillsGrid, 
   BillsLoadingSkeleton, 
   BillsErrorState, 
   BillsEmptyState 
 } from "@/components/bills";
-import { OptimizedBillsGrid } from "@/components/bills/OptimizedBillsGrid";
 
 type Bill = Tables<"Bills">;
 
@@ -123,9 +122,7 @@ const Bills = () => {
 
   if (selectedBill) {
     return (
-      <Suspense fallback={<BillsLoadingSkeleton />}>
-        <LazyBillDetail bill={selectedBill} onBack={handleBackToBills} />
-      </Suspense>
+      <BillDetail bill={selectedBill} onBack={handleBackToBills} />
     );
   }
 
@@ -160,7 +157,7 @@ const Bills = () => {
           <BillsEmptyState hasFilters={hasFilters} />
         ) : (
           <div className="space-y-6">
-            <OptimizedBillsGrid bills={bills} onBillSelect={handleBillSelect} />
+            <BillsGrid bills={bills} onBillSelect={handleBillSelect} />
             
             {/* Pagination Controls */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t">

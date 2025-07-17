@@ -1,5 +1,5 @@
 
-import { useState, useEffect, Suspense, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useCommitteesData } from "@/hooks/useCommitteesData";
 import { useCommitteeFavorites } from "@/hooks/useCommitteeFavorites";
@@ -9,7 +9,8 @@ import { CommitteesGrid } from "@/components/committees/CommitteesGrid";
 import { CommitteesEmptyState } from "@/components/committees/CommitteesEmptyState";
 import { CommitteesLoadingSkeleton } from "@/components/committees/CommitteesLoadingSkeleton";
 import { CommitteesErrorState } from "@/components/committees/CommitteesErrorState";
-import { LazyCommitteeDetail, LazyAIChatSheet } from "@/components/LazyComponents";
+import { CommitteeDetail } from "@/components/CommitteeDetail";
+import { AIChatSheet } from "@/components/AIChatSheet";
 import { supabase } from "@/integrations/supabase/client";
 
 type Committee = {
@@ -63,28 +64,28 @@ const Committees = () => {
     }
   }, [searchParams, committees]);
 
-  // Memoize committees with AI chat fetch to prevent unnecessary API calls
-  const fetchCommitteesWithAIChat = useMemo(() => async () => {
-    try {
-      const { data: sessions } = await supabase
-        .from("chat_sessions")
-        .select("committee_id")
-        .not("committee_id", "is", null);
-
-      if (sessions) {
-        const committeeIdsWithChat = new Set(
-          sessions.map((session: any) => session.committee_id).filter(Boolean)
-        );
-        setCommitteesWithAIChat(committeeIdsWithChat);
-      }
-    } catch (error) {
-      console.error("Error fetching AI chat sessions:", error);
-    }
-  }, []);
-
+  // Fetch committees that have AI chat sessions
   useEffect(() => {
+    const fetchCommitteesWithAIChat = async () => {
+      try {
+        const { data: sessions } = await supabase
+          .from("chat_sessions")
+          .select("committee_id")
+          .not("committee_id", "is", null);
+
+        if (sessions) {
+          const committeeIdsWithChat = new Set(
+            sessions.map((session: any) => session.committee_id).filter(Boolean)
+          );
+          setCommitteesWithAIChat(committeeIdsWithChat);
+        }
+      } catch (error) {
+        console.error("Error fetching AI chat sessions:", error);
+      }
+    };
+
     fetchCommitteesWithAIChat();
-  }, [fetchCommitteesWithAIChat]);
+  }, []);
 
   const handleFavorite = async (committee: Committee, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -111,12 +112,10 @@ const Committees = () => {
   // Show committee detail if one is selected
   if (selectedCommittee) {
     return (
-      <Suspense fallback={<CommitteesLoadingSkeleton />}>
-        <LazyCommitteeDetail 
-          committee={selectedCommittee} 
-          onBack={() => setSelectedCommittee(null)} 
-        />
-      </Suspense>
+      <CommitteeDetail 
+        committee={selectedCommittee} 
+        onBack={() => setSelectedCommittee(null)} 
+      />
     );
   }
 
@@ -162,13 +161,11 @@ const Committees = () => {
         </div>
       </div>
 
-      <Suspense fallback={null}>
-        <LazyAIChatSheet
-          open={chatOpen}
-          onOpenChange={setChatOpen}
-          committee={selectedCommitteeForChat}
-        />
-      </Suspense>
+      <AIChatSheet
+        open={chatOpen}
+        onOpenChange={setChatOpen}
+        committee={selectedCommitteeForChat}
+      />
     </>
   );
 };

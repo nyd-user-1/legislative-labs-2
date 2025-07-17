@@ -1,10 +1,8 @@
-
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Search, X } from "lucide-react";
-import { useEnhancedDebounce } from "@/hooks/useEnhancedDebounce";
 
 interface BillsSearchFiltersProps {
   filters: {
@@ -32,25 +30,25 @@ export const BillsSearchFilters = ({
   const [searchValue, setSearchValue] = useState(filters.search);
   const searchTimeoutRef = useRef<NodeJS.Timeout>();
 
-  // Use enhanced debounce for search
-  const debouncedSearchValue = useEnhancedDebounce(searchValue, {
-    delay: 500,
-    enableCaching: true,
-    cacheSize: 100
-  });
-
-  // Update filters when debounced value changes
-  useEffect(() => {
-    if (debouncedSearchValue !== filters.search) {
-      const newFilters = { ...filters, search: debouncedSearchValue };
-      onFiltersChange(newFilters);
-    }
-  }, [debouncedSearchValue, filters, onFiltersChange]);
-
   // Update local search value when filters change from outside
   useEffect(() => {
     setSearchValue(filters.search);
   }, [filters.search]);
+
+  const handleSearchChange = (value: string) => {
+    setSearchValue(value);
+    
+    // Clear existing timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    // Set new timeout for 500ms delay
+    searchTimeoutRef.current = setTimeout(() => {
+      const newFilters = { ...filters, search: value };
+      onFiltersChange(newFilters);
+    }, 500);
+  };
 
   const handleFilterChange = (key: string, value: string) => {
     const newFilters = { ...filters, [key]: value };
@@ -75,27 +73,23 @@ export const BillsSearchFilters = ({
     filters.sponsor !== "" ||
     filters.committee !== "";
 
-  // Memoize unique sponsors to avoid recalculation
-  const uniqueSponsors = useMemo(() => {
-    return sponsors.reduce((acc, sponsor) => {
-      const key = `${sponsor.name}-${sponsor.chamber}-${sponsor.party}`;
-      if (!acc.some(s => `${s.name}-${s.chamber}-${s.party}` === key)) {
-        acc.push(sponsor);
-      }
-      return acc;
-    }, [] as typeof sponsors);
-  }, [sponsors]);
+  // Get unique sponsors to avoid duplicate keys
+  const uniqueSponsors = sponsors.reduce((acc, sponsor) => {
+    const key = `${sponsor.name}-${sponsor.chamber}-${sponsor.party}`;
+    if (!acc.some(s => `${s.name}-${s.chamber}-${s.party}` === key)) {
+      acc.push(sponsor);
+    }
+    return acc;
+  }, [] as typeof sponsors);
 
-  // Memoize unique committees to avoid recalculation
-  const uniqueCommittees = useMemo(() => {
-    return committees.reduce((acc, committee) => {
-      const key = `${committee.name}-${committee.chamber}`;
-      if (!acc.some(c => `${c.name}-${c.chamber}` === key)) {
-        acc.push(committee);
-      }
-      return acc;
-    }, [] as typeof committees);
-  }, [committees]);
+  // Get unique committees to avoid duplicate keys  
+  const uniqueCommittees = committees.reduce((acc, committee) => {
+    const key = `${committee.name}-${committee.chamber}`;
+    if (!acc.some(c => `${c.name}-${c.chamber}` === key)) {
+      acc.push(committee);
+    }
+    return acc;
+  }, [] as typeof committees);
 
   // Get the selected sponsor's display name
   const selectedSponsor = uniqueSponsors.find(s => s.name === filters.sponsor);
@@ -111,7 +105,7 @@ export const BillsSearchFilters = ({
         <Input
           placeholder="Search bills..."
           value={searchValue}
-          onChange={(e) => setSearchValue(e.target.value)}
+          onChange={(e) => handleSearchChange(e.target.value)}
           className="pl-10"
         />
         {searchValue && (
