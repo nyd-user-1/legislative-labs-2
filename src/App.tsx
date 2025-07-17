@@ -1,4 +1,5 @@
 
+import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -23,11 +24,18 @@ import Playground from "./pages/Playground";
 import Plans from "./pages/Plans";
 import ChangeLog from "./pages/ChangeLog";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 console.log("App component is loading");
 
-const AppLayout = () => {
+const AppLayout: React.FC = () => {
   const { selectedModel, setSelectedModel } = useModel();
   
   return (
@@ -67,7 +75,7 @@ const AppLayout = () => {
   );
 };
 
-const App = () => {
+const App: React.FC = () => {
   console.log("App component is rendering");
   
   return (
@@ -75,8 +83,6 @@ const App = () => {
       <TooltipProvider>
         <AuthProvider>
           <ModelProvider>
-            <Toaster />
-            <Sonner />
             <BrowserRouter>
               <Routes>
                 <Route path="/" element={<Landing />} />
@@ -84,6 +90,8 @@ const App = () => {
                 <Route path="*" element={<AppLayout />} />
               </Routes>
             </BrowserRouter>
+            <Toaster />
+            <Sonner />
           </ModelProvider>
         </AuthProvider>
       </TooltipProvider>
