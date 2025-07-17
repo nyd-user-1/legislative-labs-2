@@ -13,5 +13,7 @@ export const LazyPlans = lazy(() => import('../pages/Plans'));
 export const LazyProfile = lazy(() => import('../pages/Profile'));
 export const LazyIndex = lazy(() => import('../pages/Index'));
 
-// Chat functionality split into separate chunk
-export const LazyChatSheet = lazy(() => import('./AIChatSheet'));
+// Chat functionality split into separate chunk - fix the export handling
+export const LazyChatSheet = lazy(() => import('./AIChatSheet').then(module => ({
+  default: module.AIChatSheet
+})));
