@@ -10,9 +10,8 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { ModelSelector } from "@/components/ModelSelector";
-import Landing from "./pages/Landing";
-import Index from "./pages/Index";
 import Home from "./pages/Home";
+import Index from "./pages/Index";
 import { Auth } from "./pages/Auth";
 import Profile from "./pages/Profile";
 import Bills from "./pages/Bills";
@@ -48,7 +47,6 @@ const AppLayout = () => {
             </header>
             <main className="flex-1">
               <Routes>
-                <Route path="/home" element={<Home />} />
                 <Route path="/chats" element={<Chats />} />
                 <Route path="/favorites" element={<Favorites />} />
                 <Route path="/playground" element={<Playground />} />
@@ -80,7 +78,7 @@ const App = () => {
             <Sonner />
             <BrowserRouter>
               <Routes>
-                <Route path="/" element={<Landing />} />
+                <Route path="/" element={<Home />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="*" element={<AppLayout />} />
               </Routes>
