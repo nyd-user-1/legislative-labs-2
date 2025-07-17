@@ -1,8 +1,23 @@
 import { supabase } from '@/integrations/supabase/client';
 
-export const generateProblemFromScenario = async (scenario: string): Promise<string> => {
+export const generateProblemFromScenario = async (scenario: string, context?: string): Promise<string> => {
   try {
-    const prompt = `Based on this real-life scenario, generate a clear and structured problem statement that identifies the legislative issue:
+    let prompt: string;
+    
+    if (context === 'landing_page') {
+      prompt = `You are helping a first-time user who is new to legislative processes. Transform their conversational problem description into a structured legislative problem statement with a welcoming, educational tone.
+
+Generate a response with exactly these sections:
+- **Problem Definition**: Clear, formal statement of the issue
+- **Scope**: Who and what is affected
+- **Impact**: Consequences and implications
+- **Stakeholders**: Key groups involved or affected
+
+User's problem: ${scenario}
+
+Use markdown formatting. Be thorough but accessible to newcomers.`;
+    } else {
+      prompt = `Based on this real-life scenario, generate a clear and structured problem statement that identifies the legislative issue:
 
 Scenario: ${scenario}
 
@@ -14,9 +29,10 @@ Please provide a problem statement that:
 5. Is written in professional policy language
 
 Keep it concise but comprehensive (2-3 paragraphs maximum).`;
+    }
 
     const { data, error } = await supabase.functions.invoke('generate-with-openai', {
-      body: { prompt, type: 'problem' }
+      body: { prompt, type: 'problem', context }
     });
 
     if (error) {

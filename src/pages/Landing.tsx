@@ -8,13 +8,13 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useNavigate } from 'react-router-dom';
 import { useVisitorCount } from '@/hooks/useVisitorCount';
 import { useAuth } from '@/contexts/AuthContext';
+import { ProblemChatSheet } from '@/components/ProblemChatSheet';
 
 const Landing = () => {
   const [userProblem, setUserProblem] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
-  const [showProblemDialog, setShowProblemDialog] = useState(false);
-  const [aiProblemStatement, setAiProblemStatement] = useState('');
+  const [showAIChatSheet, setShowAIChatSheet] = useState(false);
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
   const { count, loading } = useVisitorCount();
@@ -39,13 +39,8 @@ const Landing = () => {
       if (!user) {
         setShowAuthDialog(true);
       } else {
-        setIsTyping(true);
-        // Simulate OpenAI integration to generate refined problem statement
-        setTimeout(() => {
-          setAiProblemStatement(`Refined: ${userProblem}`);
-          setIsTyping(false);
-          setShowProblemDialog(true);
-        }, 1000);
+        // For authenticated users, open AI chat sheet directly
+        setShowAIChatSheet(true);
       }
     }
   };
@@ -341,6 +336,13 @@ const Landing = () => {
         </section>
       </main>
 
+      {/* Problem Chat Sheet */}
+      <ProblemChatSheet
+        open={showAIChatSheet}
+        onOpenChange={setShowAIChatSheet}
+        userProblem={userProblem}
+      />
+
       <footer className="border-t border-border/50 bg-background/80 backdrop-blur-lg">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid md:grid-cols-4 gap-8">
@@ -439,38 +441,6 @@ const Landing = () => {
         </div>
       )}
 
-      {/* Problem Statement Dialog */}
-      {showProblemDialog && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4">
-            <div className="text-center mb-6">
-              <h2 className="text-xl font-bold mb-4">Refined Problem Statement</h2>
-              <p className="text-gray-700 mb-6">{aiProblemStatement}</p>
-            </div>
-            <div className="space-y-3">
-              <Button 
-                className="w-full"
-                onClick={() => {
-                  setShowProblemDialog(false);
-                  // Handle save and submit logic
-                }}
-              >
-                Save and Submit
-              </Button>
-              <Button 
-                variant="outline" 
-                className="w-full"
-                onClick={() => {
-                  setShowProblemDialog(false);
-                  // Handle save logic
-                }}
-              >
-                Save
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>;
 };
 
