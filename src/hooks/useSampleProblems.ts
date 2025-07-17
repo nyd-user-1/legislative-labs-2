@@ -18,7 +18,7 @@ export const useSampleProblems = () => {
         setLoading(true);
         const { data, error } = await supabase
           .from('Sample Problems')
-          .select('id, "Sample Problems"')
+          .select('*')
           .order('id');
 
         if (error) {
@@ -26,7 +26,7 @@ export const useSampleProblems = () => {
         }
 
         // Map the data to our interface
-        const problems: SampleProblem[] = data?.map(item => ({
+        const problems: SampleProblem[] = data?.map((item: any) => ({
           id: item.id,
           problem: item['Sample Problems']
         })) || [];
