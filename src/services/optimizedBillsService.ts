@@ -73,7 +73,7 @@ export const optimizedBillsService = {
     query = query.range(startRange, endRange);
 
     // Sorting
-    query = query.order('status_date', { ascending: false, nullsLast: true });
+    query = query.order('status_date', { ascending: false, nullsFirst: false });
 
     const { data: bills, error, count } = await query;
 

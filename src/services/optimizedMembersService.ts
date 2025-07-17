@@ -58,7 +58,7 @@ export const optimizedMembersService = {
     query = query.range(startRange, endRange);
 
     // Sorting
-    query = query.order('name', { ascending: true, nullsLast: true });
+    query = query.order('name', { ascending: true, nullsFirst: false });
 
     const { data: members, error, count } = await query;
 

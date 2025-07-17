@@ -46,7 +46,7 @@ export const optimizedCommitteesService = {
     query = query.range(startRange, endRange);
 
     // Sorting
-    query = query.order('committee_name', { ascending: true, nullsLast: true });
+    query = query.order('committee_name', { ascending: true, nullsFirst: false });
 
     const { data: committees, error, count } = await query;
 
