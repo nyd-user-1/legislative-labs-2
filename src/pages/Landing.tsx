@@ -187,7 +187,7 @@ const Landing = () => {
 
             <div className="w-[98vw] max-w-none mx-auto mb-16">
               <form onSubmit={handleSubmit} className="relative">
-                <div className="relative bg-background/50 backdrop-blur-sm border border-border/50 rounded-2xl p-3 focus-within:border-primary/50 transition-all duration-300">
+                <div className="relative bg-background/50 backdrop-blur-sm border border-gray-300 rounded-2xl pl-3 pr-6 py-3 focus-within:border-primary/50 transition-all duration-300 shadow-md">
                   <div className="relative">
                     <Input 
                       ref={inputRef} 
