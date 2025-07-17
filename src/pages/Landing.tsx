@@ -7,13 +7,18 @@ import { ArrowRight, Sparkles, Zap, Code, Palette, Users, Star, Heart, Twitter, 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useNavigate } from 'react-router-dom';
 import { useVisitorCount } from '@/hooks/useVisitorCount';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Landing = () => {
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
+  const [showProblemDialog, setShowProblemDialog] = useState(false);
+  const [refinedProblem, setRefinedProblem] = useState('');
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
   const { count, loading } = useVisitorCount();
+  const { user } = useAuth();
   
   const placeholderTexts = ["Solve a problem", "Bring home Sara Lopez Garcia", "Write a new contract for your union", "Draft a constitutional amendment", "Eliminate addictive tech design features", "Develop a program for universal pre-k"];
   const [currentPlaceholder, setCurrentPlaceholder] = useState(0);
@@ -31,11 +36,24 @@ const Landing = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (hasContent && !isTyping) {
-      setIsTyping(true);
-      // Simulate navigation to app
-      setTimeout(() => {
-        navigate('/home');
-      }, 1000);
+      if (!user) {
+        setShowAuthDialog(true);
+      } else {
+        setIsTyping(true);
+        // Simulate OpenAI integration to generate refined problem statement
+        setTimeout(() => {
+          setRefinedProblem(`Refined: ${inputValue}`);
+          setIsTyping(false);
+          setShowProblemDialog(true);
+        }, 1000);
+      }
+    }
+  };
+
+  const handleDropdownSelect = (text: string) => {
+    setInputValue(`It's a problem that ${text.toLowerCase()}`);
+    if (inputRef.current) {
+      inputRef.current.focus();
     }
   };
   
@@ -164,7 +182,7 @@ const Landing = () => {
               <Button variant="ghost" onClick={() => navigate('/auth')}>
                 Sign In
               </Button>
-              <Button onClick={() => navigate('/auth')}>
+              <Button variant="ghost" onClick={() => navigate('/auth')}>
                 Get Started
               </Button>
             </div>
@@ -185,7 +203,7 @@ const Landing = () => {
 
             <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">Create legislation by chatting with ai</p>
 
-            <div className="w-[98vw] max-w-none mx-auto mb-16">
+            <div className="w-full max-w-[900px] sm:w-[calc(100vw-32px)] mx-auto mb-16 px-4 sm:px-0">
               <form onSubmit={handleSubmit} className="relative">
                 <div className="relative bg-background/50 backdrop-blur-sm border border-gray-300 rounded-2xl pl-3 pr-6 py-3 focus-within:border-primary/50 transition-all duration-300 shadow-md">
                   <div className="relative">
@@ -195,7 +213,8 @@ const Landing = () => {
                       value={inputValue} 
                       onChange={e => setInputValue(e.target.value)} 
                       placeholder={placeholderTexts[currentPlaceholder]} 
-                      className="h-10 pr-16 text-lg bg-transparent border-0 focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground" 
+                      className="h-10 pr-16 bg-transparent border-0 focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground overflow-hidden text-ellipsis" 
+                      style={{ fontSize: '16px' }}
                       disabled={isTyping} 
                     />
                     {hasContent && (
@@ -238,14 +257,14 @@ const Landing = () => {
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-blue-50 transition-all duration-200 px-3 py-2 rounded-[128px] border border-border/30 hover:border-border/50">
-                            <span className="text-xs">Prompt</span>
+                            <span className="text-xs">Problem</span>
                             <ChevronDown className="w-2 h-2" />
                           </button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
-                          <DropdownMenuItem>Option 1</DropdownMenuItem>
-                          <DropdownMenuItem>Option 2</DropdownMenuItem>
-                          <DropdownMenuItem>Option 3</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDropdownSelect("Childcare is unaffordable.")}>Childcare is unaffordable.</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDropdownSelect("Wages are stagnant.")}>Wages are stagnant.</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDropdownSelect("Technology is addictive.")}>Technology is addictive.</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
@@ -259,9 +278,9 @@ const Landing = () => {
                 {loading ? (
                   <span>Loading visitor count...</span>
                 ) : count ? (
-                  <span>{formatVisitorCount(count)}+ people building with Goodable</span>
+                  <span>{formatVisitorCount(count)}+ visited Goodable today</span>
                 ) : (
-                  <span>10,000+ people building with Goodable</span>
+                  <span>183+ visited Goodable today</span>
                 )}
               </div>
             </div>
@@ -272,10 +291,10 @@ const Landing = () => {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Just do goodable
+                Do goodable
               </h2>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                See the good others are doing
+                See the good others are doing today
               </p>
             </div>
 
@@ -302,19 +321,21 @@ const Landing = () => {
           </div>
         </section>
 
-        <section className="py-20 bg-primary/5">
+        <section className="py-20" style={{ backgroundColor: '#F6F4ED' }}>
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Ready to do something good?
-            </h2>
-            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Join thousands of people who are collaborating on a future that's Goodable.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button variant="outline" size="lg" onClick={handleDoSomethingClick}>
-                <Heart className="w-4 h-4 mr-2" />
-                Do Something
-              </Button>
+            <div className="bg-primary/5 rounded-2xl p-12">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                Ready to do something good?
+              </h2>
+              <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+                Join thousands of people who are collaborating on a future that's Goodable.
+              </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <Button variant="outline" size="lg" onClick={handleDoSomethingClick}>
+                  <Heart className="w-4 h-4 mr-2" style={{ color: '#FF0000' }} />
+                  Do Something
+                </Button>
+              </div>
             </div>
           </div>
         </section>
@@ -330,8 +351,9 @@ const Landing = () => {
                 </div>
                 <span className="text-xl font-bold">Goodable</span>
               </div>
-              <p className="text-muted-foreground text-sm">
-                The AI-powered development platform that turns your ideas into reality.
+              <p className="text-muted-foreground text-sm" style={{ textAlign: 'left' }}>
+                Do something,<br />
+                something good.
               </p>
             </div>
             
@@ -373,6 +395,82 @@ const Landing = () => {
           </div>
         </div>
       </footer>
+
+      {/* Authentication Dialog */}
+      {showAuthDialog && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <div className="text-center mb-6">
+              <div className="w-12 h-12 bg-white border border-gray-200 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <Heart className="w-6 h-6 text-red-500" />
+              </div>
+              <h2 className="text-xl font-bold mb-2">Welcome to Goodable</h2>
+              <p className="text-gray-600">Sign in to continue with your problem statement</p>
+            </div>
+            <div className="space-y-3">
+              <Button 
+                className="w-full" 
+                onClick={() => {
+                  setShowAuthDialog(false);
+                  navigate('/auth');
+                }}
+              >
+                Sign In
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => {
+                  setShowAuthDialog(false);
+                  navigate('/auth');
+                }}
+              >
+                Create Account
+              </Button>
+              <Button 
+                variant="ghost" 
+                className="w-full"
+                onClick={() => setShowAuthDialog(false)}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Problem Statement Dialog */}
+      {showProblemDialog && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <div className="text-center mb-6">
+              <h2 className="text-xl font-bold mb-4">Refined Problem Statement</h2>
+              <p className="text-gray-700 mb-6">{refinedProblem}</p>
+            </div>
+            <div className="space-y-3">
+              <Button 
+                className="w-full"
+                onClick={() => {
+                  setShowProblemDialog(false);
+                  // Handle save and submit logic
+                }}
+              >
+                Save and Submit
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => {
+                  setShowProblemDialog(false);
+                  // Handle save logic
+                }}
+              >
+                Save
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>;
 };
 
