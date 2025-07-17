@@ -1,56 +1,24 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { 
-  ArrowRight, 
-  Sparkles, 
-  Zap, 
-  Code, 
-  Palette, 
-  Users, 
-  Star,
-  Heart,
-  Twitter,
-  Image,
-  Share2,
-  ChevronDown,
-  ArrowUp
-} from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { ArrowRight, Sparkles, Zap, Code, Palette, Users, Star, Heart, Twitter, Image, Share2, ChevronDown, ArrowUp } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useNavigate } from 'react-router-dom';
-
 const Landing = () => {
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
-
-  const placeholderTexts = [
-    "Solve a problem",
-    "Write a new contract for your union",
-    "Draft a constitutional amendment", 
-    "Eliminate addictive tech design features",
-    "Develop a program for universal pre-k"
-  ];
-
+  const placeholderTexts = ["Solve a problem", "Write a new contract for your union", "Draft a constitutional amendment", "Eliminate addictive tech design features", "Develop a program for universal pre-k"];
   const [currentPlaceholder, setCurrentPlaceholder] = useState(0);
-
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentPlaceholder((prev) => (prev + 1) % placeholderTexts.length);
+      setCurrentPlaceholder(prev => (prev + 1) % placeholderTexts.length);
     }, 3000);
-
     return () => clearInterval(interval);
   }, []);
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (inputValue.trim()) {
@@ -61,60 +29,49 @@ const Landing = () => {
       }, 1000);
     }
   };
-
   const handleDoSomethingClick = () => {
     if (inputRef.current) {
-      inputRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      inputRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
       inputRef.current.focus();
     }
   };
-
-  const features = [
-    {
-      icon: <Zap className="w-6 h-6" />,
-      title: "Lightning Fast",
-      description: "Ship your ideas in minutes, not weeks"
-    },
-    {
-      icon: <Code className="w-6 h-6" />,
-      title: "AI-Powered",
-      description: "Just describe what you want to build"
-    },
-    {
-      icon: <Palette className="w-6 h-6" />,
-      title: "Beautiful Design",
-      description: "Professional UI components out of the box"
-    },
-    {
-      icon: <Users className="w-6 h-6" />,
-      title: "Collaborative",
-      description: "Share and iterate with your team"
-    }
-  ];
-
-  const examples = [
-    {
-      title: "E-commerce Dashboard",
-      description: "Complete analytics dashboard with charts and metrics",
-      image: "/placeholder.svg",
-      tags: ["React", "Charts", "Dashboard"]
-    },
-    {
-      title: "Social Media App",
-      description: "Modern social platform with real-time features",
-      image: "/placeholder.svg",
-      tags: ["Social", "Real-time", "Mobile"]
-    },
-    {
-      title: "Project Manager",
-      description: "Kanban board with team collaboration tools",
-      image: "/placeholder.svg",
-      tags: ["Productivity", "Teams", "Kanban"]
-    }
-  ];
-
-  return (
-    <div className="min-h-screen bg-background text-foreground overflow-hidden">
+  const features = [{
+    icon: <Zap className="w-6 h-6" />,
+    title: "Lightning Fast",
+    description: "Ship your ideas in minutes, not weeks"
+  }, {
+    icon: <Code className="w-6 h-6" />,
+    title: "AI-Powered",
+    description: "Just describe what you want to build"
+  }, {
+    icon: <Palette className="w-6 h-6" />,
+    title: "Beautiful Design",
+    description: "Professional UI components out of the box"
+  }, {
+    icon: <Users className="w-6 h-6" />,
+    title: "Collaborative",
+    description: "Share and iterate with your team"
+  }];
+  const examples = [{
+    title: "E-commerce Dashboard",
+    description: "Complete analytics dashboard with charts and metrics",
+    image: "/placeholder.svg",
+    tags: ["React", "Charts", "Dashboard"]
+  }, {
+    title: "Social Media App",
+    description: "Modern social platform with real-time features",
+    image: "/placeholder.svg",
+    tags: ["Social", "Real-time", "Mobile"]
+  }, {
+    title: "Project Manager",
+    description: "Kanban board with team collaboration tools",
+    image: "/placeholder.svg",
+    tags: ["Productivity", "Teams", "Kanban"]
+  }];
+  return <div className="min-h-screen bg-background text-foreground overflow-hidden">
       {/* Animated Background */}
       <div className="fixed inset-0 -z-10">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5" />
@@ -162,47 +119,27 @@ const Landing = () => {
                 Do something,
               </span>
               <br />
-              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                something good
-              </span>
+              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">something good</span>
             </h1>
 
             {/* Subheading */}
-            <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
-              Create legislation by chatting with AI
-            </p>
+            <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">Create legislation by chatting with ai</p>
 
             {/* Input Section */}
             <div className="max-w-2xl mx-auto mb-16">
               <form onSubmit={handleSubmit} className="relative">
                 <div className="relative bg-background/50 backdrop-blur-sm border border-border/50 rounded-2xl p-3 focus-within:border-primary/50 transition-all duration-300">
                   <div className="relative">
-                    <Input
-                      ref={inputRef}
-                      type="text"
-                      value={inputValue}
-                      onChange={(e) => setInputValue(e.target.value)}
-                      placeholder={placeholderTexts[currentPlaceholder]}
-                      className="h-10 pr-16 text-lg bg-transparent border-0 focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground"
-                      disabled={isTyping}
-                    />
-                    {inputValue.trim() && (
-                      <Button
-                        type="submit"
-                        className="absolute right-1 top-1 h-8 w-8 p-0 rounded-lg"
-                        disabled={isTyping}
-                      >
-                        {isTyping ? (
-                          <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                        ) : (
-                          <ArrowUp className="w-3 h-3" />
-                        )}
-                      </Button>
-                    )}
+                    <Input ref={inputRef} type="text" value={inputValue} onChange={e => setInputValue(e.target.value)} placeholder={placeholderTexts[currentPlaceholder]} className="h-10 pr-16 text-lg bg-transparent border-0 focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground" disabled={isTyping} />
+                    {inputValue.trim() && <Button type="submit" className="absolute right-1 top-1 h-8 w-8 p-0 rounded-lg" disabled={isTyping}>
+                        {isTyping ? <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" /> : <ArrowUp className="w-3 h-3" />}
+                      </Button>}
                   </div>
                   
                   {/* Toolbar inside input with 55px spacing */}
-                  <div className="flex items-center justify-between pt-[55px] border-t border-border/30" style={{ marginTop: '55px' }}>
+                  <div className="flex items-center justify-between pt-[55px] border-t border-border/30" style={{
+                  marginTop: '55px'
+                }}>
                     <div className="flex items-center gap-4">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -264,16 +201,7 @@ const Landing = () => {
 
             {/* User Count */}
             <div className="flex flex-col items-center justify-center gap-4 mb-16">
-              <div className="flex -space-x-2">
-                {[1, 2, 3, 4].map((i) => (
-                  <div
-                    key={i}
-                    className="w-8 h-8 rounded-full bg-muted border-2 border-background flex items-center justify-center text-xs"
-                  >
-                    {i}
-                  </div>
-                ))}
-              </div>
+              
               <div className="text-sm text-muted-foreground">
                 <span>10,000+ people building with Goodable</span>
               </div>
@@ -285,17 +213,12 @@ const Landing = () => {
         <section id="features" className="py-20 bg-muted/30">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Why people love Goodable
-              </h2>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                Identify the problem, develop a solution, and focus on what matters most
-              </p>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">People to use goodable</h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">Identify the problem, develop a solution, and focus on what matters most</p>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {features.map((feature, index) => (
-                <Card key={index} className="text-center bg-background/50 backdrop-blur-sm border-border/50 hover:border-primary/50 transition-all duration-300">
+              {features.map((feature, index) => <Card key={index} className="text-center bg-background/50 backdrop-blur-sm border-border/50 hover:border-primary/50 transition-all duration-300">
                   <CardContent className="pt-6">
                     <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-4 text-primary">
                       {feature.icon}
@@ -303,8 +226,7 @@ const Landing = () => {
                     <h3 className="font-semibold mb-2">{feature.title}</h3>
                     <p className="text-muted-foreground text-sm">{feature.description}</p>
                   </CardContent>
-                </Card>
-              ))}
+                </Card>)}
             </div>
           </div>
         </section>
@@ -322,29 +244,21 @@ const Landing = () => {
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {examples.map((example, index) => (
-                <Card key={index} className="group overflow-hidden bg-background/50 backdrop-blur-sm border-border/50 hover:border-primary/50 transition-all duration-300">
+              {examples.map((example, index) => <Card key={index} className="group overflow-hidden bg-background/50 backdrop-blur-sm border-border/50 hover:border-primary/50 transition-all duration-300">
                   <div className="aspect-video bg-muted/50 relative overflow-hidden">
-                    <img
-                      src={example.image}
-                      alt={example.title}
-                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
+                    <img src={example.image} alt={example.title} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
                     <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
                   </div>
                   <CardContent className="p-6">
                     <h3 className="font-semibold mb-2">{example.title}</h3>
                     <p className="text-muted-foreground text-sm mb-4">{example.description}</p>
                     <div className="flex flex-wrap gap-2">
-                      {example.tags.map((tag, tagIndex) => (
-                        <Badge key={tagIndex} variant="secondary" className="text-xs">
+                      {example.tags.map((tag, tagIndex) => <Badge key={tagIndex} variant="secondary" className="text-xs">
                           {tag}
-                        </Badge>
-                      ))}
+                        </Badge>)}
                     </div>
                   </CardContent>
-                </Card>
-              ))}
+                </Card>)}
             </div>
           </div>
         </section>
@@ -422,8 +336,6 @@ const Landing = () => {
           </div>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default Landing;
