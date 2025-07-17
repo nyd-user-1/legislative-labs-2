@@ -741,6 +741,18 @@ export type Database = {
         }
         Relationships: []
       }
+      "Sample Problems": {
+        Row: {
+          "Sample Problems": string
+        }
+        Insert: {
+          "Sample Problems": string
+        }
+        Update: {
+          "Sample Problems"?: string
+        }
+        Relationships: []
+      }
       Sponsors: {
         Row: {
           bill_id: number | null

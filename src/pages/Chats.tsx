@@ -4,14 +4,17 @@ import { ChatsEmptyState } from "./chats/components/ChatsEmptyState";
 import { ChatSessionCard } from "./chats/components/ChatSessionCard";
 import { useChatSessions } from "./chats/hooks/useChatSessions";
 import { useChatActions } from "./chats/hooks/useChatActions";
+import { useProblemChats } from "@/hooks/useProblemChats";
+import { ProblemChatCard } from "@/components/ProblemChatCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 
 const Chats = () => {
   const { chatSessions, loading, deleteSession } = useChatSessions();
+  const { problemChats, loading: problemLoading, deleteProblemChat } = useProblemChats();
   const { copyToClipboard, handleFeedback } = useChatActions();
 
-  if (loading) {
+  if (loading || problemLoading) {
     return <ChatsLoadingSkeleton />;
   }
 
@@ -41,7 +44,7 @@ const Chats = () => {
     !committeeChats.includes(session)
   );
 
-  const totalChats = chatSessions.length;
+  const totalChats = chatSessions.length + problemChats.length;
 
   return (
     <div className="container mx-auto px-4 sm:px-6 py-6">
@@ -51,7 +54,7 @@ const Chats = () => {
           <p className="text-muted-foreground">
             {totalChats === 0 
               ? "No saved chats yet" 
-              : `${billChats.length} bill chats, ${memberChats.length} member chats, ${committeeChats.length} committee chats`
+              : `${problemChats.length} problem chats, ${billChats.length} bill chats, ${memberChats.length} member chats, ${committeeChats.length} committee chats`
             }
           </p>
         </div>
@@ -59,13 +62,34 @@ const Chats = () => {
         {totalChats === 0 ? (
           <ChatsEmptyState />
         ) : (
-          <Tabs defaultValue="bills" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
+          <Tabs defaultValue="problems" className="w-full">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="problems">Problems ({problemChats.length})</TabsTrigger>
               <TabsTrigger value="bills">Bills ({billChats.length})</TabsTrigger>
               <TabsTrigger value="members">Members ({memberChats.length})</TabsTrigger>
               <TabsTrigger value="committees">Committees ({committeeChats.length})</TabsTrigger>
             </TabsList>
             
+            
+            <TabsContent value="problems" className="space-y-4">
+              {problemChats.length === 0 ? (
+                <Card>
+                  <CardContent className="flex flex-col items-center justify-center py-8">
+                    <p className="text-muted-foreground">No problem chats yet</p>
+                  </CardContent>
+                </Card>
+              ) : (
+                problemChats.map((problemChat) => (
+                  <ProblemChatCard
+                    key={problemChat.id}
+                    problemChat={problemChat}
+                    onDelete={deleteProblemChat}
+                    onCopy={copyToClipboard}
+                  />
+                ))
+              )}
+            </TabsContent>
+
             <TabsContent value="bills" className="space-y-4">
               {billChats.length === 0 ? (
                 <Card>

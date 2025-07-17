@@ -15,7 +15,9 @@ const corsHeaders = {
 // Enhanced system prompt for legislative analysis
 function getSystemPrompt(type, context = null, entityData = null) {
   const basePrompts = {
-    'problem': 'You are a legislative policy expert. Generate clear, structured problem statements that identify issues requiring legislative action. Focus on the problem, its impact, and why legislation is needed.',
+    'problem': context === 'landing_page' 
+      ? 'You are helping a first-time user who is new to legislative processes. Transform their conversational problem description into a structured legislative problem statement with a welcoming, educational tone. Generate a response with exactly these sections: **Problem Definition**: Clear, formal statement of the issue, **Scope**: Who and what is affected, **Impact**: Consequences and implications, **Stakeholders**: Key groups involved or affected. Use markdown formatting. Be thorough but accessible to newcomers.'
+      : 'You are a legislative policy expert. Generate clear, structured problem statements that identify issues requiring legislative action. Focus on the problem, its impact, and why legislation is needed.',
     'media': `You are a senior legislative communications expert and media strategist. Your task is to create comprehensive, professional media materials for policy solutions. 
 
 IMPORTANT INSTRUCTIONS:
@@ -57,7 +59,7 @@ Remember: You have access to ALL the data - use it to provide comprehensive, acc
     systemPrompt += `\n\nSPECIFIC ENTITY INFORMATION:\n${entityData}\n\nUse this information to provide detailed, specific answers about this entity.`;
   }
   
-  if (context && context.nysData) {
+  if (context && typeof context === 'object' && context.nysData) {
     systemPrompt += `\n\nCURRENT NYS LEGISLATIVE DATA:\n${context.nysData}\n\nUse this information to provide accurate, up-to-date legislative analysis with specific details.`;
   }
   
@@ -185,11 +187,12 @@ serve(async (req) => {
       type = 'default', 
       stream = false, 
       model = 'gpt-4o-mini',
+      context = null,
       entityContext = null,
       enhanceWithNYSData = true 
     } = await req.json();
 
-    console.log('Generating content:', { type, model, promptLength: prompt?.length, stream, enhanceWithNYSData });
+    console.log('Generating content:', { type, model, promptLength: prompt?.length, stream, enhanceWithNYSData, context });
 
     // Determine model provider
     const isClaudeModel = model.startsWith('claude-');
@@ -214,7 +217,8 @@ serve(async (req) => {
     let nysData = null;
     let entityData = '';
     
-    if (enhanceWithNYSData && nysApiKey && type !== 'media') {
+    // Skip NYS data enhancement for landing_page context
+    if (enhanceWithNYSData && nysApiKey && type !== 'media' && context !== 'landing_page') {
       // Build comprehensive search query based on entity context
       let searchQuery = prompt;
       let entityId = null;
@@ -254,12 +258,12 @@ Member Count: ${entityContext.committee.member_count || 'Unknown'}`;
     }
 
     // Build enhanced context with all available information
-    const context = {
+    const contextObj = {
       nysData: nysData ? formatNYSDataForContext(nysData) : null
     };
 
     const systemPrompt = getSystemPrompt(type, context, entityData);
-    const enhancedPrompt = context.nysData ? 
+    const enhancedPrompt = contextObj.nysData ? 
       `${prompt}\n\n[IMPORTANT: Use the comprehensive NYS legislative database information provided above to give specific, detailed answers with exact names, numbers, and current information.]` : 
       prompt;
 
