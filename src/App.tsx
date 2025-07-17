@@ -11,6 +11,7 @@ import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/s
 import { AppSidebar } from "@/components/AppSidebar";
 import { ModelSelector } from "@/components/ModelSelector";
 import { RouteLoadingFallback } from "@/components/RouteLoadingFallback";
+import { PerformanceToggle } from "@/components/performance/PerformanceToggle";
 import { Suspense } from "react";
 import Landing from "./pages/Landing";
 import { Auth } from "./pages/Auth";
@@ -77,6 +78,8 @@ const AppLayout = () => {
             </main>
           </SidebarInset>
         </div>
+        {/* Performance monitoring toggle - only shows in development */}
+        <PerformanceToggle />
       </SidebarProvider>
     </ProtectedRoute>
   );
