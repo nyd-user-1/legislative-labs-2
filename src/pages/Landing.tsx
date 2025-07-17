@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight, Sparkles, Zap, Code, Palette, Users, Star, Heart, Twitter, Image, Share2, ChevronDown, ArrowUp } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useNavigate } from 'react-router-dom';
+
 const Landing = () => {
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -38,23 +40,7 @@ const Landing = () => {
       inputRef.current.focus();
     }
   };
-  const features = [{
-    icon: <Zap className="w-6 h-6" />,
-    title: "Lightning Fast",
-    description: "Ship your ideas in minutes, not weeks"
-  }, {
-    icon: <Code className="w-6 h-6" />,
-    title: "AI-Powered",
-    description: "Just describe what you want to build"
-  }, {
-    icon: <Palette className="w-6 h-6" />,
-    title: "Beautiful Design",
-    description: "Professional UI components out of the box"
-  }, {
-    icon: <Users className="w-6 h-6" />,
-    title: "Collaborative",
-    description: "Share and iterate with your team"
-  }];
+  
   const examples = [{
     title: "E-commerce Dashboard",
     description: "Complete analytics dashboard with charts and metrics",
@@ -71,6 +57,7 @@ const Landing = () => {
     image: "/placeholder.svg",
     tags: ["Productivity", "Teams", "Kanban"]
   }];
+
   return <div className="min-h-screen bg-background text-foreground overflow-hidden">
       {/* Animated Background */}
       <div className="fixed inset-0 -z-10">
@@ -131,14 +118,69 @@ const Landing = () => {
                 <div className="relative bg-background/50 backdrop-blur-sm border border-border/50 rounded-2xl p-3 focus-within:border-primary/50 transition-all duration-300">
                   <div className="relative">
                     <Input ref={inputRef} type="text" value={inputValue} onChange={e => setInputValue(e.target.value)} placeholder={placeholderTexts[currentPlaceholder]} className="h-10 pr-16 text-lg bg-transparent border-0 focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground" disabled={isTyping} />
-                    {inputValue.trim()}
+                    {inputValue.trim() && <Button type="submit" className="absolute right-1 top-1 h-8 w-8 p-0 rounded-lg" disabled={isTyping}>
+                        {isTyping ? <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" /> : <ArrowUp className="w-3 h-3" />}
+                      </Button>}
                   </div>
                   
                   {/* Toolbar inside input with 55px spacing */}
                   <div className="flex items-center justify-between pt-[55px] border-t border-border/30" style={{
                   marginTop: '55px'
                 }}>
-                    
+                    <div className="flex items-center gap-4">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button type="button" className="text-muted-foreground hover:text-foreground hover:bg-blue-50 transition-all duration-200 text-xs px-3 py-2 rounded-[128px] border border-border/30 hover:border-border/50">
+                            Doc
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem>Option 1</DropdownMenuItem>
+                          <DropdownMenuItem>Option 2</DropdownMenuItem>
+                          <DropdownMenuItem>How to use goodable</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button type="button" className="text-muted-foreground hover:text-foreground hover:bg-blue-50 transition-all duration-200 px-3 py-2 rounded-[128px] border border-border/30 hover:border-border/50">
+                            <span className="text-xs">Prompt</span>
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem>Option 1</DropdownMenuItem>
+                          <DropdownMenuItem>Option 2</DropdownMenuItem>
+                          <DropdownMenuItem>Option 3</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button type="button" className="text-muted-foreground hover:text-foreground hover:bg-blue-50 transition-all duration-200 px-3 py-2 rounded-[128px] border border-border/30 hover:border-border/50" onClick={() => navigate('/plans')}>
+                            <span className="text-xs">Workspace</span>
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem>Option 1</DropdownMenuItem>
+                          <DropdownMenuItem>Option 2</DropdownMenuItem>
+                          <DropdownMenuItem>Option 3</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-blue-50 transition-all duration-200 px-3 py-2 rounded-[128px] border border-border/30 hover:border-border/50">
+                            <span className="text-xs">Supabase</span>
+                            <ChevronDown className="w-2 h-2" />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem>Option 1</DropdownMenuItem>
+                          <DropdownMenuItem>Option 2</DropdownMenuItem>
+                          <DropdownMenuItem>Option 3</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </div>
                 </div>
               </form>
@@ -154,34 +196,12 @@ const Landing = () => {
           </div>
         </div>
 
-        {/* Features Section */}
-        <section id="features" className="py-20 bg-muted/30">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">People to use goodable</h2>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">Identify the problem, develop a solution, and focus on what matters most</p>
-            </div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {features.map((feature, index) => <Card key={index} className="text-center bg-background/50 backdrop-blur-sm border-border/50 hover:border-primary/50 transition-all duration-300">
-                  <CardContent className="pt-6">
-                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-4 text-primary">
-                      {feature.icon}
-                    </div>
-                    <h3 className="font-semibold mb-2">{feature.title}</h3>
-                    <p className="text-muted-foreground text-sm">{feature.description}</p>
-                  </CardContent>
-                </Card>)}
-            </div>
-          </div>
-        </section>
-
         {/* Examples Section */}
         <section id="examples" className="py-20">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Do good with Goodable
+                Just do goodable
               </h2>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
                 See what others are doing right now
@@ -283,4 +303,5 @@ const Landing = () => {
       </footer>
     </div>;
 };
+
 export default Landing;
