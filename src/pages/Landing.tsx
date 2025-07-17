@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,12 +6,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight, Sparkles, Zap, Code, Palette, Users, Star, Heart, Twitter, Image, Share2, ChevronDown, ArrowUp } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useNavigate } from 'react-router-dom';
+import { useVisitorCount } from '@/hooks/useVisitorCount';
 
 const Landing = () => {
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
+  const { count, loading } = useVisitorCount();
+  
   const placeholderTexts = ["Solve a problem", "Write a new contract for your union", "Draft a constitutional amendment", "Eliminate addictive tech design features", "Develop a program for universal pre-k"];
   const [currentPlaceholder, setCurrentPlaceholder] = useState(0);
   
@@ -45,6 +47,13 @@ const Landing = () => {
       });
       inputRef.current.focus();
     }
+  };
+
+  const formatVisitorCount = (count: number) => {
+    if (count >= 1000) {
+      return `${Math.floor(count / 1000)}K+`;
+    }
+    return count.toString();
   };
   
   const problemCategories = [
@@ -131,23 +140,19 @@ const Landing = () => {
   ];
 
   return <div className="min-h-screen bg-background text-foreground overflow-hidden">
-      {/* Animated Background */}
       <div className="fixed inset-0 -z-10">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(120,119,198,0.1),transparent_50%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border))_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border))_1px,transparent_1px)] bg-[size:32px_32px] opacity-30" />
         
-        {/* Floating orbs */}
         <div className="absolute top-20 left-10 w-32 h-32 bg-primary/10 rounded-full blur-xl animate-pulse" />
         <div className="absolute top-40 right-20 w-24 h-24 bg-accent/10 rounded-full blur-xl animate-pulse delay-1000" />
         <div className="absolute bottom-20 left-1/4 w-40 h-40 bg-muted/10 rounded-full blur-xl animate-pulse delay-2000" />
       </div>
 
-      {/* Header */}
       <header className="relative z-10 bg-background/80 backdrop-blur-lg">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            {/* Logo */}
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-white border border-gray-200 rounded-lg flex items-center justify-center">
                 <span className="text-lg">❤️</span>
@@ -155,7 +160,6 @@ const Landing = () => {
               <span className="text-xl font-bold">Goodable</span>
             </div>
 
-            {/* Desktop Actions */}
             <div className="flex items-center space-x-4">
               <Button variant="ghost" onClick={() => navigate('/auth')}>
                 Sign In
@@ -168,11 +172,9 @@ const Landing = () => {
         </div>
       </header>
 
-      {/* Hero Section */}
       <main className="relative z-10">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
           <div className="text-center max-w-4xl mx-auto">
-            {/* Main Heading */}
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6">
               <span className="bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
                 Do something,
@@ -181,10 +183,8 @@ const Landing = () => {
               <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">something good</span>
             </h1>
 
-            {/* Subheading */}
             <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">Create legislation by chatting with ai</p>
 
-            {/* Input Section */}
             <div className="max-w-2xl mx-auto mb-16">
               <form onSubmit={handleSubmit} className="relative">
                 <div className="relative bg-background/50 backdrop-blur-sm border border-border/50 rounded-2xl p-3 focus-within:border-primary/50 transition-all duration-300">
@@ -217,10 +217,8 @@ const Landing = () => {
                     )}
                   </div>
                   
-                  {/* Extended bottom border that reaches both sides */}
                   <div className="absolute left-0 right-0 h-px bg-border/30 mt-8 mb-4" />
                   
-                  {/* Toolbar with consistent filter buttons */}
                   <div className="flex items-center justify-between mt-12">
                     <div className="flex items-center gap-4">
                       <DropdownMenu>
@@ -284,16 +282,20 @@ const Landing = () => {
               </form>
             </div>
 
-            {/* User Count */}
             <div className="flex flex-col items-center justify-center gap-4 mb-16">
               <div className="text-sm text-muted-foreground">
-                <span>10,000+ people building with Goodable</span>
+                {loading ? (
+                  <span>Loading visitor count...</span>
+                ) : count ? (
+                  <span>{formatVisitorCount(count)}+ people building with Goodable</span>
+                ) : (
+                  <span>10,000+ people building with Goodable</span>
+                )}
               </div>
             </div>
           </div>
         </div>
 
-        {/* Problem Categories Section */}
         <section id="examples" className="py-20">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
@@ -328,7 +330,6 @@ const Landing = () => {
           </div>
         </section>
 
-        {/* CTA Section */}
         <section className="py-20 bg-primary/5">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -347,7 +348,6 @@ const Landing = () => {
         </section>
       </main>
 
-      {/* Footer */}
       <footer className="border-t border-border/50 bg-background/80 backdrop-blur-lg">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid md:grid-cols-4 gap-8">

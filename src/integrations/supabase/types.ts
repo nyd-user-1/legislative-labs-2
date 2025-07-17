@@ -886,6 +886,30 @@ export type Database = {
           },
         ]
       }
+      visitor_counts: {
+        Row: {
+          count: number
+          created_at: string
+          date: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          count?: number
+          created_at?: string
+          date: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          count?: number
+          created_at?: string
+          date?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       Votes: {
         Row: {
           people_id: number
@@ -915,6 +939,10 @@ export type Database = {
       generate_problem_number: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      increment_visitor_count: {
+        Args: Record<PropertyKey, never>
+        Returns: number
       }
     }
     Enums: {
