@@ -1,9 +1,9 @@
+
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { CardActionButtons } from "@/components/ui/CardActionButtons";
 import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { formatDate } from "@/utils/dateUtils";
@@ -102,88 +102,86 @@ export const VotesTable = ({
   }
 
   return (
-    <TooltipProvider>
-      <ScrollArea className="w-full">
-        <div className="min-w-[900px]">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[120px]">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => handleSort('bill_number')}
-                    className="h-auto p-0 font-semibold hover:bg-transparent"
-                  >
-                    Bill {getSortIcon('bill_number')}
-                  </Button>
-                </TableHead>
-                <TableHead className="min-w-[300px]">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => handleSort('description')}
-                    className="h-auto p-0 font-semibold hover:bg-transparent"
-                  >
-                    Description {getSortIcon('description')}
-                  </Button>
-                </TableHead>
-                <TableHead className="w-[120px]">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => handleSort('vote_date')}
-                    className="h-auto p-0 font-semibold hover:bg-transparent"
-                  >
-                    Vote Date {getSortIcon('vote_date')}
-                  </Button>
-                </TableHead>
-                <TableHead className="w-[120px]">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => handleSort('vote_type')}
-                    className="h-auto p-0 font-semibold hover:bg-transparent"
-                  >
-                    Vote Type {getSortIcon('vote_type')}
-                  </Button>
-                </TableHead>
-                <TableHead className="w-[100px]">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {sortedVotes.map((vote) => (
-                <TableRow 
-                  key={vote.id}
-                  className="cursor-pointer hover:bg-muted/50 transition-colors"
-                  onClick={() => onVoteClick(vote)}
+    <ScrollArea className="w-full">
+      <div className="min-w-[900px]">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[120px]">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => handleSort('bill_number')}
+                  className="h-auto p-0 font-semibold hover:bg-transparent"
                 >
-                  <TableCell className="font-medium">{vote.bill_number}</TableCell>
-                  <TableCell className="max-w-[300px]">
-                    <div className="line-clamp-2 text-sm">{vote.description}</div>
-                  </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {formatDate(vote.vote_date)}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={getVoteBadgeVariant(vote.vote_type)}>
-                      {vote.vote_type}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <CardActionButtons
-                      onFavorite={(e) => onFavorite(vote, e)}
-                      onAIAnalysis={(e) => onAIAnalysis(vote, e)}
-                      isFavorited={false}
-                      hasAIChat={false}
-                    />
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      </ScrollArea>
-    </TooltipProvider>
+                  Bill {getSortIcon('bill_number')}
+                </Button>
+              </TableHead>
+              <TableHead className="min-w-[300px]">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => handleSort('description')}
+                  className="h-auto p-0 font-semibold hover:bg-transparent"
+                >
+                  Description {getSortIcon('description')}
+                </Button>
+              </TableHead>
+              <TableHead className="w-[120px]">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => handleSort('vote_date')}
+                  className="h-auto p-0 font-semibold hover:bg-transparent"
+                >
+                  Vote Date {getSortIcon('vote_date')}
+                </Button>
+              </TableHead>
+              <TableHead className="w-[120px]">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => handleSort('vote_type')}
+                  className="h-auto p-0 font-semibold hover:bg-transparent"
+                >
+                  Vote Type {getSortIcon('vote_type')}
+                </Button>
+              </TableHead>
+              <TableHead className="w-[100px]">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {sortedVotes.map((vote) => (
+              <TableRow 
+                key={vote.id}
+                className="cursor-pointer hover:bg-muted/50 transition-colors"
+                onClick={() => onVoteClick(vote)}
+              >
+                <TableCell className="font-medium">{vote.bill_number}</TableCell>
+                <TableCell className="max-w-[300px]">
+                  <div className="line-clamp-2 text-sm">{vote.description}</div>
+                </TableCell>
+                <TableCell className="text-sm text-muted-foreground">
+                  {formatDate(vote.vote_date)}
+                </TableCell>
+                <TableCell>
+                  <Badge variant={getVoteBadgeVariant(vote.vote_type)}>
+                    {vote.vote_type}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <CardActionButtons
+                    onFavorite={(e) => onFavorite(vote, e)}
+                    onAIAnalysis={(e) => onAIAnalysis(vote, e)}
+                    isFavorited={false}
+                    hasAIChat={false}
+                  />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </ScrollArea>
   );
 };
