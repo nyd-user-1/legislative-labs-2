@@ -1,4 +1,5 @@
 
+import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -41,6 +42,7 @@ const queryClient = new QueryClient({
 });
 
 console.log("App component is loading");
+console.log("React in App:", React);
 
 // Simplified error boundary for lazy loading
 const LazyErrorBoundary = ({ children }: { children: React.ReactNode }) => {
@@ -113,6 +115,25 @@ const AppLayout = () => {
 
 const App = () => {
   console.log("App component is rendering");
+  console.log("React hooks available:", { useState: React.useState, useEffect: React.useEffect });
+  
+  // Verify React is properly loaded before rendering
+  if (!React || !React.useState) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-red-600 mb-4">React Loading Error</h1>
+          <p className="text-gray-600 mb-4">React hooks are not available. Please refresh the page.</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Refresh Page
+          </button>
+        </div>
+      </div>
+    );
+  }
   
   return (
     <ErrorBoundary
