@@ -139,7 +139,7 @@ const Landing = () => {
     { title: "Impact Measurement", subtitle: "13 Sub-problems • 33 Solutions" },
   ];
 
-  return <div className="min-h-screen bg-background text-foreground overflow-hidden">
+  return <div className="min-h-screen text-foreground overflow-hidden" style={{ backgroundColor: '#F6F4ED' }}>
       <div className="fixed inset-0 -z-10">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(120,119,198,0.1),transparent_50%)]" />
@@ -185,7 +185,7 @@ const Landing = () => {
 
             <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">Create legislation by chatting with ai</p>
 
-            <div className="max-w-2xl mx-auto mb-16">
+            <div className="w-[98vw] max-w-none mx-auto mb-16">
               <form onSubmit={handleSubmit} className="relative">
                 <div className="relative bg-background/50 backdrop-blur-sm border border-border/50 rounded-2xl p-3 focus-within:border-primary/50 transition-all duration-300">
                   <div className="relative">
