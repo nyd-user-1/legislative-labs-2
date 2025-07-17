@@ -248,34 +248,6 @@ const Landing = () => {
                           <DropdownMenuItem>Option 3</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
-
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-blue-50 transition-all duration-200 px-3 py-2 rounded-[128px] border border-border/30 hover:border-border/50" onClick={() => navigate('/plans')}>
-                            <span className="text-xs">Workspace</span>
-                            <ChevronDown className="w-2 h-2" />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                          <DropdownMenuItem>Option 1</DropdownMenuItem>
-                          <DropdownMenuItem>Option 2</DropdownMenuItem>
-                          <DropdownMenuItem>Option 3</DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-blue-50 transition-all duration-200 px-3 py-2 rounded-[128px] border border-border/30 hover:border-border/50">
-                            <span className="text-xs">Supabase</span>
-                            <ChevronDown className="w-2 h-2" />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                          <DropdownMenuItem>Option 1</DropdownMenuItem>
-                          <DropdownMenuItem>Option 2</DropdownMenuItem>
-                          <DropdownMenuItem>Option 3</DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
                     </div>
                   </div>
                 </div>
