@@ -10,11 +10,11 @@ import { useVisitorCount } from '@/hooks/useVisitorCount';
 import { useAuth } from '@/contexts/AuthContext';
 
 const Landing = () => {
-  const [inputValue, setInputValue] = useState('');
+  const [userProblem, setUserProblem] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [showProblemDialog, setShowProblemDialog] = useState(false);
-  const [refinedProblem, setRefinedProblem] = useState('');
+  const [aiProblemStatement, setAiProblemStatement] = useState('');
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
   const { count, loading } = useVisitorCount();
@@ -24,7 +24,7 @@ const Landing = () => {
   const [currentPlaceholder, setCurrentPlaceholder] = useState(0);
   
   // Check if input has meaningful content (not just whitespace)
-  const hasContent = inputValue.trim().length > 0;
+  const hasContent = userProblem.trim().length > 0;
   
   useEffect(() => {
     const interval = setInterval(() => {
@@ -42,7 +42,7 @@ const Landing = () => {
         setIsTyping(true);
         // Simulate OpenAI integration to generate refined problem statement
         setTimeout(() => {
-          setRefinedProblem(`Refined: ${inputValue}`);
+          setAiProblemStatement(`Refined: ${userProblem}`);
           setIsTyping(false);
           setShowProblemDialog(true);
         }, 1000);
@@ -51,7 +51,7 @@ const Landing = () => {
   };
 
   const handleDropdownSelect = (text: string) => {
-    setInputValue(`It's a problem that ${text.toLowerCase()}`);
+    setUserProblem(`It's a problem that ${text.toLowerCase()}`);
     if (inputRef.current) {
       inputRef.current.focus();
     }
@@ -210,8 +210,8 @@ const Landing = () => {
                     <Input 
                       ref={inputRef} 
                       type="text" 
-                      value={inputValue} 
-                      onChange={e => setInputValue(e.target.value)} 
+                      value={userProblem} 
+                      onChange={e => setUserProblem(e.target.value)} 
                       placeholder={placeholderTexts[currentPlaceholder]} 
                       className="h-10 pr-16 bg-transparent border-0 focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground overflow-hidden text-ellipsis" 
                       style={{ fontSize: '16px' }}
@@ -445,7 +445,7 @@ const Landing = () => {
           <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4">
             <div className="text-center mb-6">
               <h2 className="text-xl font-bold mb-4">Refined Problem Statement</h2>
-              <p className="text-gray-700 mb-6">{refinedProblem}</p>
+              <p className="text-gray-700 mb-6">{aiProblemStatement}</p>
             </div>
             <div className="space-y-3">
               <Button 
