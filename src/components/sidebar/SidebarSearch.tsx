@@ -43,4 +43,3 @@ export function SidebarSearch({ collapsed, onSearchResultClick }: SidebarSearchP
     </>
   );
 }
-```
