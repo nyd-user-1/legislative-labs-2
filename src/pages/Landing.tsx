@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -74,7 +73,7 @@ const Landing = () => {
     tags: ["Productivity", "Teams", "Kanban"]
   }];
 
-  return <div className="min-h-screen bg-white text-foreground overflow-hidden">
+  return <div className="min-h-screen bg-background text-foreground overflow-hidden">
       {/* Animated Background */}
       <div className="fixed inset-0 -z-10">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5" />
@@ -86,6 +85,31 @@ const Landing = () => {
         <div className="absolute top-40 right-20 w-24 h-24 bg-accent/10 rounded-full blur-xl animate-pulse delay-1000" />
         <div className="absolute bottom-20 left-1/4 w-40 h-40 bg-muted/10 rounded-full blur-xl animate-pulse delay-2000" />
       </div>
+
+      {/* Header */}
+      <header className="relative z-10 bg-background/80 backdrop-blur-lg">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo */}
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                <span className="text-lg">❤️</span>
+              </div>
+              <span className="text-xl font-bold">Goodable</span>
+            </div>
+
+            {/* Desktop Actions */}
+            <div className="flex items-center space-x-4">
+              <Button variant="ghost" onClick={() => navigate('/auth')}>
+                Sign In
+              </Button>
+              <Button onClick={() => navigate('/auth')}>
+                Get Started
+              </Button>
+            </div>
+          </div>
+        </div>
+      </header>
 
       {/* Hero Section */}
       <main className="relative z-10">
@@ -121,9 +145,8 @@ const Landing = () => {
                     <div className="flex items-center gap-4">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-blue-50 transition-all duration-200 text-xs px-3 py-2 rounded-[128px] border border-border/30 hover:border-border/50">
-                            <span>Doc</span>
-                            <ChevronDown className="w-2 h-2" />
+                          <button type="button" className="text-muted-foreground hover:text-foreground hover:bg-blue-50 transition-all duration-200 text-xs px-3 py-2 rounded-[128px] border border-border/30 hover:border-border/50">
+                            Doc
                           </button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
@@ -135,9 +158,8 @@ const Landing = () => {
 
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-blue-50 transition-all duration-200 px-3 py-2 rounded-[128px] border border-border/30 hover:border-border/50">
+                          <button type="button" className="text-muted-foreground hover:text-foreground hover:bg-blue-50 transition-all duration-200 px-3 py-2 rounded-[128px] border border-border/30 hover:border-border/50">
                             <span className="text-xs">Prompt</span>
-                            <ChevronDown className="w-2 h-2" />
                           </button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
@@ -149,9 +171,8 @@ const Landing = () => {
 
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-blue-50 transition-all duration-200 px-3 py-2 rounded-[128px] border border-border/30 hover:border-border/50" onClick={() => navigate('/plans')}>
+                          <button type="button" className="text-muted-foreground hover:text-foreground hover:bg-blue-50 transition-all duration-200 px-3 py-2 rounded-[128px] border border-border/30 hover:border-border/50" onClick={() => navigate('/plans')}>
                             <span className="text-xs">Workspace</span>
-                            <ChevronDown className="w-2 h-2" />
                           </button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
@@ -184,7 +205,7 @@ const Landing = () => {
             <div className="flex flex-col items-center justify-center gap-4 mb-16">
               
               <div className="text-sm text-muted-foreground">
-                <span>10,000+ people building with ❤️</span>
+                <span>10,000+ people building with Goodable</span>
               </div>
             </div>
           </div>
@@ -217,7 +238,7 @@ const Landing = () => {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Do good with ❤️
+                Do good with Goodable
               </h2>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
                 See what others are doing right now
@@ -251,7 +272,7 @@ const Landing = () => {
               Ready to do something amazing?
             </h2>
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Join thousands of people who are collaborating on a future that's ❤️.
+              Join thousands of people who are collaborating on a future that's Goodable.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Button variant="outline" size="lg" onClick={handleDoSomethingClick}>
@@ -269,10 +290,10 @@ const Landing = () => {
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center border border-gray-100">
+                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                   <span className="text-lg">❤️</span>
                 </div>
-                <span className="text-xl font-bold">❤️</span>
+                <span className="text-xl font-bold">Goodable</span>
               </div>
               <p className="text-muted-foreground text-sm">
                 The AI-powered development platform that turns your ideas into reality.
@@ -313,7 +334,7 @@ const Landing = () => {
           </div>
           
           <div className="border-t border-border/50 mt-8 pt-8 text-center text-sm text-muted-foreground">
-            <p>&copy; 2024 ❤️. All rights reserved.</p>
+            <p>&copy; 2024 Goodable. All rights reserved.</p>
           </div>
         </div>
       </footer>

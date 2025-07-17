@@ -22,9 +22,6 @@ import Favorites from "./pages/Favorites";
 import Playground from "./pages/Playground";
 import Plans from "./pages/Plans";
 import ChangeLog from "./pages/ChangeLog";
-import { Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { useSearch } from "@/hooks/useSearch";
 
 const queryClient = new QueryClient();
 
@@ -32,30 +29,15 @@ console.log("App component is loading");
 
 const AppLayout = () => {
   const { selectedModel, setSelectedModel } = useModel();
-  const { searchTerm, setSearchTerm } = useSearch();
   
   return (
     <ProtectedRoute>
       <SidebarProvider>
-        <div className="min-h-screen flex w-full bg-white">
+        <div className="min-h-screen flex w-full">
           <AppSidebar />
           <SidebarInset className="flex-1">
-            <header className="flex h-16 shrink-0 items-center gap-4 border-b px-4">
+            <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
               <SidebarTrigger className="-ml-1" />
-              
-              {/* Search function positioned between sidebar and AI engine dropdown */}
-              <div className="flex-1 max-w-md">
-                <div className="relative">
-                  <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 h-10"
-                  />
-                </div>
-              </div>
-              
               <div className="ml-auto">
                 <ModelSelector 
                   selectedModel={selectedModel}
