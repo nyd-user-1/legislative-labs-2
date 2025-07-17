@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -122,15 +123,17 @@ const Landing = () => {
                       </Button>}
                   </div>
                   
-                  {/* Toolbar inside input with 55px spacing */}
-                  <div className="flex items-center justify-between pt-[55px] border-t border-border/30" style={{
-                  marginTop: '55px'
-                }}>
+                  {/* Bottom border positioned 20px above filter buttons */}
+                  <div className="w-full h-px bg-border/30 mt-5 mb-5" />
+                  
+                  {/* Toolbar with consistent filter buttons */}
+                  <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <button type="button" className="text-muted-foreground hover:text-foreground hover:bg-blue-50 transition-all duration-200 text-xs px-3 py-2 rounded-[128px] border border-border/30 hover:border-border/50">
-                            Doc
+                          <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-blue-50 transition-all duration-200 px-3 py-2 rounded-[128px] border border-border/30 hover:border-border/50">
+                            <span className="text-xs">Doc</span>
+                            <ChevronDown className="w-2 h-2" />
                           </button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
@@ -142,8 +145,9 @@ const Landing = () => {
 
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <button type="button" className="text-muted-foreground hover:text-foreground hover:bg-blue-50 transition-all duration-200 px-3 py-2 rounded-[128px] border border-border/30 hover:border-border/50">
+                          <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-blue-50 transition-all duration-200 px-3 py-2 rounded-[128px] border border-border/30 hover:border-border/50">
                             <span className="text-xs">Prompt</span>
+                            <ChevronDown className="w-2 h-2" />
                           </button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
@@ -155,8 +159,9 @@ const Landing = () => {
 
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <button type="button" className="text-muted-foreground hover:text-foreground hover:bg-blue-50 transition-all duration-200 px-3 py-2 rounded-[128px] border border-border/30 hover:border-border/50" onClick={() => navigate('/plans')}>
+                          <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-blue-50 transition-all duration-200 px-3 py-2 rounded-[128px] border border-border/30 hover:border-border/50" onClick={() => navigate('/plans')}>
                             <span className="text-xs">Workspace</span>
+                            <ChevronDown className="w-2 h-2" />
                           </button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
