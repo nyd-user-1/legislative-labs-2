@@ -9,7 +9,6 @@ import { useNavigate } from 'react-router-dom';
 import { useVisitorCount } from '@/hooks/useVisitorCount';
 import { useAuth } from '@/contexts/AuthContext';
 import { ProblemChatSheet } from '@/components/ProblemChatSheet';
-import { useSampleProblems } from '@/hooks/useSampleProblems';
 
 const Landing = () => {
   const [userProblem, setUserProblem] = useState('');
@@ -20,7 +19,6 @@ const Landing = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const { count, loading } = useVisitorCount();
   const { user } = useAuth();
-  const { sampleProblems, loading: problemsLoading } = useSampleProblems();
   
   const placeholderTexts = ["Solve a problem", "Bring home Sara Lopez Garcia", "Write a new contract for your union", "Draft a constitutional amendment", "Eliminate addictive tech design features", "Develop a program for universal pre-k"];
   const [currentPlaceholder, setCurrentPlaceholder] = useState(0);
@@ -47,8 +45,8 @@ const Landing = () => {
     }
   };
 
-  const handleSampleProblemSelect = (problemText: string) => {
-    setUserProblem(problemText);
+  const handleDropdownSelect = (text: string) => {
+    setUserProblem(`It's a problem that ${text.toLowerCase()}`);
     if (inputRef.current) {
       inputRef.current.focus();
     }
@@ -240,26 +238,14 @@ const Landing = () => {
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-blue-50 transition-all duration-200 px-3 py-2 rounded-[128px] border border-border/30 hover:border-border/50">
-                            <span className="text-xs">Sample Problems</span>
+                            <span className="text-xs">Doc</span>
                             <ChevronDown className="w-2 h-2" />
                           </button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg rounded-md z-50 max-h-60 overflow-y-auto">
-                          {problemsLoading ? (
-                            <DropdownMenuItem disabled>Loading...</DropdownMenuItem>
-                          ) : sampleProblems.length > 0 ? (
-                            sampleProblems.map((problem) => (
-                              <DropdownMenuItem 
-                                key={problem.id}
-                                onClick={() => handleSampleProblemSelect(problem.problem)}
-                                className="cursor-pointer hover:bg-gray-50 px-3 py-2 text-sm"
-                              >
-                                {problem.problem}
-                              </DropdownMenuItem>
-                            ))
-                          ) : (
-                            <DropdownMenuItem disabled>No problems found</DropdownMenuItem>
-                          )}
+                        <DropdownMenuContent>
+                          <DropdownMenuItem>Option 1</DropdownMenuItem>
+                          <DropdownMenuItem>Option 2</DropdownMenuItem>
+                          <DropdownMenuItem>How to use goodable</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
 
@@ -270,10 +256,10 @@ const Landing = () => {
                             <ChevronDown className="w-2 h-2" />
                           </button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg rounded-md z-50">
-                          <DropdownMenuItem onClick={() => handleSampleProblemSelect("It's a problem that childcare is unaffordable.")}>Childcare is unaffordable.</DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleSampleProblemSelect("It's a problem that wages are stagnant.")}>Wages are stagnant.</DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleSampleProblemSelect("It's a problem that technology is addictive.")}>Technology is addictive.</DropdownMenuItem>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem onClick={() => handleDropdownSelect("Childcare is unaffordable.")}>Childcare is unaffordable.</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDropdownSelect("Wages are stagnant.")}>Wages are stagnant.</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDropdownSelect("Technology is addictive.")}>Technology is addictive.</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
