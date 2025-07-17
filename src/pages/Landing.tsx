@@ -123,8 +123,8 @@ const Landing = () => {
                       </Button>}
                   </div>
                   
-                  {/* Bottom border positioned 20px above filter buttons */}
-                  <div className="w-full h-px bg-border/30 mt-5 mb-5" />
+                  {/* Bottom border with increased top spacing and decreased bottom spacing */}
+                  <div className="w-full h-px bg-border/30 mt-8 mb-4" />
                   
                   {/* Toolbar with consistent filter buttons */}
                   <div className="flex items-center justify-between">
