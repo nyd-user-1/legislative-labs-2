@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,22 +47,88 @@ const Landing = () => {
     }
   };
   
-  const examples = [{
-    title: "E-commerce Dashboard",
-    description: "Complete analytics dashboard with charts and metrics",
-    image: "/placeholder.svg",
-    tags: ["React", "Charts", "Dashboard"]
-  }, {
-    title: "Social Media App",
-    description: "Modern social platform with real-time features",
-    image: "/placeholder.svg",
-    tags: ["Social", "Real-time", "Mobile"]
-  }, {
-    title: "Project Manager",
-    description: "Kanban board with team collaboration tools",
-    image: "/placeholder.svg",
-    tags: ["Productivity", "Teams", "Kanban"]
-  }];
+  const problemCategories = [
+    // Row 1
+    { title: "Childcare", subtitle: "26 Sub-problems • 84 Solutions" },
+    { title: "Quality Time", subtitle: "5 Sub-problems • 17 Solutions" },
+    { title: "Third Place", subtitle: "30 Sub-problems • 86 Solutions" },
+    // Row 2
+    { title: "Income Stagnation", subtitle: "16 Sub-problems • 32 Solutions" },
+    { title: "End Stage Capitalism", subtitle: "2 Sub-problems • 2 Solutions" },
+    { title: "Cultural Divisions", subtitle: "1 Sub-problems • 1 Solutions" },
+    // Row 3
+    { title: "Addictive Technology", subtitle: "5 Sub-problems • 8 Solutions" },
+    { title: "Fake News", subtitle: "1 Sub-problems • 3 Solutions" },
+    { title: "Free Time", subtitle: "11 Sub-problems • 20 Solutions" },
+    // Row 4
+    { title: "Climate Change", subtitle: "23 Sub-problems • 67 Solutions" },
+    { title: "Housing Crisis", subtitle: "18 Sub-problems • 45 Solutions" },
+    { title: "Mental Health Support", subtitle: "12 Sub-problems • 38 Solutions" },
+    // Row 5
+    { title: "Food Security", subtitle: "9 Sub-problems • 24 Solutions" },
+    { title: "Digital Divide", subtitle: "14 Sub-problems • 41 Solutions" },
+    { title: "Elder Care", subtitle: "7 Sub-problems • 19 Solutions" },
+    // Row 6
+    { title: "Education Access", subtitle: "31 Sub-problems • 78 Solutions" },
+    { title: "Workplace Burnout", subtitle: "6 Sub-problems • 15 Solutions" },
+    { title: "Social Isolation", subtitle: "11 Sub-problems • 29 Solutions" },
+    // Row 7
+    { title: "Healthcare Access", subtitle: "22 Sub-problems • 56 Solutions" },
+    { title: "Financial Literacy", subtitle: "8 Sub-problems • 22 Solutions" },
+    { title: "Community Safety", subtitle: "13 Sub-problems • 34 Solutions" },
+    // Row 8
+    { title: "Environmental Justice", subtitle: "17 Sub-problems • 43 Solutions" },
+    { title: "Youth Development", subtitle: "21 Sub-problems • 51 Solutions" },
+    { title: "Disability Rights", subtitle: "5 Sub-problems • 12 Solutions" },
+    // Row 9
+    { title: "Immigration Support", subtitle: "19 Sub-problems • 47 Solutions" },
+    { title: "Gender Equality", subtitle: "24 Sub-problems • 62 Solutions" },
+    { title: "Veteran Services", subtitle: "10 Sub-problems • 26 Solutions" },
+    // Row 10
+    { title: "Rural Development", subtitle: "15 Sub-problems • 39 Solutions" },
+    { title: "Urban Planning", subtitle: "28 Sub-problems • 71 Solutions" },
+    { title: "Transportation Equity", subtitle: "12 Sub-problems • 31 Solutions" },
+    // Row 11
+    { title: "Criminal Justice Reform", subtitle: "20 Sub-problems • 54 Solutions" },
+    { title: "Substance Abuse", subtitle: "9 Sub-problems • 23 Solutions" },
+    { title: "Homelessness", subtitle: "16 Sub-problems • 42 Solutions" },
+    // Row 12
+    { title: "Digital Privacy", subtitle: "11 Sub-problems • 28 Solutions" },
+    { title: "Renewable Energy", subtitle: "25 Sub-problems • 65 Solutions" },
+    { title: "Water Conservation", subtitle: "7 Sub-problems • 18 Solutions" },
+    // Row 13
+    { title: "Food Waste Reduction", subtitle: "13 Sub-problems • 35 Solutions" },
+    { title: "Civic Engagement", subtitle: "18 Sub-problems • 46 Solutions" },
+    { title: "Small Business Support", subtitle: "22 Sub-problems • 58 Solutions" },
+    // Row 14
+    { title: "Disaster Relief", subtitle: "8 Sub-problems • 21 Solutions" },
+    { title: "Cultural Preservation", subtitle: "14 Sub-problems • 37 Solutions" },
+    { title: "Scientific Research", subtitle: "27 Sub-problems • 69 Solutions" },
+    // Row 15
+    { title: "Public Health", subtitle: "32 Sub-problems • 81 Solutions" },
+    { title: "Economic Development", subtitle: "19 Sub-problems • 49 Solutions" },
+    { title: "Infrastructure", subtitle: "24 Sub-problems • 61 Solutions" },
+    // Row 16
+    { title: "Racial Justice", subtitle: "17 Sub-problems • 44 Solutions" },
+    { title: "Worker Rights", subtitle: "15 Sub-problems • 40 Solutions" },
+    { title: "Consumer Protection", subtitle: "10 Sub-problems • 27 Solutions" },
+    // Row 17
+    { title: "Animal Welfare", subtitle: "12 Sub-problems • 32 Solutions" },
+    { title: "Media Literacy", subtitle: "9 Sub-problems • 25 Solutions" },
+    { title: "Government Transparency", subtitle: "21 Sub-problems • 53 Solutions" },
+    // Row 18
+    { title: "Nonprofit Management", subtitle: "26 Sub-problems • 66 Solutions" },
+    { title: "Community Organizing", subtitle: "14 Sub-problems • 36 Solutions" },
+    { title: "Volunteer Coordination", subtitle: "8 Sub-problems • 20 Solutions" },
+    // Row 19
+    { title: "Policy Analysis", subtitle: "18 Sub-problems • 47 Solutions" },
+    { title: "Data Advocacy", subtitle: "16 Sub-problems • 41 Solutions" },
+    { title: "Legal Aid", subtitle: "11 Sub-problems • 30 Solutions" },
+    // Row 20
+    { title: "Grassroots Mobilization", subtitle: "23 Sub-problems • 59 Collaborations" },
+    { title: "Social Innovation", subtitle: "20 Sub-problems • 52 Solutions" },
+    { title: "Impact Measurement", subtitle: "13 Sub-problems • 33 Solutions" },
+  ];
 
   return <div className="min-h-screen bg-background text-foreground overflow-hidden">
       {/* Animated Background */}
@@ -226,7 +293,7 @@ const Landing = () => {
           </div>
         </div>
 
-        {/* Examples Section */}
+        {/* Problem Categories Section */}
         <section id="examples" className="py-20">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
@@ -238,22 +305,25 @@ const Landing = () => {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {examples.map((example, index) => <Card key={index} className="group overflow-hidden bg-background/50 backdrop-blur-sm border-border/50 hover:border-primary/50 transition-all duration-300">
-                  <div className="aspect-video bg-muted/50 relative overflow-hidden">
-                    <img src={example.image} alt={example.title} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
-                  </div>
-                  <CardContent className="p-6">
-                    <h3 className="font-semibold mb-2">{example.title}</h3>
-                    <p className="text-muted-foreground text-sm mb-4">{example.description}</p>
-                    <div className="flex flex-wrap gap-2">
-                      {example.tags.map((tag, tagIndex) => <Badge key={tagIndex} variant="secondary" className="text-xs">
-                          {tag}
-                        </Badge>)}
+            <div className="max-w-[1200px] mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-8">
+                {problemCategories.map((category, index) => (
+                  <div
+                    key={index}
+                    className="bg-white border border-[#e5e5e5] rounded-xl p-6 min-h-[140px] transition-all duration-200 hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)] hover:-translate-y-0.5 cursor-pointer"
+                  >
+                    <h3 className="font-bold text-lg text-[#1a1a1a] mb-2">
+                      {category.title}
+                    </h3>
+                    <p className="text-sm text-[#666666] mb-4">
+                      {category.subtitle}
+                    </p>
+                    <div className="text-sm text-[#0066cc] hover:underline">
+                      Browse tutorials →
                     </div>
-                  </CardContent>
-                </Card>)}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
