@@ -42,11 +42,22 @@ const queryClient = new QueryClient({
 
 console.log("App component is loading");
 
-// Error boundary component for lazy loading issues
+// Simplified error boundary for lazy loading
 const LazyErrorBoundary = ({ children }: { children: React.ReactNode }) => {
   return (
     <ErrorBoundary
-      fallback={<div className="p-4 text-center">Something went wrong loading this page. Please refresh and try again.</div>}
+      fallback={
+        <div className="p-4 text-center">
+          <div className="text-lg font-semibold text-red-600 mb-2">Page failed to load</div>
+          <p className="text-gray-600 mb-4">Please refresh and try again.</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Refresh Page
+          </button>
+        </div>
+      }
       onError={(error) => {
         console.error("Lazy loading error:", error);
       }}
@@ -104,25 +115,41 @@ const App = () => {
   console.log("App component is rendering");
   
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <AuthProvider>
-          <ModelProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<Landing />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="*" element={<AppLayout />} />
-              </Routes>
-            </BrowserRouter>
-            {/* Performance monitoring toggle - now visible on all pages */}
-            <PerformanceToggle />
-          </ModelProvider>
-        </AuthProvider>
-      </TooltipProvider>
-    </QueryClientProvider>
+    <ErrorBoundary
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-red-600 mb-4">Application Error</h1>
+            <p className="text-gray-600 mb-4">Something went wrong. Please refresh the page.</p>
+            <button 
+              onClick={() => window.location.reload()}
+              className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              Refresh Page
+            </button>
+          </div>
+        </div>
+      }
+    >
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <AuthProvider>
+            <ModelProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Routes>
+                  <Route path="/" element={<Landing />} />
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="*" element={<AppLayout />} />
+                </Routes>
+              </BrowserRouter>
+              <PerformanceToggle />
+            </ModelProvider>
+          </AuthProvider>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 };
 
