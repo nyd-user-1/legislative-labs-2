@@ -1,3 +1,4 @@
+
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "react-router-dom";
 import { LazyBillDetail } from "@/components/LazyComponents";
@@ -184,5 +185,4 @@ const Bills = () => {
   );
 };
 
-// Ensure proper default export
 export default Bills;

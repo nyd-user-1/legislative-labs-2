@@ -1,30 +1,9 @@
-
 import * as React from "react"
 import * as TooltipPrimitive from "@radix-ui/react-tooltip"
 
 import { cn } from "@/lib/utils"
 
-// Create a safe wrapper for TooltipProvider that handles React context issues
-const SafeTooltipProvider = ({ children, ...props }: React.ComponentProps<typeof TooltipPrimitive.Provider>) => {
-  // Check if React context is available
-  if (!React || typeof React.useState !== 'function') {
-    console.error("React context not available in TooltipProvider, rendering children without tooltip context");
-    return <>{children}</>;
-  }
-
-  try {
-    return (
-      <TooltipPrimitive.Provider {...props}>
-        {children}
-      </TooltipPrimitive.Provider>
-    );
-  } catch (error) {
-    console.error("Error in TooltipProvider:", error);
-    return <>{children}</>;
-  }
-};
-
-const TooltipProvider = SafeTooltipProvider;
+const TooltipProvider = TooltipPrimitive.Provider
 
 const Tooltip = TooltipPrimitive.Root
 
