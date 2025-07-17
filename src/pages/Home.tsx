@@ -1,428 +1,152 @@
 
-import React, { useState, useRef, useEffect } from 'react';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { 
-  ArrowRight, 
-  Sparkles, 
-  Zap, 
-  Code, 
-  Palette, 
-  Users, 
-  Star,
-  Github,
-  Twitter,
-  Image,
-  Share2,
-  ChevronDown,
-  ArrowUp
-} from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { useNavigate } from 'react-router-dom';
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { ArrowRight, Check, Clock, Shield, Plus } from "lucide-react";
 
 const Home = () => {
-  const [inputValue, setInputValue] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const navigate = useNavigate();
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const placeholderTexts = [
-    "Ask AI to draft a bill about..."
-  ];
-
-  const [currentPlaceholder, setCurrentPlaceholder] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentPlaceholder((prev) => (prev + 1) % placeholderTexts.length);
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (inputValue.trim()) {
-      setIsTyping(true);
-      // Simulate navigation to app
-      setTimeout(() => {
-        navigate('/dashboard');
-      }, 1000);
-    }
-  };
-
-  const features = [
+  const milestones = [
     {
-      icon: <Zap className="w-6 h-6" />,
-      title: "Lightning Fast",
-      description: "Draft legislation in minutes, not weeks"
+      date: "Live",
+      title: "AI-Powered Problem Generation",
+      description: "Transform real complaints into refined problem statements with our advanced AI-powered Problem Engine.",
+      status: "Released",
+      icon: <Check className="w-6 h-6 text-primary" />,
     },
     {
-      icon: <Code className="w-6 h-6" />,
-      title: "AI-Powered",
-      description: "Just describe the policy you want to create"
+      date: "Live", 
+      title: "Real-Time Collaboration",
+      description: "Leverage your problem statement into an actionable solution statement ready for legislative drafting or policy advocacy.",
+      status: "Released",
+      icon: <Plus className="w-6 h-6 text-primary" />,
     },
     {
-      icon: <Palette className="w-6 h-6" />,
-      title: "Professional Format",
-      description: "Proper legislative formatting automatically"
+      date: "Q3 2024",
+      title: "Advanced Testing Suite", 
+      description: "Automated testing framework with AI-driven test generation and coverage analysis.",
+      status: "Planned",
+      icon: <Clock className="w-6 h-6 text-muted-foreground" />,
     },
     {
-      icon: <Users className="w-6 h-6" />,
-      title: "Collaborative",
-      description: "Work together on policy with your team"
-    }
-  ];
-
-  const examples = [
-    {
-      title: "Climate Action Bill",
-      description: "Comprehensive environmental legislation with carbon pricing",
-      image: "/placeholder.svg",
-      tags: ["Environment", "Policy", "Climate"]
+      date: "Q4 2024",
+      title: "Enterprise Security Features",
+      description: "Advanced security controls, audit logging, and compliance reporting for enterprise teams.",
+      status: "Planned", 
+      icon: <Shield className="w-6 h-6 text-muted-foreground" />,
     },
-    {
-      title: "Education Reform Act",
-      description: "Modern education policy with technology integration",
-      image: "/placeholder.svg",
-      tags: ["Education", "Reform", "Technology"]
-    },
-    {
-      title: "Healthcare Access Bill",
-      description: "Universal healthcare access and affordability measures",
-      image: "/placeholder.svg",
-      tags: ["Healthcare", "Access", "Policy"]
-    }
   ];
 
   return (
-    <div className="min-h-screen bg-background text-foreground overflow-hidden">
-      {/* Animated Background */}
-      <div className="fixed inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(120,119,198,0.1),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border))_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border))_1px,transparent_1px)] bg-[size:32px_32px] opacity-30" />
+    <div className="min-h-screen w-full relative overflow-x-hidden">
+      {/* Enhanced background pattern with better visibility */}
+      <div className="fixed inset-0 -z-10 w-full h-full">
+        {/* Grid pattern with enhanced visibility */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border))_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border))_1px,transparent_1px)] bg-[size:24px_24px] opacity-40"></div>
         
-        {/* Floating orbs */}
-        <div className="absolute top-20 left-10 w-32 h-32 bg-primary/10 rounded-full blur-xl animate-pulse" />
-        <div className="absolute top-40 right-20 w-24 h-24 bg-accent/10 rounded-full blur-xl animate-pulse delay-1000" />
-        <div className="absolute bottom-20 left-1/4 w-40 h-40 bg-muted/10 rounded-full blur-xl animate-pulse delay-2000" />
+        {/* Radial gradient overlay with enhanced colors */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_800px_at_50%_200px,hsl(var(--primary)/0.08),transparent)]"></div>
+        
+        {/* Additional subtle gradient for depth */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5"></div>
       </div>
 
-      {/* Header */}
-      <header className="relative z-10 border-b border-border/50 bg-background/80 backdrop-blur-lg">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            {/* Logo */}
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <span className="text-2xl">❤️</span>
-              </div>
-              <span className="text-xl font-bold">New York Digital</span>
-            </div>
-
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-8">
-              <a href="#features" className="text-muted-foreground hover:text-foreground transition-colors">Features</a>
-              <a href="#examples" className="text-muted-foreground hover:text-foreground transition-colors">Examples</a>
-              <a href="#pricing" className="text-muted-foreground hover:text-foreground transition-colors">Pricing</a>
-              <a href="#docs" className="text-muted-foreground hover:text-foreground transition-colors">Docs</a>
-            </nav>
-
-            {/* Desktop Actions */}
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost" onClick={() => navigate('/auth')}>
-                Sign In
-              </Button>
-              <Button onClick={() => navigate('/auth')}>
-                Get Started
-              </Button>
-            </div>
+      {/* Main content */}
+      <div className="relative z-10 container mx-auto px-4 md:px-6 2xl:max-w-[1400px] py-24 lg:py-32">
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <Badge variant="outline" className="mb-4 bg-background/80 backdrop-blur-sm">
+            New York Digital
+          </Badge>
+          <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl mb-4">
+            Building the future we want.
+          </h1>
+          <p className="text-xl text-muted-foreground mb-8">
+            Our commitment to innovation drives us forward. Your complaints and problems are the fuel to get us there.
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center gap-3">
+            <Button size="lg" className="backdrop-blur-sm">
+              View Problem Gallery
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+            <Button size="lg" variant="outline" className="bg-background/80 backdrop-blur-sm">
+              Submit Problem
+            </Button>
           </div>
         </div>
-      </header>
 
-      {/* Hero Section */}
-      <main className="relative z-10">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
-          <div className="text-center max-w-4xl mx-auto">
-            {/* Main Heading */}
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6">
-              <span className="bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
-                Draft legislation
-              </span>
-              <br />
-              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                with AI
-              </span>
-            </h1>
-
-            {/* Subheading */}
-            <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
-              Create professional legislation by describing your policy goals to AI
-            </p>
-
-            {/* Input Section */}
-            <div className="max-w-2xl mx-auto mb-16">
-              <form onSubmit={handleSubmit} className="relative">
-                <div className="relative bg-background/50 backdrop-blur-sm border border-border/50 rounded-2xl p-3 focus-within:border-primary/50 transition-all duration-300">
-                  <div className="relative">
-                    <Input
-                      ref={inputRef}
-                      type="text"
-                      value={inputValue}
-                      onChange={(e) => setInputValue(e.target.value)}
-                      placeholder={placeholderTexts[currentPlaceholder]}
-                      className="h-10 pr-16 text-lg bg-transparent border-0 focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground"
-                      disabled={isTyping}
-                    />
-                    {inputValue.trim() && (
-                      <Button
-                        type="submit"
-                        className="absolute right-1 top-1 h-8 w-8 p-0 rounded-lg"
-                        disabled={isTyping}
-                      >
-                        {isTyping ? (
-                          <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                        ) : (
-                          <ArrowUp className="w-3 h-3" />
-                        )}
-                      </Button>
-                    )}
-                  </div>
-                  
-                  {/* Toolbar inside input with 55px spacing */}
-                  <div className="flex items-center justify-between pt-[55px] border-t border-border/30" style={{ marginTop: '55px' }}>
-                    <div className="flex items-center gap-4">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button type="button" className="text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all duration-200 text-xs px-3 py-2 rounded-md border border-border/30 hover:border-border/50">
-                            Doc
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                          <DropdownMenuItem>Option 1</DropdownMenuItem>
-                          <DropdownMenuItem>Option 2</DropdownMenuItem>
-                          <DropdownMenuItem>Option 3</DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button type="button" className="text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all duration-200 px-3 py-2 rounded-md border border-border/30 hover:border-border/50">
-                            <span className="text-xs">Prompt</span>
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                          <DropdownMenuItem>Option 1</DropdownMenuItem>
-                          <DropdownMenuItem>Option 2</DropdownMenuItem>
-                          <DropdownMenuItem>Option 3</DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button type="button" className="text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all duration-200 px-3 py-2 rounded-md border border-border/30 hover:border-border/50" onClick={() => navigate('/plans')}>
-                            <span className="text-xs">Workspace</span>
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                          <DropdownMenuItem>Option 1</DropdownMenuItem>
-                          <DropdownMenuItem>Option 2</DropdownMenuItem>
-                          <DropdownMenuItem>Option 3</DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all duration-200 px-3 py-2 rounded-md border border-border/30 hover:border-border/50">
-                            <span className="text-xs">Supabase</span>
-                            <ChevronDown className="w-2 h-2" />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                          <DropdownMenuItem>Option 1</DropdownMenuItem>
-                          <DropdownMenuItem>Option 2</DropdownMenuItem>
-                          <DropdownMenuItem>Option 3</DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </div>
-                </div>
-              </form>
-            </div>
-
-            {/* User Count */}
-            <div className="flex flex-col items-center justify-center gap-4 mb-16">
-              <div className="flex -space-x-2">
-                {[1, 2, 3, 4].map((i) => (
+        {/* Timeline with enhanced cards */}
+        <div className="max-w-4xl mx-auto">
+          <div className="space-y-8">
+            {milestones.map((milestone, index) => (
+              <div key={milestone.date + milestone.title} className="relative">
+                {/* Timeline line */}
+                {index !== milestones.length - 1 && (
                   <div
-                    key={i}
-                    className="w-8 h-8 rounded-full bg-muted border-2 border-background flex items-center justify-center text-xs"
+                    className={`absolute left-6 top-12 h-full w-0.5 ${
+                      milestone.status === "Released"
+                        ? "bg-primary"
+                        : milestone.status === "In Progress"
+                        ? "bg-gradient-to-b from-primary to-muted"
+                        : "bg-muted"
+                    }`}
+                  ></div>
+                )}
+
+                <Card className="relative flex gap-6 p-6 hover:shadow-lg transition-all duration-300 bg-card/95 backdrop-blur-sm border-border/50">
+                  {/* Icon */}
+                  <div
+                    className={`w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-sm ${
+                      milestone.status === "Released"
+                        ? "bg-primary/10"
+                        : milestone.status === "In Progress"
+                        ? "bg-primary/5"
+                        : "bg-muted"
+                    }`}
                   >
-                    {i}
+                    {milestone.icon}
                   </div>
-                ))}
+
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <Badge
+                        variant={
+                          milestone.status === "Released"
+                            ? "default"
+                            : milestone.status === "In Progress"
+                            ? "secondary"
+                            : "outline"
+                        }
+                        className="backdrop-blur-sm"
+                      >
+                        {milestone.status}
+                      </Badge>
+                      <div className="text-sm text-muted-foreground">
+                        {milestone.date}
+                      </div>
+                    </div>
+                    <h3 className="font-semibold mb-2">
+                      {milestone.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      {milestone.description}
+                    </p>
+                  </div>
+                </Card>
               </div>
-              <div className="text-sm text-muted-foreground">
-                <span>1,000+ policy makers using New York Digital</span>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
 
-        {/* Features Section */}
-        <section id="features" className="py-20 bg-muted/30">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Why policy makers choose us
-              </h2>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                Create better legislation faster with AI assistance
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {features.map((feature, index) => (
-                <Card key={index} className="text-center bg-background/50 backdrop-blur-sm border-border/50 hover:border-primary/50 transition-all duration-300">
-                  <CardContent className="pt-6">
-                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-4 text-primary">
-                      {feature.icon}
-                    </div>
-                    <h3 className="font-semibold mb-2">{feature.title}</h3>
-                    <p className="text-muted-foreground text-sm">{feature.description}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Examples Section */}
-        <section id="examples" className="py-20">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Built with New York Digital
-              </h2>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                See what legislation has been created
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {examples.map((example, index) => (
-                <Card key={index} className="group overflow-hidden bg-background/50 backdrop-blur-sm border-border/50 hover:border-primary/50 transition-all duration-300">
-                  <div className="aspect-video bg-muted/50 relative overflow-hidden">
-                    <img
-                      src={example.image}
-                      alt={example.title}
-                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
-                  </div>
-                  <CardContent className="p-6">
-                    <h3 className="font-semibold mb-2">{example.title}</h3>
-                    <p className="text-muted-foreground text-sm mb-4">{example.description}</p>
-                    <div className="flex flex-wrap gap-2">
-                      {example.tags.map((tag, tagIndex) => (
-                        <Badge key={tagIndex} variant="secondary" className="text-xs">
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* CTA Section */}
-        <section className="py-20 bg-primary/5">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Ready to create better policy?
-            </h2>
-            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Join thousands of policy makers who are building better legislation with AI
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button size="lg" onClick={() => navigate('/dashboard')}>
-                Start Drafting
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-              <Button variant="outline" size="lg">
-                <Github className="w-4 h-4 mr-2" />
-                View on GitHub
-              </Button>
-            </div>
-          </div>
-        </section>
-      </main>
-
-      {/* Footer */}
-      <footer className="border-t border-border/50 bg-background/80 backdrop-blur-lg">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                  <span className="text-2xl">❤️</span>
-                </div>
-                <span className="text-xl font-bold">New York Digital</span>
-              </div>
-              <p className="text-muted-foreground text-sm">
-                The AI-powered platform for creating professional legislation.
-              </p>
-            </div>
-            
-            <div>
-              <h3 className="font-semibold mb-4">Product</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#features" className="hover:text-foreground">Features</a></li>
-                <li><a href="#examples" className="hover:text-foreground">Examples</a></li>
-                <li><a href="#pricing" className="hover:text-foreground">Pricing</a></li>
-                <li><a href="#docs" className="hover:text-foreground">Documentation</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className="font-semibold mb-4">Company</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#about" className="hover:text-foreground">About</a></li>
-                <li><a href="#blog" className="hover:text-foreground">Blog</a></li>
-                <li><a href="#careers" className="hover:text-foreground">Careers</a></li>
-                <li><a href="#contact" className="hover:text-foreground">Contact</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className="font-semibold mb-4">Connect</h3>
-              <div className="flex space-x-4">
-                <a href="#" className="text-muted-foreground hover:text-foreground">
-                  <Twitter className="w-5 h-5" />
-                </a>
-                <a href="#" className="text-muted-foreground hover:text-foreground">
-                  <Github className="w-5 h-5" />
-                </a>
-              </div>
-            </div>
-          </div>
-          
-          <div className="border-t border-border/50 mt-8 pt-8 text-center text-sm text-muted-foreground">
-            <p>&copy; 2024 New York Digital. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
+        {/* Feature Request CTA with enhanced styling */}
+        <Card className="mt-16 p-8 text-center max-w-2xl mx-auto bg-muted/30 backdrop-blur-sm border-border/50">
+          <h3 className="font-semibold mb-2">Have a feature in mind?</h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            We're always looking to improve. Share your ideas and help shape our roadmap.
+          </p>
+          <Button variant="outline" size="lg" className="bg-background/80 backdrop-blur-sm">
+            Submit Feature Request
+          </Button>
+        </Card>
+      </div>
     </div>
   );
 };
