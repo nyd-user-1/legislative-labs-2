@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,23 +40,7 @@ const Landing = () => {
       inputRef.current.focus();
     }
   };
-  const features = [{
-    icon: <Zap className="w-6 h-6" />,
-    title: "Lightning Fast",
-    description: "Ship your ideas in minutes, not weeks"
-  }, {
-    icon: <Code className="w-6 h-6" />,
-    title: "AI-Powered",
-    description: "Just describe what you want to build"
-  }, {
-    icon: <Palette className="w-6 h-6" />,
-    title: "Beautiful Design",
-    description: "Professional UI components out of the box"
-  }, {
-    icon: <Users className="w-6 h-6" />,
-    title: "Collaborative",
-    description: "Share and iterate with your team"
-  }];
+  
   const examples = [{
     title: "E-commerce Dashboard",
     description: "Complete analytics dashboard with charts and metrics",
@@ -210,28 +195,6 @@ const Landing = () => {
             </div>
           </div>
         </div>
-
-        {/* Features Section */}
-        <section id="features" className="py-20 bg-muted/30">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">How to use goodable</h2>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">Identify the problem, develop a solution, and focus on what matters most</p>
-            </div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {features.map((feature, index) => <Card key={index} className="text-center bg-background/50 backdrop-blur-sm border-border/50 hover:border-primary/50 transition-all duration-300">
-                  <CardContent className="pt-6">
-                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-4 text-primary">
-                      {feature.icon}
-                    </div>
-                    <h3 className="font-semibold mb-2">{feature.title}</h3>
-                    <p className="text-muted-foreground text-sm">{feature.description}</p>
-                  </CardContent>
-                </Card>)}
-            </div>
-          </div>
-        </section>
 
         {/* Examples Section */}
         <section id="examples" className="py-20">
