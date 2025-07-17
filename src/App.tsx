@@ -12,7 +12,8 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { ModelSelector } from "@/components/ModelSelector";
 import { RouteLoadingFallback } from "@/components/RouteLoadingFallback";
 import { PerformanceToggle } from "@/components/performance/PerformanceToggle";
-import { Suspense, ErrorBoundary } from "react";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { Suspense } from "react";
 import Landing from "./pages/Landing";
 import { Auth } from "./pages/Auth";
 import {
