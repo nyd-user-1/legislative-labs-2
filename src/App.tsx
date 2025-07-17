@@ -1,7 +1,7 @@
 
+import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -69,24 +69,23 @@ const AppLayout = () => {
 
 const App = () => {
   console.log("App component is rendering");
+  console.log("React version:", React.version);
   
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <AuthProvider>
-          <ModelProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<Landing />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="*" element={<AppLayout />} />
-              </Routes>
-            </BrowserRouter>
-          </ModelProvider>
-        </AuthProvider>
-      </TooltipProvider>
+      <AuthProvider>
+        <ModelProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Landing />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="*" element={<AppLayout />} />
+            </Routes>
+          </BrowserRouter>
+          <Toaster />
+          <Sonner />
+        </ModelProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 };
