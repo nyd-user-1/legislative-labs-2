@@ -303,7 +303,7 @@ const Landing = () => {
                 Just do goodable
               </h2>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                See what others are doing right now
+                See the good others are doing
               </p>
             </div>
 
