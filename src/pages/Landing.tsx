@@ -15,7 +15,7 @@ const Landing = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const { count, loading } = useVisitorCount();
   
-  const placeholderTexts = ["Solve a problem", "Write a new contract for your union", "Draft a constitutional amendment", "Eliminate addictive tech design features", "Develop a program for universal pre-k"];
+  const placeholderTexts = ["Solve a problem", "Bring home Sara Lopez Garcia", "Write a new contract for your union", "Draft a constitutional amendment", "Eliminate addictive tech design features", "Develop a program for universal pre-k"];
   const [currentPlaceholder, setCurrentPlaceholder] = useState(0);
   
   // Check if input has meaningful content (not just whitespace)
