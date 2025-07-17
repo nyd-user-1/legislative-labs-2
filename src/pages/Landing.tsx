@@ -321,7 +321,7 @@ const Landing = () => {
                       {category.subtitle}
                     </p>
                     <div className="text-sm text-[#0066cc] hover:underline">
-                      Browse tutorials →
+                      Learn more →
                     </div>
                   </div>
                 ))}
