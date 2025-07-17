@@ -12,7 +12,7 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { ModelSelector } from "@/components/ModelSelector";
 import { RouteLoadingFallback } from "@/components/RouteLoadingFallback";
 import { PerformanceToggle } from "@/components/performance/PerformanceToggle";
-import { Suspense } from "react";
+import { Suspense, ErrorBoundary } from "react";
 import Landing from "./pages/Landing";
 import { Auth } from "./pages/Auth";
 import {
@@ -41,6 +41,20 @@ const queryClient = new QueryClient({
 
 console.log("App component is loading");
 
+// Error boundary component for lazy loading issues
+const LazyErrorBoundary = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <ErrorBoundary
+      fallback={<div className="p-4 text-center">Something went wrong loading this page. Please refresh and try again.</div>}
+      onError={(error) => {
+        console.error("Lazy loading error:", error);
+      }}
+    >
+      {children}
+    </ErrorBoundary>
+  );
+};
+
 const AppLayout = () => {
   const { selectedModel, setSelectedModel } = useModel();
   
@@ -60,26 +74,26 @@ const AppLayout = () => {
               </div>
             </header>
             <main className="flex-1">
-              <Suspense fallback={<RouteLoadingFallback />}>
-                <Routes>
-                  <Route path="/home" element={<Landing />} />
-                  <Route path="/chats" element={<LazyChats />} />
-                  <Route path="/favorites" element={<LazyFavorites />} />
-                  <Route path="/playground" element={<LazyPlayground />} />
-                  <Route path="/bills" element={<LazyBills />} />
-                  <Route path="/members" element={<LazyMembers />} />
-                  <Route path="/committees" element={<LazyCommittees />} />
-                  <Route path="/plans" element={<LazyPlans />} />
-                  <Route path="/profile" element={<LazyProfile />} />
-                  <Route path="/changelog" element={<LazyChangeLog />} />
-                  <Route path="/dashboard" element={<LazyIndex />} />
-                </Routes>
-              </Suspense>
+              <LazyErrorBoundary>
+                <Suspense fallback={<RouteLoadingFallback />}>
+                  <Routes>
+                    <Route path="/home" element={<Landing />} />
+                    <Route path="/chats" element={<LazyChats />} />
+                    <Route path="/favorites" element={<LazyFavorites />} />
+                    <Route path="/playground" element={<LazyPlayground />} />
+                    <Route path="/bills" element={<LazyBills />} />
+                    <Route path="/members" element={<LazyMembers />} />
+                    <Route path="/committees" element={<LazyCommittees />} />
+                    <Route path="/plans" element={<LazyPlans />} />
+                    <Route path="/profile" element={<LazyProfile />} />
+                    <Route path="/changelog" element={<LazyChangeLog />} />
+                    <Route path="/dashboard" element={<LazyIndex />} />
+                  </Routes>
+                </Suspense>
+              </LazyErrorBoundary>
             </main>
           </SidebarInset>
         </div>
-        {/* Performance monitoring toggle - only shows in development */}
-        <PerformanceToggle />
       </SidebarProvider>
     </ProtectedRoute>
   );
@@ -102,6 +116,8 @@ const App = () => {
                 <Route path="*" element={<AppLayout />} />
               </Routes>
             </BrowserRouter>
+            {/* Performance monitoring toggle - now visible on all pages */}
+            <PerformanceToggle />
           </ModelProvider>
         </AuthProvider>
       </TooltipProvider>
