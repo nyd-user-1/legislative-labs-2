@@ -9,7 +9,6 @@ import { useNavigate } from 'react-router-dom';
 import { useVisitorCount } from '@/hooks/useVisitorCount';
 import { useAuth } from '@/contexts/AuthContext';
 import { ProblemChatSheet } from '@/components/ProblemChatSheet';
-import { useSampleProblems } from '@/hooks/useSampleProblems';
 
 const Landing = () => {
   const [userProblem, setUserProblem] = useState('');
@@ -20,7 +19,6 @@ const Landing = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const { count, loading } = useVisitorCount();
   const { user } = useAuth();
-  const { problems, loading: problemsLoading, error: problemsError } = useSampleProblems();
   
   const placeholderTexts = ["Solve a problem", "Bring home Sara Lopez Garcia", "Write a new contract for your union", "Draft a constitutional amendment", "Eliminate addictive tech design features", "Develop a program for universal pre-k"];
   const [currentPlaceholder, setCurrentPlaceholder] = useState(0);
@@ -47,7 +45,7 @@ const Landing = () => {
     }
   };
 
-  const handleSampleProblemSelect = (text: string) => {
+  const handleDropdownSelect = (text: string) => {
     setUserProblem(`It's a problem that ${text.toLowerCase()}`);
     if (inputRef.current) {
       inputRef.current.focus();
@@ -240,28 +238,28 @@ const Landing = () => {
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-blue-50 transition-all duration-200 px-3 py-2 rounded-[128px] border border-border/30 hover:border-border/50">
-                            <span className="text-xs">Sample Problems</span>
+                            <span className="text-xs">Doc</span>
                             <ChevronDown className="w-2 h-2" />
                           </button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent style={{ minWidth: 'max-content' }}>
-                          {problemsLoading ? (
-                            <DropdownMenuItem disabled>Loading...</DropdownMenuItem>
-                          ) : problemsError ? (
-                            <DropdownMenuItem disabled>Error loading problems</DropdownMenuItem>
-                          ) : problems.length === 0 ? (
-                            <DropdownMenuItem disabled>No problems found</DropdownMenuItem>
-                          ) : (
-                            problems.map((problem, index) => (
-                              <DropdownMenuItem 
-                                key={index} 
-                                onClick={() => handleSampleProblemSelect(problem.text)}
-                                style={{ whiteSpace: 'nowrap' }}
-                              >
-                                {problem.text}
-                              </DropdownMenuItem>
-                            ))
-                          )}
+                        <DropdownMenuContent>
+                          <DropdownMenuItem>Option 1</DropdownMenuItem>
+                          <DropdownMenuItem>Option 2</DropdownMenuItem>
+                          <DropdownMenuItem>How to use goodable</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-blue-50 transition-all duration-200 px-3 py-2 rounded-[128px] border border-border/30 hover:border-border/50">
+                            <span className="text-xs">Problem</span>
+                            <ChevronDown className="w-2 h-2" />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem onClick={() => handleDropdownSelect("Childcare is unaffordable.")}>Childcare is unaffordable.</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDropdownSelect("Wages are stagnant.")}>Wages are stagnant.</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDropdownSelect("Technology is addictive.")}>Technology is addictive.</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
@@ -338,6 +336,7 @@ const Landing = () => {
         </section>
       </main>
 
+      {/* Problem Chat Sheet */}
       <ProblemChatSheet
         open={showAIChatSheet}
         onOpenChange={setShowAIChatSheet}
@@ -399,6 +398,7 @@ const Landing = () => {
         </div>
       </footer>
 
+      {/* Authentication Dialog */}
       {showAuthDialog && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
           <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4">
