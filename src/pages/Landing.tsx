@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,15 +14,20 @@ const Landing = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const placeholderTexts = ["Solve a problem", "Write a new contract for your union", "Draft a constitutional amendment", "Eliminate addictive tech design features", "Develop a program for universal pre-k"];
   const [currentPlaceholder, setCurrentPlaceholder] = useState(0);
+  
+  // Check if input has meaningful content (not just whitespace)
+  const hasContent = inputValue.trim().length > 0;
+  
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentPlaceholder(prev => (prev + 1) % placeholderTexts.length);
     }, 3000);
     return () => clearInterval(interval);
   }, []);
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (inputValue.trim()) {
+    if (hasContent && !isTyping) {
       setIsTyping(true);
       // Simulate navigation to app
       setTimeout(() => {
@@ -31,6 +35,7 @@ const Landing = () => {
       }, 1000);
     }
   };
+  
   const handleDoSomethingClick = () => {
     if (inputRef.current) {
       inputRef.current.scrollIntoView({
@@ -117,17 +122,39 @@ const Landing = () => {
               <form onSubmit={handleSubmit} className="relative">
                 <div className="relative bg-background/50 backdrop-blur-sm border border-border/50 rounded-2xl p-3 focus-within:border-primary/50 transition-all duration-300">
                   <div className="relative">
-                    <Input ref={inputRef} type="text" value={inputValue} onChange={e => setInputValue(e.target.value)} placeholder={placeholderTexts[currentPlaceholder]} className="h-10 pr-16 text-lg bg-transparent border-0 focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground" disabled={isTyping} />
-                    {inputValue.trim() && <Button type="submit" className="absolute right-1 top-1 h-8 w-8 p-0 rounded-lg" disabled={isTyping}>
-                        {isTyping ? <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" /> : <ArrowUp className="w-3 h-3" />}
-                      </Button>}
+                    <Input 
+                      ref={inputRef} 
+                      type="text" 
+                      value={inputValue} 
+                      onChange={e => setInputValue(e.target.value)} 
+                      placeholder={placeholderTexts[currentPlaceholder]} 
+                      className="h-10 pr-16 text-lg bg-transparent border-0 focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground" 
+                      disabled={isTyping} 
+                    />
+                    {hasContent && (
+                      <Button 
+                        type="submit" 
+                        className={`absolute right-1 top-1 h-8 w-8 p-0 rounded-lg transition-all duration-300 ${
+                          hasContent && !isTyping 
+                            ? 'opacity-100 bg-primary hover:bg-primary/90' 
+                            : 'opacity-40 bg-muted-foreground cursor-not-allowed'
+                        }`}
+                        disabled={!hasContent || isTyping}
+                      >
+                        {isTyping ? (
+                          <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <ArrowUp className="w-3 h-3" />
+                        )}
+                      </Button>
+                    )}
                   </div>
                   
-                  {/* Bottom border with increased top spacing and decreased bottom spacing */}
-                  <div className="w-full h-px bg-border/30 mt-8 mb-4" />
+                  {/* Extended bottom border that reaches both sides */}
+                  <div className="absolute left-0 right-0 h-px bg-border/30 mt-8 mb-4" />
                   
                   {/* Toolbar with consistent filter buttons */}
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between mt-12">
                     <div className="flex items-center gap-4">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -192,7 +219,6 @@ const Landing = () => {
 
             {/* User Count */}
             <div className="flex flex-col items-center justify-center gap-4 mb-16">
-              
               <div className="text-sm text-muted-foreground">
                 <span>10,000+ people building with Goodable</span>
               </div>
