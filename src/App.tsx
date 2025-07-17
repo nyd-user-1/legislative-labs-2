@@ -117,8 +117,9 @@ const App = () => {
   console.log("App component is rendering");
   console.log("React hooks available:", { useState: React.useState, useEffect: React.useEffect });
   
-  // Verify React is properly loaded before rendering
-  if (!React || !React.useState) {
+  // Enhanced React validation
+  if (!React || typeof React.useState !== 'function' || typeof React.useEffect !== 'function') {
+    console.error("React hooks are not available, cannot render app");
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
