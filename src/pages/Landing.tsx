@@ -38,11 +38,14 @@ const Landing = () => {
 
   useEffect(() => {
     const fetchSampleProblems = async () => {
+      console.log('Fetching sample problems...');
       try {
         const { data, error } = await supabase
           .from('Sample Problems')
           .select('"Sample Problems"')
           .order('"Sample Problems"');
+        
+        console.log('Sample problems query result:', { data, error });
         
         if (error) {
           console.error('Error fetching sample problems:', error);
@@ -50,9 +53,12 @@ const Landing = () => {
         }
         
         if (data) {
-          setSampleProblems(data.map(item => ({
+          console.log('Raw data from database:', data);
+          const processedData = data.map(item => ({
             text: item['Sample Problems']
-          })));
+          }));
+          console.log('Processed data:', processedData);
+          setSampleProblems(processedData);
         }
       } catch (error) {
         console.error('Error fetching sample problems:', error);
@@ -269,15 +275,24 @@ const Landing = () => {
                           </button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent className="w-auto min-w-0" sideOffset={8}>
-                          {sampleProblems.map((problem, index) => (
-                            <DropdownMenuItem 
-                              key={index}
-                              onClick={() => handleDropdownSelect(problem.text)}
-                              className="whitespace-nowrap cursor-pointer"
-                            >
-                              {problem.text}
+                          {sampleProblems.length === 0 ? (
+                            <DropdownMenuItem className="text-muted-foreground">
+                              Loading problems...
                             </DropdownMenuItem>
-                          ))}
+                          ) : (
+                            sampleProblems.map((problem, index) => {
+                              console.log('Rendering problem:', problem);
+                              return (
+                                <DropdownMenuItem 
+                                  key={index}
+                                  onClick={() => handleDropdownSelect(problem.text)}
+                                  className="whitespace-nowrap cursor-pointer"
+                                >
+                                  {problem.text}
+                                </DropdownMenuItem>
+                              );
+                            })
+                          )}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
