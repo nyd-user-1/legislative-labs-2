@@ -304,7 +304,7 @@ const Landing = () => {
                     <p className="text-sm text-[#666666] mb-4">
                       {category.subtitle}
                     </p>
-                    <div className="text-sm text-[#0066cc] hover:underline">
+                    <div className="text-sm text-[#ef4444] hover:underline">
                       Learn more →
                     </div>
                   </div>
