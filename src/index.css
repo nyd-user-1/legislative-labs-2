@@ -1,4 +1,5 @@
 
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -135,6 +136,32 @@
   .touch-manipulation {
     touch-action: manipulation;
   }
+
+  /* Shimmer effect for "good" text */
+  .shimmer-text {
+    background: linear-gradient(
+      90deg,
+      #718096 0%,
+      #718096 40%,
+      #ffffff 50%,
+      #718096 60%,
+      #718096 100%
+    );
+    background-size: 200% 100%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 5s ease-in-out infinite;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 @layer base {
@@ -146,3 +173,4 @@
     @apply bg-background text-foreground;
   }
 }
+

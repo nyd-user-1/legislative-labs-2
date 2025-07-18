@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -191,7 +190,8 @@ const Landing = () => {
                 Do something,
               </span>
               <br />
-              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">something good</span>
+              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">something </span>
+              <span className="shimmer-text">good</span>
             </h1>
 
             <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">Create legislation by chatting with ai</p>
