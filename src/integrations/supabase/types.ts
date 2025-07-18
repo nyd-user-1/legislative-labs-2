@@ -743,12 +743,15 @@ export type Database = {
       }
       "Sample Problems": {
         Row: {
+          id: number
           "Sample Problems": string
         }
         Insert: {
+          id?: number
           "Sample Problems": string
         }
         Update: {
+          id?: number
           "Sample Problems"?: string
         }
         Relationships: []
