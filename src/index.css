@@ -137,7 +137,7 @@
     touch-action: manipulation;
   }
 
-  /* Shimmer effect for "good" text */
+  /* Shimmer effect for "something good" text */
   .shimmer-text {
     background: linear-gradient(
       90deg,
