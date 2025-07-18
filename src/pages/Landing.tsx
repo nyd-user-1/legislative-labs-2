@@ -10,12 +10,14 @@ import { useNavigate } from 'react-router-dom';
 import { useVisitorCount } from '@/hooks/useVisitorCount';
 import { useAuth } from '@/contexts/AuthContext';
 import { ProblemChatSheet } from '@/components/ProblemChatSheet';
+import { supabase } from '@/integrations/supabase/client';
 
 const Landing = () => {
   const [userProblem, setUserProblem] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [showAIChatSheet, setShowAIChatSheet] = useState(false);
+  const [sampleProblems, setSampleProblems] = useState<Array<{text: string}>>([]);
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
   const { count, loading } = useVisitorCount();
@@ -32,6 +34,32 @@ const Landing = () => {
       setCurrentPlaceholder(prev => (prev + 1) % placeholderTexts.length);
     }, 3000);
     return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const fetchSampleProblems = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('Sample Problems')
+          .select('"Sample Problems"')
+          .order('"Sample Problems"');
+        
+        if (error) {
+          console.error('Error fetching sample problems:', error);
+          return;
+        }
+        
+        if (data) {
+          setSampleProblems(data.map(item => ({
+            text: item['Sample Problems']
+          })));
+        }
+      } catch (error) {
+        console.error('Error fetching sample problems:', error);
+      }
+    };
+
+    fetchSampleProblems();
   }, []);
   
   const handleSubmit = (e: React.FormEvent) => {
@@ -236,28 +264,20 @@ const Landing = () => {
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-blue-50 transition-all duration-200 px-3 py-2 rounded-[128px] border border-border/30 hover:border-border/50">
-                            <span className="text-xs">Doc</span>
+                            <span className="text-xs">Problems</span>
                             <ChevronDown className="w-2 h-2" />
                           </button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                          <DropdownMenuItem>Option 1</DropdownMenuItem>
-                          <DropdownMenuItem>Option 2</DropdownMenuItem>
-                          <DropdownMenuItem>How to use goodable</DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-blue-50 transition-all duration-200 px-3 py-2 rounded-[128px] border border-border/30 hover:border-border/50">
-                            <span className="text-xs">Problem</span>
-                            <ChevronDown className="w-2 h-2" />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                          <DropdownMenuItem onClick={() => handleDropdownSelect("Childcare is unaffordable.")}>Childcare is unaffordable.</DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleDropdownSelect("Wages are stagnant.")}>Wages are stagnant.</DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleDropdownSelect("Technology is addictive.")}>Technology is addictive.</DropdownMenuItem>
+                        <DropdownMenuContent className="w-auto min-w-0" sideOffset={8}>
+                          {sampleProblems.map((problem, index) => (
+                            <DropdownMenuItem 
+                              key={index}
+                              onClick={() => handleDropdownSelect(problem.text)}
+                              className="whitespace-nowrap cursor-pointer"
+                            >
+                              {problem.text}
+                            </DropdownMenuItem>
+                          ))}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
