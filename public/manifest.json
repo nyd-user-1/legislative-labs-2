@@ -1,3 +1,4 @@
+
 {
   "name": "New York Digital - Legislative Research System",
   "short_name": "NY Digital",
@@ -8,19 +9,19 @@
   "background_color": "#ffffff",
   "icons": [
     {
-      "src": "/lovable-uploads/32f9061d-58db-4fcb-81dc-0222930c4bd1.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/lovable-uploads/32f9061d-58db-4fcb-81dc-0222930c4bd1.png",
+      "src": "/heart-icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/lovable-uploads/32f9061d-58db-4fcb-81dc-0222930c4bd1.png",
+      "src": "/heart-icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
       "sizes": "180x180",
       "type": "image/png",
       "purpose": "any"
