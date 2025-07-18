@@ -20,7 +20,7 @@ const Landing = () => {
   const { count, loading } = useVisitorCount();
   const { user } = useAuth();
   
-  const placeholderTexts = ["Solve a problem...", "Bring home Sara...", "Analyze a CBA...", "Draft a bill...", "Eliminate addictive tech...", "Fund universal pre-k..."];
+  const placeholderTexts = ["Solve a problem", "Bring home Sara", "Analyze your CBA", "Draft a bill", "Eliminate addictive tech", "Fund universal pre-k"];
   const [currentPlaceholder, setCurrentPlaceholder] = useState(0);
   
   // Check if input has meaningful content (not just whitespace)
@@ -241,9 +241,9 @@ const Landing = () => {
                           </button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
-                          <DropdownMenuItem>Add a Doc</DropdownMenuItem>
-                          <DropdownMenuItem>Add a CSV</DropdownMenuItem>
-                          <DropdownMenuItem>Add a PDF</DropdownMenuItem>
+                          <DropdownMenuItem>Option 1</DropdownMenuItem>
+                          <DropdownMenuItem>Option 2</DropdownMenuItem>
+                          <DropdownMenuItem>How to use goodable</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
 
@@ -271,9 +271,9 @@ const Landing = () => {
                 {loading ? (
                   <span>Loading visitor count...</span>
                 ) : count ? (
-                  <span>{formatVisitorCount(count)}+ people visited Goodable today</span>
+                  <span>{formatVisitorCount(count)}+ visited Goodable today</span>
                 ) : (
-                  <span>183+ people visited Goodable today</span>
+                  <span>183+ visited Goodable today</span>
                 )}
               </div>
             </div>
@@ -287,7 +287,7 @@ const Landing = () => {
                 Do goodable
               </h2>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                See the good others are doing
+                See the good others are doing today
               </p>
             </div>
 
@@ -305,7 +305,7 @@ const Landing = () => {
                       {category.subtitle}
                     </p>
                     <div className="text-sm text-[#ef4444] hover:underline">
-                      Start something →
+                      Learn more →
                     </div>
                   </div>
                 ))}
@@ -391,7 +391,7 @@ const Landing = () => {
           </div>
           
           <div className="border-t border-border/50 mt-8 pt-8 text-center text-sm text-muted-foreground">
-            <p>&copy; 2025 Goodable. All rights reserved.</p>
+            <p>&copy; 2024 Goodable. All rights reserved.</p>
           </div>
         </div>
       </footer>
@@ -405,7 +405,7 @@ const Landing = () => {
                 <Heart className="w-6 h-6 text-red-500" />
               </div>
               <h2 className="text-xl font-bold mb-2">Welcome to Goodable</h2>
-              <p className="text-gray-600">Sign in to do something... </p>
+              <p className="text-gray-600">Sign in to continue with your problem statement</p>
             </div>
             <div className="space-y-3">
               <Button 
