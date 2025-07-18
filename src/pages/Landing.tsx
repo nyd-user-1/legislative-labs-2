@@ -190,7 +190,7 @@ const Landing = () => {
                 Do something,
               </span>
               <br />
-              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">good</span>
+              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">something good</span>
               <span className="shimmer-text">something good</span>
             </h1>
 
