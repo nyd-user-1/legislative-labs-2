@@ -353,7 +353,7 @@ const Landing = () => {
               </div>
               <p className="text-muted-foreground text-sm" style={{ textAlign: 'left' }}>
                 Do something,<br />
-                something goodable.
+                something good.
               </p>
             </div>
             
