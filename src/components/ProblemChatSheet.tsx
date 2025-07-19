@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import {
   Sheet,
@@ -20,6 +21,13 @@ interface ProblemChatSheetProps {
   userProblem: string;
 }
 
+interface Message {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  timestamp: Date;
+}
+
 export const ProblemChatSheet = ({ open, onOpenChange, userProblem }: ProblemChatSheetProps) => {
   const [aiProblemStatement, setAiProblemStatement] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
@@ -28,6 +36,8 @@ export const ProblemChatSheet = ({ open, onOpenChange, userProblem }: ProblemCha
   const [chatTitle, setChatTitle] = useState('Problem 1');
   const [chatSessionId, setChatSessionId] = useState<string | null>(null);
   const [inputValue, setInputValue] = useState('');
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
   const streamingRef = useRef<string>('');
@@ -61,6 +71,27 @@ export const ProblemChatSheet = ({ open, onOpenChange, userProblem }: ProblemCha
       startStreaming();
     }
   }, [open, userProblem]);
+
+  // Initialize messages when AI problem statement is generated
+  useEffect(() => {
+    if (isComplete && aiProblemStatement && messages.length === 0) {
+      const initialMessages: Message[] = [
+        {
+          id: 'user-1',
+          role: 'user',
+          content: userProblem,
+          timestamp: new Date()
+        },
+        {
+          id: 'assistant-1',
+          role: 'assistant',
+          content: aiProblemStatement,
+          timestamp: new Date()
+        }
+      ];
+      setMessages(initialMessages);
+    }
+  }, [isComplete, aiProblemStatement, userProblem, messages.length]);
 
   const startStreaming = async () => {
     if (!userProblem || !user) return;
@@ -122,7 +153,6 @@ export const ProblemChatSheet = ({ open, onOpenChange, userProblem }: ProblemCha
 
           const chunk = decoder.decode(value);
           const lines = chunk.split('\n');
-
 
           for (const line of lines) {
             if (line.startsWith('data: ')) {
@@ -244,17 +274,77 @@ export const ProblemChatSheet = ({ open, onOpenChange, userProblem }: ProblemCha
     });
   };
 
+  const sendMessage = async (message: string) => {
+    if (!message.trim()) return;
+
+    const userMessage: Message = {
+      id: `user-${Date.now()}`,
+      role: "user",
+      content: message,
+      timestamp: new Date()
+    };
+
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
+    setIsLoading(true);
+    setInputValue(''); // Clear input immediately
+
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-with-openai', {
+        body: { 
+          prompt: message,
+          type: 'chat',
+          context: 'problem_chat',
+          enhanceWithNYSData: true
+        }
+      });
+
+      if (error) {
+        console.error('Error calling OpenAI function:', error);
+        throw new Error('Failed to generate response');
+      }
+
+      const assistantMessage: Message = {
+        id: `assistant-${Date.now()}`,
+        role: "assistant",
+        content: data.generatedText || 'Unable to generate response. Please try again.',
+        timestamp: new Date()
+      };
+
+      const finalMessages = [...updatedMessages, assistantMessage];
+      setMessages(finalMessages);
+
+      // Update chat session with new messages
+      if (chatSessionId) {
+        await supabase
+          .from('problem_chats')
+          .update({
+            current_state: JSON.stringify(finalMessages),
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', chatSessionId);
+      }
+
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast({
+        title: "Error", 
+        description: "Failed to send message. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handlePromptClick = (prompt: string) => {
-    setInputValue(prompt);
+    console.log("Handling prompt click:", prompt);
+    sendMessage(prompt);
   };
 
   const handleSendMessage = () => {
     if (inputValue.trim()) {
-      toast({
-        title: "Message sent",
-        description: `You sent: ${inputValue}`,
-      });
-      setInputValue('');
+      sendMessage(inputValue);
     }
   };
 
@@ -266,41 +356,47 @@ export const ProblemChatSheet = ({ open, onOpenChange, userProblem }: ProblemCha
         </SheetHeader>
 
         <div className="flex-1 overflow-y-auto space-y-4 py-4">
-          {/* User Problem Display */}
-          <div className="flex justify-end">
-            <div className="bg-primary text-primary-foreground rounded-lg px-4 py-2 max-w-[80%]">
-              {userProblem}
+          {/* Display all messages */}
+          {messages.map((message) => (
+            <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <div className={`rounded-lg px-4 py-3 max-w-[90%] ${
+                message.role === 'user' 
+                  ? 'bg-primary text-primary-foreground' 
+                  : 'bg-muted relative'
+              }`}>
+                {message.role === 'assistant' ? (
+                  <div className="prose prose-sm max-w-none">
+                    <ReactMarkdown>{message.content}</ReactMarkdown>
+                  </div>
+                ) : (
+                  message.content
+                )}
+                
+                {message.role === 'assistant' && message.id === 'assistant-1' && isComplete && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleCopy}
+                    className="absolute top-2 right-2 h-8 w-8 p-0"
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
             </div>
-          </div>
+          ))}
 
-          {/* AI Problem Statement */}
-          <div className="flex justify-start">
-            <div className="bg-muted rounded-lg px-4 py-3 max-w-[90%] relative">
-              {aiProblemStatement && (
-                <div className="prose prose-sm max-w-none">
-                  <ReactMarkdown>{aiProblemStatement}</ReactMarkdown>
-                </div>
-              )}
-              
-              {isStreaming && !aiProblemStatement && (
+          {/* Loading indicator for new messages */}
+          {isLoading && (
+            <div className="flex justify-start">
+              <div className="bg-muted rounded-lg px-4 py-3 max-w-[90%]">
                 <div className="text-muted-foreground">Generating response...</div>
-              )}
-
-              {isComplete && aiProblemStatement && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleCopy}
-                  className="absolute top-2 right-2 h-8 w-8 p-0"
-                >
-                  <Copy className="h-4 w-4" />
-                </Button>
-              )}
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* Suggested Prompts - Only show after completion */}
-          {isComplete && suggestedPrompts.length > 0 && (
+          {/* Suggested Prompts - Only show after initial completion and if no follow-up messages */}
+          {isComplete && suggestedPrompts.length > 0 && messages.length <= 2 && (
             <div className="space-y-2">
               <div className="text-sm text-muted-foreground">Suggested prompts:</div>
               <div className="flex gap-2 flex-wrap">
@@ -310,6 +406,7 @@ export const ProblemChatSheet = ({ open, onOpenChange, userProblem }: ProblemCha
                     variant="outline"
                     size="sm"
                     onClick={() => handlePromptClick(prompt)}
+                    disabled={isLoading}
                     className="text-xs"
                   >
                     {prompt}
@@ -326,7 +423,7 @@ export const ProblemChatSheet = ({ open, onOpenChange, userProblem }: ProblemCha
             inputValue={inputValue}
             onInputChange={setInputValue}
             onSendMessage={handleSendMessage}
-            isLoading={isStreaming}
+            isLoading={isLoading || isStreaming}
             placeholder="Ask a follow-up question..."
           />
         </div>
