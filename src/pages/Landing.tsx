@@ -233,7 +233,7 @@ const Landing = () => {
             <div className="w-full max-w-[900px] sm:w-[calc(100vw-32px)] mx-auto mb-16 px-4 sm:px-0">
               <form onSubmit={handleSubmit} className="relative">
                 <div className={`relative bg-[#f3f3f5] border border-gray-300 transition-all duration-300 shadow-sm ${
-  isDropdownOpen ? 'rounded-t-2xl' : 'rounded-2xl'
+  sampleProblems.length > 0 ? 'rounded-t-2xl' : 'rounded-2xl'
 }`}>
                   <div className="relative">
                     <Input 
