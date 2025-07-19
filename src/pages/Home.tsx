@@ -209,7 +209,7 @@ const Home = () => {
                 ) : count ? (
                   <span>{formatVisitorCount(count)}+ visited Goodable today</span>
                 ) : (
-                  <span>183+ visited Goodable today</span>
+                  <span>183+ visited Goodable today • Make a habit of it.</span>
                 )}
               </div>
             </div>
