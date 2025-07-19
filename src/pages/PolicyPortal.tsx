@@ -757,9 +757,10 @@ The AI will automatically detect the input type and transform it into profession
               <div className="flex items-center gap-2 mt-4">
                 {!isChatting ? (
                   <Button 
-                    className="bg-black text-white hover:bg-gray-800 px-6"
+                    variant="default"
                     onClick={handleSubmit}
                     disabled={!prompt.trim()}
+                    className="px-6"
                   >
                     {mode === 'chat' ? 'Process with AI' : 'Generate Legislation'}
                   </Button>
