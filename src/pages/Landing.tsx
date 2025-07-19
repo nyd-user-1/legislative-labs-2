@@ -18,7 +18,6 @@ const Landing = () => {
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [showAIChatSheet, setShowAIChatSheet] = useState(false);
   const [sampleProblems, setSampleProblems] = useState<Array<{text: string}>>([]);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
   const { count, loading } = useVisitorCount();
@@ -86,13 +85,6 @@ const Landing = () => {
     if (inputRef.current) {
       inputRef.current.focus();
     }
-  };
-
-  const handleProblemSelect = (problem: string) => {
-    setUserProblem(`It's a problem that ${problem}`);
-    setIsDropdownOpen(false);
-    // Keep input focused to trigger submit button
-    inputRef.current?.focus();
   };
   
   const handleDoSomethingClick = () => {
@@ -240,17 +232,13 @@ const Landing = () => {
 
             <div className="w-full max-w-[900px] sm:w-[calc(100vw-32px)] mx-auto mb-16 px-4 sm:px-0">
               <form onSubmit={handleSubmit} className="relative">
-                <div className={`relative bg-[#f3f3f5] border border-gray-300 shadow-sm ${
-                  isDropdownOpen ? 'rounded-t-2xl' : 'rounded-2xl'
-                } pl-3 pr-6 py-3 focus-within:border-primary/50 transition-all duration-300`}>
+                <div className="relative bg-background/50 backdrop-blur-sm border border-gray-300 rounded-2xl pl-3 pr-6 py-3 focus-within:border-primary/50 transition-all duration-300 shadow-md">
                   <div className="relative">
                     <Input 
                       ref={inputRef} 
                       type="text" 
                       value={userProblem} 
                       onChange={e => setUserProblem(e.target.value)} 
-                      onFocus={() => setIsDropdownOpen(true)}
-                      onBlur={() => setTimeout(() => setIsDropdownOpen(false), 150)}
                       placeholder={placeholderTexts[currentPlaceholder]} 
                       className="h-10 pr-16 bg-transparent border-0 focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground overflow-hidden text-ellipsis" 
                       style={{ fontSize: '16px' }}
@@ -310,23 +298,6 @@ const Landing = () => {
                     </div>
                   </div>
                 </div>
-
-                {/* Dropdown Menu - Absolutely positioned to appear seamlessly connected */}
-                {isDropdownOpen && (
-                  <div className="absolute left-0 right-0 top-full bg-[#f3f3f5] border-l border-r border-b border-gray-300 rounded-b-2xl shadow-sm overflow-hidden z-50">
-                    <div className="py-2">
-                      {sampleProblems.map((problem, index) => (
-                        <div
-                          key={index}
-                          onClick={() => handleProblemSelect(problem.text)}
-                          className="px-8 py-3 hover:bg-[#e8e8e0] cursor-pointer transition-colors"
-                        >
-                          <span className="text-black text-sm">{problem.text}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </form>
             </div>
 
