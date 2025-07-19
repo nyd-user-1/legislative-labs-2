@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { useVisitorCount } from '@/hooks/useVisitorCount';
 import { useAuth } from '@/contexts/AuthContext';
 import { ProblemChatSheet } from '@/components/ProblemChatSheet';
+import { ProblemsDropdown } from '@/components/ProblemsDropdown';
 import { supabase } from '@/integrations/supabase/client';
 
 const Landing = () => {
@@ -18,6 +19,7 @@ const Landing = () => {
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [showAIChatSheet, setShowAIChatSheet] = useState(false);
   const [sampleProblems, setSampleProblems] = useState<Array<{text: string}>>([]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
   const { count, loading } = useVisitorCount();
@@ -80,11 +82,11 @@ const Landing = () => {
     }
   };
 
-  const handleDropdownSelect = (text: string) => {
-    setUserProblem(`It's a problem that ${text.toLowerCase()}`);
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
+  const handleProblemSelect = (problem: string) => {
+    setUserProblem(`It's a problem that ${problem}`);
+    setIsDropdownOpen(false);
+    // Keep input focused to trigger submit button
+    inputRef.current?.focus();
   };
   
   const handleDoSomethingClick = () => {
@@ -232,71 +234,55 @@ const Landing = () => {
 
             <div className="w-full max-w-[900px] sm:w-[calc(100vw-32px)] mx-auto mb-16 px-4 sm:px-0">
               <form onSubmit={handleSubmit} className="relative">
-                <div className="relative bg-background/50 backdrop-blur-sm border border-gray-300 rounded-2xl pl-3 pr-6 py-3 focus-within:border-primary/50 transition-all duration-300 shadow-md">
-                  <div className="relative">
-                    <Input 
-                      ref={inputRef} 
-                      type="text" 
-                      value={userProblem} 
-                      onChange={e => setUserProblem(e.target.value)} 
-                      placeholder={placeholderTexts[currentPlaceholder]} 
-                      className="h-10 pr-16 bg-transparent border-0 focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground overflow-hidden text-ellipsis" 
-                      style={{ fontSize: '16px' }}
-                      disabled={isTyping} 
-                    />
-                    {hasContent && (
-                      <Button 
-                        type="submit" 
-                        className={`absolute right-1 top-1 h-8 w-8 p-0 rounded-lg transition-all duration-300 ${
-                          hasContent && !isTyping 
-                            ? 'opacity-100 bg-primary hover:bg-primary/90' 
-                            : 'opacity-40 bg-muted-foreground cursor-not-allowed'
-                        }`}
-                        disabled={!hasContent || isTyping}
-                      >
-                        {isTyping ? (
-                          <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                        ) : (
-                          <ArrowUp className="w-3 h-3" />
-                        )}
-                      </Button>
-                    )}
-                  </div>
-                  
-                  <div className="absolute left-0 right-0 h-px bg-border/30 mt-8 mb-4" />
-                  
-                  <div className="flex items-center justify-between mt-12">
-                    <div className="flex items-center gap-4">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-blue-50 transition-all duration-200 px-3 py-2 rounded-[128px] border border-border/30 hover:border-border/50">
-                            <span className="text-xs">Problems</span>
-                            <ChevronDown className="w-2 h-2" />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-auto min-w-0" sideOffset={8}>
-                          {sampleProblems.length === 0 ? (
-                            <DropdownMenuItem className="text-muted-foreground">
-                              Loading problems...
-                            </DropdownMenuItem>
+                {/* Unified Container with Input + Dropdown */}
+                <div className="bg-[#f5f5f5] border border-gray-200 shadow-sm rounded-[24px]">
+                  <div className="relative pl-3 pr-6 py-3 focus-within:border-primary/50 transition-all duration-300">
+                    <div className="relative">
+                      <Input 
+                        ref={inputRef} 
+                        type="text" 
+                        value={userProblem} 
+                        onChange={e => setUserProblem(e.target.value)} 
+                        onFocus={() => setIsDropdownOpen(true)}
+                        onBlur={() => {
+                          // Delay hiding dropdown to allow for clicks
+                          setTimeout(() => setIsDropdownOpen(false), 150);
+                        }}
+                        placeholder={placeholderTexts[currentPlaceholder]} 
+                        className="h-10 pr-16 bg-transparent border-0 focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground overflow-hidden text-ellipsis" 
+                        style={{ fontSize: '16px' }}
+                        disabled={isTyping} 
+                      />
+                      {hasContent && (
+                        <Button 
+                          type="submit" 
+                          className={`absolute right-1 top-1 h-8 w-8 p-0 rounded-lg transition-all duration-300 ${
+                            hasContent && !isTyping 
+                              ? 'opacity-100 bg-primary hover:bg-primary/90' 
+                              : 'opacity-40 bg-muted-foreground cursor-not-allowed'
+                          }`}
+                          disabled={!hasContent || isTyping}
+                        >
+                          {isTyping ? (
+                            <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
                           ) : (
-                            sampleProblems.map((problem, index) => {
-                              console.log('Rendering problem:', problem);
-                              return (
-                                <DropdownMenuItem 
-                                  key={index}
-                                  onClick={() => handleDropdownSelect(problem.text)}
-                                  className="whitespace-nowrap cursor-pointer"
-                                >
-                                  {problem.text}
-                                </DropdownMenuItem>
-                              );
-                            })
+                            <ArrowUp className="w-3 h-3" />
                           )}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                        </Button>
+                      )}
                     </div>
                   </div>
+                  
+                  {/* Conditional dropdown - only when open */}
+                  {isDropdownOpen && (
+                    <>
+                      <div className="border-b border-gray-200/30 my-4"></div>
+                      <ProblemsDropdown 
+                        problems={sampleProblems}
+                        onProblemSelect={handleProblemSelect}
+                      />
+                    </>
+                  )}
                 </div>
               </form>
             </div>
