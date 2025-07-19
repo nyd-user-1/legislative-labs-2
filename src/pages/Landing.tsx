@@ -232,9 +232,7 @@ const Landing = () => {
 
             <div className="w-full max-w-[900px] sm:w-[calc(100vw-32px)] mx-auto mb-16 px-4 sm:px-0">
               <form onSubmit={handleSubmit} className="relative">
-                <div className={`relative bg-[#f3f3f5] border border-gray-300 transition-all duration-300 shadow-sm ${
-  sampleProblems.length > 0 ? 'rounded-t-2xl' : 'rounded-2xl'
-}`}>
+                <div className="relative bg-background/50 backdrop-blur-sm border border-gray-300 rounded-2xl pl-3 pr-6 py-3 focus-within:border-primary/50 transition-all duration-300 shadow-md">
                   <div className="relative">
                     <Input 
                       ref={inputRef} 
@@ -276,11 +274,7 @@ const Landing = () => {
                             <ChevronDown className="w-2 h-2" />
                           </button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent 
-  className="!w-full !border-t-0 !rounded-t-none !rounded-b-2xl !bg-[#f3f3f5] !border !border-gray-300 !shadow-none overflow-hidden"
-  align="start"
-  sideOffset={-8}
->
+                        <DropdownMenuContent className="w-auto min-w-0" sideOffset={8}>
                           {sampleProblems.length === 0 ? (
                             <DropdownMenuItem className="text-muted-foreground">
                               Loading problems...
