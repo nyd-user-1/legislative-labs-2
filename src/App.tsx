@@ -1,92 +1,94 @@
 
-import React from 'react';
-import { ProblemsDropdown } from './components/ProblemsDropdown';
-import { ScrollArea } from './components/ui/scroll-area';
-import { supabase } from './integrations/supabase/client';
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { ModelProvider, useModel } from "@/contexts/ModelContext";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/AppSidebar";
+import { ModelSelector } from "@/components/ModelSelector";
+import Landing from "./pages/Landing";
+import Index from "./pages/Index";
+import { Auth } from "./pages/Auth";
+import Profile from "./pages/Profile";
+import Bills from "./pages/Bills";
+import Members from "./pages/Members";
+import Committees from "./pages/Committees";
+import Chats from "./pages/Chats";
+import Favorites from "./pages/Favorites";
+import Playground from "./pages/Playground";
+import Plans from "./pages/Plans";
+import ChangeLog from "./pages/ChangeLog";
 
-export default function App() {
-  const [inputValue, setInputValue] = React.useState('Some students still don\'t have internet');
-  const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
+const queryClient = new QueryClient();
 
-  const [problems, setProblems] = React.useState([]);
+console.log("App component is loading");
 
-  // Fetch problems from Supabase on component mount
-  React.useEffect(() => {
-    const fetchProblems = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('Sample Problems')
-          .select('id, "Sample Problems"')
-          .order('Sample Problems');
-        
-        if (error) throw error;
-        setProblems(data || []);
-      } catch (error) {
-        console.error('Error fetching problems:', error);
-      }
-    };
-
-    fetchProblems();
-  }, []);
-
-  const handleProblemSelect = (problem: any) => {
-    setInputValue(problem["Sample Problems"]);
-    setIsDropdownOpen(false);
-  };
-
+const AppLayout = () => {
+  const { selectedModel, setSelectedModel } = useModel();
+  
   return (
-    <div className="min-h-screen bg-[#f5f5f0] flex items-center justify-center p-8">
-      <div className="w-full max-w-4xl">
-        {/* Single Unified Container - Input only */}
-        <div className="relative">
-          {/* Main Text Input Area - stays in exact position */}
-          <div className={`bg-[#F6F4ED] border border-gray-200 shadow-sm ${
-            isDropdownOpen ? 'rounded-t-2xl' : 'rounded-2xl'
-          }`}>
-            <div className="p-8">
-              <textarea
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                className="w-full bg-transparent border-none outline-none resize-none text-lg placeholder-gray-500 min-h-[120px]"
-                placeholder="Draft a constitutional amendment"
-              />
-              
-              {/* Very faint divider line (barely visible) */}
-              <div className="border-b border-gray-200/30 my-4"></div>
-              
-              {/* Problems Dropdown Button */}
-              <ProblemsDropdown 
-                isOpen={isDropdownOpen}
-                onToggle={setIsDropdownOpen}
-              />
-            </div>
-          </div>
-          
-          {/* Dropdown Menu - Absolutely positioned to appear seamlessly connected */}
-          {isDropdownOpen && (
-            <div className="absolute left-0 right-0 top-full bg-[#F6F4ED] border-l border-r border-b border-gray-200 rounded-b-2xl shadow-sm overflow-hidden z-50">
-              <ScrollArea className="h-80">
-                <div className="py-2">
-                  {problems.map((problem) => (
-                    <div
-                      key={problem.id}
-                      onClick={() => handleProblemSelect(problem)}
-                      className="px-8 py-3 hover:bg-[#E8E4D6] cursor-pointer transition-colors"
-                    >
-                      <div className="flex items-center gap-3">
-                        <svg className="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                        <span className="text-gray-700 text-sm">{problem["Sample Problems"]}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </ScrollArea>
-            </div>
-          )}
+    <ProtectedRoute>
+      <SidebarProvider>
+        <div className="min-h-screen flex w-full">
+          <AppSidebar />
+          <SidebarInset className="flex-1">
+            <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+              <SidebarTrigger className="-ml-1" />
+              <div className="ml-auto">
+                <ModelSelector 
+                  selectedModel={selectedModel}
+                  onModelChange={setSelectedModel}
+                />
+              </div>
+            </header>
+            <main className="flex-1">
+              <Routes>
+                <Route path="/home" element={<Landing />} />
+                <Route path="/chats" element={<Chats />} />
+                <Route path="/favorites" element={<Favorites />} />
+                <Route path="/playground" element={<Playground />} />
+                <Route path="/bills" element={<Bills />} />
+                <Route path="/members" element={<Members />} />
+                <Route path="/committees" element={<Committees />} />
+                <Route path="/plans" element={<Plans />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/changelog" element={<ChangeLog />} />
+                <Route path="/dashboard" element={<Index />} />
+              </Routes>
+            </main>
+          </SidebarInset>
         </div>
-      </div>
-    </div>
+      </SidebarProvider>
+    </ProtectedRoute>
   );
-}
+};
+
+const App = () => {
+  console.log("App component is rendering");
+  
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <AuthProvider>
+          <ModelProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Landing />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="*" element={<AppLayout />} />
+              </Routes>
+            </BrowserRouter>
+          </ModelProvider>
+        </AuthProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
+
+export default App;
