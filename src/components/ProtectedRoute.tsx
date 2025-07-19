@@ -1,5 +1,6 @@
+
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -10,6 +11,7 @@ interface ProtectedRouteProps {
 export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   
   console.log("ProtectedRoute - loading:", loading, "user:", user);
 
@@ -18,6 +20,13 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
       navigate('/auth');
     }
   }, [user, loading, navigate]);
+
+  // Redirect authenticated users from root to home
+  useEffect(() => {
+    if (!loading && user && location.pathname === '/') {
+      navigate('/home');
+    }
+  }, [user, loading, location.pathname, navigate]);
 
   if (loading) {
     return (

@@ -10,7 +10,7 @@ import { NavigationItem } from "./NavigationItem";
 import { useNavigation } from "@/hooks/useNavigation";
 
 const researchNavItems = [
-  { title: "Dashboard", url: "/", icon: TrendingUp },
+  { title: "Dashboard", url: "/dashboard", icon: TrendingUp },
   { title: "Bills", url: "/bills", icon: FileText },
   { title: "Members", url: "/members", icon: Users },
   { title: "Committees", url: "/committees", icon: Building2 },
