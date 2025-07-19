@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { RotateCcw, Download, Code, Share, List, SlidersHorizontal, Settings, Info } from "lucide-react";
+import { RotateCcw, Download, Code, Share, List, SlidersHorizontal, Settings, Info, X } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -98,6 +98,7 @@ const PolicyPortal = () => {
   const [isChatting, setIsChatting] = useState(false);
   const [streamingContent, setStreamingContent] = useState("");
   const [pipelineStage, setPipelineStage] = useState<'input' | 'processing' | 'draft' | 'review'>('input');
+  const [abortController, setAbortController] = useState<AbortController | null>(null);
   const isMobile = useIsMobile();
   const { toast } = useToast();
   const chatScrollRef = useRef<HTMLDivElement>(null);
@@ -315,6 +316,9 @@ const PolicyPortal = () => {
       return;
     }
 
+    // Create abort controller for this request
+    const controller = new AbortController();
+    setAbortController(controller);
     setIsChatting(true);
     setStreamingContent("");
     setPipelineStage('processing');
@@ -336,11 +340,21 @@ const PolicyPortal = () => {
         throw new Error(response.error.message);
       }
 
+      // Check if request was aborted
+      if (controller.signal.aborted) {
+        throw new Error('Generation stopped by user');
+      }
+
       // Simulate streaming for now - in production, you'd handle actual streaming
       const fullContent = response.data.message;
       let currentContent = "";
       
       for (let i = 0; i < fullContent.length; i++) {
+        // Check if request was aborted during streaming
+        if (controller.signal.aborted) {
+          break;
+        }
+        
         await new Promise(resolve => setTimeout(resolve, 20)); // Simulate typing speed
         currentContent += fullContent[i];
         setStreamingContent(currentContent);
@@ -351,26 +365,48 @@ const PolicyPortal = () => {
         }
       }
 
-      // Add final AI response to chat
-      const aiMessage = { role: 'assistant' as const, content: fullContent };
-      setChatMessages(prev => [...prev, aiMessage]);
-      setStreamingContent("");
-      setPipelineStage('draft');
+      // Only complete if not aborted
+      if (!controller.signal.aborted) {
+        // Add final AI response to chat
+        const aiMessage = { role: 'assistant' as const, content: fullContent };
+        setChatMessages(prev => [...prev, aiMessage]);
+        setStreamingContent("");
+        setPipelineStage('draft');
 
-      toast({
-        title: "Policy Draft Generated",
-        description: `Legislative draft created with ${selectedPersona}`,
-      });
+        toast({
+          title: "Policy Draft Generated",
+          description: `Legislative draft created with ${selectedPersona}`,
+        });
+      }
       
     } catch (error) {
       console.error("Error starting chat:", error);
-      toast({
-        title: "Error",
-        description: "Failed to generate policy draft",
-        variant: "destructive",
-      });
+      if (error.message === 'Generation stopped by user') {
+        toast({
+          title: "Generation Stopped",
+          description: "AI generation was stopped by user",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to generate policy draft",
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsChatting(false);
+      setAbortController(null);
+      setStreamingContent("");
+    }
+  };
+
+  const handleStopGeneration = () => {
+    if (abortController) {
+      abortController.abort();
+      toast({
+        title: "Stopping Generation",
+        description: "Cancelling AI generation...",
+      });
     }
   };
 
@@ -719,13 +755,24 @@ The AI will automatically detect the input type and transform it into profession
 
               {/* Bottom Controls */}
               <div className="flex items-center gap-2 mt-4">
-                <Button 
-                  className="bg-black text-white hover:bg-gray-800 px-6"
-                  onClick={handleSubmit}
-                  disabled={isChatting}
-                >
-                  {mode === 'chat' ? 'Process with AI' : 'Generate Legislation'}
-                </Button>
+                {!isChatting ? (
+                  <Button 
+                    className="bg-black text-white hover:bg-gray-800 px-6"
+                    onClick={handleSubmit}
+                    disabled={!prompt.trim()}
+                  >
+                    {mode === 'chat' ? 'Process with AI' : 'Generate Legislation'}
+                  </Button>
+                ) : (
+                  <Button 
+                    variant="destructive"
+                    onClick={handleStopGeneration}
+                    className="px-6"
+                  >
+                    <X className="h-4 w-4 mr-2" />
+                    Stop Generation
+                  </Button>
+                )}
                 
                 {chatMessages.length > 0 && (
                   <>
