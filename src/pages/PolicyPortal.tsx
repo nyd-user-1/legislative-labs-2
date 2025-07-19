@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -7,7 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { RotateCcw, Download, Code, Share, List, SlidersHorizontal, Settings, Eye, Edit, Info } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { RotateCcw, Download, Code, Share, List, SlidersHorizontal, Settings, Info } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -95,9 +96,11 @@ const PolicyPortal = () => {
   const [mode, setMode] = useState<'textEditor' | 'chat'>('textEditor');
   const [chatMessages, setChatMessages] = useState<Array<{role: 'user' | 'assistant', content: string}>>([]);
   const [isChatting, setIsChatting] = useState(false);
+  const [streamingContent, setStreamingContent] = useState("");
   const [pipelineStage, setPipelineStage] = useState<'input' | 'processing' | 'draft' | 'review'>('input');
   const isMobile = useIsMobile();
   const { toast } = useToast();
+  const chatScrollRef = useRef<HTMLDivElement>(null);
 
   const fetchUserChats = async () => {
     try {
@@ -313,6 +316,7 @@ const PolicyPortal = () => {
     }
 
     setIsChatting(true);
+    setStreamingContent("");
     setPipelineStage('processing');
     
     try {
@@ -320,7 +324,7 @@ const PolicyPortal = () => {
       const initialMessages = [{ role: 'user' as const, content: prompt }];
       setChatMessages(initialMessages);
 
-      // Call the edge function
+      // Call the edge function with streaming
       const response = await supabase.functions.invoke('chat-with-persona', {
         body: {
           messages: initialMessages,
@@ -332,9 +336,25 @@ const PolicyPortal = () => {
         throw new Error(response.error.message);
       }
 
-      // Add AI response to chat
-      const aiMessage = { role: 'assistant' as const, content: response.data.message };
+      // Simulate streaming for now - in production, you'd handle actual streaming
+      const fullContent = response.data.message;
+      let currentContent = "";
+      
+      for (let i = 0; i < fullContent.length; i++) {
+        await new Promise(resolve => setTimeout(resolve, 20)); // Simulate typing speed
+        currentContent += fullContent[i];
+        setStreamingContent(currentContent);
+        
+        // Scroll to bottom during streaming
+        if (chatScrollRef.current) {
+          chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
+        }
+      }
+
+      // Add final AI response to chat
+      const aiMessage = { role: 'assistant' as const, content: fullContent };
       setChatMessages(prev => [...prev, aiMessage]);
+      setStreamingContent("");
       setPipelineStage('draft');
 
       toast({
@@ -387,6 +407,7 @@ const PolicyPortal = () => {
   const handleRefresh = () => {
     setPrompt('');
     setChatMessages([]);
+    setStreamingContent('');
     setSelectedPersona('');
     setSelectedPersonaAct('');
     setSystemPrompt('');
@@ -584,17 +605,8 @@ const PolicyPortal = () => {
                 </AlertDialog>
               )}
               
-              {/* Preview/Edit Toggle */}
+              {/* Mode Toggle */}
               <div className="flex gap-2 mb-4">
-                <Button
-                  variant={mode === 'textEditor' ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setMode('textEditor')}
-                  className="flex items-center gap-2"
-                >
-                  <Edit className="h-4 w-4" />
-                  Text Editor
-                </Button>
                 <Button
                   variant={mode === 'chat' ? "default" : "outline"}
                   size="sm"
@@ -603,38 +615,68 @@ const PolicyPortal = () => {
                 >
                   Chat
                 </Button>
-                {mode === 'textEditor' && (
-                  <Button
-                    variant={isPreviewMode ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setIsPreviewMode(!isPreviewMode)}
-                    className="flex items-center gap-2"
-                  >
-                    <Eye className="h-4 w-4" />
-                    Preview
-                  </Button>
-                )}
               </div>
 
-              {/* Conditional Content */}
-              {mode === 'textEditor' ? (
-                <>
-                  {/* Text Editor Mode */}
-                  {isPreviewMode ? (
-                    <div className="flex-1 border border-gray-300 rounded-lg p-4 bg-gray-50 overflow-auto">
-                      {prompt ? (
-                        <div className="prose prose-sm max-w-none">
-                          <ReactMarkdown>{prompt}</ReactMarkdown>
-                        </div>
-                      ) : (
-                        <p className="text-gray-500 italic">Nothing to preview yet...</p>
-                      )}
-                    </div>
-                  ) : (
-                    <Textarea
-                      value={prompt}
-                      onChange={(e) => setPrompt(e.target.value)}
-                      placeholder="POLICY PIPELINE INPUT:
+              {/* Chat Content */}
+              <div className="flex-1 flex flex-col bg-[#FBF9F6] rounded-lg border border-gray-200">
+                <ScrollArea className="flex-1" ref={chatScrollRef}>
+                  <div className="p-4">
+                    {chatMessages.length === 0 && !streamingContent ? (
+                      <div className="text-center text-gray-500 py-8">
+                        <p>Start a conversation by entering your prompt and clicking "Generate Legislation"</p>
+                        {selectedPersona && (
+                          <p className="mt-2 text-sm">
+                            Selected persona: <strong>{selectedPersona}</strong>
+                          </p>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {chatMessages.map((message, index) => (
+                          <div
+                            key={index}
+                            className={`p-3 rounded-lg ${
+                              message.role === 'user'
+                                ? 'bg-gray-600 text-white ml-auto max-w-[80%]'
+                                : 'bg-white text-gray-800 mr-auto max-w-[80%] border'
+                            }`}
+                          >
+                            <div className="text-xs opacity-70 mb-1">
+                              {message.role === 'user' ? 'You' : selectedPersona}
+                            </div>
+                            <div className="prose prose-sm max-w-none">
+                              <ReactMarkdown>{message.content}</ReactMarkdown>
+                            </div>
+                          </div>
+                        ))}
+                        {streamingContent && (
+                          <div className="bg-white text-gray-800 mr-auto max-w-[80%] border p-3 rounded-lg">
+                            <div className="text-xs opacity-70 mb-1">{selectedPersona}</div>
+                            <div className="prose prose-sm max-w-none">
+                              <ReactMarkdown>{streamingContent}</ReactMarkdown>
+                            </div>
+                          </div>
+                        )}
+                        {isChatting && !streamingContent && (
+                          <div className="bg-white text-gray-800 mr-auto max-w-[80%] border p-3 rounded-lg">
+                            <div className="text-xs opacity-70 mb-1">{selectedPersona}</div>
+                            <div className="flex items-center gap-2">
+                              <div className="animate-spin w-4 h-4 border-2 border-gray-300 border-t-gray-600 rounded-full"></div>
+                              <span className="text-sm">Generating policy draft...</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </ScrollArea>
+                
+                {/* Input Area */}
+                <div className="border-t border-gray-200 p-4">
+                  <Textarea
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    placeholder="POLICY PIPELINE INPUT:
 
 Option 1 - Load from Goodable:
 Click 'Load' above and select a citizen problem from your chat history.
@@ -647,58 +689,10 @@ Option 3 - Manual Entry:
 Describe any civic issue you want transformed into legislation.
 
 The AI will automatically detect the input type and transform it into professional NYS legislative format."
-                      className="flex-1 min-h-[300px] sm:min-h-[500px] resize-none border border-gray-300 rounded-lg p-4 text-sm"
-                    />
-                  )}
-                </>
-              ) : (
-                <>
-                  {/* Chat Mode */}
-                  <div className="flex-1 flex flex-col bg-gray-50 rounded-lg border border-gray-200">
-                    <div className="flex-1 p-4 overflow-auto">
-                      {chatMessages.length === 0 ? (
-                        <div className="text-center text-gray-500 py-8">
-                          <p>Start a conversation by entering your prompt and clicking "Generate Legislation"</p>
-                          {selectedPersona && (
-                            <p className="mt-2 text-sm">
-                              Selected persona: <strong>{selectedPersona}</strong>
-                            </p>
-                          )}
-                        </div>
-                      ) : (
-                        <div className="space-y-4">
-                          {chatMessages.map((message, index) => (
-                            <div
-                              key={index}
-                              className={`p-3 rounded-lg ${
-                                message.role === 'user'
-                                  ? 'bg-blue-500 text-white ml-auto max-w-[80%]'
-                                  : 'bg-white text-gray-800 mr-auto max-w-[80%] border'
-                              }`}
-                            >
-                              <div className="text-xs opacity-70 mb-1">
-                                {message.role === 'user' ? 'You' : selectedPersona}
-                              </div>
-                              <div className="prose prose-sm max-w-none">
-                                <ReactMarkdown>{message.content}</ReactMarkdown>
-                              </div>
-                            </div>
-                          ))}
-                          {isChatting && (
-                            <div className="bg-white text-gray-800 mr-auto max-w-[80%] border p-3 rounded-lg">
-                              <div className="text-xs opacity-70 mb-1">{selectedPersona}</div>
-                              <div className="flex items-center gap-2">
-                                <div className="animate-spin w-4 h-4 border-2 border-gray-300 border-t-blue-600 rounded-full"></div>
-                                <span className="text-sm">Generating policy draft...</span>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </>
-              )}
+                    className="min-h-[120px] resize-none border border-gray-300 rounded-lg p-3 text-sm"
+                  />
+                </div>
+              </div>
 
               {/* Bottom Controls */}
               <div className="flex items-center gap-2 mt-4">
