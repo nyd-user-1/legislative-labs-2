@@ -269,19 +269,14 @@ const Landing = () => {
                     <div className="flex items-center gap-4">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-[#E8E4D6] transition-all duration-200 px-3 py-2 rounded-[128px] border border-border/30 hover:border-border/50">
+                          <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-blue-50 transition-all duration-200 px-3 py-2 rounded-[128px] border border-border/30 hover:border-border/50">
                             <span className="text-xs">Problems</span>
                             <ChevronDown className="w-2 h-2" />
                           </button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent 
-                          className="w-auto min-w-[200px] max-h-[310px] overflow-y-auto bg-background/50 backdrop-blur-sm border border-gray-300 shadow-md z-50" 
-                          side="bottom" 
-                          align="start" 
-                          sideOffset={8}
-                        >
+                        <DropdownMenuContent className="w-auto min-w-0" sideOffset={8}>
                           {sampleProblems.length === 0 ? (
-                            <DropdownMenuItem className="text-muted-foreground hover:bg-[#E8E4D6] hover:text-foreground">
+                            <DropdownMenuItem className="text-muted-foreground">
                               Loading problems...
                             </DropdownMenuItem>
                           ) : (
@@ -291,7 +286,7 @@ const Landing = () => {
                                 <DropdownMenuItem 
                                   key={index}
                                   onClick={() => handleDropdownSelect(problem.text)}
-                                  className="whitespace-nowrap cursor-pointer hover:bg-[#E8E4D6] hover:text-foreground transition-colors duration-200"
+                                  className="whitespace-nowrap cursor-pointer"
                                 >
                                   {problem.text}
                                 </DropdownMenuItem>
