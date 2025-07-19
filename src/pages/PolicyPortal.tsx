@@ -87,8 +87,10 @@ const PolicyPortal = () => {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [chatOptions, setChatOptions] = useState<ChatOption[]>([]);
   const [personas, setPersonas] = useState<Persona[]>([]);
+  const [sampleProblems, setSampleProblems] = useState<{id: number, "Sample Problems": string}[]>([]);
   const [loading, setLoading] = useState(false);
   const [personasLoading, setPersonasLoading] = useState(false);
+  const [problemsLoading, setProblemsLoading] = useState(false);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [mode, setMode] = useState<'textEditor' | 'chat'>('textEditor');
   const [chatMessages, setChatMessages] = useState<Array<{role: 'user' | 'assistant', content: string}>>([]);
@@ -222,9 +224,36 @@ const PolicyPortal = () => {
     }
   };
 
+  const fetchSampleProblems = async () => {
+    try {
+      setProblemsLoading(true);
+      const { data: problemsData, error } = await supabase
+        .from("Sample Problems")
+        .select("*")
+        .order("id", { ascending: true });
+
+      if (error) {
+        console.error("Error fetching sample problems:", error);
+        throw error;
+      }
+
+      setSampleProblems(problemsData || []);
+    } catch (error) {
+      console.error("Error fetching sample problems:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load sample problems",
+        variant: "destructive",
+      });
+    } finally {
+      setProblemsLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchUserChats();
     fetchPersonas();
+    fetchSampleProblems();
   }, []);
 
   const handleChatSelection = (chatId: string) => {
@@ -242,6 +271,15 @@ const PolicyPortal = () => {
         setPrompt(selectedOption.content);
       }
       setSelectedChat(chatId);
+    }
+  };
+
+  const handleSampleProblemSelection = (problemId: string) => {
+    const selectedProblem = sampleProblems.find(problem => problem.id.toString() === problemId);
+    if (selectedProblem) {
+      setPrompt(`POLICY PIPELINE INPUT:\nProblem Statement: ${selectedProblem["Sample Problems"]}\n\nINSTRUCTIONS: Transform this citizen problem into a complete NYS legislative draft.`);
+      setPipelineStage('processing');
+      setSelectedChat(problemId);
     }
   };
 
@@ -375,46 +413,23 @@ const PolicyPortal = () => {
   };
 
   const SettingsContent = () => (
-    <div className="space-y-6">
-      {/* Load Chat */}
+    <div className="space-y-6 bg-[#FBF9F6] p-4 rounded-lg">
+      {/* Load Sample Problems */}
       <div>
         <Label className="text-sm font-medium text-gray-700 mb-3 block">Load</Label>
-        <Select value={selectedChat} onValueChange={handleChatSelection}>
+        <Select value={selectedChat} onValueChange={handleSampleProblemSelection}>
           <SelectTrigger>
-            <SelectValue placeholder="Select a chat..." />
+            <SelectValue placeholder="Select a sample problem..." />
           </SelectTrigger>
           <SelectContent>
-            {loading ? (
-              <SelectItem value="loading" disabled>Loading chats...</SelectItem>
-            ) : chatOptions.length === 0 ? (
-              <SelectItem value="empty" disabled>No chats found</SelectItem>
+            {problemsLoading ? (
+              <SelectItem value="loading" disabled>Loading problems...</SelectItem>
+            ) : sampleProblems.length === 0 ? (
+              <SelectItem value="empty" disabled>No problems found</SelectItem>
             ) : (
-              chatOptions.map((option) => (
-                <SelectItem key={option.id} value={option.id}>
-                  {option.label}
-                </SelectItem>
-              ))
-            )}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Persona */}
-      <div>
-        <Label className="text-sm font-medium text-gray-700 mb-3 block">Persona</Label>
-        <Select value={selectedPersona} onValueChange={handlePersonaSelection}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select a persona..." />
-          </SelectTrigger>
-          <SelectContent className="max-h-60 overflow-y-auto">
-            {personasLoading ? (
-              <SelectItem value="loading" disabled>Loading personas...</SelectItem>
-            ) : personas.length === 0 ? (
-              <SelectItem value="empty" disabled>No personas found</SelectItem>
-            ) : (
-              personas.map((persona) => (
-                <SelectItem key={persona.act} value={persona.act}>
-                  {persona.act}
+              sampleProblems.map((problem) => (
+                <SelectItem key={problem.id} value={problem.id.toString()}>
+                  {problem["Sample Problems"]}
                 </SelectItem>
               ))
             )}
@@ -473,19 +488,16 @@ const PolicyPortal = () => {
   );
 
   return (
-    <div className="flex h-full bg-white">
+    <div className="flex h-full bg-[#F6F4EE]">
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-4">
+        <div className="bg-[#F6F4EE] border-b border-gray-200 px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-semibold text-gray-900">
-                Policy Pipeline Builder
+                Policy Portal
               </h1>
-              <p className="text-sm text-gray-600 mt-1">
-                Transform citizen problems into professional legislative drafts
-              </p>
             </div>
             <div className="flex items-center gap-3">
               {/* Mobile Settings Button */}
@@ -722,7 +734,7 @@ The AI will automatically detect the input type and transform it into profession
 
           {/* Right Panel - Settings (Desktop Only) */}
           {!isMobile && (
-            <div className="w-80 bg-gray-50 border-l border-gray-200 p-6">
+            <div className="w-80 bg-[#F6F4EE] border-l border-gray-200 p-6">
               <SettingsContent />
             </div>
           )}
