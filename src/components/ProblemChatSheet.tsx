@@ -122,55 +122,25 @@ export const ProblemChatSheet = ({ open, onOpenChange, userProblem }: ProblemCha
       if (sessionError) throw sessionError;
       setChatSessionId(sessionData.id);
 
-      const response = await fetch(
-        `https://kwyjohornlgujoqypyvu.supabase.co/functions/v1/generate-with-openai`,
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt3eWpvaG9ybmxndWpvcXlweXZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MTAyODcsImV4cCI6MjA2NzE4NjI4N30.nPewQZse07MkYAK5W9wCEwYhnndHkA8pKmedgHkvD9M`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            prompt: userProblem,
-            type: 'problem',
-            context: 'landing_page',
-            stream: true
-          }),
+      // Use supabase.functions.invoke instead of direct HTTP call
+      const { data, error } = await supabase.functions.invoke('generate-with-openai', {
+        body: {
+          prompt: userProblem,
+          type: 'problem',
+          context: 'landing_page',
+          stream: false // Change to non-streaming for now to fix the issue
         }
-      );
+      });
 
-      if (!response.ok) {
+      if (error) {
+        console.error('Error calling generate-with-openai function:', error);
         throw new Error('Failed to generate problem statement');
       }
 
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-
-      if (reader) {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          const chunk = decoder.decode(value);
-          const lines = chunk.split('\n');
-
-          for (const line of lines) {
-            if (line.startsWith('data: ')) {
-              try {
-                const data = JSON.parse(line.slice(6));
-                if (data.choices?.[0]?.delta?.content) {
-                  const content = data.choices[0].delta.content;
-                  streamingRef.current += content;
-                  setAiProblemStatement(streamingRef.current);
-                }
-              } catch (e) {
-                // Skip invalid JSON lines
-              }
-            }
-          }
-        }
-      }
-
+      // Set the complete response
+      const generatedText = data.generatedText || 'Unable to generate problem statement. Please try again.';
+      streamingRef.current = generatedText;
+      setAiProblemStatement(generatedText);
       setIsComplete(true);
       setIsStreaming(false);
 
@@ -179,15 +149,15 @@ export const ProblemChatSheet = ({ open, onOpenChange, userProblem }: ProblemCha
         await supabase
           .from('problem_chats')
           .update({
-            current_state: streamingRef.current,
+            current_state: generatedText,
             updated_at: new Date().toISOString()
           })
           .eq('id', sessionData.id);
       }
 
       // Generate suggested prompts and dynamic title
-      generateSuggestedPrompts(streamingRef.current);
-      generateDynamicTitle(streamingRef.current, sessionData?.id);
+      generateSuggestedPrompts(generatedText);
+      generateDynamicTitle(generatedText, sessionData?.id);
 
     } catch (error) {
       console.error('Streaming error:', error);
@@ -205,21 +175,23 @@ export const ProblemChatSheet = ({ open, onOpenChange, userProblem }: ProblemCha
     const prompts = [];
     
     if (content.toLowerCase().includes('fiscal') || content.toLowerCase().includes('cost') || content.toLowerCase().includes('budget')) {
-      prompts.push('Fiscal Impact');
+      prompts.push('What are the fiscal implications?');
     }
     if (content.toLowerCase().includes('social') || content.toLowerCase().includes('community')) {
-      prompts.push('Social Impact');
+      prompts.push('How does this affect different communities?');
     }
     if (content.toLowerCase().includes('cause') || content.toLowerCase().includes('reason')) {
-      prompts.push('Root Cause');
+      prompts.push('What are the root causes?');
     }
     if (content.toLowerCase().includes('effect') || content.toLowerCase().includes('consequence')) {
-      prompts.push('Hidden Effects');
+      prompts.push('What are the potential unintended consequences?');
     }
 
-    // Fallback prompts if none match
-    if (prompts.length === 0) {
-      prompts.push('Root Cause', 'Social Impact', 'Fiscal Impact');
+    // Add context-aware next steps prompts
+    if (prompts.length < 3) {
+      prompts.push('What would a policy solution look like?');
+      prompts.push('Who are the key stakeholders?');
+      prompts.push('What similar legislation exists?');
     }
 
     setSuggestedPrompts(prompts.slice(0, 4)); // Maximum 4 prompts
@@ -227,26 +199,16 @@ export const ProblemChatSheet = ({ open, onOpenChange, userProblem }: ProblemCha
 
   const generateDynamicTitle = async (content: string, sessionId?: string) => {
     try {
-      // Extract key terms from the AI response for a descriptive title
-      const response = await fetch(
-        `https://kwyjohornlgujoqypyvu.supabase.co/functions/v1/generate-with-openai`,
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt3eWpvaG9ybmxndWpvcXlweXZ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MTAyODcsImV4cCI6MjA2NzE4NjI4N30.nPewQZse07MkYAK5W9wCEwYhnndHkA8pKmedgHkvD9M`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            prompt: `Create a short, descriptive title (3-5 words) for this problem analysis: ${content.substring(0, 200)}...`,
-            type: 'default',
-            model: 'gpt-4o-mini'
-          }),
+      const { data, error } = await supabase.functions.invoke('generate-with-openai', {
+        body: {
+          prompt: `Create a short, descriptive title (3-5 words) for this problem analysis: ${content.substring(0, 200)}...`,
+          type: 'default',
+          model: 'gpt-4o-mini'
         }
-      );
+      });
 
-      if (response.ok) {
-        const data = await response.json();
-        let rawTitle = data.generatedText?.trim().replace(/['"]/g, '') || chatTitle;
+      if (!error && data?.generatedText) {
+        let rawTitle = data.generatedText.trim().replace(/['"]/g, '');
         
         // Clean markdown from title
         const cleanTitle = rawTitle.replace(/\*\*/g, '').replace(/\*/g, '').replace(/^#+\s*/g, '').trim();
@@ -290,24 +252,25 @@ export const ProblemChatSheet = ({ open, onOpenChange, userProblem }: ProblemCha
     setInputValue(''); // Clear input immediately
 
     try {
-      const { data, error } = await supabase.functions.invoke('generate-with-openai', {
+      const { data, error } = await supabase.functions.invoke('chat-with-persona', {
         body: { 
-          prompt: message,
-          type: 'chat',
-          context: 'problem_chat',
-          enhanceWithNYSData: true
+          messages: updatedMessages.map(msg => ({
+            role: msg.role,
+            content: msg.content
+          })),
+          systemPrompt: getCivicDesignPartnerPrompt()
         }
       });
 
       if (error) {
-        console.error('Error calling OpenAI function:', error);
+        console.error('Error calling chat-with-persona function:', error);
         throw new Error('Failed to generate response');
       }
 
       const assistantMessage: Message = {
         id: `assistant-${Date.now()}`,
         role: "assistant",
-        content: data.generatedText || 'Unable to generate response. Please try again.',
+        content: data.message || 'Unable to generate response. Please try again.',
         timestamp: new Date()
       };
 
@@ -337,6 +300,43 @@ export const ProblemChatSheet = ({ open, onOpenChange, userProblem }: ProblemCha
     }
   };
 
+  const getCivicDesignPartnerPrompt = () => {
+    return `You are a Civic Design Partner - a warm, professional, and proactive assistant helping users navigate policy development. Your role is to guide users through the policy creation process with expertise and encouragement.
+
+CORE PERSONA:
+• Warm and approachable, yet professional and knowledgeable
+• Proactive in suggesting next steps and connecting ideas
+• Context-aware of where users are in their policy journey
+• Focused on practical, actionable guidance
+
+COMMUNICATION STYLE:
+• Use "we" language to create partnership ("Let's explore...", "We could consider...")
+• Be encouraging and optimistic about policy solutions
+• Ask thoughtful follow-up questions to deepen understanding
+• Provide specific, actionable next steps
+• Reference real-world examples when helpful
+
+KEY RESPONSIBILITIES:
+1. ANALYZE the problem comprehensively (root causes, stakeholders, impacts)
+2. GUIDE toward solution development (policy options, implementation strategies)
+3. CONNECT to relevant resources (similar legislation, case studies, experts)
+4. ANTICIPATE next steps (what research is needed, who to engage, how to build support)
+
+CONTEXT AWARENESS:
+• Track user's progress through the policy development process
+• Suggest logical next steps based on current discussion
+• Connect new questions to previously discussed elements
+• Maintain continuity across the conversation
+
+RESPONSE STRUCTURE:
+• Start with acknowledgment of their question/concern
+• Provide thoughtful analysis with specific insights
+• Suggest 2-3 concrete next steps
+• End with an engaging follow-up question
+
+Remember: You're not just answering questions - you're actively partnering with users to develop effective policy solutions. Be proactive, strategic, and encouraging.`;
+  };
+
   const handlePromptClick = (prompt: string) => {
     console.log("Handling prompt click:", prompt);
     sendMessage(prompt);
@@ -352,7 +352,7 @@ export const ProblemChatSheet = ({ open, onOpenChange, userProblem }: ProblemCha
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-2xl flex flex-col h-full">
         <SheetHeader className="flex-shrink-0">
-          <SheetTitle>{chatTitle}</SheetTitle>
+          <SheetTitle>Problem Statement</SheetTitle>
         </SheetHeader>
 
         <div className="flex-1 overflow-y-auto space-y-4 py-4">
@@ -398,7 +398,7 @@ export const ProblemChatSheet = ({ open, onOpenChange, userProblem }: ProblemCha
           {/* Suggested Prompts - Only show after initial completion and if no follow-up messages */}
           {isComplete && suggestedPrompts.length > 0 && messages.length <= 2 && (
             <div className="space-y-2">
-              <div className="text-sm text-muted-foreground">Suggested prompts:</div>
+              <div className="text-sm text-muted-foreground">Suggested next steps:</div>
               <div className="flex gap-2 flex-wrap">
                 {suggestedPrompts.map((prompt, index) => (
                   <Button
@@ -424,7 +424,7 @@ export const ProblemChatSheet = ({ open, onOpenChange, userProblem }: ProblemCha
             onInputChange={setInputValue}
             onSendMessage={handleSendMessage}
             isLoading={isLoading || isStreaming}
-            placeholder="Ask a follow-up question..."
+            placeholder="Ask a follow-up question or explore next steps..."
           />
         </div>
       </SheetContent>

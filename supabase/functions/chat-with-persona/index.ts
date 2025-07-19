@@ -1,3 +1,4 @@
+
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
@@ -33,7 +34,7 @@ serve(async (req) => {
           ...messages
         ],
         temperature: 0.7,
-        max_tokens: 1000,
+        max_tokens: 1500,
       }),
     });
 
@@ -43,6 +44,8 @@ serve(async (req) => {
 
     const data = await response.json();
     const assistantMessage = data.choices[0].message.content;
+
+    console.log('Chat response generated successfully');
 
     return new Response(JSON.stringify({ message: assistantMessage }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
