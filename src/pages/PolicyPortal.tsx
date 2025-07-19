@@ -546,8 +546,6 @@ const PolicyPortal = () => {
           {/* Left Panel - Prompt Area */}
           <div className={`flex-1 p-4 sm:p-6 ${isMobile ? 'w-full' : ''}`}>
             <div className="h-full flex flex-col">
-              {/* Pipeline Status Indicator */}
-              <PipelineStatus stage={pipelineStage} />
 
               {/* System Prompt Indicator */}
               {systemPrompt && (
