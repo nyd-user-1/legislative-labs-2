@@ -13,8 +13,8 @@ export const HeartSidebarTrigger = () => {
       className="p-0 h-auto hover:bg-transparent"
       aria-label="Toggle Sidebar"
     >
-      <div className="flex items-center gap-2 hover:shadow-md transition-shadow duration-200">
-        <div className="w-8 h-8 bg-white border border-gray-200 rounded-lg flex items-center justify-center">
+      <div className="flex items-center gap-2">
+        <div className="w-8 h-8 bg-white border border-gray-200 rounded-lg flex items-center justify-center hover:shadow-md transition-shadow duration-200">
           <span className="text-lg">❤️</span>
         </div>
         <span className="text-xl font-semibold text-gray-900">Goodable</span>

@@ -11,7 +11,7 @@ export function SidebarHeader() {
       {!collapsed && (
         <div className="text-center">
           <NavLink to="/" className="hover:text-gray-700 transition-colors">
-            <h1 className="text-lg font-bold">Goodable</h1>
+            <h1 className="text-lg font-bold">Do something</h1>
           </NavLink>
         </div>
       )}

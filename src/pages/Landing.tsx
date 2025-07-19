@@ -207,6 +207,13 @@ const Landing = () => {
               </div>
               <span className="text-xl font-bold">Goodable</span>
             </div>
+            <Button 
+              variant="outline" 
+              onClick={() => navigate('/auth')}
+              className="bg-white/80 hover:bg-white border-gray-300"
+            >
+              Sign In
+            </Button>
           </div>
         </div>
       </header>
