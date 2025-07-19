@@ -23,7 +23,7 @@ const Landing = () => {
   const { count, loading } = useVisitorCount();
   const { user } = useAuth();
   
-  const placeholderTexts = ["Solve a problem...","Analyze your CBA...", "Bring home Sara...", "Draft a bill...", "Eliminate addictive tech...", "Fund universal pre-k..."];
+  const placeholderTexts = ["Solve a problem...","Protect your local farm...", "Bring home Sara...", "Draft a bill...", "Eliminate addictive tech...", "Fund universal pre-k...", "Analyze your CBA..."];
   const [currentPlaceholder, setCurrentPlaceholder] = useState(0);
   
   // Check if input has meaningful content (not just whitespace)
