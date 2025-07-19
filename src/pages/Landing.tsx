@@ -207,12 +207,6 @@ const Landing = () => {
               </div>
               <span className="text-xl font-bold">Goodable</span>
             </div>
-
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost" onClick={() => navigate('/auth')}>
-                Sign In
-              </Button>
-            </div>
           </div>
         </div>
       </header>
