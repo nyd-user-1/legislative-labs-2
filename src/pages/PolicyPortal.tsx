@@ -596,11 +596,11 @@ const PolicyPortal = () => {
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <button 
-                      className="w-full mb-4 p-3 bg-blue-50 rounded-md cursor-pointer hover:bg-blue-100 transition-colors text-left"
+                      className="w-full mb-4 p-3 bg-[#FBF9F6] rounded-md cursor-pointer hover:bg-gray-100 transition-colors text-left"
                       aria-label={`View ${selectedPersonaAct} system prompt details`}
                       aria-describedby="system-prompt-status"
                     >
-                      <p id="system-prompt-status" className="text-sm font-medium text-blue-800 flex items-center gap-2">
+                      <p id="system-prompt-status" className="text-sm font-medium text-gray-700 flex items-center gap-2">
                         <Info className="h-4 w-4" />
                         {selectedPersonaAct} System Prompt Active
                       </p>
@@ -608,11 +608,11 @@ const PolicyPortal = () => {
                   </AlertDialogTrigger>
                   <AlertDialogContent className="max-w-2xl max-h-[80vh] overflow-hidden">
                     <AlertDialogHeader>
-                      <AlertDialogTitle className="text-blue-800">
+                      <AlertDialogTitle className="text-gray-800">
                         {selectedPersonaAct} System Prompt Active
                       </AlertDialogTitle>
                       <AlertDialogDescription asChild>
-                        <div className="text-blue-700 max-h-[60vh] overflow-y-auto prose prose-sm max-w-none">
+                        <div className="text-gray-700 max-h-[60vh] overflow-y-auto prose prose-sm max-w-none">
                           <ReactMarkdown>
                             {systemPrompt}
                           </ReactMarkdown>
@@ -620,7 +620,7 @@ const PolicyPortal = () => {
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogAction className="bg-blue-600 hover:bg-blue-700">
+                      <AlertDialogAction className="bg-gray-600 hover:bg-gray-700">
                         Close
                       </AlertDialogAction>
                     </AlertDialogFooter>
