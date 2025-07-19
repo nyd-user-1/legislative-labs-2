@@ -7,9 +7,10 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ModelProvider, useModel } from "@/contexts/ModelContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
-import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { ModelSelector } from "@/components/ModelSelector";
+import { HeartSidebarTrigger } from "@/components/HeartSidebarTrigger";
 import Landing from "./pages/Landing";
 import Index from "./pages/Index";
 import { Auth } from "./pages/Auth";
@@ -37,7 +38,7 @@ const AppLayout = () => {
           <AppSidebar />
           <SidebarInset className="flex-1">
             <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-              <SidebarTrigger className="-ml-1" />
+              <HeartSidebarTrigger />
               <div className="ml-auto">
                 <ModelSelector 
                   selectedModel={selectedModel}
