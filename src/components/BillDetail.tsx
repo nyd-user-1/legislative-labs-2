@@ -149,7 +149,7 @@ export const BillDetail = ({ bill, onBack }: BillDetailProps) => {
   };
 
   return (
-    <div className="page-container min-h-screen bg-white p-4 sm:p-6 lg:p-8">
+    <div className="page-container min-h-screen bg-background p-4 sm:p-6 lg:p-8">
       <div className="content-wrapper max-w-7xl mx-auto">
         <div className="space-y-6">
           {/* Navigation Section */}

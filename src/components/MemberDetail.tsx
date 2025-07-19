@@ -18,7 +18,7 @@ interface MemberDetailProps {
 
 export const MemberDetail = ({ member, onBack }: MemberDetailProps) => {
   return (
-    <div className="container mx-auto px-4 sm:px-6 py-6 bg-white min-h-screen">
+    <div className="container mx-auto px-4 sm:px-6 py-6 bg-background min-h-screen">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Navigation Section */}
         <div className="pb-6">
