@@ -596,7 +596,7 @@ const PolicyPortal = () => {
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <button 
-                      className="w-full mb-4 p-3 bg-[#FBF9F6] rounded-md cursor-pointer hover:bg-gray-100 transition-colors text-left"
+                      className="w-full mb-4 p-3 bg-[#FBF9F6] rounded-md cursor-pointer hover:bg-[#EBE9E4] transition-colors text-left"
                       aria-label={`View ${selectedPersonaAct} system prompt details`}
                       aria-describedby="system-prompt-status"
                     >
