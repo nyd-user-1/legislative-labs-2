@@ -435,9 +435,32 @@ const PolicyPortal = () => {
 
   const SettingsContent = () => (
     <div className="space-y-6 bg-[#FBF9F6] p-4 rounded-lg">
+      {/* Persona Selection */}
+      <div>
+        <Label className="text-sm font-medium text-gray-700 mb-3 block">Persona</Label>
+        <Select value={selectedPersona} onValueChange={handlePersonaSelection}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select a persona..." />
+          </SelectTrigger>
+          <SelectContent>
+            {personasLoading ? (
+              <SelectItem value="loading" disabled>Loading personas...</SelectItem>
+            ) : personas.length === 0 ? (
+              <SelectItem value="empty" disabled>No personas found</SelectItem>
+            ) : (
+              personas.map((persona) => (
+                <SelectItem key={persona.id} value={persona.act}>
+                  {persona.act}
+                </SelectItem>
+              ))
+            )}
+          </SelectContent>
+        </Select>
+      </div>
+
       {/* Load Sample Problems */}
       <div>
-        <Label className="text-sm font-medium text-gray-700 mb-3 block">Load</Label>
+        <Label className="text-sm font-medium text-gray-700 mb-3 block">Problem Statement</Label>
         <Select value={selectedChat} onValueChange={handleSampleProblemSelection}>
           <SelectTrigger>
             <SelectValue placeholder="Select a sample problem..." />
@@ -637,8 +660,8 @@ const PolicyPortal = () => {
                             key={index}
                             className={`p-3 rounded-lg ${
                               message.role === 'user'
-                                ? 'bg-gray-600 text-white ml-auto max-w-[80%]'
-                                : 'bg-white text-gray-800 mr-auto max-w-[80%] border'
+                                ? 'bg-white text-gray-800 ml-4 mr-auto border'
+                                : 'bg-white text-gray-800 ml-auto mr-4 border'
                             }`}
                           >
                             <div className="text-xs opacity-70 mb-1">
@@ -650,7 +673,7 @@ const PolicyPortal = () => {
                           </div>
                         ))}
                         {streamingContent && (
-                          <div className="bg-white text-gray-800 mr-auto max-w-[80%] border p-3 rounded-lg">
+                          <div className="bg-white text-gray-800 ml-auto mr-4 border p-3 rounded-lg">
                             <div className="text-xs opacity-70 mb-1">{selectedPersona}</div>
                             <div className="prose prose-sm max-w-none">
                               <ReactMarkdown>{streamingContent}</ReactMarkdown>
@@ -658,7 +681,7 @@ const PolicyPortal = () => {
                           </div>
                         )}
                         {isChatting && !streamingContent && (
-                          <div className="bg-white text-gray-800 mr-auto max-w-[80%] border p-3 rounded-lg">
+                          <div className="bg-white text-gray-800 ml-auto mr-4 border p-3 rounded-lg">
                             <div className="text-xs opacity-70 mb-1">{selectedPersona}</div>
                             <div className="flex items-center gap-2">
                               <div className="animate-spin w-4 h-4 border-2 border-gray-300 border-t-gray-600 rounded-full"></div>
