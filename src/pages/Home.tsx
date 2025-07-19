@@ -170,7 +170,7 @@ const Home = () => {
                     <div className="flex items-center gap-4">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-blue-50 transition-all duration-200 px-3 py-2 rounded-[128px] border border-border/30 hover:border-border/50">
+                          <button type="button" className="flex items-center gap-2 text-muted-foreground hover:text-foreground hover:bg-[#EBE9E4] transition-all duration-200 px-3 py-2 rounded-[128px] border border-border/30 hover:border-border/50">
                             <span className="text-xs">Problems</span>
                             <ChevronDown className="w-2 h-2" />
                           </button>
@@ -252,7 +252,7 @@ const Home = () => {
 
         <section className="py-20" style={{ backgroundColor: '#F6F4ED' }}>
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div className="bg-primary/5 rounded-2xl p-12">
+            <div className="bg-[#FBF9F6] rounded-2xl p-12">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
                 Ready to do something good?
               </h2>

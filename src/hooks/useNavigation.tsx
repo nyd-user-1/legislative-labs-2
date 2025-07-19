@@ -14,8 +14,8 @@ export const useNavigation = () => {
 
   const getNavClassName = (path: string) => {
     return isActive(path) 
-      ? "bg-gray-200 text-gray-900 font-medium" 
-      : "hover:bg-gray-100 hover:text-gray-900";
+      ? "bg-[#EBE9E4] text-gray-900 font-medium" 
+      : "hover:bg-[#EBE9E4] hover:text-gray-900";
   };
 
   return {
