@@ -99,6 +99,7 @@ const PolicyPortal = () => {
   const [streamingContent, setStreamingContent] = useState("");
   const [pipelineStage, setPipelineStage] = useState<'input' | 'processing' | 'draft' | 'review'>('input');
   const [abortController, setAbortController] = useState<AbortController | null>(null);
+  const [hasDrafts, setHasDrafts] = useState(false);
   const isMobile = useIsMobile();
   const { toast } = useToast();
   const chatScrollRef = useRef<HTMLDivElement>(null);
@@ -372,6 +373,7 @@ const PolicyPortal = () => {
         setChatMessages(prev => [...prev, aiMessage]);
         setStreamingContent("");
         setPipelineStage('draft');
+        setHasDrafts(true); // Set drafts flag when first draft is generated
 
         toast({
           title: "Policy Draft Generated",
@@ -564,6 +566,32 @@ const PolicyPortal = () => {
           className="w-full"
         />
       </div>
+
+      {/* My Drafts Panel - Only show after drafts are generated */}
+      {hasDrafts && (
+        <div>
+          <Label className="text-sm font-medium text-gray-700 mb-3 block">My Drafts</Label>
+          <div className="space-y-2">
+            <div className="p-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+              <div className="text-sm font-medium text-gray-800">Housing Affordability and Wage Adjustment Act</div>
+              <div className="text-xs text-gray-500 mt-1">Created with Legislative Drafter - Citizen Bridge</div>
+              <div className="text-xs text-gray-400 mt-1">2 hours ago</div>
+            </div>
+            
+            <div className="p-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+              <div className="text-sm font-medium text-gray-800">Elder Care Support and Accessibility Act</div>
+              <div className="text-xs text-gray-500 mt-1">Created with Legislative Drafter - Citizen Bridge</div>
+              <div className="text-xs text-gray-400 mt-1">1 day ago</div>
+            </div>
+            
+            <div className="p-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+              <div className="text-sm font-medium text-gray-800">Small Business Tax Relief Initiative</div>
+              <div className="text-xs text-gray-500 mt-1">Created with Policy Advisor - Economic Development</div>
+              <div className="text-xs text-gray-400 mt-1">3 days ago</div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 
