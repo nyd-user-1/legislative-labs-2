@@ -10,7 +10,7 @@ export function SidebarHeader() {
     <div className="flex items-center justify-center space-x-2">
       {!collapsed && (
         <div className="text-center">
-          <NavLink to="/" className="hover:text-gray-700 transition-colors">
+          <NavLink to="/home" className="hover:text-gray-700 transition-colors">
             <h1 className="text-lg font-bold">Do something</h1>
           </NavLink>
         </div>

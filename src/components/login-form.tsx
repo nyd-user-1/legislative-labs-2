@@ -30,7 +30,7 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
       } else {
         await signIn(email, password);
       }
-      navigate('/');
+      navigate('/home');
     } catch (err: any) {
       setError(err.message || 'Authentication failed');
     } finally {
