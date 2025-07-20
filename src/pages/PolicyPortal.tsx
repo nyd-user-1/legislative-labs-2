@@ -692,18 +692,6 @@ const PolicyPortal = () => {
                   </AlertDialogContent>
                 </AlertDialog>
               )}
-              
-              {/* Mode Toggle */}
-              <div className="flex gap-2 mb-4">
-                <Button
-                  variant={mode === 'chat' ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setMode('chat')}
-                  className="flex items-center gap-2"
-                >
-                  Chat
-                </Button>
-              </div>
 
               {/* Chat Content */}
               <div className="flex-1 flex flex-col bg-[#FBF9F6] rounded-lg border border-gray-200">
