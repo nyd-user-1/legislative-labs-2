@@ -559,35 +559,22 @@ const PolicyPortal = () => {
           </div>
           <span className="text-sm text-gray-500">{maxWords} words</span>
         </div>
-        <div className="space-y-3">
-          <div className="flex justify-between text-xs text-gray-400">
-            <span>250</span>
-            <span>500</span>
-            <span>750</span>
-            <span>1000</span>
-          </div>
-          <div className="relative">
-            <input
-              type="range"
-              min="250"
-              max="1000"
-              step="250"
-              value={maxWords}
-              onChange={(e) => setMaxWords(Number(e.target.value))}
-              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider-with-ticks"
-            />
-            <div className="flex justify-between mt-1">
-              {[250, 500, 750, 1000].map((value) => (
-                <div
-                  key={value}
-                  className={`w-2 h-2 rounded-full ${
-                    maxWords >= value ? 'bg-gray-900' : 'bg-gray-300'
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
+        <Slider
+          value={[maxWords]}
+          onValueChange={(value) => {
+            const newValue = value[0];
+            // Snap to nearest valid value
+            const validValues = [250, 500, 750, 1000];
+            const closest = validValues.reduce((prev, curr) => 
+              Math.abs(curr - newValue) < Math.abs(prev - newValue) ? curr : prev
+            );
+            setMaxWords(closest);
+          }}
+          max={1000}
+          min={250}
+          step={250}
+          className="w-full"
+        />
       </div>
 
       {/* Temperature */}
