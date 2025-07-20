@@ -571,8 +571,8 @@ const PolicyPortal = () => {
             setMaxWords(closest);
           }}
           max={1000}
-          min={250}
-          step={250}
+          min={0}
+          step={1}
           className="w-full"
         />
       </div>
