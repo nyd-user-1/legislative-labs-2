@@ -787,66 +787,79 @@ const PolicyPortal = () => {
               )}
 
               {/* Chat Content */}
-              <div className="flex-1 flex flex-col bg-[#FBF9F6] rounded-lg border border-gray-200 min-h-0">
-                <ScrollArea className="flex-1 h-0" ref={chatScrollRef}>
-                  <div className="p-4 min-h-full">
-                    {chatMessages.length === 0 && !streamingContent ? (
-                      <div className="text-center text-gray-500 py-8">
-                        <p>Select a Persona. Select a Problem. Start a chat.</p>
-                        {selectedPersona && (
-                          <p className="mt-2 text-sm">
-                            Selected persona: <strong>{selectedPersona}</strong>
-                          </p>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="space-y-4">
-                        {chatMessages.map((message, index) => (
-                          <div
-                            key={index}
-                            className={`p-3 rounded-lg ${
-                              message.role === 'user'
-                                ? 'bg-white text-gray-800 ml-4 mr-auto border'
-                                : 'bg-white text-gray-800 ml-auto mr-4 border'
-                            }`}
-                          >
-                            <div className="text-xs opacity-70 mb-1">
-                              {message.role === 'user' ? 'You' : selectedPersona}
+              <div className="flex-1 flex flex-col bg-[#FBF9F6] rounded-lg border border-gray-200">
+                {/* Fixed height container for messages */}
+                <div className="flex-1 overflow-hidden">
+                  <ScrollArea className="h-full" ref={chatScrollRef}>
+                    <div className="p-4 space-y-4">
+                      {chatMessages.length === 0 && !streamingContent ? (
+                        <div className="text-center text-gray-500 py-8">
+                          <p>Select a Persona. Select a Problem. Start a chat.</p>
+                          {selectedPersona && (
+                            <p className="mt-2 text-sm">
+                              Selected persona: <strong>{selectedPersona}</strong>
+                            </p>
+                          )}
+                        </div>
+                      ) : (
+                        <>
+                          {chatMessages.map((message, index) => (
+                            <div
+                              key={index}
+                              className={`max-w-none ${
+                                message.role === 'user' ? 'flex justify-end' : 'flex justify-start'
+                              }`}
+                            >
+                              <div
+                                className={`p-3 rounded-lg max-w-[85%] ${
+                                  message.role === 'user'
+                                    ? 'bg-[#1e3a8a] text-white' // Dark blue background for user messages
+                                    : 'bg-white text-gray-800 border border-gray-200'
+                                }`}
+                              >
+                                <div className={`text-xs mb-1 ${message.role === 'user' ? 'text-blue-100' : 'text-gray-500'}`}>
+                                  {message.role === 'user' ? 'You' : selectedPersona}
+                                </div>
+                                <div className="prose prose-sm max-w-none">
+                                  <ReactMarkdown>{message.content}</ReactMarkdown>
+                                </div>
+                              </div>
                             </div>
-                            <div className="prose prose-sm max-w-none">
-                              <ReactMarkdown>{message.content}</ReactMarkdown>
+                          ))}
+                          {streamingContent && (
+                            <div className="flex justify-start">
+                              <div className="bg-white text-gray-800 border border-gray-200 p-3 rounded-lg max-w-[85%]">
+                                <div className="text-xs text-gray-500 mb-1">{selectedPersona}</div>
+                                <div className="prose prose-sm max-w-none">
+                                  <ReactMarkdown>{streamingContent}</ReactMarkdown>
+                                </div>
+                              </div>
                             </div>
-                          </div>
-                        ))}
-                        {streamingContent && (
-                          <div className="bg-white text-gray-800 ml-auto mr-4 border p-3 rounded-lg">
-                            <div className="text-xs opacity-70 mb-1">{selectedPersona}</div>
-                            <div className="prose prose-sm max-w-none">
-                              <ReactMarkdown>{streamingContent}</ReactMarkdown>
+                          )}
+                          {isChatting && !streamingContent && (
+                            <div className="flex justify-start">
+                              <div className="bg-white text-gray-800 border border-gray-200 p-3 rounded-lg max-w-[85%]">
+                                <div className="text-xs text-gray-500 mb-1">{selectedPersona}</div>
+                                <div className="flex items-center gap-2">
+                                  <MorphingHeartLoader size={16} className="text-red-500" />
+                                  <span className="text-sm">Generating policy draft...</span>
+                                </div>
+                              </div>
                             </div>
-                          </div>
-                        )}
-                        {isChatting && !streamingContent && (
-                          <div className="bg-white text-gray-800 ml-auto mr-4 border p-3 rounded-lg">
-                            <div className="text-xs opacity-70 mb-1">{selectedPersona}</div>
-                            <div className="flex items-center gap-2">
-                              <MorphingHeartLoader size={16} className="text-red-500" />
-                              <span className="text-sm">Generating policy draft...</span>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </ScrollArea>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </ScrollArea>
+                </div>
                 
                 {/* Input Area */}
-                <div className="border-t border-gray-200 p-4">
+                <div className="border-t border-gray-200 p-4 bg-white rounded-b-lg">
                   <Textarea
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value)}
                     placeholder="Describe any civic issue you want transformed into legislation. Goodable will automatically detect the input type and transform it."
-                    className="min-h-[120px] resize-none border border-gray-300 rounded-lg p-3 text-sm"
+                    className="min-h-[120px] resize-none border border-gray-300 rounded-lg p-3 text-sm w-full"
                   />
                 </div>
               </div>
