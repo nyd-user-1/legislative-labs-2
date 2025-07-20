@@ -8,11 +8,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { RotateCcw, Download, Code, Share, List, SlidersHorizontal, Settings, Info, X, HelpCircle } from "lucide-react";
+import { RotateCcw, Download, Code, Share, List, SlidersHorizontal, Settings, Info, X, HelpCircle, Trash2, Copy } from "lucide-react";
 import { MorphingHeartLoader } from "@/components/ui/MorphingHeartLoader";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { usePolicyDrafts, PolicyDraft } from "@/hooks/usePolicyDrafts";
+import { PolicyDraftDialog } from "@/components/PolicyDraftDialog";
+import { format } from "date-fns";
 import ReactMarkdown from 'react-markdown';
 
 interface ChatSession {
@@ -104,6 +107,10 @@ const PolicyPortal = () => {
   const isMobile = useIsMobile();
   const { toast } = useToast();
   const chatScrollRef = useRef<HTMLDivElement>(null);
+
+  const { drafts, loading: draftsLoading, saveDraft, deleteDraft } = usePolicyDrafts();
+  const [selectedDraft, setSelectedDraft] = useState<PolicyDraft | null>(null);
+  const [draftDialogOpen, setDraftDialogOpen] = useState(false);
 
   const fetchUserChats = async () => {
     try {
@@ -308,6 +315,20 @@ const PolicyPortal = () => {
     }
   };
 
+  const generateDraftTitle = (input: string): string => {
+    // Extract a meaningful title from the input
+    const lines = input.split('\n').filter(line => line.trim());
+    const firstLine = lines[0]?.trim() || '';
+    
+    if (firstLine.toLowerCase().includes('problem statement:')) {
+      const titlePart = firstLine.replace(/problem statement:/i, '').trim();
+      return titlePart.length > 50 ? titlePart.substring(0, 47) + '...' : titlePart;
+    }
+    
+    const words = firstLine.split(' ').slice(0, 8).join(' ');
+    return words.length > 50 ? words.substring(0, 47) + '...' : words;
+  };
+
   const handleChatSubmit = async () => {
     if (!selectedPersona || !prompt.trim()) {
       toast({
@@ -377,11 +398,37 @@ const PolicyPortal = () => {
         setChatMessages(prev => [...prev, aiMessage]);
         setStreamingContent("");
         setPipelineStage('draft');
-        setHasDrafts(true); // Set drafts flag when first draft is generated
+        
+        // Save the draft
+        const draftId = saveDraft({
+          title: generateDraftTitle(prompt),
+          persona: selectedPersona,
+          userInput: prompt,
+          aiOutput: fullContent
+        });
 
         toast({
           title: "Policy Draft Generated",
-          description: `Legislative draft created with ${selectedPersona}`,
+          description: (
+            <div className="flex flex-col gap-2">
+              <span>Legislative draft created with {selectedPersona}</span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  // Scroll to My Policy Drafts section
+                  const draftsSection = document.getElementById('my-policy-drafts');
+                  if (draftsSection) {
+                    draftsSection.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+                className="w-fit"
+              >
+                View in My Policy Drafts
+              </Button>
+            </div>
+          ),
+          duration: 6000,
         });
       }
       
@@ -473,6 +520,11 @@ const PolicyPortal = () => {
       title: "Professional Sharing",
       description: "NYS professional sharing coming soon",
     });
+  };
+
+  const handleDraftClick = (draft: PolicyDraft) => {
+    setSelectedDraft(draft);
+    setDraftDialogOpen(true);
   };
 
   const SettingsContent = () => (
@@ -661,31 +713,51 @@ const PolicyPortal = () => {
         />
       </div>
 
-      {/* My Drafts Panel - Only show after drafts are generated */}
-      {hasDrafts && (
-        <div>
-          <Label className="text-sm font-medium text-gray-700 mb-3 block">My Drafts</Label>
-          <div className="space-y-2">
-            <div className="p-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-              <div className="text-sm font-medium text-gray-800">Housing Affordability and Wage Adjustment Act</div>
-              <div className="text-xs text-gray-500 mt-1">Created with Legislative Drafter - Citizen Bridge</div>
-              <div className="text-xs text-gray-400 mt-1">2 hours ago</div>
+      {/* My Policy Drafts Panel */}
+      <div id="my-policy-drafts">
+        <Label className="text-sm font-medium text-gray-700 mb-3 block">My Policy Drafts</Label>
+        <div className="space-y-2 max-h-64 overflow-y-auto">
+          {draftsLoading ? (
+            <div className="p-3 bg-white border border-gray-200 rounded-lg">
+              <div className="text-sm text-gray-500">Loading drafts...</div>
             </div>
-            
-            <div className="p-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-              <div className="text-sm font-medium text-gray-800">Elder Care Support and Accessibility Act</div>
-              <div className="text-xs text-gray-500 mt-1">Created with Legislative Drafter - Citizen Bridge</div>
-              <div className="text-xs text-gray-400 mt-1">1 day ago</div>
+          ) : drafts.length === 0 ? (
+            <div className="p-4 bg-white border border-gray-200 rounded-lg text-center">
+              <div className="text-sm text-gray-500">No policy drafts yet</div>
+              <div className="text-xs text-gray-400 mt-1">Generate your first draft to see it here</div>
             </div>
-            
-            <div className="p-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-              <div className="text-sm font-medium text-gray-800">Small Business Tax Relief Initiative</div>
-              <div className="text-xs text-gray-500 mt-1">Created with Policy Advisor - Economic Development</div>
-              <div className="text-xs text-gray-400 mt-1">3 days ago</div>
-            </div>
-          </div>
+          ) : (
+            drafts.map((draft) => (
+              <div 
+                key={draft.id}
+                className="p-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer group"
+                onClick={() => handleDraftClick(draft)}
+              >
+                <div className="flex justify-between items-start">
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium text-gray-800 truncate">{draft.title}</div>
+                    <div className="text-xs text-gray-500 mt-1">Created with {draft.persona}</div>
+                    <div className="text-xs text-gray-400 mt-1">
+                      {format(new Date(draft.createdAt), "MMM d, h:mm a")}
+                    </div>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteDraft(draft.id);
+                    }}
+                    className="opacity-0 group-hover:opacity-100 h-6 w-6 p-0"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </Button>
+                </div>
+              </div>
+            ))
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 
@@ -744,9 +816,9 @@ const PolicyPortal = () => {
         </div>
 
         {/* Content */}
-        <div className="flex-1 flex">
+        <div className="flex-1 flex overflow-hidden">
           {/* Left Panel - Prompt Area */}
-          <div className={`flex-1 p-4 sm:p-6 ${isMobile ? 'w-full' : ''}`}>
+          <div className={`flex-1 p-4 sm:p-6 ${isMobile ? 'w-full' : ''} flex flex-col overflow-hidden`}>
             <div className="h-full flex flex-col">
 
               {/* System Prompt Indicator */}
@@ -786,9 +858,9 @@ const PolicyPortal = () => {
                 </AlertDialog>
               )}
 
-              {/* Chat Content */}
-              <div className="flex-1 flex flex-col bg-[#FBF9F6] rounded-lg border border-gray-200">
-                {/* Fixed height container for messages */}
+              {/* Chat Content - Fixed height container */}
+              <div className="flex-1 flex flex-col bg-[#FBF9F6] rounded-lg border border-gray-200 min-h-0">
+                {/* Messages area with fixed height and scroll */}
                 <div className="flex-1 overflow-hidden">
                   <ScrollArea className="h-full" ref={chatScrollRef}>
                     <div className="p-4 space-y-4">
@@ -813,22 +885,38 @@ const PolicyPortal = () => {
                               <div
                                 className={`p-3 rounded-lg max-w-[85%] ${
                                   message.role === 'user'
-                                    ? 'bg-[#1e3a8a] text-white' // Dark blue background for user messages
-                                    : 'bg-white text-gray-800 border border-gray-200'
+                                    ? 'bg-[#1e3a8a] text-white' // Correct dark blue background for user messages
+                                    : 'bg-white text-gray-800 border border-gray-200 relative'
                                 }`}
                               >
+                                {/* Copy button for AI messages */}
+                                {message.role === 'assistant' && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => navigator.clipboard.writeText(message.content)}
+                                    className="absolute top-2 right-2 h-6 w-6 p-0 opacity-60 hover:opacity-100"
+                                  >
+                                    <Copy className="h-3 w-3" />
+                                  </Button>
+                                )}
+                                
                                 <div className={`text-xs mb-1 ${message.role === 'user' ? 'text-blue-100' : 'text-gray-500'}`}>
                                   {message.role === 'user' ? 'You' : selectedPersona}
                                 </div>
-                                <div className="prose prose-sm max-w-none">
-                                  <ReactMarkdown>{message.content}</ReactMarkdown>
+                                <div className={`${message.role === 'assistant' ? 'prose prose-sm max-w-none pr-8' : ''}`}>
+                                  {message.role === 'assistant' ? (
+                                    <ReactMarkdown>{message.content}</ReactMarkdown>
+                                  ) : (
+                                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                                  )}
                                 </div>
                               </div>
                             </div>
                           ))}
                           {streamingContent && (
                             <div className="flex justify-start">
-                              <div className="bg-white text-gray-800 border border-gray-200 p-3 rounded-lg max-w-[85%]">
+                              <div className="bg-white text-gray-800 border border-gray-200 p-3 rounded-lg max-w-[85%] relative">
                                 <div className="text-xs text-gray-500 mb-1">{selectedPersona}</div>
                                 <div className="prose prose-sm max-w-none">
                                   <ReactMarkdown>{streamingContent}</ReactMarkdown>
@@ -853,13 +941,13 @@ const PolicyPortal = () => {
                   </ScrollArea>
                 </div>
                 
-                {/* Input Area */}
-                <div className="border-t border-gray-200 p-4 bg-white rounded-b-lg">
+                {/* Input Area - Fixed at bottom */}
+                <div className="border-t border-gray-200 p-4 bg-white rounded-b-lg flex-shrink-0">
                   <Textarea
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value)}
                     placeholder="Describe any civic issue you want transformed into legislation. Goodable will automatically detect the input type and transform it."
-                    className="min-h-[120px] resize-none border border-gray-300 rounded-lg p-3 text-sm w-full"
+                    className="min-h-[120px] resize-none border border-gray-300 rounded-lg p-3 text-sm w-full bg-white text-gray-900"
                   />
                 </div>
               </div>
@@ -914,6 +1002,13 @@ const PolicyPortal = () => {
           )}
         </div>
       </div>
+
+      {/* Policy Draft Dialog */}
+      <PolicyDraftDialog
+        draft={selectedDraft}
+        open={draftDialogOpen}
+        onOpenChange={setDraftDialogOpen}
+      />
     </div>
   );
 };
