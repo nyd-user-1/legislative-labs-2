@@ -711,7 +711,7 @@ const PolicyPortal = () => {
                   <div className="p-4">
                     {chatMessages.length === 0 && !streamingContent ? (
                       <div className="text-center text-gray-500 py-8">
-                        <p>Start a conversation by entering your prompt and clicking "Generate Legislation"</p>
+                        <p>Select a Persona. Select a Problem. Start a chat.</p>
                         {selectedPersona && (
                           <p className="mt-2 text-sm">
                             Selected persona: <strong>{selectedPersona}</strong>
