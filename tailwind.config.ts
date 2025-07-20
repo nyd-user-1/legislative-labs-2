@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -102,11 +103,34 @@ export default {
             transform: "translateX(100%)",
           },
         },
+        "morphing-heart": {
+          "0%": {
+            transform: "scale(1) rotate(0deg)",
+            opacity: "1",
+          },
+          "25%": {
+            transform: "scale(1.1) rotate(5deg)",
+            opacity: "0.8",
+          },
+          "50%": {
+            transform: "scale(0.9) rotate(-5deg)",
+            opacity: "0.6",
+          },
+          "75%": {
+            transform: "scale(1.05) rotate(3deg)",
+            opacity: "0.8",
+          },
+          "100%": {
+            transform: "scale(1) rotate(0deg)",
+            opacity: "1",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         shimmer: "shimmer 2s infinite",
+        "morphing-heart": "morphing-heart 1.5s ease-in-out infinite",
       },
     },
   },

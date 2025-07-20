@@ -9,6 +9,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { RotateCcw, Download, Code, Share, List, SlidersHorizontal, Settings, Info, X } from "lucide-react";
+import { MorphingHeartLoader } from "@/components/ui/MorphingHeartLoader";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -748,7 +749,7 @@ const PolicyPortal = () => {
                           <div className="bg-white text-gray-800 ml-auto mr-4 border p-3 rounded-lg">
                             <div className="text-xs opacity-70 mb-1">{selectedPersona}</div>
                             <div className="flex items-center gap-2">
-                              <div className="animate-spin w-4 h-4 border-2 border-gray-300 border-t-gray-600 rounded-full"></div>
+                              <MorphingHeartLoader size={16} className="text-red-500" />
                               <span className="text-sm">Generating policy draft...</span>
                             </div>
                           </div>
