@@ -112,6 +112,11 @@ const PolicyPortal = () => {
   const [selectedDraft, setSelectedDraft] = useState<PolicyDraft | null>(null);
   const [draftDialogOpen, setDraftDialogOpen] = useState(false);
 
+  // Debug logging for drafts
+  useEffect(() => {
+    console.log('Drafts state updated:', { drafts, draftsLoading, draftsLength: drafts.length });
+  }, [drafts, draftsLoading]);
+
   const fetchUserChats = async () => {
     try {
       setLoading(true);
