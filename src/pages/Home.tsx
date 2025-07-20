@@ -133,7 +133,7 @@ const Home = () => {
 
             <div className="w-full max-w-[900px] sm:w-[calc(100vw-32px)] mx-auto mb-16 px-4 sm:px-0">
               <form onSubmit={handleSubmit} className="relative">
-                <div className="relative bg-background/50 backdrop-blur-sm border border-gray-300 rounded-2xl pl-3 pr-6 py-3 focus-within:border-primary/50 transition-all duration-300 shadow-md">
+                <div className="relative bg-[#FBF9F6] backdrop-blur-sm border border-gray-300 rounded-2xl pl-3 pr-6 py-3 focus-within:border-primary/50 transition-all duration-300 shadow-md">
                   <div className="relative">
                     <Input 
                       ref={inputRef} 
@@ -252,7 +252,7 @@ const Home = () => {
 
         <section className="py-20" style={{ backgroundColor: '#F6F4ED' }}>
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div className="bg-[#FBF9F6] rounded-2xl p-12">
+            <div className="bg-[#FBF9F6] border border-gray-300 rounded-2xl p-12">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
                 Ready to do something good?
               </h2>
