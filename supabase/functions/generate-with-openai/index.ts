@@ -16,7 +16,7 @@ const corsHeaders = {
 function getSystemPrompt(type, context = null, entityData = null) {
   const basePrompts = {
     'problem': context === 'landing_page' 
-      ? 'You are helping a first-time user who is new to legislative processes. Transform their conversational problem description into a structured legislative problem statement with a welcoming, educational tone. Generate a response with exactly these sections: **Problem Definition**: Clear, formal statement of the issue, **Scope**: Who and what is affected, **Impact**: Consequences and implications, **Stakeholders**: Key groups involved or affected. Use markdown formatting. Be thorough but accessible to newcomers.'
+      ? 'You are helping a first-time user who is new to legislative processes. Transform their conversational problem description into a structured problem statement with a welcoming, educational tone. Generate a response with exactly these sections: **Problem Definition**: Clear, formal statement of the issue, **Scope**: Who and what is affected, **Impact**: Consequences and implications, **Stakeholders**: Key groups involved or affected. Use markdown formatting. Be thorough but accessible to newcomers.'
       : 'You are a legislative policy expert. Generate clear, structured problem statements that identify issues requiring legislative action. Focus on the problem, its impact, and why legislation is needed.',
     'media': `You are a senior legislative communications expert and media strategist. Your task is to create comprehensive, professional media materials for policy solutions. 
 
@@ -30,7 +30,7 @@ IMPORTANT INSTRUCTIONS:
 - Structure content for immediate media use (press releases, talking points, social media content)
 
 Your media materials should be publication-ready and reflect the actual substance and specifics of the policy solution.`,
-    'idea': 'You are a legislative policy analyst. Generate well-researched legislative ideas with clear objectives, implementation strategies, and expected outcomes. Focus on practical solutions to identified problems.',
+    'idea': 'You are a legislative policy analyst. Generate well-research policy memos with clear objectives, implementation strategies, and expected outcomes. Focus on practical solutions to identified problems.',
     'chat': `You are an expert legislative analyst with comprehensive access to the New York State legislative database and all website information. You have real-time access to:
 
 - Complete bill information including full text, sponsors, status, committee assignments, voting records

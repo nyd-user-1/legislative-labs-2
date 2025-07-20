@@ -271,7 +271,7 @@ const PolicyPortal = () => {
                            selectedOption.content.includes('Legislative Problem Statement:');
       
       if (isProblemChat) {
-        setPrompt(`POLICY PIPELINE INPUT:\n${selectedOption.content}\n\nINSTRUCTIONS: Transform this citizen problem into a complete NYS legislative draft.`);
+        setPrompt(`Policy Playground:\n${selectedOption.content}\n\nInstructions: Transform the identified problem into a policy memo.`);
         setPipelineStage('processing');
       } else {
         setPrompt(selectedOption.content);
@@ -283,7 +283,7 @@ const PolicyPortal = () => {
   const handleSampleProblemSelection = (problemId: string) => {
     const selectedProblem = sampleProblems.find(problem => problem.id.toString() === problemId);
     if (selectedProblem) {
-      setPrompt(`POLICY PIPELINE INPUT:\nProblem Statement: ${selectedProblem["Sample Problems"]}\n\nINSTRUCTIONS: Transform this citizen problem into a complete NYS legislative draft.`);
+      setPrompt(`Policy Playground:\nProblem Statement: ${selectedProblem["Sample Problems"]}\n\nInstructions: Transform the identified problem into a policy memo.`);
       setPipelineStage('processing');
       setSelectedChat(problemId);
     }
