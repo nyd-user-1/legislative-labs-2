@@ -764,19 +764,7 @@ const PolicyPortal = () => {
                   <Textarea
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value)}
-                    placeholder="POLICY PIPELINE INPUT:
-
-Option 1 - Load from Goodable:
-Click 'Load' above and select a citizen problem from your chat history.
-
-Option 2 - Direct Input:
-Paste a problem statement like:
-'Problem: Childcare costs are unaffordable for working families...'
-
-Option 3 - Manual Entry:
-Describe any civic issue you want transformed into legislation.
-
-The AI will automatically detect the input type and transform it into professional NYS legislative format."
+                    placeholder="Describe any civic issue you want transformed into legislation. Goodable will automatically detect the input type and transform it."
                     className="min-h-[120px] resize-none border border-gray-300 rounded-lg p-3 text-sm"
                   />
                 </div>
