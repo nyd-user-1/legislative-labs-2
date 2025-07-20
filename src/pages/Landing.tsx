@@ -241,7 +241,7 @@ const Landing = () => {
                       value={userProblem} 
                       onChange={e => setUserProblem(e.target.value)} 
                       placeholder={placeholderTexts[currentPlaceholder]} 
-                      className="h-10 pr-16 bg-transparent border-0 focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground overflow-hidden text-ellipsis" 
+                      className="h-10 pr-16 bg-input border-0 focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground overflow-hidden text-ellipsis" 
                       style={{ fontSize: '16px' }}
                       disabled={isTyping} 
                     />
