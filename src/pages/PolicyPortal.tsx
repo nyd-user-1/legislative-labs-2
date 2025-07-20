@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { RotateCcw, Download, Code, Share, List, SlidersHorizontal, Settings, Info, X } from "lucide-react";
+import { RotateCcw, Download, Code, Share, List, SlidersHorizontal, Settings, Info, X, HelpCircle } from "lucide-react";
 import { MorphingHeartLoader } from "@/components/ui/MorphingHeartLoader";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
@@ -84,7 +84,7 @@ const PolicyPortal = () => {
   const [selectedPersonaAct, setSelectedPersonaAct] = useState("");
   const [systemPrompt, setSystemPrompt] = useState("");
   const [temperature, setTemperature] = useState([0.56]);
-  const [maxLength, setMaxLength] = useState([256]);
+  const [maxWords, setMaxWords] = useState(250); // Changed from maxLength to maxWords
   const [topP, setTopP] = useState([0.9]);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [chatOptions, setChatOptions] = useState<ChatOption[]>([]);
@@ -334,7 +334,10 @@ const PolicyPortal = () => {
       const response = await supabase.functions.invoke('chat-with-persona', {
         body: {
           messages: initialMessages,
-          systemPrompt: systemPrompt
+          systemPrompt: systemPrompt,
+          temperature: temperature[0],
+          maxWords: maxWords,
+          topP: topP[0]
         }
       });
 
@@ -520,10 +523,103 @@ const PolicyPortal = () => {
         </Select>
       </div>
 
+      {/* Maximum Length */}
+      <div>
+        <div className="flex justify-between items-center mb-3">
+          <div className="flex items-center gap-2">
+            <Label className="text-sm font-medium text-gray-700">Maximum Length</Label>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-5 w-5 p-0">
+                  <HelpCircle className="h-3 w-3" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="max-w-2xl">
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Maximum Length</AlertDialogTitle>
+                  <AlertDialogDescription className="text-gray-700 leading-relaxed">
+                    Maximum Length determines how long the model's response can be. It's a way to guide the AI on how much detail to include based on your needs.
+                    <br /><br />
+                    A 250-word response is about half a page, single spaced. It works well for a short summary or a quick explanation.
+                    <br /><br />
+                    A 500-word response is roughly one full page. It's ideal for a focused proposal, policy outline, or structured argument.
+                    <br /><br />
+                    A 750-word response comes out to about a page and a half. This length allows for a more detailed breakdown or multi-part response while staying concise.
+                    <br /><br />
+                    A 1000-word response is approximately two single-spaced pages. This is the upper limit for most memos, offering enough space for thorough analysis or complete legislative recommendations without being overwhelming.
+                    <br /><br />
+                    In most cases, a one-page memo is enough to communicate a strong and actionable idea. Maximum Length simply helps you shape the depth and scope of your message.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogAction>Close</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+          <span className="text-sm text-gray-500">{maxWords} words</span>
+        </div>
+        <div className="space-y-3">
+          <div className="flex justify-between text-xs text-gray-400">
+            <span>250</span>
+            <span>500</span>
+            <span>750</span>
+            <span>1000</span>
+          </div>
+          <div className="relative">
+            <input
+              type="range"
+              min="250"
+              max="1000"
+              step="250"
+              value={maxWords}
+              onChange={(e) => setMaxWords(Number(e.target.value))}
+              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider-with-ticks"
+            />
+            <div className="flex justify-between mt-1">
+              {[250, 500, 750, 1000].map((value) => (
+                <div
+                  key={value}
+                  className={`w-2 h-2 rounded-full ${
+                    maxWords >= value ? 'bg-gray-900' : 'bg-gray-300'
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Temperature */}
       <div>
         <div className="flex justify-between items-center mb-3">
-          <Label className="text-sm font-medium text-gray-700">Temperature</Label>
+          <div className="flex items-center gap-2">
+            <Label className="text-sm font-medium text-gray-700">Temperature</Label>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-5 w-5 p-0">
+                  <HelpCircle className="h-3 w-3" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="max-w-2xl">
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Temperature</AlertDialogTitle>
+                  <AlertDialogDescription className="text-gray-700 leading-relaxed">
+                    Temperature controls how bold or cautious the model is when generating a response.
+                    <br /><br />
+                    Lower temperatures (closer to 0) make the model more focused and predictable. It will choose the safest and most likely words, which is helpful for formal writing, legal language, or structured analysis.
+                    <br /><br />
+                    Higher temperatures (closer to 1) make the model more creative and exploratory. It may take more risks with phrasing, tone, or ideas. This is useful for brainstorming, ideation, or more expressive writing.
+                    <br /><br />
+                    Most thoughtful work happens between the extremes. Use temperature to dial in whether you want the model to stay on-script or think outside the box.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogAction>Close</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
           <span className="text-sm text-gray-500">{temperature[0]}</span>
         </div>
         <Slider
@@ -536,26 +632,36 @@ const PolicyPortal = () => {
         />
       </div>
 
-      {/* Maximum Length */}
-      <div>
-        <div className="flex justify-between items-center mb-3">
-          <Label className="text-sm font-medium text-gray-700">Maximum Length</Label>
-          <span className="text-sm text-gray-500">{maxLength[0]}</span>
-        </div>
-        <Slider
-          value={maxLength}
-          onValueChange={setMaxLength}
-          max={4000}
-          min={1}
-          step={1}
-          className="w-full"
-        />
-      </div>
-
       {/* Top P */}
       <div>
         <div className="flex justify-between items-center mb-3">
-          <Label className="text-sm font-medium text-gray-700">Top P</Label>
+          <div className="flex items-center gap-2">
+            <Label className="text-sm font-medium text-gray-700">Top P</Label>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-5 w-5 p-0">
+                  <HelpCircle className="h-3 w-3" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="max-w-2xl">
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Top P</AlertDialogTitle>
+                  <AlertDialogDescription className="text-gray-700 leading-relaxed">
+                    Top P controls how creatively or narrowly the model responds by limiting which words it's allowed to consider next.
+                    <br /><br />
+                    A lower Top P (like 0.1 to 0.3) restricts the model to a smaller set of highly likely words. This tends to produce more predictable, focused, or formal responses.
+                    <br /><br />
+                    A higher Top P (like 0.8 to 1.0) gives the model access to a broader range of words. This results in more open-ended, diverse, or creative answers.
+                    <br /><br />
+                    In practical terms, lower values are useful when precision or clarity matters most. Higher values are better for brainstorming, storytelling, or exploring new perspectives. Use Top P to tune how safe or surprising you want the output to be.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogAction>Close</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
           <span className="text-sm text-gray-500">{topP[0]}</span>
         </div>
         <Slider
@@ -694,9 +800,9 @@ const PolicyPortal = () => {
               )}
 
               {/* Chat Content */}
-              <div className="flex-1 flex flex-col bg-[#FBF9F6] rounded-lg border border-gray-200">
-                <ScrollArea className="flex-1" ref={chatScrollRef}>
-                  <div className="p-4">
+              <div className="flex-1 flex flex-col bg-[#FBF9F6] rounded-lg border border-gray-200 min-h-0">
+                <ScrollArea className="flex-1 h-0" ref={chatScrollRef}>
+                  <div className="p-4 min-h-full">
                     {chatMessages.length === 0 && !streamingContent ? (
                       <div className="text-center text-gray-500 py-8">
                         <p>Select a Persona. Select a Problem. Start a chat.</p>

@@ -15,11 +15,14 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, systemPrompt } = await req.json();
+    const { messages, systemPrompt, temperature = 0.7, maxWords = 500, topP = 0.9 } = await req.json();
 
     if (!messages || messages.length === 0) {
       throw new Error('Messages are required');
     }
+
+    // Convert words to tokens (rough approximation: 1 word ≈ 1.3 tokens)
+    const maxTokens = Math.round(maxWords * 1.3);
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -33,8 +36,9 @@ serve(async (req) => {
           ...(systemPrompt ? [{ role: 'system', content: systemPrompt }] : []),
           ...messages
         ],
-        temperature: 0.7,
-        max_tokens: 1500,
+        temperature: temperature,
+        max_tokens: Math.min(maxTokens, 4000), // Cap at reasonable limit
+        top_p: topP,
       }),
     });
 
