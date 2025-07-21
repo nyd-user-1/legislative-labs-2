@@ -4,6 +4,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { MessageBubble } from "@/pages/chats/components/MessageBubble";
 import { Message as ChatMessage } from "@/pages/chats/types";
 import { EntityType } from "@/hooks/chat/types";
+import { MorphingHeartLoader } from "@/components/ui/MorphingHeartLoader";
 
 interface Message {
   id: string;
@@ -73,12 +74,11 @@ export const ChatMessages = ({
         {isLoading && (
           <div className="space-y-2">
             <div className="flex justify-start">
-              <div className="w-full rounded-lg p-3 bg-muted">
-                <div className="flex gap-1">
-                  <div className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce"></div>
-                  <div className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: "0.1s" }}></div>
-                  <div className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+              <div className="w-full rounded-lg p-3 bg-muted flex items-center gap-3">
+                <div className="flex items-center justify-center">
+                  <MorphingHeartLoader size={20} className="text-red-500" />
                 </div>
+                <span className="text-sm text-muted-foreground">Thinking...</span>
               </div>
             </div>
           </div>

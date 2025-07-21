@@ -1,10 +1,11 @@
 
 import { Button } from "@/components/ui/button";
-import { Copy, ExternalLink, BookOpen } from "lucide-react";
+import { Copy, ExternalLink, BookOpen, MessageSquareMore, PictureInPicture } from "lucide-react";
 import { format } from "date-fns";
 import ReactMarkdown from "react-markdown";
 import { Message } from "../types";
 import { ContextBuilder } from "@/utils/contextBuilder";
+import { useNavigate } from "react-router-dom";
 
 interface MessageBubbleProps {
   message: Message;
@@ -27,6 +28,29 @@ export const MessageBubble = ({
   entityType,
   isFirstAssistantMessage = false
 }: MessageBubbleProps) => {
+  const navigate = useNavigate();
+  
+  // Check if message contains a question (AI asking user something)
+  const containsQuestion = message.role === "assistant" && message.content.includes("?");
+  
+  // Extract the last question from the message
+  const extractLastQuestion = (content: string): string => {
+    const sentences = content.split(/[.!?]+/);
+    const questions = sentences.filter(sentence => sentence.trim().endsWith("?") || sentence.includes("?"));
+    return questions.length > 0 ? questions[questions.length - 1].trim() + "?" : "";
+  };
+  
+  const handleRepeatQuestion = () => {
+    const question = extractLastQuestion(message.content);
+    if (question && onSendPrompt) {
+      onSendPrompt(question);
+    }
+  };
+  
+  const handleMoveToPortal = () => {
+    // Navigate to policy portal - in the future this could also transfer the chat context
+    navigate("/policy-portal");
+  };
   
   // Generate dynamic prompts based on AI content for subsequent messages
   const getDynamicPrompts = () => {
@@ -121,16 +145,41 @@ export const MessageBubble = ({
             </p>
           )}
           
-          {/* Share button in bottom right for assistant messages */}
-          {message.role === "assistant" && onShare && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onShare}
-              className="absolute bottom-2 right-2 h-6 w-6 p-0 opacity-60 hover:opacity-100"
-            >
-              <ExternalLink className="h-3 w-3" />
-            </Button>
+          {/* Bottom right action buttons for assistant messages */}
+          {message.role === "assistant" && (
+            <div className="absolute bottom-2 right-2 flex gap-1">
+              {containsQuestion && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleRepeatQuestion}
+                  className="h-6 w-6 p-0 opacity-60 hover:opacity-100"
+                  title="Repeat question"
+                >
+                  <MessageSquareMore className="h-3 w-3" />
+                </Button>
+              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleMoveToPortal}
+                className="h-6 w-6 p-0 opacity-60 hover:opacity-100"
+                title="Move to Policy Portal"
+              >
+                <PictureInPicture className="h-3 w-3" />
+              </Button>
+              {onShare && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onShare}
+                  className="h-6 w-6 p-0 opacity-60 hover:opacity-100"
+                  title="Share"
+                >
+                  <ExternalLink className="h-3 w-3" />
+                </Button>
+              )}
+            </div>
           )}
         </div>
       </div>
