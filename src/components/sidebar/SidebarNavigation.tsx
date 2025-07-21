@@ -1,5 +1,5 @@
 
-import { Search, Settings, User, FileText, Lightbulb, BarChart3, Users, Building2, TrendingUp, MessageSquare, Heart, CreditCard, History, Gamepad2, Factory } from "lucide-react";
+import { Search, Settings, User, FileText, Lightbulb, BarChart3, Users, Building2, TrendingUp, MessageSquare, Heart, CreditCard, History, Gamepad2, Factory, Target } from "lucide-react";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -13,6 +13,7 @@ const researchNavItems = [
   { title: "Dashboard", url: "/dashboard", icon: TrendingUp },
   { title: "Bills", url: "/bills", icon: FileText },
   { title: "Members", url: "/members", icon: Users },
+  { title: "Problems", url: "/problems", icon: Target },
   { title: "Committees", url: "/committees", icon: Building2 },
 ];
 

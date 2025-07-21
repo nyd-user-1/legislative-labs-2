@@ -26,6 +26,7 @@ import PolicyPortal from "./pages/PolicyPortal";
 import Plans from "./pages/Plans";
 import ChangeLog from "./pages/ChangeLog";
 import ProblemPage from "./pages/ProblemPage";
+import Problems from "./pages/Problems";
 
 const queryClient = new QueryClient();
 
@@ -58,6 +59,7 @@ const AppLayout = () => {
                 <Route path="/policy-portal" element={<PolicyPortal />} />
                 <Route path="/bills" element={<Bills />} />
                 <Route path="/members" element={<Members />} />
+                <Route path="/problems" element={<Problems />} />
                 <Route path="/committees" element={<Committees />} />
                 <Route path="/plans" element={<Plans />} />
                 <Route path="/profile" element={<Profile />} />
