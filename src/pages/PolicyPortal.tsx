@@ -622,10 +622,13 @@ const PolicyPortal = () => {
   };
 
   const SettingsContent = () => (
-    <div className="space-y-6 bg-[#FBF9F6] p-4 rounded-lg">
+    <div className="space-y-6 bg-[#FBF9F6] p-6 rounded-lg mx-4">
       {/* Chat */}
       <div>
-        <Label className="text-sm font-medium text-gray-700 mb-3 block">Chat</Label>
+        <Label className="text-sm font-medium text-gray-700 mb-3 block flex items-center gap-2">
+          <MessageSquare className="h-4 w-4" />
+          Chat
+        </Label>
         <Select value={selectedChat} onValueChange={handleChatSelection}>
           <SelectTrigger className="w-64">
             <SelectValue placeholder="Select chat" />
@@ -661,7 +664,7 @@ const PolicyPortal = () => {
           Persona
         </Label>
         <Select value={selectedPersona} onValueChange={handlePersonaSelection}>
-          <SelectTrigger>
+          <SelectTrigger className="w-64">
             <SelectValue placeholder="Select persona" />
           </SelectTrigger>
           <SelectContent>
@@ -687,7 +690,7 @@ const PolicyPortal = () => {
           Problem
         </Label>
         <Select value={selectedChat} onValueChange={handleSampleProblemSelection}>
-          <SelectTrigger>
+          <SelectTrigger className="w-64">
             <SelectValue placeholder="Select problem" />
           </SelectTrigger>
           <SelectContent>
@@ -1030,32 +1033,32 @@ const PolicyPortal = () => {
                     )}
                   </div>
                 </div>
-                
-                {/* Input Area - Fixed at bottom, full width */}
-                <div className="flex-shrink-0 p-4">
-                  <div className="flex gap-2 w-full">
-                    <Textarea
-                      value={prompt}
-                      onChange={(e) => setPrompt(e.target.value)}
-                      placeholder="Ask about this legislation..."
-                      className="min-h-[60px] resize-none border border-gray-300 rounded-lg p-3 text-sm flex-1 bg-[#FBF9F6] text-gray-900"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                          e.preventDefault();
-                          if (prompt.trim() && !isChatting) {
-                            handleSubmit();
-                          }
+              </div>
+
+              {/* Input Area - Standalone below chat container */}
+              <div className="mt-4 p-4 bg-white rounded-lg border border-gray-200">
+                <div className="flex gap-2 w-full">
+                  <Textarea
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    placeholder="Ask about this legislation..."
+                    className="min-h-[60px] resize-none border border-gray-300 rounded-lg p-3 text-sm flex-1 bg-[#FBF9F6] text-gray-900"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        if (prompt.trim() && !isChatting) {
+                          handleSubmit();
                         }
-                      }}
-                    />
-                    <Button 
-                      onClick={handleSubmit}
-                      disabled={!prompt.trim() || isChatting}
-                      className="px-4 self-end"
-                    >
-                      <Send className="h-4 w-4" />
-                    </Button>
-                  </div>
+                      }
+                    }}
+                  />
+                  <Button 
+                    onClick={handleSubmit}
+                    disabled={!prompt.trim() || isChatting}
+                    className="px-4 self-end"
+                  >
+                    <Send className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
 
