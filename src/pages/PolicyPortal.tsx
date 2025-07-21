@@ -286,11 +286,29 @@ const PolicyPortal = () => {
       if (error) throw error;
 
       if (session) {
-        setLoadedChatSession(session);
-        const messages = Array.isArray(session.messages) ? session.messages : JSON.parse(session.messages || '[]');
+        // Parse messages from JSON if needed
+        const parsedMessages = Array.isArray(session.messages) 
+          ? session.messages 
+          : typeof session.messages === 'string' 
+            ? JSON.parse(session.messages || '[]')
+            : [];
+        
+        // Create properly typed chat session
+        const typedSession: ChatSession = {
+          id: session.id,
+          title: session.title,
+          messages: parsedMessages,
+          bill_id: session.bill_id || undefined,
+          member_id: session.member_id || undefined,
+          committee_id: session.committee_id || undefined,
+          created_at: session.created_at
+        };
+        
+        setLoadedChatSession(typedSession);
+        setSelectedChat(session.id);
         
         // Convert messages to the format expected by the chat component
-        const formattedMessages = messages.map((msg: any) => ({
+        const formattedMessages = parsedMessages.map((msg: any) => ({
           role: msg.role,
           content: msg.content
         }));
@@ -299,7 +317,7 @@ const PolicyPortal = () => {
         setMode('chat');
         
         // Set the first user message as the prompt for context
-        const firstUserMessage = messages.find((msg: any) => msg.role === 'user')?.content || '';
+        const firstUserMessage = parsedMessages.find((msg: any) => msg.role === 'user')?.content || '';
         setPrompt(firstUserMessage);
         
         toast({
