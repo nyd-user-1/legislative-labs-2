@@ -31,28 +31,19 @@ export const SuggestedPrompts = ({
   return (
     <div className="space-y-3">
       <h4 className="text-sm font-medium">Suggested prompts:</h4>
-      {isLoading ? (
-        <div className="flex items-center justify-center py-8">
-          <div className="flex items-center gap-3">
-            <MorphingHeartLoader size={24} className="text-red-500" />
-            <span className="text-sm text-muted-foreground">Preparing conversation...</span>
-          </div>
-        </div>
-      ) : (
-        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-          {prompts.map((prompt, index) => (
-            <Button
-              key={index}
-              variant="outline"
-              className="h-auto py-3 px-4 text-left whitespace-normal min-w-[160px] max-w-[180px] flex-shrink-0 leading-tight text-sm"
-              onClick={() => onPromptClick(prompt)}
-              disabled={isLoading}
-            >
-              {prompt}
-            </Button>
-          ))}
-        </div>
-      )}
+      <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+        {prompts.map((prompt, index) => (
+          <Button
+            key={index}
+            variant="outline"
+            className="h-auto py-3 px-4 text-left whitespace-normal min-w-[160px] max-w-[180px] flex-shrink-0 leading-tight text-sm"
+            onClick={() => onPromptClick(prompt)}
+            disabled={isLoading}
+          >
+            {prompt}
+          </Button>
+        ))}
+      </div>
     </div>
   );
 };
