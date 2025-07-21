@@ -136,6 +136,29 @@ const PolicyPortal = () => {
 
       const options: ChatOption[] = [];
 
+      // Fetch member and committee data for better labeling
+      const memberIds = [...new Set(chatSessions?.filter(s => s.member_id).map(s => s.member_id))];
+      const committeeIds = [...new Set(chatSessions?.filter(s => s.committee_id).map(s => s.committee_id))];
+
+      let membersData: any[] = [];
+      let committeesData: any[] = [];
+
+      if (memberIds.length > 0) {
+        const { data: members } = await supabase
+          .from("People")
+          .select("people_id, name, first_name, last_name")
+          .in("people_id", memberIds);
+        membersData = members || [];
+      }
+
+      if (committeeIds.length > 0) {
+        const { data: committees } = await supabase
+          .from("Committees")
+          .select("committee_id, committee_name")
+          .in("committee_id", committeeIds);
+        committeesData = committees || [];
+      }
+
       // Process chat sessions and create options
       chatSessions?.forEach((session: any) => {
         const messages = Array.isArray(session.messages) ? session.messages : JSON.parse(session.messages || '[]');
@@ -146,7 +169,7 @@ const PolicyPortal = () => {
           const problemNumber = session.title.split(':')[1]?.trim() || 'Unknown';
           options.push({
             id: session.id,
-            label: `Problem ${problemNumber}: ${firstUserMessage.substring(0, 50)}...`,
+            label: `Problem ${problemNumber}`,
             content: formattedConversation,
             type: 'problem'
           });
@@ -154,7 +177,7 @@ const PolicyPortal = () => {
           const solutionNumber = session.title.split(':')[1]?.trim() || 'Unknown';
           options.push({
             id: session.id,
-            label: `Solution ${solutionNumber}: ${firstUserMessage.substring(0, 50)}...`,
+            label: `Solution ${solutionNumber}`,
             content: formattedConversation,
             type: 'solution'
           });
@@ -162,7 +185,7 @@ const PolicyPortal = () => {
           const mediaKitNumber = session.title.split(':')[1]?.trim() || 'Unknown';
           options.push({
             id: session.id,
-            label: `Media Kit ${mediaKitNumber}: ${firstUserMessage.substring(0, 50)}...`,
+            label: `Media Kit ${mediaKitNumber}`,
             content: formattedConversation,
             type: 'mediaKit'
           });
@@ -175,26 +198,31 @@ const PolicyPortal = () => {
             type: 'bill'
           });
         } else if (session.member_id) {
-          // For member-related chats
+          // For member-related chats, find member name
+          const member = membersData.find(m => m.people_id === session.member_id);
+          const memberName = member ? (member.name || `${member.first_name} ${member.last_name}`.trim()) : 'Unknown Member';
           options.push({
             id: session.id,
-            label: `Member Chat: ${firstUserMessage.substring(0, 50)}...`,
+            label: `Member Chat: ${memberName}`,
             content: formattedConversation,
             type: 'member'
           });
         } else if (session.committee_id) {
-          // For committee-related chats
+          // For committee-related chats, find committee name
+          const committee = committeesData.find(c => c.committee_id === session.committee_id);
+          const committeeName = committee ? committee.committee_name : 'Unknown Committee';
           options.push({
             id: session.id,
-            label: `Committee Chat: ${firstUserMessage.substring(0, 50)}...`,
+            label: `Committee Chat: ${committeeName}`,
             content: formattedConversation,
             type: 'committee'
           });
         } else {
           // Generic chat session
+          const shortPrompt = firstUserMessage.length > 30 ? `${firstUserMessage.substring(0, 30)}...` : firstUserMessage;
           options.push({
             id: session.id,
-            label: `Chat: ${firstUserMessage.substring(0, 50)}...`,
+            label: `Chat: ${shortPrompt}`,
             content: formattedConversation,
             type: 'problem' // Default type
           });
@@ -595,12 +623,12 @@ const PolicyPortal = () => {
 
   const SettingsContent = () => (
     <div className="space-y-6 bg-[#FBF9F6] p-4 rounded-lg">
-      {/* Select Chat */}
+      {/* Chat */}
       <div>
-        <Label className="text-sm font-medium text-gray-700 mb-3 block">Select Chat</Label>
+        <Label className="text-sm font-medium text-gray-700 mb-3 block">Chat</Label>
         <Select value={selectedChat} onValueChange={handleChatSelection}>
           <SelectTrigger>
-            <SelectValue placeholder="Select a chat to resume..." />
+            <SelectValue placeholder="Select chat" />
           </SelectTrigger>
           <SelectContent>
             {loading ? (
@@ -631,7 +659,7 @@ const PolicyPortal = () => {
         <Label className="text-sm font-medium text-gray-700 mb-3 block">Persona</Label>
         <Select value={selectedPersona} onValueChange={handlePersonaSelection}>
           <SelectTrigger>
-            <SelectValue placeholder="Select a persona..." />
+            <SelectValue placeholder="Select persona" />
           </SelectTrigger>
           <SelectContent>
             {personasLoading ? (
@@ -651,10 +679,10 @@ const PolicyPortal = () => {
 
       {/* Load Sample Problems */}
       <div>
-        <Label className="text-sm font-medium text-gray-700 mb-3 block">Problem Statement</Label>
+        <Label className="text-sm font-medium text-gray-700 mb-3 block">Problem</Label>
         <Select value={selectedChat} onValueChange={handleSampleProblemSelection}>
           <SelectTrigger>
-            <SelectValue placeholder="Select a sample problem..." />
+            <SelectValue placeholder="Select problem" />
           </SelectTrigger>
           <SelectContent>
             {problemsLoading ? (

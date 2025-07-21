@@ -128,18 +128,18 @@ const Playground = () => {
             type: 'bill'
           });
         } else if (session.member_id) {
-          // For member-related chats
+          // For member-related chats - need to fetch member name for better labeling
           options.push({
             id: session.id,
-            label: `Member Chat: ${firstUserMessage.substring(0, 50)}...`,
+            label: `Member Chat: ${firstUserMessage.substring(0, 30)}...`,
             content: formattedConversation,
             type: 'member'
           });
         } else if (session.committee_id) {
-          // For committee-related chats
+          // For committee-related chats - need to fetch committee name for better labeling
           options.push({
             id: session.id,
-            label: `Committee Chat: ${firstUserMessage.substring(0, 50)}...`,
+            label: `Committee Chat: ${firstUserMessage.substring(0, 30)}...`,
             content: formattedConversation,
             type: 'committee'
           });
