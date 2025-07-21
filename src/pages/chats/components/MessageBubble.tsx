@@ -114,7 +114,7 @@ export const MessageBubble = ({
         }`}
       >
         <div
-          className={`w-full rounded-lg p-3 relative ${
+          className={`max-w-full rounded-lg p-2 sm:p-3 relative overflow-hidden ${
             message.role === "user"
               ? "bg-slate-800 text-white"
               : "bg-muted"
@@ -133,11 +133,20 @@ export const MessageBubble = ({
           )}
           
           {message.role === "assistant" ? (
-            <div className="text-sm prose prose-sm max-w-none dark:prose-invert pr-8 pb-8">
-              <ReactMarkdown>{message.content}</ReactMarkdown>
+            <div className="text-sm prose prose-sm max-w-none dark:prose-invert pr-6 sm:pr-8 pb-6 sm:pb-8 break-words">
+              <ReactMarkdown
+                components={{
+                  p: ({ children }) => <p className="break-words mb-2 last:mb-0">{children}</p>,
+                  li: ({ children }) => <li className="break-words mb-1">{children}</li>,
+                  ol: ({ children }) => <ol className="break-words pl-4 mb-2">{children}</ol>,
+                  ul: ({ children }) => <ul className="break-words pl-4 mb-2">{children}</ul>
+                }}
+              >
+                {message.content}
+              </ReactMarkdown>
             </div>
           ) : (
-            <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+            <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
           )}
           {message.timestamp && (
             <p className="text-xs opacity-70 mt-1">
@@ -187,13 +196,13 @@ export const MessageBubble = ({
       {message.role === "assistant" && (
         <div className="space-y-2">
           {/* Dynamic suggested prompts with horizontal scrolling */}
-          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+          <div className="flex gap-1 sm:gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1">
             {getDynamicPrompts().map((prompt, index) => (
               <Button
                 key={index}
                 variant="outline"
                 size="sm"
-                className="h-7 px-3 text-xs whitespace-nowrap flex-shrink-0"
+                className="h-6 sm:h-7 px-2 sm:px-3 text-xs whitespace-nowrap flex-shrink-0 min-w-fit"
                 onClick={() => onSendPrompt?.(prompt)}
               >
                 {prompt}
