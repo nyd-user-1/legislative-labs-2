@@ -1,14 +1,12 @@
-import React, { useState, useEffect } from "react";
+
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Trash2, Heart } from "lucide-react";
 import { format } from "date-fns";
 import { ProblemChat } from "@/hooks/useProblemChats";
-import { ConversationView } from "@/pages/chats/components/ConversationView";
-import { parseMessages } from "@/pages/chats/utils/messageParser";
-import { supabase } from "@/integrations/supabase/client";
-import { Message } from "@/pages/chats/types";
+import { ProblemConversationView } from "@/components/ProblemConversationView";
 import { useToast } from "@/hooks/use-toast";
 
 interface ProblemChatCardProps {
@@ -24,48 +22,23 @@ export const ProblemChatCard = ({
   onCopy,
   onFeedback,
 }: ProblemChatCardProps) => {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   
   // Placeholder for problem favorites (since no problem favorites system exists yet)
   const [isFavorited, setIsFavorited] = useState(false);
 
-  useEffect(() => {
-    const fetchChatSession = async () => {
-      if (!problemChat.chat_session_id) {
-        setLoading(false);
-        return;
-      }
+  // Calculate message count based on actual content
+  const getMessageCount = () => {
+    let count = 1; // Always have the problem statement
+    if (problemChat.current_state && 
+        problemChat.current_state !== 'draft' && 
+        problemChat.current_state !== 'generating') {
+      count += 1; // Add AI analysis if available
+    }
+    return count;
+  };
 
-      try {
-        const { data, error } = await supabase
-          .from("chat_sessions")
-          .select("*")
-          .eq("id", problemChat.chat_session_id)
-          .single();
-
-        if (error) {
-          console.error("Error fetching chat session:", error);
-          setLoading(false);
-          return;
-        }
-
-        if (data) {
-          const parsedMessages = parseMessages(data.messages);
-          setMessages(parsedMessages);
-        }
-      } catch (error) {
-        console.error("Error parsing messages:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchChatSession();
-  }, [problemChat.chat_session_id]);
-
-  const messageCount = messages.length;
+  const messageCount = getMessageCount();
 
   const handleFavorite = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -113,15 +86,14 @@ export const ProblemChatCard = ({
 
       <CardContent>
         <Accordion type="single" collapsible>
-          <AccordionItem value="chat-content" className="border-none">
+          <AccordionItem value="problem-content" className="border-none">
             <AccordionTrigger className="hover:no-underline py-2">
-              View conversation
+              View problem details
             </AccordionTrigger>
             <AccordionContent>
-              <ConversationView
-                messages={messages}
+              <ProblemConversationView
+                problemChat={problemChat}
                 onCopy={onCopy}
-                onFeedback={onFeedback}
               />
             </AccordionContent>
           </AccordionItem>
