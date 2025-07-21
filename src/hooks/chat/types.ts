@@ -13,4 +13,4 @@ export interface Citation {
   excerpt: string;
 }
 
-export type EntityType = 'bill' | 'member' | 'committee' | 'problem' | null;
+export type EntityType = 'bill' | 'member' | 'committee' | null;

@@ -352,12 +352,7 @@ Remember: You're not just answering questions - you're actively partnering with 
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-2xl flex flex-col h-full">
         <SheetHeader className="flex-shrink-0">
-          <SheetTitle className="flex items-center gap-2">
-            <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center animate-pulse">
-              <span className="text-white text-xs">❤️</span>
-            </div>
-            <span>Goodable</span>
-          </SheetTitle>
+          <SheetTitle>Problem Statement</SheetTitle>
         </SheetHeader>
 
         <div className="flex-1 overflow-y-auto space-y-4 py-4">

@@ -30,7 +30,7 @@ export const getTitle = (entity: any, entityType: 'bill' | 'member' | 'committee
   if (entityType === 'mediaKit' && entity?.mediaKitNumber) {
     return `Media Kit: ${entity.mediaKitNumber}`;
   }
-  return 'Goodable';
+  return 'AI Assistant';
 };
 
 export const getBillChamber = (billNumber: string): string => {
