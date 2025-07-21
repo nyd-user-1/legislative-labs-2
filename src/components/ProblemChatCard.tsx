@@ -2,14 +2,13 @@ import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Trash2, Heart, Star } from "lucide-react";
+import { Trash2, Heart } from "lucide-react";
 import { format } from "date-fns";
 import { ProblemChat } from "@/hooks/useProblemChats";
 import { ConversationView } from "@/pages/chats/components/ConversationView";
 import { parseMessages } from "@/pages/chats/utils/messageParser";
 import { supabase } from "@/integrations/supabase/client";
 import { Message } from "@/pages/chats/types";
-import { useProblemVoting } from "@/hooks/useProblemVoting";
 import { useToast } from "@/hooks/use-toast";
 
 interface ProblemChatCardProps {
@@ -29,8 +28,8 @@ export const ProblemChatCard = ({
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   
-  // Use problem voting hook to provide star rating functionality
-  const { userRating, submitVote, hasUserVoted } = useProblemVoting(problemChat.problem_number);
+  // Placeholder for problem favorites (since no problem favorites system exists yet)
+  const [isFavorited, setIsFavorited] = useState(false);
 
   useEffect(() => {
     const fetchChatSession = async () => {
@@ -68,42 +67,15 @@ export const ProblemChatCard = ({
 
   const messageCount = messages.length;
 
-  const handleRating = async (e: React.MouseEvent) => {
+  const handleFavorite = async (e: React.MouseEvent) => {
     e.stopPropagation();
     
-    // Toggle between 5-star rating and no rating
-    const newRating = hasUserVoted ? 0 : 5;
-    
-    try {
-      if (newRating === 0) {
-        // Remove rating - we'll need to handle this in the voting hook
-        // For now, just show a message
-        toast({
-          title: "Rating removed",
-          description: "Your rating has been removed",
-        });
-      } else {
-        const result = await submitVote(newRating);
-        if (result.success) {
-          toast({
-            title: "Rating submitted",
-            description: "Thank you for rating this problem!",
-          });
-        } else {
-          toast({
-            title: "Error",
-            description: result.error || "Failed to submit rating",
-            variant: "destructive",
-          });
-        }
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update rating",
-        variant: "destructive",
-      });
-    }
+    // For now, just toggle local state until problem favorites system is implemented
+    setIsFavorited(!isFavorited);
+    toast({
+      title: isFavorited ? "Removed from favorites" : "Added to favorites",
+      description: isFavorited ? "Problem removed from your favorites" : "Problem added to your favorites",
+    });
   };
 
   return (
@@ -116,11 +88,11 @@ export const ProblemChatCard = ({
               <Button 
                 variant="ghost" 
                 size="sm" 
-                onClick={handleRating}
+                onClick={handleFavorite}
                 className="h-auto p-1 hover:bg-transparent"
-                title={hasUserVoted ? "Remove rating" : "Rate this problem"}
+                title={isFavorited ? "Remove from favorites" : "Add to favorites"}
               >
-                <Star className={`h-4 w-4 ${hasUserVoted ? 'fill-yellow-500 text-yellow-500' : ''}`} />
+                <Heart className={`h-4 w-4 ${isFavorited ? 'fill-red-500 text-red-500' : ''}`} />
               </Button>
             </div>
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
@@ -141,22 +113,16 @@ export const ProblemChatCard = ({
 
       <CardContent>
         <Accordion type="single" collapsible>
-          <AccordionItem value="problem-content" className="border-none">
+          <AccordionItem value="chat-content" className="border-none">
             <AccordionTrigger className="hover:no-underline py-2">
               View conversation
             </AccordionTrigger>
             <AccordionContent>
-              {loading ? (
-                <div className="text-sm text-muted-foreground">Loading conversation...</div>
-              ) : messages.length > 0 ? (
-                <ConversationView
-                  messages={messages}
-                  onCopy={onCopy}
-                  onFeedback={onFeedback}
-                />
-              ) : (
-                <div className="text-sm text-muted-foreground">No conversation available</div>
-              )}
+              <ConversationView
+                messages={messages}
+                onCopy={onCopy}
+                onFeedback={onFeedback}
+              />
             </AccordionContent>
           </AccordionItem>
         </Accordion>
