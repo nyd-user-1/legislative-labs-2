@@ -33,7 +33,6 @@ export const ProblemChatSheet = ({ open, onOpenChange, userProblem }: ProblemCha
   const [aiProblemStatement, setAiProblemStatement] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
-  const [streamingText, setStreamingText] = useState('');
   const [suggestedPrompts, setSuggestedPrompts] = useState<string[]>([]);
   const [chatTitle, setChatTitle] = useState('Problem 1');
   const [chatSessionId, setChatSessionId] = useState<string | null>(null);
@@ -95,27 +94,6 @@ export const ProblemChatSheet = ({ open, onOpenChange, userProblem }: ProblemCha
     }
   }, [isComplete, aiProblemStatement, userProblem, messages.length]);
 
-  // Show streaming message during typewriter effect
-  useEffect(() => {
-    if (isStreaming && streamingText && messages.length === 0) {
-      const streamingMessages: Message[] = [
-        {
-          id: 'user-1',
-          role: 'user',
-          content: userProblem,
-          timestamp: new Date()
-        },
-        {
-          id: 'assistant-streaming',
-          role: 'assistant',
-          content: streamingText,
-          timestamp: new Date()
-        }
-      ];
-      setMessages(streamingMessages);
-    }
-  }, [isStreaming, streamingText, userProblem, messages.length]);
-
   const startStreaming = async () => {
     if (!userProblem || !user) return;
 
@@ -123,7 +101,6 @@ export const ProblemChatSheet = ({ open, onOpenChange, userProblem }: ProblemCha
     setIsComplete(false);
     streamingRef.current = '';
     setAiProblemStatement('');
-    setStreamingText('');
 
     try {
       // Generate initial problem number and create chat session
@@ -146,13 +123,13 @@ export const ProblemChatSheet = ({ open, onOpenChange, userProblem }: ProblemCha
       if (sessionError) throw sessionError;
       setChatSessionId(sessionData.id);
 
-      // Get the complete response first
+      // Use supabase.functions.invoke instead of direct HTTP call
       const { data, error } = await supabase.functions.invoke('generate-with-openai', {
         body: {
           prompt: userProblem,
           type: 'problem',
           context: 'landing_page',
-          stream: false
+          stream: false // Change to non-streaming for now to fix the issue
         }
       });
 
@@ -161,43 +138,27 @@ export const ProblemChatSheet = ({ open, onOpenChange, userProblem }: ProblemCha
         throw new Error('Failed to generate problem statement');
       }
 
+      // Set the complete response
       const generatedText = data.generatedText || 'Unable to generate problem statement. Please try again.';
-      
-      // Start typewriter effect
-      let currentIndex = 0;
-      const typewriterSpeed = 20; // milliseconds per character
-      
-      const typewriterEffect = () => {
-        if (currentIndex < generatedText.length) {
-          const currentText = generatedText.substring(0, currentIndex + 1);
-          setStreamingText(currentText);
-          currentIndex++;
-          setTimeout(typewriterEffect, typewriterSpeed);
-        } else {
-          // Animation complete
-          streamingRef.current = generatedText;
-          setAiProblemStatement(generatedText);
-          setIsComplete(true);
-          setIsStreaming(false);
-          
-          // Update chat session with final content
-          if (sessionData?.id) {
-            supabase
-              .from('problem_chats')
-              .update({
-                current_state: generatedText,
-                updated_at: new Date().toISOString()
-              })
-              .eq('id', sessionData.id);
-          }
+      streamingRef.current = generatedText;
+      setAiProblemStatement(generatedText);
+      setIsComplete(true);
+      setIsStreaming(false);
 
-          // Generate suggested prompts and dynamic title
-          generateSuggestedPrompts(generatedText);
-          generateDynamicTitle(generatedText, sessionData?.id);
-        }
-      };
-      
-      typewriterEffect();
+      // Update chat session with final content
+      if (sessionData?.id) {
+        await supabase
+          .from('problem_chats')
+          .update({
+            current_state: generatedText,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', sessionData.id);
+      }
+
+      // Generate suggested prompts and dynamic title
+      generateSuggestedPrompts(generatedText);
+      generateDynamicTitle(generatedText, sessionData?.id);
 
     } catch (error) {
       console.error('Streaming error:', error);
@@ -396,8 +357,8 @@ Remember: You're not just answering questions - you're actively partnering with 
         </SheetHeader>
 
         <div className="flex-1 overflow-y-auto space-y-4 py-4">
-          {/* Show loading state only before streaming starts */}
-          {isStreaming && !streamingText && messages.length === 0 && (
+          {/* Show loading state during initial generation */}
+          {isStreaming && messages.length === 0 && (
             <div className="flex justify-center items-center py-8">
               <div className="flex items-center gap-3">
                 <MorphingHeartLoader size={24} className="text-red-500" />
@@ -417,9 +378,6 @@ Remember: You're not just answering questions - you're actively partnering with 
                 {message.role === 'assistant' ? (
                   <div className="prose prose-sm max-w-none">
                     <ReactMarkdown>{message.content}</ReactMarkdown>
-                    {message.id === 'assistant-streaming' && isStreaming && (
-                      <span className="inline-block w-2 h-5 bg-primary animate-pulse ml-1 align-middle" />
-                    )}
                   </div>
                 ) : (
                   message.content
