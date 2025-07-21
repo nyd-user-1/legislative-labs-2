@@ -8,6 +8,7 @@ import { useVisitorCount } from '@/hooks/useVisitorCount';
 import { useAuth } from '@/contexts/AuthContext';
 import { ProblemChatSheet } from '@/components/ProblemChatSheet';
 import { supabase } from '@/integrations/supabase/client';
+import VotedProblemsSection from '@/components/VotedProblemsSection';
 
 const Home = () => {
   const [userProblem, setUserProblem] = useState('');
@@ -95,16 +96,6 @@ const Home = () => {
     return count.toString();
   };
   
-  const problemCategories = [
-    // Row 1
-    { title: "Childcare", subtitle: "26 Sub-problems • 84 Solutions" },
-    { title: "Quality Time", subtitle: "5 Sub-problems • 17 Solutions" },
-    { title: "Third Place", subtitle: "30 Sub-problems • 86 Solutions" },
-    // ... keep existing code (all problem categories array)
-    { title: "Grassroots Mobilization", subtitle: "23 Sub-problems • 59 Collaborations" },
-    { title: "Social Innovation", subtitle: "20 Sub-problems • 52 Solutions" },
-    { title: "Impact Measurement", subtitle: "13 Sub-problems • 33 Solutions" },
-  ].slice(0, 60); // Keep all 60 categories from the original
 
   return (
     <div className="min-h-screen text-foreground overflow-hidden" style={{ backgroundColor: '#F6F4ED' }}>
@@ -216,39 +207,7 @@ const Home = () => {
           </div>
         </div>
 
-        <section id="examples" className="py-20">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Do goodable
-              </h2>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                See the good others are doing today
-              </p>
-            </div>
-
-            <div className="max-w-[1200px] mx-auto">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-8">
-                {problemCategories.map((category, index) => (
-                  <div
-                    key={index}
-                    className="bg-white border border-[#e5e5e5] rounded-xl p-6 min-h-[140px] transition-all duration-200 hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)] hover:-translate-y-0.5 cursor-pointer"
-                  >
-                    <h3 className="font-bold text-lg text-[#1a1a1a] mb-2">
-                      {category.title}
-                    </h3>
-                    <p className="text-sm text-[#666666] mb-4">
-                      {category.subtitle}
-                    </p>
-                    <div className="text-sm text-[#ef4444] hover:underline">
-                      Learn more →
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
+        <VotedProblemsSection />
 
         <section className="py-20" style={{ backgroundColor: '#F6F4ED' }}>
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
