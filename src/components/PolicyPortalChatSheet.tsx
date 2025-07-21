@@ -1,6 +1,4 @@
-
 import React, { useState, useEffect, useRef } from "react";
-import { Tables } from "@/integrations/supabase/types";
 import {
   Sheet,
   SheetContent,
@@ -13,41 +11,34 @@ import { SuggestedPrompts } from "./chat/SuggestedPrompts";
 import { ChatMessages } from "./chat/ChatMessages";
 import { ChatInput } from "./chat/ChatInput";
 import { ChatContainer } from "./chat/ChatContainer";
+import { ChatHeader } from "./chat/ChatHeader";
 import { useChatLogic } from "@/hooks/useChatLogic";
+import { MorphingHeartLoader } from "@/components/ui/MorphingHeartLoader";
 
-type Bill = Tables<"Bills">;
-type Member = {
-  people_id: number;
-  name: string;
-  party?: string;
-  district?: string;
-  chamber?: string;
-};
-type Committee = {
-  committee_id: number;
-  name: string;
-  chamber: string;
-  description?: string;
-};
-
-interface AIChatSheetProps {
+interface PolicyPortalChatSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  bill?: Bill | null;
-  member?: Member | null;
-  committee?: Committee | null;
+  initialPrompt?: string;
+  systemPrompt?: string;
+  selectedPersona?: string;
 }
 
-export const AIChatSheet = ({ open, onOpenChange, bill, member, committee }: AIChatSheetProps) => {
+export const PolicyPortalChatSheet = ({ 
+  open, 
+  onOpenChange, 
+  initialPrompt = "",
+  systemPrompt = "",
+  selectedPersona = ""
+}: PolicyPortalChatSheetProps) => {
   const [citationsOpen, setCitationsOpen] = useState(false);
   const { toast } = useToast();
   
   // Use ref to track if we've already initialized this session
   const hasInitialized = useRef(false);
   
-  // Determine the entity and type for the chat session
-  const entity = bill || member || committee || null;
-  const entityType = bill ? 'bill' : member ? 'member' : committee ? 'committee' : null;
+  // For Policy Portal, we use a 'problem' entity type for consistency
+  const entity = { prompt: initialPrompt, systemPrompt, selectedPersona };
+  const entityType = 'problem' as const;
   
   const {
     inputValue,
@@ -63,17 +54,27 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee }: AIC
 
   // Initialize session when sheet opens (only once per entity)
   useEffect(() => {
-    if (open && entity && !hasInitialized.current) {
-      console.log("Chat sheet opened, initializing session");
+    if (open && !hasInitialized.current) {
+      console.log("Policy Portal chat sheet opened, initializing session");
       hasInitialized.current = true;
-      initializeSession(true);
+      
+      // If there's an initial prompt, start with it
+      if (initialPrompt.trim()) {
+        initializeSession(false);
+        // Small delay to ensure session is ready, then send initial message
+        setTimeout(() => {
+          sendMessage(initialPrompt);
+        }, 100);
+      } else {
+        initializeSession(true);
+      }
     }
     
     // Reset when sheet closes
     if (!open) {
       hasInitialized.current = false;
     }
-  }, [open, entity, initializeSession]);
+  }, [open, initialPrompt, initializeSession, sendMessage]);
 
   const handleSendMessage = () => {
     if (inputValue.trim()) {
@@ -107,14 +108,22 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee }: AIC
     }
   };
 
+  // Custom title with Goodable branding
+  const getChatTitle = () => {
+    return (
+      <div className="flex items-center gap-2">
+        <MorphingHeartLoader size={20} className="text-red-500" />
+        <span>Goodable</span>
+      </div>
+    );
+  };
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-2xl flex flex-col h-full">
         <SheetHeader className="flex-shrink-0">
           <SheetTitle className="flex items-center gap-2">
-            <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center animate-pulse">
-              <span className="text-white text-xs">❤️</span>
-            </div>
+            <MorphingHeartLoader size={20} className="text-red-500" />
             <span>Goodable</span>
           </SheetTitle>
         </SheetHeader>
@@ -148,6 +157,7 @@ export const AIChatSheet = ({ open, onOpenChange, bill, member, committee }: AIC
             onInputChange={setInputValue}
             onSendMessage={handleSendMessage}
             isLoading={isLoading}
+            placeholder="Ask about policy development..."
           />
         </ChatContainer>
       </SheetContent>

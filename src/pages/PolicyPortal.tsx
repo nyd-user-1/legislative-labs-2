@@ -15,6 +15,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { usePolicyDrafts, PolicyDraft } from "@/hooks/usePolicyDrafts";
 import { PolicyDraftDialog } from "@/components/PolicyDraftDialog";
+import { PolicyPortalChatSheet } from "@/components/PolicyPortalChatSheet";
 import { format } from "date-fns";
 import ReactMarkdown from 'react-markdown';
 
@@ -106,6 +107,7 @@ const PolicyPortal = () => {
   const [abortController, setAbortController] = useState<AbortController | null>(null);
   const [hasDrafts, setHasDrafts] = useState(false);
   const [loadedChatSession, setLoadedChatSession] = useState<ChatSession | null>(null);
+  const [chatSheetOpen, setChatSheetOpen] = useState(false);
   const isMobile = useIsMobile();
   const { toast } = useToast();
   const chatScrollRef = useRef<HTMLDivElement>(null);
@@ -913,142 +915,61 @@ const PolicyPortal = () => {
             <div className={`flex-1 p-4 sm:p-6 ${isMobile ? 'w-full' : ''} flex flex-col max-h-[90vh]`}>
               
 
-              {/* Chat Container with proper height and scroll */}
-              <div className="flex-1 flex flex-col bg-[#F6F4EE] rounded-lg border border-gray-200 min-h-0 max-h-[calc(90vh-200px)]">
-                {/* Messages area */}
-                <div className="flex-1 overflow-y-auto p-4">
-                  <div className="space-y-4">
-                    {chatMessages.length === 0 && !streamingContent ? (
-                      <div className="text-center text-gray-500 py-8">
-                        <p>Start a conversation about this bill</p>
-                        {/* Suggested prompts */}
-                        <div className="mt-4 space-y-2">
-                          <p className="text-sm text-muted-foreground mb-3">Try asking:</p>
-                          <div className="flex flex-wrap gap-2 justify-center">
-                            {[
-                              "What does this bill do?",
-                              "Who are the sponsors?",
-                              "What's the current status?",
-                              "What are the key provisions?"
-                            ].map((promptText, index) => (
-                              <Button
-                                key={index}
-                                variant="outline"
-                                size="sm"
-                                onClick={() => {
-                                  setPrompt(promptText);
-                                  handleSubmit();
-                                }}
-                                className="text-xs"
-                              >
-                                {promptText}
-                              </Button>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    ) : (
-                      <>
-                        {chatMessages.map((message, index) => (
-                          <div
-                            key={index}
-                            className={`flex ${
-                              message.role === 'user' ? 'justify-end' : 'justify-start'
-                            }`}
-                          >
-                            <div
-                              className={`${
-                                message.role === 'user'
-                                  ? 'p-3 rounded-lg max-w-[85%] bg-[#1e3a8a] text-white'
-                                  : 'max-w-none text-gray-800 relative'
-                              }`}
-                            >
-                              {/* Copy and Move to Policy Portal buttons for AI messages */}
-                              {message.role === 'assistant' && (
-                                <div className="flex gap-1 mb-2">
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => {
-                                      navigator.clipboard.writeText(message.content);
-                                      toast({
-                                        description: "Response copied to clipboard",
-                                      });
-                                    }}
-                                    className="h-6 px-2 text-xs"
-                                  >
-                                    <Copy className="w-3 h-3 mr-1" />
-                                    Copy
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => {
-                                      // Move to Policy Portal functionality
-                                      toast({
-                                        description: "Moved to Policy Portal",
-                                      });
-                                    }}
-                                    className="h-6 px-2 text-xs"
-                                  >
-                                    <ArrowRight className="w-3 h-3 mr-1" />
-                                    Move to Policy Portal
-                                  </Button>
-                                </div>
-                              )}
-                              
-                              <div className={`text-xs mb-1 ${message.role === 'user' ? 'text-blue-100' : 'text-gray-500'}`}>
-                                {message.role === 'user' ? 'You' : 'AI Assistant'}
-                              </div>
-                              <div className={`${message.role === 'assistant' ? 'prose prose-sm max-w-none' : ''}`}>
-                                {message.role === 'assistant' ? (
-                                  <ReactMarkdown>{message.content}</ReactMarkdown>
-                                ) : (
-                                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                        {streamingContent && (
-                          <div className="flex justify-start">
-                            <div className="text-gray-800 max-w-none relative">
-                              <div className="text-xs text-gray-500 mb-1">AI Assistant</div>
-                              <div className="prose prose-sm max-w-none">
-                                <ReactMarkdown>{streamingContent}</ReactMarkdown>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </div>
-                </div>
-                
-                {/* Input Area - Fixed at bottom, full width */}
-                <div className="border-t border-gray-200 p-4 bg-white rounded-b-lg flex-shrink-0">
-                  <div className="flex gap-2 w-full">
-                    <Textarea
-                      value={prompt}
-                      onChange={(e) => setPrompt(e.target.value)}
-                      placeholder="Ask about this legislation..."
-                      className="min-h-[60px] resize-none border border-gray-300 rounded-lg p-3 text-sm flex-1 bg-white text-gray-900"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                          e.preventDefault();
-                          if (prompt.trim() && !isChatting) {
-                            handleSubmit();
+              {/* Policy Portal Chat Interface */}
+              <div className="flex-1 flex flex-col bg-white rounded-lg border border-gray-200 min-h-0 max-h-[calc(90vh-200px)]">
+                <div className="flex-1 p-8 flex flex-col items-center justify-center text-center">
+                  <div className="max-w-md mx-auto space-y-6">
+                    <div className="flex items-center justify-center gap-3 mb-4">
+                      <MorphingHeartLoader size={32} className="text-red-500" />
+                      <h2 className="text-2xl font-semibold text-gray-900">Goodable</h2>
+                    </div>
+                    
+                    <p className="text-gray-600 text-lg">
+                      Start a conversation with your policy development assistant
+                    </p>
+                    
+                    <div className="space-y-4">
+                      <Textarea
+                        value={prompt}
+                        onChange={(e) => setPrompt(e.target.value)}
+                        placeholder="Describe your policy challenge or idea..."
+                        className="min-h-[120px] resize-none border border-gray-300 rounded-lg p-4 text-sm bg-white text-gray-900"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            if (prompt.trim() && selectedPersona) {
+                              setChatSheetOpen(true);
+                            }
                           }
-                        }
-                      }}
-                    />
-                    <Button 
-                      onClick={handleSubmit}
-                      disabled={!prompt.trim() || isChatting}
-                      className="px-4 self-end"
-                    >
-                      Send
-                    </Button>
+                        }}
+                      />
+                      
+                      <Button 
+                        onClick={() => {
+                          if (prompt.trim() && selectedPersona) {
+                            setChatSheetOpen(true);
+                          } else {
+                            toast({
+                              title: "Missing Information",
+                              description: "Please enter a prompt and select a persona from the settings panel.",
+                              variant: "destructive",
+                            });
+                          }
+                        }}
+                        disabled={!prompt.trim() || !selectedPersona}
+                        className="w-full py-3"
+                        size="lg"
+                      >
+                        <MessageCircle className="w-5 h-5 mr-2" />
+                        Start Chat with {selectedPersona || 'Persona'}
+                      </Button>
+                    </div>
+                    
+                    {!selectedPersona && (
+                      <p className="text-sm text-yellow-600 bg-yellow-50 p-3 rounded-lg border border-yellow-200">
+                        💡 Select a persona from the settings panel to get started
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -1109,6 +1030,15 @@ const PolicyPortal = () => {
         draft={selectedDraft}
         open={draftDialogOpen}
         onOpenChange={setDraftDialogOpen}
+      />
+
+      {/* Policy Portal Chat Sheet */}
+      <PolicyPortalChatSheet
+        open={chatSheetOpen}
+        onOpenChange={setChatSheetOpen}
+        initialPrompt={prompt}
+        systemPrompt={systemPrompt}
+        selectedPersona={selectedPersona}
       />
     </div>
   );
