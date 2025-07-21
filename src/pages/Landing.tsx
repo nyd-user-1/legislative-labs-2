@@ -342,7 +342,7 @@ const Landing = () => {
                     >
                       <Link 
                         to={`/problems/${problemSlug}`}
-                        className="block h-full"
+                        className="block mb-4"
                       >
                         <h3 className="font-bold text-lg text-[#1a1a1a] mb-2">
                           {category.title}
@@ -355,14 +355,14 @@ const Landing = () => {
                         </div>
                       </Link>
                       
-                      {/* Star Rating positioned in bottom right */}
+                      {/* Star Rating positioned below Learn more link, distributed horizontally */}
                       <div 
-                        className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                        className="w-full"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <StarRating 
                           problemId={problemData?.id || problemSlug} 
-                          className="scale-75 origin-bottom-right"
+                          className="w-full"
                         />
                       </div>
                     </div>
