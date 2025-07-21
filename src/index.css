@@ -135,6 +135,22 @@
   .touch-manipulation {
     touch-action: manipulation;
   }
+
+  /* MorphingHeartLoader Animation */
+  .animate-morphing-heart {
+    animation: morphing-heart 1.5s ease-in-out infinite;
+  }
+
+  @keyframes morphing-heart {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 0.8;
+    }
+    50% {
+      transform: scale(1.2);
+      opacity: 1;
+    }
+  }
 }
 
 @layer base {

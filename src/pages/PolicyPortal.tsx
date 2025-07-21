@@ -857,11 +857,11 @@ const PolicyPortal = () => {
   );
 
   return (
-    <div className="flex h-full bg-[#F6F4EE]">
+    <div className="flex h-screen bg-[#F6F4EE]">
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-h-0">
         {/* Header */}
-        <div className="bg-[#F6F4EE] border-b border-gray-200 px-4 sm:px-6 py-4">
+        <div className="bg-[#F6F4EE] border-b border-gray-200 px-4 sm:px-6 py-4 flex-shrink-0">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-semibold text-gray-900">
@@ -915,10 +915,11 @@ const PolicyPortal = () => {
           </div>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 flex overflow-hidden">
-          {/* Left Panel - Chat Area */}
-          <div className={`flex-1 p-4 sm:p-6 ${isMobile ? 'w-full' : ''} flex flex-col overflow-hidden`}>
+        {/* Content - Scrollable Container */}
+        <ScrollArea className="flex-1">
+          <div className="flex min-h-full">
+            {/* Left Panel - Chat Area */}
+            <div className={`flex-1 p-4 sm:p-6 ${isMobile ? 'w-full' : ''} flex flex-col`}>
             <div className="h-full flex flex-col">
 
               {/* System Prompt Indicator */}
@@ -1092,15 +1093,16 @@ const PolicyPortal = () => {
                 </Button>
               </div>
             </div>
-          </div>
-
-          {/* Right Panel - Settings (Desktop Only) */}
-          {!isMobile && (
-            <div className="w-80 bg-[#F6F4EE] border-l border-gray-200 p-6">
-              <SettingsContent />
             </div>
-          )}
-        </div>
+
+            {/* Right Panel - Settings (Desktop Only) */}
+            {!isMobile && (
+              <div className="w-80 bg-[#F6F4EE] border-l border-gray-200 p-6">
+                <SettingsContent />
+              </div>
+            )}
+          </div>
+        </ScrollArea>
       </div>
 
       {/* Policy Draft Dialog */}
