@@ -80,12 +80,13 @@ const Chats = () => {
                 </Card>
               ) : (
                 problemChats.map((problemChat) => (
-                  <ProblemChatCard
-                    key={problemChat.id}
-                    problemChat={problemChat}
-                    onDelete={deleteProblemChat}
-                    onCopy={copyToClipboard}
-                  />
+                <ProblemChatCard
+                  key={problemChat.id}
+                  problemChat={problemChat}
+                  onDelete={deleteProblemChat}
+                  onCopy={copyToClipboard}
+                  onFeedback={handleFeedback}
+                />
                 ))
               )}
             </TabsContent>
