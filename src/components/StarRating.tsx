@@ -143,48 +143,52 @@ export const StarRating: React.FC<StarRatingProps> = ({ problemId, className = "
   const displayRating = hoveredRating || rating || voteStats.average_rating;
 
   return (
-    <div className={`flex items-center justify-between w-full ${className}`}>
-      <div className="flex items-center space-x-1">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <Button
-            key={star}
-            variant="ghost"
-            size="sm"
-            className="p-0 h-6 w-6 hover:bg-transparent"
-            onClick={() => handleStarClick(star)}
-            onMouseEnter={() => setHoveredRating(star)}
-            onMouseLeave={() => setHoveredRating(0)}
-            disabled={isLoading}
-          >
-            <Star
-              className={`w-4 h-4 transition-colors ${
-                star <= displayRating
-                  ? 'fill-yellow-400 text-yellow-400'
-                  : 'text-gray-300 hover:text-yellow-300'
-              } ${isLoading ? 'opacity-50' : ''}`}
-            />
-          </Button>
-        ))}
-      </div>
-      
-      <div className="text-xs text-muted-foreground text-right">
-        {voteStats.total_votes > 0 ? (
-          <div className="flex flex-col items-end">
-            <div className="font-medium">
-              {voteStats.average_rating.toFixed(1)} stars
-            </div>
-            <div>
-              {voteStats.total_votes} vote{voteStats.total_votes !== 1 ? 's' : ''}
-            </div>
-            {userRating && (
-              <div className="text-primary text-xs mt-1">
-                Your vote: {userRating} star{userRating !== 1 ? 's' : ''}
-              </div>
-            )}
+    <div className={`w-full ${className}`} style={{ marginTop: '1rem' }}>
+      <div className="flex items-center justify-between w-full">
+        <div className="flex flex-col">
+          <div className="flex items-center space-x-1 mb-1">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <Button
+                key={star}
+                variant="ghost"
+                size="sm"
+                className="p-0 h-6 w-6 hover:bg-transparent"
+                onClick={() => handleStarClick(star)}
+                onMouseEnter={() => setHoveredRating(star)}
+                onMouseLeave={() => setHoveredRating(0)}
+                disabled={isLoading}
+              >
+                <Star
+                  className={`w-4 h-4 transition-colors ${
+                    star <= displayRating
+                      ? 'fill-yellow-400 text-yellow-400'
+                      : 'text-gray-300 hover:text-yellow-300'
+                  } ${isLoading ? 'opacity-50' : ''}`}
+                />
+              </Button>
+            ))}
           </div>
-        ) : (
-          <div>No votes yet</div>
-        )}
+          {userRating && (
+            <div className="text-primary text-xs">
+              Your vote: {userRating} star{userRating !== 1 ? 's' : ''}
+            </div>
+          )}
+        </div>
+        
+        <div className="text-xs text-muted-foreground text-right">
+          {voteStats.total_votes > 0 ? (
+            <div className="flex flex-col items-end">
+              <div className="font-medium">
+                {voteStats.average_rating.toFixed(1)} stars
+              </div>
+              <div>
+                {voteStats.total_votes} vote{voteStats.total_votes !== 1 ? 's' : ''}
+              </div>
+            </div>
+          ) : (
+            <div>No votes yet</div>
+          )}
+        </div>
       </div>
     </div>
   );
