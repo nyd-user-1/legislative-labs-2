@@ -14,6 +14,7 @@ import { generateProblemFromScenario } from "@/utils/problemStatementHelpers";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import ReactMarkdown from "react-markdown";
+import { MorphingHeartLoader } from "@/components/ui/MorphingHeartLoader";
 
 interface ProblemChatSheetProps {
   open: boolean;
@@ -360,7 +361,7 @@ Remember: You're not just answering questions - you're actively partnering with 
           {isStreaming && messages.length === 0 && (
             <div className="flex justify-center items-center py-8">
               <div className="flex items-center gap-3">
-                <div className="animate-spin h-5 w-5 border-2 border-primary border-t-transparent rounded-full"></div>
+                <MorphingHeartLoader size={24} className="text-red-500" />
                 <span className="text-sm text-muted-foreground">Generating problem statement...</span>
               </div>
             </div>
