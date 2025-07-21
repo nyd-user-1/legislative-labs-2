@@ -120,10 +120,10 @@ const Playground = () => {
             type: 'mediaKit'
           });
         } else if (session.bill_id) {
-          // For bill-related chats, fetch bill info separately if needed
+          // For bill-related chats, use the session title which contains the bill number
           options.push({
             id: session.id,
-            label: `Bill Chat: ${firstUserMessage.substring(0, 50)}...`,
+            label: session.title.startsWith('Bill:') ? `Bill Chat: ${session.title.replace('Bill: ', '')}` : session.title,
             content: formattedConversation,
             type: 'bill'
           });

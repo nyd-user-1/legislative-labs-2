@@ -167,10 +167,10 @@ const PolicyPortal = () => {
             type: 'mediaKit'
           });
         } else if (session.bill_id) {
-          // For bill-related chats, fetch bill info separately if needed
+          // For bill-related chats, use the session title which contains the bill number
           options.push({
             id: session.id,
-            label: `Bill Chat: ${firstUserMessage.substring(0, 50)}...`,
+            label: session.title.startsWith('Bill:') ? `Bill Chat: ${session.title.replace('Bill: ', '')}` : session.title,
             content: formattedConversation,
             type: 'bill'
           });
@@ -927,7 +927,7 @@ const PolicyPortal = () => {
               <div className="mb-4">
                 <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                   <MessageCircle className="w-5 h-5" />
-                  Bill Chat: A08697
+                  Bill Chat: {loadedChatSession?.bill_id ? `A${loadedChatSession.bill_id.toString().padStart(5, '0')}` : 'Select a bill'}
                 </h2>
               </div>
 
