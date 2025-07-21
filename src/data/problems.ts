@@ -1,3 +1,4 @@
+
 export interface Problem {
   id: string;
   slug: string;
@@ -120,6 +121,43 @@ export const problems: Problem[] = [
     }
   },
   {
+    id: "third-place",
+    slug: createSlug("Third Place"),
+    title: "Third Place",
+    description: "Creating vibrant community spaces that serve as informal gathering places beyond home and work.",
+    subProblems: 30,
+    solutions: 86,
+    category: "Community Development",
+    priority: "high",
+    relatedProblems: ["social-isolation", "community-safety", "civic-engagement"],
+    statistics: [
+      { label: "Communities Lacking Third Places", value: "65%", source: "Urban Planning Institute" },
+      { label: "Impact on Mental Health", value: "40% reduction", source: "Community Health Study" },
+      { label: "Economic Benefit", value: "$2.3B annually", source: "Local Business Alliance" }
+    ],
+    solutionsList: [
+      {
+        id: "community-centers",
+        title: "Neighborhood Community Centers",
+        description: "Multi-purpose spaces for local gatherings and activities",
+        feasibility: 7,
+        impact: 8
+      },
+      {
+        id: "pocket-parks",
+        title: "Pocket Parks and Plazas",
+        description: "Small-scale public spaces in urban neighborhoods",
+        feasibility: 8,
+        impact: 7
+      }
+    ],
+    metadata: {
+      title: "Third Place Solutions | Goodable",
+      description: "Explore solutions for creating vibrant community spaces that bring people together.",
+      keywords: ["third place", "community spaces", "social connection", "urban planning", "public spaces"]
+    }
+  },
+  {
     id: "climate-change",
     slug: createSlug("Climate Change"),
     title: "Climate Change",
@@ -156,26 +194,82 @@ export const problems: Problem[] = [
       keywords: ["climate change", "carbon emissions", "renewable energy", "sustainability", "environmental policy"]
     }
   }
-  // Adding a few more key problems for demonstration
 ];
 
-// Additional problems for demonstration
-const additionalProblemTitles = [
-  "Third Place", "Income Stagnation", "Housing Crisis", "Mental Health Support", "Food Security", 
-  "Digital Divide", "Elder Care", "Education Access", "Healthcare Access", "Social Isolation"
+// Generate additional problems for all categories shown on landing page
+const additionalProblems = [
+  { title: "Income Stagnation", subProblems: 16, solutions: 32, category: "Economic Policy" },
+  { title: "End Stage Capitalism", subProblems: 2, solutions: 2, category: "Economic Policy" },
+  { title: "Cultural Divisions", subProblems: 1, solutions: 1, category: "Social Issues" },
+  { title: "Addictive Technology", subProblems: 5, solutions: 8, category: "Technology" },
+  { title: "Fake News", subProblems: 1, solutions: 3, category: "Media" },
+  { title: "Free Time", subProblems: 11, solutions: 20, category: "Social Connection" },
+  { title: "Housing Crisis", subProblems: 18, solutions: 45, category: "Housing" },
+  { title: "Mental Health Support", subProblems: 12, solutions: 38, category: "Healthcare" },
+  { title: "Food Security", subProblems: 9, solutions: 24, category: "Food & Agriculture" },
+  { title: "Digital Divide", subProblems: 14, solutions: 41, category: "Technology" },
+  { title: "Elder Care", subProblems: 7, solutions: 19, category: "Healthcare" },
+  { title: "Education Access", subProblems: 31, solutions: 78, category: "Education" },
+  { title: "Workplace Burnout", subProblems: 6, solutions: 15, category: "Labor" },
+  { title: "Social Isolation", subProblems: 11, solutions: 29, category: "Social Connection" },
+  { title: "Healthcare Access", subProblems: 22, solutions: 56, category: "Healthcare" },
+  { title: "Financial Literacy", subProblems: 8, solutions: 22, category: "Education" },
+  { title: "Community Safety", subProblems: 13, solutions: 34, category: "Public Safety" },
+  { title: "Environmental Justice", subProblems: 17, solutions: 43, category: "Environment" },
+  { title: "Youth Development", subProblems: 21, solutions: 51, category: "Education" },
+  { title: "Disability Rights", subProblems: 5, solutions: 12, category: "Civil Rights" },
+  { title: "Immigration Support", subProblems: 19, solutions: 47, category: "Immigration" },
+  { title: "Gender Equality", subProblems: 24, solutions: 62, category: "Civil Rights" },
+  { title: "Veteran Services", subProblems: 10, solutions: 26, category: "Veterans Affairs" },
+  { title: "Rural Development", subProblems: 15, solutions: 39, category: "Community Development" },
+  { title: "Urban Planning", subProblems: 28, solutions: 71, category: "Community Development" },
+  { title: "Transportation Equity", subProblems: 12, solutions: 31, category: "Transportation" },
+  { title: "Criminal Justice Reform", subProblems: 20, solutions: 54, category: "Justice" },
+  { title: "Substance Abuse", subProblems: 9, solutions: 23, category: "Healthcare" },
+  { title: "Homelessness", subProblems: 16, solutions: 42, category: "Housing" },
+  { title: "Digital Privacy", subProblems: 11, solutions: 28, category: "Technology" },
+  { title: "Renewable Energy", subProblems: 25, solutions: 65, category: "Environment" },
+  { title: "Water Conservation", subProblems: 7, solutions: 18, category: "Environment" },
+  { title: "Food Waste Reduction", subProblems: 13, solutions: 35, category: "Environment" },
+  { title: "Civic Engagement", subProblems: 18, solutions: 46, category: "Democracy" },
+  { title: "Small Business Support", subProblems: 22, solutions: 58, category: "Economic Policy" },
+  { title: "Disaster Relief", subProblems: 8, solutions: 21, category: "Emergency Management" },
+  { title: "Cultural Preservation", subProblems: 14, solutions: 37, category: "Culture" },
+  { title: "Scientific Research", subProblems: 27, solutions: 69, category: "Science" },
+  { title: "Public Health", subProblems: 32, solutions: 81, category: "Healthcare" },
+  { title: "Economic Development", subProblems: 19, solutions: 49, category: "Economic Policy" },
+  { title: "Infrastructure", subProblems: 24, solutions: 61, category: "Infrastructure" },
+  { title: "Racial Justice", subProblems: 17, solutions: 44, category: "Civil Rights" },
+  { title: "Worker Rights", subProblems: 15, solutions: 40, category: "Labor" },
+  { title: "Consumer Protection", subProblems: 10, solutions: 27, category: "Consumer Affairs" },
+  { title: "Animal Welfare", subProblems: 12, solutions: 32, category: "Animal Rights" },
+  { title: "Media Literacy", subProblems: 9, solutions: 25, category: "Education" },
+  { title: "Government Transparency", subProblems: 21, solutions: 53, category: "Democracy" },
+  { title: "Nonprofit Management", subProblems: 26, solutions: 66, category: "Nonprofit" },
+  { title: "Community Organizing", subProblems: 14, solutions: 36, category: "Community Development" },
+  { title: "Volunteer Coordination", subProblems: 8, solutions: 20, category: "Community Service" },
+  { title: "Policy Analysis", subProblems: 18, solutions: 47, category: "Policy" },
+  { title: "Data Advocacy", subProblems: 16, solutions: 41, category: "Technology" },
+  { title: "Legal Aid", subProblems: 11, solutions: 30, category: "Justice" },
+  { title: "Grassroots Mobilization", subProblems: 23, solutions: 59, category: "Activism" },
+  { title: "Social Innovation", subProblems: 20, solutions: 52, category: "Innovation" },
+  { title: "Impact Measurement", subProblems: 13, solutions: 33, category: "Analytics" }
 ];
 
-additionalProblemTitles.forEach((title, index) => {
-  const priorities: Problem['priority'][] = ["urgent", "high", "normal"];
+// Add all additional problems to the main problems array
+additionalProblems.forEach((problem) => {
+  const priorities: Problem['priority'][] = ["urgent", "high", "normal", "low"];
+  const randomPriority = priorities[Math.floor(Math.random() * priorities.length)];
+  
   problems.push({
-    id: createSlug(title),
-    slug: createSlug(title),
-    title,
-    description: `Comprehensive solutions and policy approaches to address ${title.toLowerCase()} challenges in our communities.`,
-    subProblems: Math.floor(Math.random() * 25) + 5,
-    solutions: Math.floor(Math.random() * 60) + 20,
-    category: "Community",
-    priority: priorities[Math.floor(Math.random() * 3)],
+    id: createSlug(problem.title),
+    slug: createSlug(problem.title),
+    title: problem.title,
+    description: `Comprehensive solutions and policy approaches to address ${problem.title.toLowerCase()} challenges in our communities.`,
+    subProblems: problem.subProblems,
+    solutions: problem.solutions,
+    category: problem.category,
+    priority: randomPriority,
     relatedProblems: [],
     statistics: [
       { label: "People Affected", value: `${Math.floor(Math.random() * 50) + 10}M`, source: "Census Bureau" },
@@ -183,17 +277,17 @@ additionalProblemTitles.forEach((title, index) => {
     ],
     solutionsList: [
       {
-        id: `solution-${index}-1`,
-        title: `Policy Solution ${index + 1}`,
-        description: `Strategic policy approach to address ${title.toLowerCase()}`,
+        id: `solution-${createSlug(problem.title)}-1`,
+        title: `${problem.title} Policy Initiative`,
+        description: `Strategic policy approach to address ${problem.title.toLowerCase()}`,
         feasibility: Math.floor(Math.random() * 5) + 5,
         impact: Math.floor(Math.random() * 5) + 5
       }
     ],
     metadata: {
-      title: `${title} Solutions | Goodable`,
-      description: `Find innovative solutions and policy proposals for ${title.toLowerCase()} challenges.`,
-      keywords: [title.toLowerCase(), "policy", "solutions", "community", "social issues"]
+      title: `${problem.title} Solutions | Goodable`,
+      description: `Find innovative solutions and policy proposals for ${problem.title.toLowerCase()} challenges.`,
+      keywords: [problem.title.toLowerCase(), "policy", "solutions", "community", "social issues"]
     }
   });
 });

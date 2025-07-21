@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight, Sparkles, Zap, Code, Palette, Users, Star, Heart, Twitter, Image, Share2, ChevronDown, ArrowUp } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useNavigate, Link } from 'react-router-dom';
-import { StarRating } from '@/components/StarRating';
+import { StarRating, VoteStats } from '@/components/StarRating';
 import { problems } from '@/data/problems';
 import { useVisitorCount } from '@/hooks/useVisitorCount';
 import { useAuth } from '@/contexts/AuthContext';
@@ -227,7 +227,9 @@ const Landing = () => {
                 Do something,
               </span>
               <br />
-              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">something good</span>
+              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                something good
+              </span>
             </h1>
 
             <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">Create legislation by chatting with ai</p>
@@ -347,22 +349,33 @@ const Landing = () => {
                         <h3 className="font-bold text-lg text-[#1a1a1a] mb-2">
                           {category.title}
                         </h3>
-                        <p className="text-sm text-[#666666] mb-4">
+                        <p className="text-sm text-[#666666] mb-2">
                           {category.subtitle}
                         </p>
+                        
+                        {/* Vote statistics positioned below subtitle */}
+                        <div className="mb-4">
+                          <VoteStats 
+                            problemId={problemData?.id || problemSlug}
+                            className="text-[#666666]"
+                          />
+                        </div>
+                        
                         <div className="text-sm text-[#ef4444] hover:underline">
                           Learn more →
                         </div>
                       </Link>
                       
-                      {/* Star Rating positioned below Learn more link, distributed horizontally */}
+                      {/* Interactive star rating positioned below Learn more link */}
                       <div 
-                        className="w-full"
+                        className="w-full mt-4"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <StarRating 
-                          problemId={problemData?.id || problemSlug} 
+                          problemId={problemData?.id || problemSlug}
                           className="w-full"
+                          showVoteCount={false}
+                          showStars={true}
                         />
                       </div>
                     </div>
