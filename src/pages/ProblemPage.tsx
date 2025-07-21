@@ -104,51 +104,66 @@ const ProblemPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Hero Section */}
+      {/* Problem Info Card Section */}
       <section className="bg-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="max-w-4xl">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-              <div className="flex-1">
-                <div className="flex items-center space-x-3 mb-4">
-                  <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
-                    {problem.title}
-                  </h1>
-                  <Badge className={priorityColors[problem.priority]}>
-                    {problem.priority.charAt(0).toUpperCase() + problem.priority.slice(1)} Priority
-                  </Badge>
-                </div>
-                <p className="text-xl text-gray-600 mb-6 leading-relaxed">
-                  {problem.description}
-                </p>
-                <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
-                  <div className="flex items-center space-x-1">
-                    <Target className="w-4 h-4" />
-                    <span>{problem.subProblems} Sub-problems</span>
+            <Card className="card bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              <CardHeader className="card-header px-6 py-4 border-b border-gray-200">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <CardTitle className="text-xl font-semibold mb-2">
+                      {problem.title}
+                    </CardTitle>
+                    <Badge className={priorityColors[problem.priority]}>
+                      {problem.priority.charAt(0).toUpperCase() + problem.priority.slice(1)} Priority
+                    </Badge>
                   </div>
-                  <div className="flex items-center space-x-1">
-                    <TrendingUp className="w-4 h-4" />
-                    <span>{problem.solutions} Solutions</span>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <Users className="w-4 h-4" />
-                    <span>{problem.category}</span>
+                  <div className="flex items-center gap-3">
+                    <StarRating 
+                      problemId={problem.id} 
+                      className="w-full"
+                      showVoteCount={false}
+                      showStars={true}
+                    />
                   </div>
                 </div>
-              </div>
-              
-              {/* Voting Section */}
-              <div className="flex-shrink-0">
-                <Card className="p-4">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-medium text-center">Rate this problem</CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <StarRating problemId={problem.id} className="justify-center" />
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
+              </CardHeader>
+              <CardContent className="card-body p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div>
+                    <h4 className="font-medium text-sm text-muted-foreground mb-2">Category</h4>
+                    <p className="text-sm font-medium">
+                      {problem.category}
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-medium text-sm text-muted-foreground mb-2">Sub-problems</h4>
+                    <p className="text-sm">{problem.subProblems}</p>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-medium text-sm text-muted-foreground mb-2">Solutions</h4>
+                    <p className="text-sm">{problem.solutions}</p>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-medium text-sm text-muted-foreground mb-2">Priority</h4>
+                    <p className="text-sm">{problem.priority.charAt(0).toUpperCase() + problem.priority.slice(1)}</p>
+                  </div>
+                </div>
+                
+                {problem.description && (
+                  <div className="mt-6 pt-6 border-t border-gray-200">
+                    <h4 className="font-medium text-sm text-muted-foreground mb-2">Description</h4>
+                    <p className="text-sm leading-relaxed text-gray-700">
+                      {problem.description}
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
