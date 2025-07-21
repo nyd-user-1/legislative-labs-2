@@ -42,7 +42,7 @@ export const getBillChamber = (billNumber: string): string => {
 };
 
 // Parse problem chat current_state to extract messages
-export const parseProblemChatState = (currentState: string, problemStatement: string, createdAt: string, updatedAt: string) => {
+export const parseProblemChatState = (currentState: string, problemStatement: string, createdAt: string, updatedAt: string): Array<{id: string, role: 'user' | 'assistant', content: string, timestamp: string}> => {
   try {
     // If current_state is a JSON string (array of messages), parse it
     if (typeof currentState === 'string' && currentState.startsWith('[')) {
@@ -58,10 +58,10 @@ export const parseProblemChatState = (currentState: string, problemStatement: st
     }
     
     // If current_state is just the AI response string, create the conversation
-    const messages = [
+    const messages: Array<{id: string, role: 'user' | 'assistant', content: string, timestamp: string}> = [
       {
         id: 'user-problem',
-        role: 'user' as const,
+        role: 'user',
         content: problemStatement,
         timestamp: createdAt
       }
@@ -74,7 +74,7 @@ export const parseProblemChatState = (currentState: string, problemStatement: st
         !currentState.startsWith('[')) {
       messages.push({
         id: 'ai-analysis',
-        role: 'assistant' as const,
+        role: 'assistant',
         content: currentState,
         timestamp: updatedAt
       });
@@ -87,7 +87,7 @@ export const parseProblemChatState = (currentState: string, problemStatement: st
     return [
       {
         id: 'user-problem',
-        role: 'user' as const,
+        role: 'user',
         content: problemStatement,
         timestamp: createdAt
       }
