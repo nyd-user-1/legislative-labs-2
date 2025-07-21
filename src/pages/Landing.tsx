@@ -5,7 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight, Sparkles, Zap, Code, Palette, Users, Star, Heart, Twitter, Image, Share2, ChevronDown, ArrowUp } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { StarRating } from '@/components/StarRating';
+import { problems } from '@/data/problems';
 import { useVisitorCount } from '@/hooks/useVisitorCount';
 import { useAuth } from '@/contexts/AuthContext';
 import { ProblemChatSheet } from '@/components/ProblemChatSheet';
@@ -328,22 +330,44 @@ const Landing = () => {
 
             <div className="max-w-[1200px] mx-auto">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-8">
-                {problemCategories.map((category, index) => (
-                  <div
-                    key={index}
-                    className="bg-white border border-[#e5e5e5] rounded-xl p-6 min-h-[140px] transition-all duration-200 hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)] hover:-translate-y-0.5 cursor-pointer"
-                  >
-                    <h3 className="font-bold text-lg text-[#1a1a1a] mb-2">
-                      {category.title}
-                    </h3>
-                    <p className="text-sm text-[#666666] mb-4">
-                      {category.subtitle}
-                    </p>
-                    <div className="text-sm text-[#ef4444] hover:underline">
-                      Learn more →
+                {problemCategories.map((category, index) => {
+                  // Find matching problem data for this category
+                  const problemData = problems.find(p => p.title === category.title);
+                  const problemSlug = problemData ? problemData.slug : category.title.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-');
+                  
+                  return (
+                    <div
+                      key={index}
+                      className="bg-white border border-[#e5e5e5] rounded-xl p-6 min-h-[140px] transition-all duration-200 hover:shadow-[0_4px_12px_rgba(0,0,0,0.1)] hover:-translate-y-0.5 cursor-pointer relative group"
+                    >
+                      <Link 
+                        to={`/problems/${problemSlug}`}
+                        className="block h-full"
+                      >
+                        <h3 className="font-bold text-lg text-[#1a1a1a] mb-2">
+                          {category.title}
+                        </h3>
+                        <p className="text-sm text-[#666666] mb-4">
+                          {category.subtitle}
+                        </p>
+                        <div className="text-sm text-[#ef4444] hover:underline">
+                          Learn more →
+                        </div>
+                      </Link>
+                      
+                      {/* Star Rating positioned in bottom right */}
+                      <div 
+                        className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <StarRating 
+                          problemId={problemData?.id || problemSlug} 
+                          className="scale-75 origin-bottom-right"
+                        />
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>

@@ -560,20 +560,20 @@ export type Database = {
       Persona: {
         Row: {
           act: string
-          for_devs: boolean | null
           id: string
+          Label: string | null
           prompt: string | null
         }
         Insert: {
           act: string
-          for_devs?: boolean | null
           id?: string
+          Label?: string | null
           prompt?: string | null
         }
         Update: {
           act?: string
-          for_devs?: boolean | null
           id?: string
+          Label?: string | null
           prompt?: string | null
         }
         Relationships: []
@@ -665,6 +665,33 @@ export type Database = {
             referencedColumns: ["user_id"]
           },
         ]
+      }
+      problem_votes: {
+        Row: {
+          created_at: string
+          id: string
+          problem_id: string
+          rating: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          problem_id: string
+          rating: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          problem_id?: string
+          rating?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -948,7 +975,14 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      problem_vote_stats: {
+        Row: {
+          average_rating: number | null
+          problem_id: string | null
+          total_votes: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       generate_problem_number: {

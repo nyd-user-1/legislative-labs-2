@@ -25,6 +25,7 @@ import Playground from "./pages/Playground";
 import PolicyPortal from "./pages/PolicyPortal";
 import Plans from "./pages/Plans";
 import ChangeLog from "./pages/ChangeLog";
+import ProblemPage from "./pages/ProblemPage";
 
 const queryClient = new QueryClient();
 
@@ -85,6 +86,7 @@ const App = () => {
               <Routes>
                 <Route path="/" element={<Landing />} />
                 <Route path="/auth" element={<Auth />} />
+                <Route path="/problems/:problemSlug" element={<ProblemPage />} />
                 <Route path="*" element={<AppLayout />} />
               </Routes>
             </BrowserRouter>
