@@ -7,6 +7,7 @@ import {
   SidebarMenu,
 } from "@/components/ui/sidebar";
 import { NavigationItem } from "./NavigationItem";
+import { ColorSchemeToggle } from "../ColorSchemeToggle";
 import { useNavigation } from "@/hooks/useNavigation";
 
 const researchNavItems = [
@@ -88,7 +89,23 @@ export function SidebarNavigation({ collapsed, hasSearchResults }: SidebarNaviga
         <SidebarGroupLabel>Account</SidebarGroupLabel>
         <SidebarGroupContent>
           <SidebarMenu>
-            {bottomNavItems.map((item) => (
+            {bottomNavItems.slice(0, 2).map((item) => (
+              <NavigationItem
+                key={item.title}
+                title={item.title}
+                url={item.url}
+                icon={item.icon}
+                collapsed={collapsed}
+                getNavClassName={getNavClassName}
+              />
+            ))}
+            
+            {/* Color Scheme Toggle */}
+            <div className="px-2 py-1">
+              <ColorSchemeToggle collapsed={collapsed} />
+            </div>
+            
+            {bottomNavItems.slice(2).map((item) => (
               <NavigationItem
                 key={item.title}
                 title={item.title}
