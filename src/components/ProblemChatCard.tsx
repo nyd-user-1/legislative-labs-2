@@ -2,13 +2,15 @@ import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Trash2 } from "lucide-react";
+import { Trash2, Heart, Star } from "lucide-react";
 import { format } from "date-fns";
 import { ProblemChat } from "@/hooks/useProblemChats";
 import { ConversationView } from "@/pages/chats/components/ConversationView";
 import { parseMessages } from "@/pages/chats/utils/messageParser";
 import { supabase } from "@/integrations/supabase/client";
 import { Message } from "@/pages/chats/types";
+import { useProblemVoting } from "@/hooks/useProblemVoting";
+import { useToast } from "@/hooks/use-toast";
 
 interface ProblemChatCardProps {
   problemChat: ProblemChat;
@@ -25,6 +27,10 @@ export const ProblemChatCard = ({
 }: ProblemChatCardProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+  
+  // Use problem voting hook to provide star rating functionality
+  const { userRating, submitVote, hasUserVoted } = useProblemVoting(problemChat.problem_number);
 
   useEffect(() => {
     const fetchChatSession = async () => {
@@ -62,6 +68,44 @@ export const ProblemChatCard = ({
 
   const messageCount = messages.length;
 
+  const handleRating = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    // Toggle between 5-star rating and no rating
+    const newRating = hasUserVoted ? 0 : 5;
+    
+    try {
+      if (newRating === 0) {
+        // Remove rating - we'll need to handle this in the voting hook
+        // For now, just show a message
+        toast({
+          title: "Rating removed",
+          description: "Your rating has been removed",
+        });
+      } else {
+        const result = await submitVote(newRating);
+        if (result.success) {
+          toast({
+            title: "Rating submitted",
+            description: "Thank you for rating this problem!",
+          });
+        } else {
+          toast({
+            title: "Error",
+            description: result.error || "Failed to submit rating",
+            variant: "destructive",
+          });
+        }
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update rating",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <Card className="w-full">
       <CardHeader className="pb-3">
@@ -69,6 +113,15 @@ export const ProblemChatCard = ({
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <CardTitle className="text-lg">{problemChat.title}</CardTitle>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={handleRating}
+                className="h-auto p-1 hover:bg-transparent"
+                title={hasUserVoted ? "Remove rating" : "Rate this problem"}
+              >
+                <Star className={`h-4 w-4 ${hasUserVoted ? 'fill-yellow-500 text-yellow-500' : ''}`} />
+              </Button>
             </div>
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
               <span>{format(new Date(problemChat.created_at), "MMM d, yyyy 'at' h:mm a")}</span>
