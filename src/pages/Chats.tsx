@@ -64,10 +64,10 @@ const Chats = () => {
         ) : (
           <Tabs defaultValue="problems" className="w-full">
             <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="problems">Problems ({problemChats.length})</TabsTrigger>
-              <TabsTrigger value="bills">Bills ({billChats.length})</TabsTrigger>
-              <TabsTrigger value="members">Members ({memberChats.length})</TabsTrigger>
-              <TabsTrigger value="committees">Committees ({committeeChats.length})</TabsTrigger>
+              <TabsTrigger value="problems">Problems</TabsTrigger>
+              <TabsTrigger value="bills">Bills</TabsTrigger>
+              <TabsTrigger value="members">Members</TabsTrigger>
+              <TabsTrigger value="committees">Committees</TabsTrigger>
             </TabsList>
             
             

@@ -73,9 +73,6 @@ export const ProblemChatCard = ({
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
               <span>{format(new Date(problemChat.created_at), "MMM d, yyyy 'at' h:mm a")}</span>
               <span>{messageCount} messages</span>
-              {problemChat.current_state === 'generating' && (
-                <span className="text-yellow-600">Generating...</span>
-              )}
             </div>
           </div>
           <Button
