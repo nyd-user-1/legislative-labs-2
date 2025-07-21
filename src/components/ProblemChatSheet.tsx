@@ -356,6 +356,16 @@ Remember: You're not just answering questions - you're actively partnering with 
         </SheetHeader>
 
         <div className="flex-1 overflow-y-auto space-y-4 py-4">
+          {/* Show loading state during initial generation */}
+          {isStreaming && messages.length === 0 && (
+            <div className="flex justify-center items-center py-8">
+              <div className="flex items-center gap-3">
+                <div className="animate-spin h-5 w-5 border-2 border-primary border-t-transparent rounded-full"></div>
+                <span className="text-sm text-muted-foreground">Generating problem statement...</span>
+              </div>
+            </div>
+          )}
+
           {/* Display all messages */}
           {messages.map((message) => (
             <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
