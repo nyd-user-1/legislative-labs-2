@@ -5,6 +5,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { ProblemChat } from "@/hooks/useProblemChats";
+import { ProblemConversationView } from "./ProblemConversationView";
 
 interface ProblemChatCardProps {
   problemChat: ProblemChat;
@@ -54,61 +55,10 @@ export const ProblemChatCard = ({
               View conversation
             </AccordionTrigger>
             <AccordionContent>
-              <div className="space-y-4">
-                {/* Problem Statement */}
-                <div className="space-y-2">
-                  <h4 className="text-sm font-medium text-muted-foreground">Original Problem:</h4>
-                  <div className="text-sm bg-muted/50 p-3 rounded-md leading-relaxed">
-                    {problemChat.problem_statement}
-                  </div>
-                </div>
-
-                {/* Current State/Response */}
-                {problemChat.current_state && 
-                 problemChat.current_state !== 'draft' && 
-                 problemChat.current_state !== 'generating' && (
-                  <div className="space-y-2">
-                    <h4 className="text-sm font-medium text-muted-foreground">AI Analysis:</h4>
-                    <div className="text-sm bg-primary/5 p-3 rounded-md leading-relaxed">
-                      {problemChat.current_state}
-                    </div>
-                  </div>
-                )}
-
-                {problemChat.current_state === 'generating' && (
-                  <div className="text-sm text-muted-foreground italic flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></div>
-                    Generating AI analysis...
-                  </div>
-                )}
-
-                {/* Action buttons */}
-                <div className="flex gap-2 pt-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => onCopy(problemChat.problem_statement)}
-                  >
-                    Copy Problem
-                  </Button>
-                  {problemChat.current_state && 
-                   problemChat.current_state !== 'draft' && 
-                   problemChat.current_state !== 'generating' && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onCopy(problemChat.current_state)}
-                    >
-                      Copy Response
-                    </Button>
-                  )}
-                </div>
-
-                {/* Metadata */}
-                <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t">
-                  <span>Problem #{problemChat.problem_number}</span>
-                </div>
-              </div>
+              <ProblemConversationView
+                problemChat={problemChat}
+                onCopy={onCopy}
+              />
             </AccordionContent>
           </AccordionItem>
         </Accordion>
