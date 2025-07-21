@@ -13,11 +13,11 @@ const researchNavItems = [
   { title: "Dashboard", url: "/dashboard", icon: TrendingUp },
   { title: "Bills", url: "/bills", icon: FileText },
   { title: "Members", url: "/members", icon: Users },
-  { title: "Problems", url: "/problems", icon: Target },
   { title: "Committees", url: "/committees", icon: Building2 },
 ];
 
 const workflowNavItems = [
+  { title: "Problems", url: "/problems", icon: Target },
   { title: "Chats", url: "/chats", icon: MessageSquare },
   { title: "Favorites", url: "/favorites", icon: Heart },
   { title: "Playground", url: "/playground", icon: Gamepad2 },
