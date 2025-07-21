@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import {
   Sheet,
@@ -93,21 +92,68 @@ export const ProblemChatSheet = ({ open, onOpenChange, userProblem }: ProblemCha
     }
   }, [isComplete, aiProblemStatement, userProblem, messages.length]);
 
+  // Enhanced database update function with retry logic
+  const updateProblemChatWithRetry = async (sessionId: string, content: string, maxRetries = 3) => {
+    console.log(`[DB UPDATE] Attempting to update problem chat ${sessionId} with content length: ${content.length}`);
+    
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`[DB UPDATE] Attempt ${attempt}/${maxRetries} for session ${sessionId}`);
+        
+        const { data, error } = await supabase
+          .from('problem_chats')
+          .update({
+            current_state: content,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', sessionId)
+          .select();
+
+        if (error) {
+          console.error(`[DB UPDATE] Error on attempt ${attempt}:`, error);
+          throw error;
+        }
+
+        if (!data || data.length === 0) {
+          throw new Error('No rows were updated - session may not exist');
+        }
+
+        console.log(`[DB UPDATE] Success on attempt ${attempt}:`, data[0]);
+        return data[0];
+      } catch (error) {
+        console.error(`[DB UPDATE] Attempt ${attempt} failed:`, error);
+        
+        if (attempt === maxRetries) {
+          throw error;
+        }
+        
+        // Wait before retrying (exponential backoff)
+        await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000));
+      }
+    }
+  };
+
   const startStreaming = async () => {
     if (!userProblem || !user) return;
 
+    console.log('[STREAMING] Starting streaming process for user problem:', userProblem.substring(0, 100) + '...');
+    
     setIsStreaming(true);
     setIsComplete(false);
     streamingRef.current = '';
     setAiProblemStatement('');
 
+    let sessionData = null;
+
     try {
       // Generate initial problem number and create chat session
       const problemNumber = await generateProblemNumber();
+      console.log('[SESSION] Generated problem number:', problemNumber);
       setChatTitle(problemNumber);
 
       // Create chat session
-      const { data: sessionData, error: sessionError } = await supabase
+      console.log('[SESSION] Creating chat session...');
+      const { data: newSessionData, error: sessionError } = await supabase
         .from('problem_chats')
         .insert({
           user_id: user.id,
@@ -119,49 +165,68 @@ export const ProblemChatSheet = ({ open, onOpenChange, userProblem }: ProblemCha
         .select()
         .single();
 
-      if (sessionError) throw sessionError;
+      if (sessionError) {
+        console.error('[SESSION] Error creating session:', sessionError);
+        throw sessionError;
+      }
+      
+      sessionData = newSessionData;
+      console.log('[SESSION] Created session successfully:', sessionData.id);
       setChatSessionId(sessionData.id);
 
-      // Use supabase.functions.invoke instead of direct HTTP call
+      // Generate AI content
+      console.log('[AI] Calling generate-with-openai function...');
       const { data, error } = await supabase.functions.invoke('generate-with-openai', {
         body: {
           prompt: userProblem,
           type: 'problem',
           context: 'landing_page',
-          stream: false // Change to non-streaming for now to fix the issue
+          stream: false
         }
       });
 
       if (error) {
-        console.error('Error calling generate-with-openai function:', error);
+        console.error('[AI] Error calling generate-with-openai function:', error);
         throw new Error('Failed to generate problem statement');
       }
 
+      console.log('[AI] Function response received:', data);
+
       // Set the complete response
       const generatedText = data.generatedText || 'Unable to generate problem statement. Please try again.';
+      console.log('[AI] Generated text length:', generatedText.length);
+      
       streamingRef.current = generatedText;
       setAiProblemStatement(generatedText);
       setIsComplete(true);
       setIsStreaming(false);
 
-      // Update chat session with final content
-      if (sessionData?.id) {
-        await supabase
-          .from('problem_chats')
-          .update({
-            current_state: generatedText,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', sessionData.id);
-      }
+      // Update chat session with final content using retry logic
+      console.log('[DB] Updating session with generated content...');
+      await updateProblemChatWithRetry(sessionData.id, generatedText);
+      console.log('[DB] Session updated successfully');
 
       // Generate suggested prompts and dynamic title
       generateSuggestedPrompts(generatedText);
-      generateDynamicTitle(generatedText, sessionData?.id);
+      generateDynamicTitle(generatedText, sessionData.id);
 
     } catch (error) {
-      console.error('Streaming error:', error);
+      console.error('[ERROR] Streaming error:', error);
       setIsStreaming(false);
+      
+      // If we have a session but failed to update it, try to clean up
+      if (sessionData?.id) {
+        try {
+          console.log('[CLEANUP] Attempting to update session with error state...');
+          await updateProblemChatWithRetry(
+            sessionData.id, 
+            'Error generating problem statement. Please try again.'
+          );
+        } catch (cleanupError) {
+          console.error('[CLEANUP] Failed to update session with error state:', cleanupError);
+        }
+      }
+      
       toast({
         title: "Error",
         description: "Failed to generate problem statement. Please try again.",
@@ -199,6 +264,7 @@ export const ProblemChatSheet = ({ open, onOpenChange, userProblem }: ProblemCha
 
   const generateDynamicTitle = async (content: string, sessionId?: string) => {
     try {
+      console.log('[TITLE] Generating dynamic title...');
       const { data, error } = await supabase.functions.invoke('generate-with-openai', {
         body: {
           prompt: `Create a short, descriptive title (3-5 words) for this problem analysis: ${content.substring(0, 200)}...`,
@@ -212,18 +278,25 @@ export const ProblemChatSheet = ({ open, onOpenChange, userProblem }: ProblemCha
         
         // Clean markdown from title
         const cleanTitle = rawTitle.replace(/\*\*/g, '').replace(/\*/g, '').replace(/^#+\s*/g, '').trim();
+        console.log('[TITLE] Generated title:', cleanTitle);
         setChatTitle(cleanTitle);
 
         // Update the database with the clean title
         if (sessionId) {
-          await supabase
-            .from('problem_chats')
-            .update({ title: cleanTitle })
-            .eq('id', sessionId);
+          try {
+            console.log('[TITLE] Updating database with new title...');
+            await supabase
+              .from('problem_chats')
+              .update({ title: cleanTitle })
+              .eq('id', sessionId);
+            console.log('[TITLE] Title updated in database');
+          } catch (titleError) {
+            console.error('[TITLE] Error updating title in database:', titleError);
+          }
         }
       }
     } catch (error) {
-      console.error('Error generating dynamic title:', error);
+      console.error('[TITLE] Error generating dynamic title:', error);
       // Keep the fallback title
     }
   };
@@ -239,6 +312,8 @@ export const ProblemChatSheet = ({ open, onOpenChange, userProblem }: ProblemCha
   const sendMessage = async (message: string) => {
     if (!message.trim()) return;
 
+    console.log('[CHAT] Sending message:', message);
+
     const userMessage: Message = {
       id: `user-${Date.now()}`,
       role: "user",
@@ -252,6 +327,7 @@ export const ProblemChatSheet = ({ open, onOpenChange, userProblem }: ProblemCha
     setInputValue(''); // Clear input immediately
 
     try {
+      console.log('[CHAT] Calling chat-with-persona function...');
       const { data, error } = await supabase.functions.invoke('chat-with-persona', {
         body: { 
           messages: updatedMessages.map(msg => ({
@@ -263,7 +339,7 @@ export const ProblemChatSheet = ({ open, onOpenChange, userProblem }: ProblemCha
       });
 
       if (error) {
-        console.error('Error calling chat-with-persona function:', error);
+        console.error('[CHAT] Error calling chat-with-persona function:', error);
         throw new Error('Failed to generate response');
       }
 
@@ -279,17 +355,20 @@ export const ProblemChatSheet = ({ open, onOpenChange, userProblem }: ProblemCha
 
       // Update chat session with new messages
       if (chatSessionId) {
-        await supabase
-          .from('problem_chats')
-          .update({
-            current_state: JSON.stringify(finalMessages),
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', chatSessionId);
+        try {
+          console.log('[CHAT] Updating session with new messages...');
+          await updateProblemChatWithRetry(
+            chatSessionId,
+            JSON.stringify(finalMessages)
+          );
+          console.log('[CHAT] Session updated with new messages');
+        } catch (updateError) {
+          console.error('[CHAT] Error updating session with messages:', updateError);
+        }
       }
 
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error('[CHAT] Error sending message:', error);
       toast({
         title: "Error", 
         description: "Failed to send message. Please try again.",
