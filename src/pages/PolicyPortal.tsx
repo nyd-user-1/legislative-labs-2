@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { RotateCcw, Download, Code, Share, List, SlidersHorizontal, Settings, Info, X, HelpCircle, Trash2, Copy, MessageSquare, Check, MessageCircle, ArrowRight, User, PenTool, Send } from "lucide-react";
+import { RotateCcw, Download, Code, Share, List, SlidersHorizontal, Settings, Info, X, HelpCircle, Trash2, Copy, MessageSquare, Check, MessageCircle, ArrowRight } from "lucide-react";
 import { MorphingHeartLoader } from "@/components/ui/MorphingHeartLoader";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
@@ -627,7 +627,7 @@ const PolicyPortal = () => {
       <div>
         <Label className="text-sm font-medium text-gray-700 mb-3 block">Chat</Label>
         <Select value={selectedChat} onValueChange={handleChatSelection}>
-          <SelectTrigger className="w-64">
+          <SelectTrigger>
             <SelectValue placeholder="Select chat" />
           </SelectTrigger>
           <SelectContent>
@@ -645,7 +645,7 @@ const PolicyPortal = () => {
                 <SelectItem key={chat.id} value={chat.id}>
                   <div className="flex items-center gap-2">
                     <MessageSquare className="h-4 w-4" />
-                    <span className="truncate max-w-40">{chat.label}</span>
+                    <span>{chat.label}</span>
                   </div>
                 </SelectItem>
               ))
@@ -656,10 +656,7 @@ const PolicyPortal = () => {
 
       {/* Persona Selection */}
       <div>
-        <Label className="text-sm font-medium text-gray-700 mb-3 block flex items-center gap-2">
-          <User className="h-4 w-4" />
-          Persona
-        </Label>
+        <Label className="text-sm font-medium text-gray-700 mb-3 block">Persona</Label>
         <Select value={selectedPersona} onValueChange={handlePersonaSelection}>
           <SelectTrigger>
             <SelectValue placeholder="Select persona" />
@@ -682,10 +679,7 @@ const PolicyPortal = () => {
 
       {/* Load Sample Problems */}
       <div>
-        <Label className="text-sm font-medium text-gray-700 mb-3 block flex items-center gap-2">
-          <PenTool className="h-4 w-4" />
-          Problem
-        </Label>
+        <Label className="text-sm font-medium text-gray-700 mb-3 block">Problem</Label>
         <Select value={selectedChat} onValueChange={handleSampleProblemSelection}>
           <SelectTrigger>
             <SelectValue placeholder="Select problem" />
@@ -1032,13 +1026,13 @@ const PolicyPortal = () => {
                 </div>
                 
                 {/* Input Area - Fixed at bottom, full width */}
-                <div className="flex-shrink-0 p-4">
+                <div className="border-t border-gray-200 p-4 bg-white rounded-b-lg flex-shrink-0">
                   <div className="flex gap-2 w-full">
                     <Textarea
                       value={prompt}
                       onChange={(e) => setPrompt(e.target.value)}
                       placeholder="Ask about this legislation..."
-                      className="min-h-[60px] resize-none border border-gray-300 rounded-lg p-3 text-sm flex-1 bg-[#FBF9F6] text-gray-900"
+                      className="min-h-[60px] resize-none border border-gray-300 rounded-lg p-3 text-sm flex-1 bg-white text-gray-900"
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' && !e.shiftKey) {
                           e.preventDefault();
@@ -1053,7 +1047,7 @@ const PolicyPortal = () => {
                       disabled={!prompt.trim() || isChatting}
                       className="px-4 self-end"
                     >
-                      <Send className="h-4 w-4" />
+                      Send
                     </Button>
                   </div>
                 </div>
@@ -1068,7 +1062,7 @@ const PolicyPortal = () => {
                     disabled={!prompt.trim()}
                     className="px-6 bg-white"
                   >
-                    Generate Legislation
+                    {mode === 'chat' ? 'Send Message' : 'Generate Legislation'}
                   </Button>
                 ) : (
                   <Button 
