@@ -40,3 +40,57 @@ export const getBillChamber = (billNumber: string): string => {
   if (upperBillNumber.startsWith('A')) return 'Assembly';
   return '';
 };
+
+// Parse problem chat current_state to extract messages
+export const parseProblemChatState = (currentState: string, problemStatement: string, createdAt: string, updatedAt: string) => {
+  try {
+    // If current_state is a JSON string (array of messages), parse it
+    if (typeof currentState === 'string' && currentState.startsWith('[')) {
+      const parsedMessages = JSON.parse(currentState);
+      if (Array.isArray(parsedMessages)) {
+        return parsedMessages.map((msg: any) => ({
+          id: msg.id || `msg-${Date.now()}-${Math.random()}`,
+          role: msg.role,
+          content: msg.content,
+          timestamp: msg.timestamp || new Date().toISOString()
+        }));
+      }
+    }
+    
+    // If current_state is just the AI response string, create the conversation
+    const messages = [
+      {
+        id: 'user-problem',
+        role: 'user' as const,
+        content: problemStatement,
+        timestamp: createdAt
+      }
+    ];
+
+    // Add AI response if it exists and is not a draft state
+    if (currentState && 
+        currentState !== 'draft' && 
+        currentState !== 'generating' &&
+        !currentState.startsWith('[')) {
+      messages.push({
+        id: 'ai-analysis',
+        role: 'assistant' as const,
+        content: currentState,
+        timestamp: updatedAt
+      });
+    }
+
+    return messages;
+  } catch (error) {
+    console.error('Error parsing current_state:', error);
+    // Fallback to just the problem statement
+    return [
+      {
+        id: 'user-problem',
+        role: 'user' as const,
+        content: problemStatement,
+        timestamp: createdAt
+      }
+    ];
+  }
+};

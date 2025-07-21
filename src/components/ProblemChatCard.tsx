@@ -6,7 +6,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Trash2, Heart } from "lucide-react";
 import { format } from "date-fns";
 import { ProblemChat } from "@/hooks/useProblemChats";
-import { ProblemConversationView } from "@/components/ProblemConversationView";
+import { ConversationView } from "@/pages/chats/components/ConversationView";
+import { Message } from "@/pages/chats/types";
 import { useToast } from "@/hooks/use-toast";
 
 interface ProblemChatCardProps {
@@ -27,18 +28,62 @@ export const ProblemChatCard = ({
   // Placeholder for problem favorites (since no problem favorites system exists yet)
   const [isFavorited, setIsFavorited] = useState(false);
 
-  // Calculate message count based on actual content
-  const getMessageCount = () => {
-    let count = 1; // Always have the problem statement
-    if (problemChat.current_state && 
-        problemChat.current_state !== 'draft' && 
-        problemChat.current_state !== 'generating') {
-      count += 1; // Add AI analysis if available
+  // Parse the current_state to get messages
+  const parseCurrentState = (): Message[] => {
+    try {
+      // If current_state is a JSON string (array of messages), parse it
+      if (typeof problemChat.current_state === 'string' && problemChat.current_state.startsWith('[')) {
+        const parsedMessages = JSON.parse(problemChat.current_state);
+        if (Array.isArray(parsedMessages)) {
+          return parsedMessages.map((msg: any) => ({
+            id: msg.id || `msg-${Date.now()}-${Math.random()}`,
+            role: msg.role,
+            content: msg.content,
+            timestamp: msg.timestamp || new Date().toISOString()
+          }));
+        }
+      }
+      
+      // If current_state is just the AI response string, create the conversation
+      const messages: Message[] = [
+        {
+          id: 'user-problem',
+          role: 'user' as const,
+          content: problemChat.problem_statement,
+          timestamp: problemChat.created_at
+        }
+      ];
+
+      // Add AI response if it exists and is not a draft state
+      if (problemChat.current_state && 
+          problemChat.current_state !== 'draft' && 
+          problemChat.current_state !== 'generating' &&
+          !problemChat.current_state.startsWith('[')) {
+        messages.push({
+          id: 'ai-analysis',
+          role: 'assistant' as const,
+          content: problemChat.current_state,
+          timestamp: problemChat.updated_at
+        });
+      }
+
+      return messages;
+    } catch (error) {
+      console.error('Error parsing current_state:', error);
+      // Fallback to just the problem statement
+      return [
+        {
+          id: 'user-problem',
+          role: 'user' as const,
+          content: problemChat.problem_statement,
+          timestamp: problemChat.created_at
+        }
+      ];
     }
-    return count;
   };
 
-  const messageCount = getMessageCount();
+  const messages = parseCurrentState();
+  const messageCount = messages.length;
 
   const handleFavorite = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -88,12 +133,13 @@ export const ProblemChatCard = ({
         <Accordion type="single" collapsible>
           <AccordionItem value="problem-content" className="border-none">
             <AccordionTrigger className="hover:no-underline py-2">
-              View problem details
+              View conversation
             </AccordionTrigger>
             <AccordionContent>
-              <ProblemConversationView
-                problemChat={problemChat}
+              <ConversationView
+                messages={messages}
                 onCopy={onCopy}
+                onFeedback={onFeedback}
               />
             </AccordionContent>
           </AccordionItem>
