@@ -37,7 +37,7 @@ export const MemberCard = ({
 }: MemberCardProps) => {
   return (
     <Card 
-      className="cursor-pointer hover:bg-muted/50 transition-colors"
+      className="bg-white cursor-pointer hover:bg-muted/50 transition-colors"
       onClick={() => onMemberSelect(member)}
     >
       <CardHeader className="pb-3">
