@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { RotateCcw, Download, Code, Share, List, SlidersHorizontal, Settings, Info, X, HelpCircle, Trash2, Copy } from "lucide-react";
+import { RotateCcw, Download, Code, Share, List, SlidersHorizontal, Settings, Info, X, HelpCircle, Trash2, Copy, MessageSquare } from "lucide-react";
 import { MorphingHeartLoader } from "@/components/ui/MorphingHeartLoader";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
@@ -104,6 +104,7 @@ const PolicyPortal = () => {
   const [pipelineStage, setPipelineStage] = useState<'input' | 'processing' | 'draft' | 'review'>('input');
   const [abortController, setAbortController] = useState<AbortController | null>(null);
   const [hasDrafts, setHasDrafts] = useState(false);
+  const [loadedChatSession, setLoadedChatSession] = useState<ChatSession | null>(null);
   const isMobile = useIsMobile();
   const { toast } = useToast();
   const chatScrollRef = useRef<HTMLDivElement>(null);
@@ -274,22 +275,53 @@ const PolicyPortal = () => {
     fetchSampleProblems();
   }, []);
 
-  const handleChatSelection = (chatId: string) => {
-    const selectedOption = chatOptions.find(option => option.id === chatId);
-    if (selectedOption) {
-      // ADD this detection logic
-      const isProblemChat = selectedOption.type === 'problem' || 
-                           selectedOption.content.includes('Problem Statement:') ||
-                           selectedOption.content.includes('Legislative Problem Statement:');
-      
-      if (isProblemChat) {
-        setPrompt(`Policy Playground:\n${selectedOption.content}\n\nInstructions: Transform the identified problem into a policy memo.`);
-        setPipelineStage('processing');
-      } else {
-        setPrompt(selectedOption.content);
+  const loadChatSession = async (sessionId: string) => {
+    try {
+      const { data: session, error } = await supabase
+        .from("chat_sessions")
+        .select("*")
+        .eq("id", sessionId)
+        .single();
+
+      if (error) throw error;
+
+      if (session) {
+        setLoadedChatSession(session);
+        const messages = Array.isArray(session.messages) ? session.messages : JSON.parse(session.messages || '[]');
+        
+        // Convert messages to the format expected by the chat component
+        const formattedMessages = messages.map((msg: any) => ({
+          role: msg.role,
+          content: msg.content
+        }));
+        
+        setChatMessages(formattedMessages);
+        setMode('chat');
+        
+        // Set the first user message as the prompt for context
+        const firstUserMessage = messages.find((msg: any) => msg.role === 'user')?.content || '';
+        setPrompt(firstUserMessage);
+        
+        toast({
+          title: "Chat Loaded",
+          description: `Loaded conversation: ${session.title}`,
+        });
       }
-      setSelectedChat(chatId);
+    } catch (error) {
+      console.error("Error loading chat session:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load chat session",
+        variant: "destructive",
+      });
     }
+  };
+
+  const handleChatSelection = (chatId: string) => {
+    if (chatId === selectedChat) return;
+    
+    setSelectedChat(chatId);
+    loadChatSession(chatId);
   };
 
   const handleSampleProblemSelection = (problemId: string) => {
@@ -298,6 +330,10 @@ const PolicyPortal = () => {
       setPrompt(`Policy Playground:\nProblem Statement: ${selectedProblem["Sample Problems"]}\n\nInstructions: Transform the identified problem into a policy memo.`);
       setPipelineStage('processing');
       setSelectedChat(problemId);
+      // Clear any loaded chat session when selecting a sample problem
+      setLoadedChatSession(null);
+      setChatMessages([]);
+      setMode('textEditor');
     }
   };
 
@@ -353,13 +389,14 @@ const PolicyPortal = () => {
     
     try {
       // Initialize chat with user message
-      const initialMessages = [{ role: 'user' as const, content: prompt }];
-      setChatMessages(initialMessages);
+      const newUserMessage = { role: 'user' as const, content: prompt };
+      const updatedMessages = [...chatMessages, newUserMessage];
+      setChatMessages(updatedMessages);
 
       // Call the edge function with streaming
       const response = await supabase.functions.invoke('chat-with-persona', {
         body: {
-          messages: initialMessages,
+          messages: updatedMessages,
           systemPrompt: systemPrompt,
           temperature: temperature[0],
           maxWords: maxWords,
@@ -400,7 +437,8 @@ const PolicyPortal = () => {
       if (!controller.signal.aborted) {
         // Add final AI response to chat
         const aiMessage = { role: 'assistant' as const, content: fullContent };
-        setChatMessages(prev => [...prev, aiMessage]);
+        const finalMessages = [...updatedMessages, aiMessage];
+        setChatMessages(finalMessages);
         setStreamingContent("");
         setPipelineStage('draft');
         
@@ -455,6 +493,7 @@ const PolicyPortal = () => {
       setIsChatting(false);
       setAbortController(null);
       setStreamingContent("");
+      setPrompt(""); // Clear the prompt after submission
     }
   };
 
@@ -505,6 +544,8 @@ const PolicyPortal = () => {
     setSelectedPersona('');
     setSelectedPersonaAct('');
     setSystemPrompt('');
+    setSelectedChat('');
+    setLoadedChatSession(null);
     setMode('textEditor');
     setPipelineStage('input');
     toast({
@@ -534,6 +575,37 @@ const PolicyPortal = () => {
 
   const SettingsContent = () => (
     <div className="space-y-6 bg-[#FBF9F6] p-4 rounded-lg">
+      {/* Select Chat */}
+      <div>
+        <Label className="text-sm font-medium text-gray-700 mb-3 block">Select Chat</Label>
+        <Select value={selectedChat} onValueChange={handleChatSelection}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select a chat to resume..." />
+          </SelectTrigger>
+          <SelectContent>
+            {loading ? (
+              <SelectItem value="loading" disabled>
+                <div className="flex items-center gap-2">
+                  <MorphingHeartLoader size={16} className="text-red-500" />
+                  <span>Loading chats...</span>
+                </div>
+              </SelectItem>
+            ) : chatOptions.length === 0 ? (
+              <SelectItem value="empty" disabled>No chats found</SelectItem>
+            ) : (
+              chatOptions.map((chat) => (
+                <SelectItem key={chat.id} value={chat.id}>
+                  <div className="flex items-center gap-2">
+                    <MessageSquare className="h-4 w-4" />
+                    <span>{chat.label}</span>
+                  </div>
+                </SelectItem>
+              ))
+            )}
+          </SelectContent>
+        </Select>
+      </div>
+
       {/* Persona Selection */}
       <div>
         <Label className="text-sm font-medium text-gray-700 mb-3 block">Persona</Label>
@@ -777,6 +849,11 @@ const PolicyPortal = () => {
               <h1 className="text-2xl font-semibold text-gray-900">
                 Policy Portal
               </h1>
+              {loadedChatSession && (
+                <p className="text-sm text-gray-600 mt-1">
+                  Continuing: {loadedChatSession.title}
+                </p>
+              )}
             </div>
             <div className="flex items-center gap-3">
               {/* Mobile Settings Button */}
@@ -822,7 +899,7 @@ const PolicyPortal = () => {
 
         {/* Content */}
         <div className="flex-1 flex overflow-hidden">
-          {/* Left Panel - Prompt Area */}
+          {/* Left Panel - Chat Area */}
           <div className={`flex-1 p-4 sm:p-6 ${isMobile ? 'w-full' : ''} flex flex-col overflow-hidden`}>
             <div className="h-full flex flex-col">
 
@@ -871,7 +948,7 @@ const PolicyPortal = () => {
                     <div className="p-4 space-y-4">
                       {chatMessages.length === 0 && !streamingContent ? (
                         <div className="text-center text-gray-500 py-8">
-                          <p>Select a Persona. Select a Problem. Start a chat.</p>
+                          <p>Select a Persona. Select a Problem or Chat. Start a conversation.</p>
                           {selectedPersona && (
                             <p className="mt-2 text-sm">
                               Selected persona: <strong>{selectedPersona}</strong>
@@ -951,7 +1028,7 @@ const PolicyPortal = () => {
                   <Textarea
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value)}
-                    placeholder="Describe any civic issue you want transformed into legislation. Goodable will automatically detect the input type and transform it."
+                    placeholder="Continue the conversation or describe any civic issue you want transformed into legislation..."
                     className="min-h-[120px] resize-none border border-gray-300 rounded-lg p-3 text-sm w-full bg-white text-gray-900"
                   />
                 </div>
@@ -966,7 +1043,7 @@ const PolicyPortal = () => {
                     disabled={!prompt.trim()}
                     className="px-6 bg-white"
                   >
-                    {mode === 'chat' ? 'Process with AI' : 'Generate Legislation'}
+                    {mode === 'chat' ? 'Send Message' : 'Generate Legislation'}
                   </Button>
                 ) : (
                   <Button 
