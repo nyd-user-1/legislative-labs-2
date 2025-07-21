@@ -1008,10 +1008,10 @@ const PolicyPortal = () => {
                               }`}
                             >
                               <div
-                                className={`p-3 rounded-lg max-w-[85%] ${
+                                className={`${
                                   message.role === 'user'
-                                    ? 'bg-[#1e3a8a] text-white' // Correct dark blue background for user messages
-                                    : 'bg-white text-gray-800 border border-gray-200 relative'
+                                    ? 'p-3 rounded-lg max-w-[85%] bg-[#1e3a8a] text-white' // Correct dark blue background for user messages
+                                    : 'max-w-none text-gray-800 relative'
                                 }`}
                               >
                                 {/* Copy button for AI messages */}
@@ -1041,7 +1041,7 @@ const PolicyPortal = () => {
                           ))}
                           {streamingContent && (
                             <div className="flex justify-start">
-                              <div className="bg-white text-gray-800 border border-gray-200 p-3 rounded-lg max-w-[85%] relative">
+                              <div className="text-gray-800 max-w-none relative">
                                 <div className="text-xs text-gray-500 mb-1">{selectedPersona}</div>
                                 <div className="prose prose-sm max-w-none">
                                   <ReactMarkdown>{streamingContent}</ReactMarkdown>
@@ -1051,7 +1051,7 @@ const PolicyPortal = () => {
                           )}
                           {isChatting && !streamingContent && (
                             <div className="flex justify-start">
-                              <div className="bg-white text-gray-800 border border-gray-200 p-3 rounded-lg max-w-[85%]">
+                              <div className="text-gray-800 max-w-none">
                                 <div className="text-xs text-gray-500 mb-1">{selectedPersona}</div>
                                 <div className="flex items-center gap-2">
                                   <MorphingHeartLoader size={16} className="text-red-500" />
