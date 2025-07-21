@@ -866,9 +866,6 @@ const PolicyPortal = () => {
         <div className="bg-[#F6F4EE] border-b border-gray-200 px-4 sm:px-6 py-4 flex-shrink-0">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-semibold text-gray-900">
-                Policy Portal
-              </h1>
               {loadedChatSession && (
                 <p className="text-sm text-gray-600 mt-1">
                   Loading: {loadedChatSession.title}
@@ -876,43 +873,7 @@ const PolicyPortal = () => {
               )}
             </div>
             <div className="flex items-center gap-3">
-              {/* Mobile Settings Button */}
-              {isMobile && (
-                <Sheet open={settingsOpen} onOpenChange={setSettingsOpen}>
-                  <SheetTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      <Settings className="h-4 w-4" />
-                    </Button>
-                  </SheetTrigger>
-                  <SheetContent side="right" className="w-80">
-                    <SheetHeader>
-                      <SheetTitle>Settings</SheetTitle>
-                    </SheetHeader>
-                    <div className="mt-6">
-                      <SettingsContent />
-                    </div>
-                  </SheetContent>
-                </Sheet>
-              )}
-
-              {/* Desktop Settings Button */}
-              {!isMobile && (
-                <Button variant="outline" size="sm">
-                  <Settings className="h-4 w-4" />
-                </Button>
-              )}
-
-              <Button variant="outline" size="sm" className="hidden sm:flex">
-                Save
-              </Button>
-              <Button variant="outline" size="sm" className="hidden sm:flex">
-                <Code className="h-4 w-4 mr-2" />
-                View code
-              </Button>
-              <Button variant="outline" size="sm" className="hidden sm:flex">
-                <Share className="h-4 w-4 mr-2" />
-                Share
-              </Button>
+              {/* Keep space for future header content if needed */}
             </div>
           </div>
         </div>
