@@ -896,11 +896,11 @@ const PolicyPortal = () => {
   );
 
   return (
-    <div className="flex h-screen bg-[#F6F4EE]">
+    <div className="flex h-screen bg-[#FBF9F6]">
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-h-0">
         {/* Header */}
-        <div className="bg-[#F6F4EE] border-b border-gray-200 px-4 sm:px-6 py-4 flex-shrink-0">
+        <div className="bg-[#FBF9F6] px-4 sm:px-6 py-4 flex-shrink-0">
           <div className="flex items-center justify-between">
             <div>
               {loadedChatSession && (
@@ -923,7 +923,7 @@ const PolicyPortal = () => {
               
 
               {/* Chat Container with proper height and scroll */}
-              <div className="flex-1 flex flex-col bg-[#F6F4EE] rounded-lg border border-gray-200 min-h-0 max-h-[calc(90vh-200px)]">
+              <div className="flex-1 flex flex-col bg-[#FBF9F6] rounded-lg min-h-0 max-h-[calc(90vh-200px)]">
                 {/* Messages area */}
                 <div className="flex-1 overflow-y-auto p-4">
                   <div className="space-y-4">
@@ -969,47 +969,31 @@ const PolicyPortal = () => {
                               className={`${
                                 message.role === 'user'
                                   ? 'p-3 rounded-lg max-w-[85%] bg-[#1e3a8a] text-white'
-                                  : 'max-w-none text-gray-800 relative'
+                                  : 'max-w-none text-gray-800 relative bg-white p-4 rounded-lg shadow-sm border border-gray-200'
                               }`}
                             >
                               {/* Copy and Move to Policy Portal buttons for AI messages */}
                               {message.role === 'assistant' && (
-                                <div className="flex gap-1 mb-2">
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => {
-                                      navigator.clipboard.writeText(message.content);
-                                      toast({
-                                        description: "Response copied to clipboard",
-                                      });
-                                    }}
-                                    className="h-6 px-2 text-xs"
-                                  >
-                                    <Copy className="w-3 h-3 mr-1" />
-                                    Copy
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => {
-                                      // Move to Policy Portal functionality
-                                      toast({
-                                        description: "Moved to Policy Portal",
-                                      });
-                                    }}
-                                    className="h-6 px-2 text-xs"
-                                  >
-                                    <ArrowRight className="w-3 h-3 mr-1" />
-                                    Move to Policy Portal
-                                  </Button>
-                                </div>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    // Move to Policy Portal functionality
+                                    toast({
+                                      description: "Moved to Policy Portal",
+                                    });
+                                  }}
+                                  className="absolute bottom-2 right-2 bg-white hover:bg-gray-50 border border-gray-300 shadow-sm"
+                                >
+                                  <Copy className="w-3 h-3 mr-1" />
+                                  Move to Policy Portal
+                                </Button>
                               )}
                               
                               <div className={`text-xs mb-1 ${message.role === 'user' ? 'text-blue-100' : 'text-gray-500'}`}>
                                 {message.role === 'user' ? 'You' : 'AI Assistant'}
                               </div>
-                              <div className={`${message.role === 'assistant' ? 'prose prose-sm max-w-none' : ''}`}>
+                              <div className={`${message.role === 'assistant' ? 'prose prose-sm max-w-none pb-8' : ''}`}>
                                 {message.role === 'assistant' ? (
                                   <ReactMarkdown>{message.content}</ReactMarkdown>
                                 ) : (
@@ -1021,44 +1005,31 @@ const PolicyPortal = () => {
                         ))}
                         {streamingContent && (
                           <div className="flex justify-start">
-                            <div className="text-gray-800 max-w-none relative">
+                            <div className="text-gray-800 max-w-none relative bg-white p-4 rounded-lg shadow-sm border border-gray-200">
                               <div className="text-xs text-gray-500 mb-1">AI Assistant</div>
-                              <div className="prose prose-sm max-w-none">
+                              <div className="prose prose-sm max-w-none pb-8">
                                 <ReactMarkdown>{streamingContent}</ReactMarkdown>
                               </div>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  // Move to Policy Portal functionality
+                                  toast({
+                                    description: "Moved to Policy Portal",
+                                  });
+                                }}
+                                className="absolute bottom-2 right-2 bg-white hover:bg-gray-50 border border-gray-300 shadow-sm"
+                              >
+                                <Copy className="w-3 h-3 mr-1" />
+                                Move to Policy Portal
+                              </Button>
                             </div>
                           </div>
                         )}
                       </>
                     )}
                   </div>
-                </div>
-              </div>
-
-              {/* Input Area - Standalone below chat container */}
-              <div className="mt-4 p-4 bg-white rounded-lg border border-gray-200">
-                <div className="flex gap-2 w-full">
-                  <Textarea
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
-                    placeholder="Ask about this legislation..."
-                    className="min-h-[60px] resize-none border border-gray-300 rounded-lg p-3 text-sm flex-1 bg-[#FBF9F6] text-gray-900"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        if (prompt.trim() && !isChatting) {
-                          handleSubmit();
-                        }
-                      }
-                    }}
-                  />
-                  <Button 
-                    onClick={handleSubmit}
-                    disabled={!prompt.trim() || isChatting}
-                    className="px-4 self-end"
-                  >
-                    <Send className="h-4 w-4" />
-                  </Button>
                 </div>
               </div>
 
@@ -1105,12 +1076,40 @@ const PolicyPortal = () => {
 
             {/* Right Panel - Settings (Desktop Only) */}
             {!isMobile && (
-              <div className="w-80 bg-[#F6F4EE] border-l border-gray-200 p-6">
+              <div className="w-80 bg-[#FBF9F6] p-6">
                 <SettingsContent />
               </div>
             )}
           </div>
         </ScrollArea>
+
+        {/* Input Area - Full width at bottom */}
+        <div className="flex-shrink-0 p-4 bg-[#FBF9F6]">
+          <div className="relative w-full">
+            <Textarea
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              placeholder="Enter a problem statement or a policy question"
+              className="w-full min-h-[60px] resize-none border border-gray-300 rounded-lg p-3 pr-12 text-sm bg-white text-gray-900"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  if (prompt.trim() && !isChatting) {
+                    handleSubmit();
+                  }
+                }
+              }}
+            />
+            <Button 
+              onClick={handleSubmit}
+              disabled={!prompt.trim() || isChatting}
+              size="sm"
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
+            >
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
       </div>
 
       {/* Policy Draft Dialog */}
