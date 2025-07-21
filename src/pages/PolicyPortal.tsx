@@ -895,7 +895,7 @@ const PolicyPortal = () => {
           <div className="flex items-center justify-between">
             <div>
               {loadedChatSession && (
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="text-sm text-gray-600">
                   Loading: {loadedChatSession.title}
                 </p>
               )}
@@ -912,16 +912,9 @@ const PolicyPortal = () => {
             {/* Left Panel - Bill Chat */}
             <div className={`flex-1 p-4 sm:p-6 ${isMobile ? 'w-full' : ''} flex flex-col max-h-[90vh]`}>
               
-              {/* Chat Header */}
-              <div className="mb-4">
-                <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                  <MessageCircle className="w-5 h-5" />
-                  Bill Chat: {loadedChatSession?.bill_id ? `A${loadedChatSession.bill_id.toString().padStart(5, '0')}` : 'Select a bill'}
-                </h2>
-              </div>
 
               {/* Chat Container with proper height and scroll */}
-              <div className="flex-1 flex flex-col bg-white rounded-lg border border-gray-200 min-h-0 max-h-[calc(90vh-200px)]">
+              <div className="flex-1 flex flex-col bg-[#F6F4EE] rounded-lg border border-gray-200 min-h-0 max-h-[calc(90vh-200px)]">
                 {/* Messages area */}
                 <div className="flex-1 overflow-y-auto p-4">
                   <div className="space-y-4">
