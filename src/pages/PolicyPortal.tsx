@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { RotateCcw, Download, Code, Share, List, SlidersHorizontal, Settings, Info, X, HelpCircle, Trash2, Copy, MessageSquare } from "lucide-react";
+import { RotateCcw, Download, Code, Share, List, SlidersHorizontal, Settings, Info, X, HelpCircle, Trash2, Copy, MessageSquare, Check } from "lucide-react";
 import { MorphingHeartLoader } from "@/components/ui/MorphingHeartLoader";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
@@ -85,6 +85,7 @@ const PolicyPortal = () => {
   const [selectedChat, setSelectedChat] = useState("");
   const [selectedPersona, setSelectedPersona] = useState("");
   const [selectedPersonaAct, setSelectedPersonaAct] = useState("");
+  const [selectedProblemStatement, setSelectedProblemStatement] = useState("");
   const [systemPrompt, setSystemPrompt] = useState("");
   const [temperature, setTemperature] = useState([0.56]);
   const [maxWords, setMaxWords] = useState(250); // Changed from maxLength to maxWords
@@ -320,10 +321,10 @@ const PolicyPortal = () => {
         const firstUserMessage = parsedMessages.find((msg: any) => msg.role === 'user')?.content || '';
         setPrompt(firstUserMessage);
         
-        toast({
-          title: "Chat Loaded",
-          description: `Loaded conversation: ${session.title}`,
-        });
+              toast({
+                title: "Chat Loaded",
+                description: `Notification: ${session.title}`,
+              });
       }
     } catch (error) {
       console.error("Error loading chat session:", error);
@@ -345,6 +346,7 @@ const PolicyPortal = () => {
   const handleSampleProblemSelection = (problemId: string) => {
     const selectedProblem = sampleProblems.find(problem => problem.id.toString() === problemId);
     if (selectedProblem) {
+      setSelectedProblemStatement(selectedProblem["Sample Problems"]);
       setPrompt(`Policy Playground:\nProblem Statement: ${selectedProblem["Sample Problems"]}\n\nInstructions: Transform the identified problem into a policy memo.`);
       setPipelineStage('processing');
       setSelectedChat(problemId);
@@ -869,7 +871,7 @@ const PolicyPortal = () => {
               </h1>
               {loadedChatSession && (
                 <p className="text-sm text-gray-600 mt-1">
-                  Continuing: {loadedChatSession.title}
+                  Loading: {loadedChatSession.title}
                 </p>
               )}
             </div>
@@ -959,6 +961,20 @@ const PolicyPortal = () => {
                 </AlertDialog>
               )}
 
+              {/* Instructions Button */}
+              {selectedPersona && selectedProblemStatement && (
+                <button 
+                  className="w-full mb-4 p-3 bg-[#FBF9F6] rounded-md cursor-pointer hover:bg-[#EBE9E4] transition-colors text-left"
+                  aria-label="Policy generation instructions"
+                  disabled
+                >
+                  <p className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                    <Info className="h-4 w-4" />
+                    Instructions: Transform the identified problem into a policy memo.
+                  </p>
+                </button>
+              )}
+
               {/* Chat Content - Fixed height container */}
               <div className="flex-1 flex flex-col bg-[#FBF9F6] rounded-lg border border-gray-200 min-h-0">
                 {/* Messages area with fixed height and scroll */}
@@ -969,9 +985,17 @@ const PolicyPortal = () => {
                         <div className="text-center text-gray-500 py-8">
                           <p>Select a Persona. Select a Problem or Chat. Start a conversation.</p>
                           {selectedPersona && (
-                            <p className="mt-2 text-sm">
-                              Selected persona: <strong>{selectedPersona}</strong>
-                            </p>
+                            <div className="mt-4 space-y-2">
+                              <p className="text-sm flex items-center justify-center gap-2">
+                                Selected persona: <strong>{selectedPersona}</strong>
+                                <Check className="h-4 w-4 text-green-600" />
+                              </p>
+                              {selectedProblemStatement && (
+                                <p className="text-sm">
+                                  Selected Problem Statement: <strong>{selectedProblemStatement}</strong>
+                                </p>
+                              )}
+                            </div>
                           )}
                         </div>
                       ) : (
