@@ -13,7 +13,7 @@ export const useBlogProposals = () => {
     try {
       setLoading(true);
       const { data, error } = await supabase
-        .from('blog_proposal_stats')
+        .from('blog_proposal_stats' as any)
         .select('*')
         .order('created_at', { ascending: false });
 
@@ -37,7 +37,7 @@ export const useBlogProposals = () => {
       if (!user) throw new Error('User not authenticated');
 
       const { data, error } = await supabase
-        .from('blog_proposals')
+        .from('blog_proposals' as any)
         .insert({
           ...proposal,
           author_id: user.id,
@@ -74,7 +74,7 @@ export const useBlogProposals = () => {
       };
 
       const { data, error } = await supabase
-        .from('blog_proposals')
+        .from('blog_proposals' as any)
         .update(updateData)
         .eq('id', id)
         .select()
@@ -103,7 +103,7 @@ export const useBlogProposals = () => {
   const deleteProposal = async (id: string) => {
     try {
       const { error } = await supabase
-        .from('blog_proposals')
+        .from('blog_proposals' as any)
         .delete()
         .eq('id', id);
 
@@ -129,7 +129,7 @@ export const useBlogProposals = () => {
   const incrementViewCount = async (id: string) => {
     try {
       const { error } = await supabase
-        .from('blog_proposals')
+        .from('blog_proposals' as any)
         .update({ view_count: supabase.raw('view_count + 1') })
         .eq('id', id);
 

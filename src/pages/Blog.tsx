@@ -11,8 +11,10 @@ import { useBlogProposals } from '@/hooks/useBlogProposals';
 import { BlogProposalStats } from '@/types/blog';
 import { Plus, Search } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useNavigate } from 'react-router-dom';
 
 const Blog = () => {
+  const navigate = useNavigate();
   const { proposals, loading, createProposal, updateProposal, deleteProposal } = useBlogProposals();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -34,8 +36,7 @@ const Blog = () => {
   const categories = Array.from(new Set(proposals.map(p => p.category).filter(Boolean)));
 
   const handleView = (proposal: BlogProposalStats) => {
-    // Navigate to proposal detail page
-    console.log('View proposal:', proposal);
+    navigate(`/blog/${proposal.id}`);
   };
 
   const handleEdit = (proposal: BlogProposalStats) => {

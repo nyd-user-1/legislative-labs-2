@@ -65,6 +65,154 @@ export type Database = {
         }
         Relationships: []
       }
+      blog_comments: {
+        Row: {
+          author_id: string
+          content: string
+          created_at: string
+          edited_at: string | null
+          id: string
+          is_edited: boolean
+          parent_comment_id: string | null
+          proposal_id: string
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          content: string
+          created_at?: string
+          edited_at?: string | null
+          id?: string
+          is_edited?: boolean
+          parent_comment_id?: string | null
+          proposal_id: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          content?: string
+          created_at?: string
+          edited_at?: string | null
+          id?: string
+          is_edited?: boolean
+          parent_comment_id?: string | null
+          proposal_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_comments_parent_comment_id_fkey"
+            columns: ["parent_comment_id"]
+            isOneToOne: false
+            referencedRelation: "blog_comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blog_comments_proposal_id_fkey"
+            columns: ["proposal_id"]
+            isOneToOne: false
+            referencedRelation: "blog_proposal_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blog_comments_proposal_id_fkey"
+            columns: ["proposal_id"]
+            isOneToOne: false
+            referencedRelation: "blog_proposals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      blog_proposals: {
+        Row: {
+          author_id: string
+          category: string | null
+          content: string
+          created_at: string
+          id: string
+          is_featured: boolean
+          published_at: string | null
+          status: string
+          summary: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string
+          view_count: number
+        }
+        Insert: {
+          author_id: string
+          category?: string | null
+          content: string
+          created_at?: string
+          id?: string
+          is_featured?: boolean
+          published_at?: string | null
+          status?: string
+          summary?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          view_count?: number
+        }
+        Update: {
+          author_id?: string
+          category?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          is_featured?: boolean
+          published_at?: string | null
+          status?: string
+          summary?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          view_count?: number
+        }
+        Relationships: []
+      }
+      blog_votes: {
+        Row: {
+          created_at: string
+          id: string
+          proposal_id: string
+          updated_at: string
+          vote_type: string
+          voter_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          proposal_id: string
+          updated_at?: string
+          vote_type: string
+          voter_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          proposal_id?: string
+          updated_at?: string
+          vote_type?: string
+          voter_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_votes_proposal_id_fkey"
+            columns: ["proposal_id"]
+            isOneToOne: false
+            referencedRelation: "blog_proposal_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blog_votes_proposal_id_fkey"
+            columns: ["proposal_id"]
+            isOneToOne: false
+            referencedRelation: "blog_proposals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chat_sessions: {
         Row: {
           bill_id: number | null
@@ -1002,6 +1150,26 @@ export type Database = {
       }
     }
     Views: {
+      blog_proposal_stats: {
+        Row: {
+          author_id: string | null
+          category: string | null
+          comment_count: number | null
+          created_at: string | null
+          display_name: string | null
+          downvotes: number | null
+          id: string | null
+          is_featured: boolean | null
+          published_at: string | null
+          status: string | null
+          title: string | null
+          total_votes: number | null
+          upvotes: number | null
+          username: string | null
+          view_count: number | null
+        }
+        Relationships: []
+      }
       problem_vote_stats: {
         Row: {
           average_rating: number | null

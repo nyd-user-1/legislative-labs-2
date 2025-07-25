@@ -15,7 +15,7 @@ export const useBlogVotes = (proposalId: string) => {
       if (!user) return;
 
       const { data, error } = await supabase
-        .from('blog_votes')
+        .from('blog_votes' as any)
         .select('*')
         .eq('proposal_id', proposalId)
         .eq('voter_id', user.id)
@@ -45,7 +45,7 @@ export const useBlogVotes = (proposalId: string) => {
         if (userVote.vote_type === voteType) {
           // Remove vote if clicking same vote type
           const { error } = await supabase
-            .from('blog_votes')
+            .from('blog_votes' as any)
             .delete()
             .eq('id', userVote.id);
 
@@ -54,7 +54,7 @@ export const useBlogVotes = (proposalId: string) => {
         } else {
           // Update vote type
           const { data, error } = await supabase
-            .from('blog_votes')
+            .from('blog_votes' as any)
             .update({ vote_type: voteType })
             .eq('id', userVote.id)
             .select()
@@ -66,7 +66,7 @@ export const useBlogVotes = (proposalId: string) => {
       } else {
         // Create new vote
         const { data, error } = await supabase
-          .from('blog_votes')
+          .from('blog_votes' as any)
           .insert({
             proposal_id: proposalId,
             voter_id: user.id,
