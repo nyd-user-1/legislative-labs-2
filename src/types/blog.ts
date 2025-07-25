@@ -60,7 +60,7 @@ export interface CreateBlogProposalRequest {
   summary?: string;
   category?: string;
   tags?: string[];
-  status?: 'draft' | 'published';
+  status?: 'draft' | 'published' | 'archived';
 }
 
 export interface UpdateBlogProposalRequest {

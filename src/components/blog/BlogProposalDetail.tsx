@@ -36,7 +36,7 @@ export const BlogProposalDetail = () => {
     try {
       setLoading(true);
       const { data, error } = await supabase
-        .from('blog_proposals' as any)
+        .from('blog_proposals')
         .select('*')
         .eq('id', id)
         .single();
@@ -54,10 +54,18 @@ export const BlogProposalDetail = () => {
       setAuthor(authorData);
 
       // Increment view count
-      await supabase
-        .from('blog_proposals' as any)
-        .update({ view_count: supabase.raw('view_count + 1') })
-        .eq('id', id);
+      const { data: currentProposal } = await supabase
+        .from('blog_proposals')
+        .select('view_count')
+        .eq('id', id)
+        .single();
+
+      if (currentProposal) {
+        await supabase
+          .from('blog_proposals')
+          .update({ view_count: (currentProposal.view_count || 0) + 1 })
+          .eq('id', id);
+      }
 
     } catch (error) {
       console.error('Error fetching proposal:', error);

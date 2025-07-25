@@ -15,13 +15,13 @@ export const useBlogVotes = (proposalId: string) => {
       if (!user) return;
 
       const { data, error } = await supabase
-        .from('blog_votes' as any)
+        .from('blog_votes')
         .select('*')
         .eq('proposal_id', proposalId)
         .eq('voter_id', user.id)
-        .single();
+        .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') throw error;
+      if (error) throw error;
       setUserVote(data || null);
     } catch (error) {
       console.error('Error fetching user vote:', error);
@@ -45,7 +45,7 @@ export const useBlogVotes = (proposalId: string) => {
         if (userVote.vote_type === voteType) {
           // Remove vote if clicking same vote type
           const { error } = await supabase
-            .from('blog_votes' as any)
+            .from('blog_votes')
             .delete()
             .eq('id', userVote.id);
 
@@ -54,7 +54,7 @@ export const useBlogVotes = (proposalId: string) => {
         } else {
           // Update vote type
           const { data, error } = await supabase
-            .from('blog_votes' as any)
+            .from('blog_votes')
             .update({ vote_type: voteType })
             .eq('id', userVote.id)
             .select()
@@ -66,7 +66,7 @@ export const useBlogVotes = (proposalId: string) => {
       } else {
         // Create new vote
         const { data, error } = await supabase
-          .from('blog_votes' as any)
+          .from('blog_votes')
           .insert({
             proposal_id: proposalId,
             voter_id: user.id,

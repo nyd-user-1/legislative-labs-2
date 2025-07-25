@@ -20,10 +20,10 @@ export const useBlogComments = (proposalId: string) => {
     try {
       setLoading(true);
       const { data, error } = await supabase
-        .from('blog_comments' as any)
+        .from('blog_comments')
         .select(`
           *,
-          author:author_id (
+          author:profiles!blog_comments_author_id_fkey (
             username,
             display_name
           )
@@ -58,7 +58,7 @@ export const useBlogComments = (proposalId: string) => {
       }
 
       const { data, error } = await supabase
-        .from('blog_comments' as any)
+        .from('blog_comments')
         .insert({
           proposal_id: proposalId,
           author_id: user.id,
@@ -91,7 +91,7 @@ export const useBlogComments = (proposalId: string) => {
   const updateComment = async (commentId: string, content: string) => {
     try {
       const { data, error } = await supabase
-        .from('blog_comments' as any)
+        .from('blog_comments')
         .update({
           content,
           is_edited: true,
@@ -124,7 +124,7 @@ export const useBlogComments = (proposalId: string) => {
   const deleteComment = async (commentId: string) => {
     try {
       const { error } = await supabase
-        .from('blog_comments' as any)
+        .from('blog_comments')
         .delete()
         .eq('id', commentId);
 
