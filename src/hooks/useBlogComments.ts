@@ -31,8 +31,16 @@ export const useBlogComments = (proposalId: string) => {
         .eq('proposal_id', proposalId)
         .order('created_at', { ascending: true });
 
-      if (error) throw error;
-      setComments(data || []);
+    if (error) throw error;
+    
+    // Transform the data to match our interface
+    const transformedData = (data || []).map(item => ({
+      ...item,
+      username: item.author?.username,
+      display_name: item.author?.display_name
+    }));
+    
+    setComments(transformedData as CommentWithAuthor[]);
     } catch (error) {
       console.error('Error fetching comments:', error);
       toast({

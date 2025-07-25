@@ -22,7 +22,7 @@ export const useBlogVotes = (proposalId: string) => {
         .maybeSingle();
 
       if (error) throw error;
-      setUserVote(data || null);
+      setUserVote(data as BlogVote || null);
     } catch (error) {
       console.error('Error fetching user vote:', error);
     }
@@ -61,7 +61,7 @@ export const useBlogVotes = (proposalId: string) => {
             .single();
 
           if (error) throw error;
-          setUserVote(data);
+          setUserVote(data as BlogVote);
         }
       } else {
         // Create new vote
@@ -76,7 +76,7 @@ export const useBlogVotes = (proposalId: string) => {
           .single();
 
         if (error) throw error;
-        setUserVote(data);
+        setUserVote(data as BlogVote);
       }
     } catch (error) {
       console.error('Error voting:', error);

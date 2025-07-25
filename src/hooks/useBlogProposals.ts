@@ -18,7 +18,7 @@ export const useBlogProposals = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setProposals(data || []);
+      setProposals((data || []) as BlogProposalStats[]);
     } catch (error) {
       console.error('Error fetching proposals:', error);
       toast({

@@ -57,7 +57,7 @@ export const BlogProposalForm = ({
       content: initialData?.content || '',
       summary: initialData?.summary || '',
       category: initialData?.category || '',
-      status: initialData?.status || 'draft',
+      status: (initialData?.status as 'draft' | 'published') || 'draft',
     },
   });
 

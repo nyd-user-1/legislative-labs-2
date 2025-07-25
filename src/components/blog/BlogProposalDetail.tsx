@@ -42,7 +42,7 @@ export const BlogProposalDetail = () => {
         .single();
 
       if (error) throw error;
-      setProposal(data);
+      setProposal(data as BlogProposal);
 
       // Fetch author information
       const { data: authorData } = await supabase
