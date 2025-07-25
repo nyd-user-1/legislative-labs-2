@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -22,7 +21,10 @@ export const useBlogVotes = (proposalId: string) => {
         .maybeSingle();
 
       if (error) throw error;
-      setUserVote(data as BlogVote || null);
+      setUserVote(data ? {
+        ...data,
+        vote_type: data.vote_type as 'upvote' | 'downvote'
+      } : null);
     } catch (error) {
       console.error('Error fetching user vote:', error);
     }
@@ -61,7 +63,10 @@ export const useBlogVotes = (proposalId: string) => {
             .single();
 
           if (error) throw error;
-          setUserVote(data as BlogVote);
+          setUserVote({
+            ...data,
+            vote_type: data.vote_type as 'upvote' | 'downvote'
+          });
         }
       } else {
         // Create new vote
@@ -76,7 +81,10 @@ export const useBlogVotes = (proposalId: string) => {
           .single();
 
         if (error) throw error;
-        setUserVote(data as BlogVote);
+        setUserVote({
+          ...data,
+          vote_type: data.vote_type as 'upvote' | 'downvote'
+        });
       }
     } catch (error) {
       console.error('Error voting:', error);
