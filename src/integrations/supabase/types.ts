@@ -840,6 +840,33 @@ export type Database = {
         }
         Relationships: []
       }
+      "Top 50 Public Policy Problems": {
+        Row: {
+          "The Path Forward": string | null
+          "The Real Challenge": string | null
+          Title: string
+          "What We're Seeing": string | null
+          "Why This Matters Now": string | null
+          "Your Role": string | null
+        }
+        Insert: {
+          "The Path Forward"?: string | null
+          "The Real Challenge"?: string | null
+          Title: string
+          "What We're Seeing"?: string | null
+          "Why This Matters Now"?: string | null
+          "Your Role"?: string | null
+        }
+        Update: {
+          "The Path Forward"?: string | null
+          "The Real Challenge"?: string | null
+          Title?: string
+          "What We're Seeing"?: string | null
+          "Why This Matters Now"?: string | null
+          "Your Role"?: string | null
+        }
+        Relationships: []
+      }
       user_committee_favorites: {
         Row: {
           committee_id: number
