@@ -1,14 +1,11 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { BlogComment } from '@/types/blog';
 
 interface CommentWithAuthor extends BlogComment {
-  author: {
-    username?: string;
-    display_name?: string;
-  };
+  username?: string;
+  display_name?: string;
 }
 
 export const useBlogComments = (proposalId: string) => {
@@ -21,28 +18,35 @@ export const useBlogComments = (proposalId: string) => {
       setLoading(true);
       const { data, error } = await supabase
         .from('blog_comments')
-        .select(`
-          *,
-          author:profiles!blog_comments_author_id_fkey (
-            username,
-            display_name
-          )
-        `)
+        .select('*')
         .eq('proposal_id', proposalId)
         .order('created_at', { ascending: true });
 
       if (error) throw error;
       
-      // Transform the data to match our interface
-      const transformedData = (data || []).map(item => ({
-        ...item,
-        author: {
-          username: (item as any).author?.username || '',
-          display_name: (item as any).author?.display_name || ''
-        }
-      }));
+      // Fetch author profiles separately
+      const authorIds = [...new Set(data?.map(comment => comment.author_id) || [])];
       
-      setComments(transformedData as CommentWithAuthor[]);
+      if (authorIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('user_id, username, display_name')
+          .in('user_id', authorIds);
+        
+        // Transform the data to match our interface
+        const transformedData = (data || []).map(item => {
+          const profile = profiles?.find(p => p.user_id === item.author_id);
+          return {
+            ...item,
+            username: profile?.username,
+            display_name: profile?.display_name
+          };
+        });
+        
+        setComments(transformedData as CommentWithAuthor[]);
+      } else {
+        setComments([]);
+      }
     } catch (error) {
       console.error('Error fetching comments:', error);
       toast({
@@ -58,14 +62,7 @@ export const useBlogComments = (proposalId: string) => {
   const addComment = async (content: string, parentCommentId?: string) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast({
-          title: "Authentication required",
-          description: "Please sign in to comment",
-          variant: "destructive",
-        });
-        return;
-      }
+      if (!user) throw new Error('User not authenticated');
 
       const { data, error } = await supabase
         .from('blog_comments')
@@ -73,7 +70,7 @@ export const useBlogComments = (proposalId: string) => {
           proposal_id: proposalId,
           author_id: user.id,
           content,
-          parent_comment_id: parentCommentId,
+          parent_comment_id: parentCommentId || null,
         })
         .select()
         .single();
