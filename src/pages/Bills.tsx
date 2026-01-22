@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useParams, useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 import { BillDetail } from "@/components/BillDetail";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
 import { useBillsData } from "@/hooks/useBillsData";
@@ -20,7 +22,10 @@ console.log("Bills.tsx file is loading");
 const Bills = () => {
   console.log("Bills page component rendering");
   const [searchParams] = useSearchParams();
+  const { billNumber } = useParams<{ billNumber: string }>();
+  const navigate = useNavigate();
   const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
+  const [billNotFound, setBillNotFound] = useState(false);
   const [committees, setCommittees] = useState<Array<{ name: string; chamber: string }>>([]);
   const [sponsors, setSponsors] = useState<Array<{ name: string; chamber: string; party: string }>>([]);
   
@@ -53,6 +58,54 @@ const Bills = () => {
       }
     }
   }, [searchParams, bills]);
+
+  // Handle direct bill number from URL route (e.g., /bills/S00270)
+  useEffect(() => {
+    const fetchBillByNumber = async () => {
+      if (billNumber) {
+        setBillNotFound(false);
+        try {
+          // Try exact match first
+          let { data, error } = await supabase
+            .from("Bills")
+            .select("*")
+            .ilike("bill_number", billNumber)
+            .single();
+
+          // If not found, try without leading zeros (e.g., S00270 -> S270)
+          if (!data && !error?.message?.includes('multiple')) {
+            const strippedNumber = billNumber.replace(/^([A-Z]+)0+/, '$1');
+            if (strippedNumber !== billNumber) {
+              const result = await supabase
+                .from("Bills")
+                .select("*")
+                .ilike("bill_number", strippedNumber)
+                .single();
+              data = result.data;
+              error = result.error;
+            }
+          }
+
+          if (data && !error) {
+            setSelectedBill(data);
+          } else {
+            console.error("Bill not found:", billNumber);
+            setSelectedBill(null);
+            setBillNotFound(true);
+          }
+        } catch (error) {
+          console.error("Error fetching bill:", error);
+          setSelectedBill(null);
+          setBillNotFound(true);
+        }
+      } else {
+        setSelectedBill(null);
+        setBillNotFound(false);
+      }
+    };
+
+    fetchBillByNumber();
+  }, [billNumber]);
 
   useEffect(() => {
     fetchCommittees();
@@ -123,6 +176,18 @@ const Bills = () => {
   if (selectedBill) {
     return (
       <BillDetail bill={selectedBill} onBack={handleBackToBills} />
+    );
+  }
+
+  // Show "Bill not found" when URL has billNumber but no bill was found
+  if (billNumber && billNotFound) {
+    return (
+      <div className="container mx-auto px-4 py-6">
+        <Button variant="ghost" onClick={() => navigate('/bills')} className="mb-4">
+          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Bills
+        </Button>
+        <p className="text-muted-foreground">Bill not found: {billNumber}</p>
+      </div>
     );
   }
 

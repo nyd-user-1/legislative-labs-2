@@ -52,6 +52,7 @@ const AppLayout = () => {
                 <Route path="/favorites" element={<Favorites />} />
                 <Route path="/playground" element={<Playground />} />
                 <Route path="/bills" element={<Bills />} />
+                <Route path="/bills/:billNumber" element={<Bills />} />
                 <Route path="/members" element={<Members />} />
                 <Route path="/committees" element={<Committees />} />
                 <Route path="/plans" element={<Plans />} />
